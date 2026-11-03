@@ -6,15 +6,15 @@
 
 | ID | Título | Marco | Dono | Status |
 |---|---|---|---|---|
-| T-001 | Layers de colisão nomeadas | M0 | AG00 | pronta p/ briefing |
-| T-002 | Instalar GUT e teste smoke headless | M0 | AG00 | a fazer |
+| T-001 | Layers de colisão nomeadas | M0 | AG07 | pronta p/ briefing |
+| T-002 | Instalar GUT e teste smoke headless | M0 | AG07 | a fazer |
 | T-003 | `docs/ui.md` (tokens, layout, fluxo de telas) | M0 | AG02 | pronta p/ briefing |
 | T-004 | Preset Web + HTML shell mínimo | M0 | AG02 | a fazer |
 | T-005 | Build vazio no Chrome PC e no iPhone | M0 | AG02 | bloqueada |
 | T-006 | Cena de estresse para confirmar metas de desempenho | M0 | AG02 | a fazer |
-| T-007 | Registrar metas e decisões do M0 e fechar o marco | M0 | AG00 | a fazer |
+| T-007 | ADR das metas de desempenho e da exportação single-threaded | M0 | AG07 | a fazer |
 | T-101 | `docs/gameplay.md` (parâmetros e sinais) | M1 | AG01 | pronta p/ briefing |
-| T-102 | Autoload de fluxo de cenas | M1 | AG00 | a fazer |
+| T-102 | Autoload de fluxo de cenas | M1 | AG07 | a fazer |
 | T-103 | Protótipo cinza: arena, Anima, 1 inimigo | M1 | AG01 | a fazer |
 | T-104 | Ataque automático com pool | M1 | AG01 | a fazer |
 | T-105 | Ondas por dados, HP do Núcleo, moedas, vitória/derrota | M1 | AG01 | a fazer |
@@ -36,7 +36,7 @@
 
 ## Próximas prontas p/ briefing
 
-1. **T-001** (AG00), **T-003** (AG02) e **T-101** (AG01): arquivos diferentes, podem rodar **em paralelo**.
+1. **T-001** (AG07), **T-003** (AG02) e **T-101** (AG01): arquivos diferentes, podem rodar **em paralelo**.
 2. Também paralelizável com elas: **T-004** (AG02, outra sessão; mexe em `export_presets.cfg` e `web/`).
 
 ## Paralelismo e conflitos
@@ -56,16 +56,16 @@
 ## M0 — Fundação
 
 ### T-001 — Layers de colisão nomeadas
-- **Marco:** M0 · **Dono:** AG00 · **Status:** pronta p/ briefing
+- **Marco:** M0 · **Dono:** AG07 · **Status:** pronta p/ briefing
 - **Depende de:** — · **Desbloqueia:** T-103
 - **Arquivos:** `project.godot`
 - **Pronto quando:**
   - layers 2D nomeadas (sugestão: `anima`, `core`, `enemy`, `player_projectile`, `enemy_projectile`, `skill_area`);
-  - tabela de layers e máscaras registrada em `docs/estrutura.md` ou na Bíblia;
+  - tabela de layers e máscaras registrada em `docs/estrutura.md` ou `docs/arquitetura.md`;
   - projeto abre sem erros.
 
 ### T-002 — Instalar GUT e teste smoke headless
-- **Marco:** M0 · **Dono:** AG00 · **Status:** a fazer
+- **Marco:** M0 · **Dono:** AG07 · **Status:** a fazer
 - **Depende de:** T-001 (mesmo arquivo) · **Desbloqueia:** T-114, T-120
 - **Arquivos:** `addons/gut/`, `.gutconfig.json`, `tests/unit/test_smoke.gd`, `project.godot` (plugin)
 - **Pronto quando:**
@@ -81,7 +81,7 @@
 
 ### T-004 — Preset Web + HTML shell mínimo
 - **Marco:** M0 · **Dono:** AG02 · **Status:** a fazer
-- **Depende de:** autorização para `export_presets.cfg` no briefing · **Desbloqueia:** T-005, T-006, T-107
+- **Depende de:** requisitos técnicos do AG07 (Compatibility, sem threads) · **Desbloqueia:** T-005, T-006, T-107
 - **Arquivos:** `export_presets.cfg`, `web/`
 - **Pronto quando:**
   - preset "Web": Compatibility, Thread Support desligado;
@@ -103,11 +103,11 @@
 - **Arquivos:** `tests/perf/` (cena isolada, sem lógica de jogo)
 - **Pronto quando:** cena com ~150 sprites móveis e ~300 projéteis em pool roda no build Web; fps medido no PC e no iPhone e registrado.
 
-### T-007 — Registrar metas e decisões do M0 e fechar o marco
-- **Marco:** M0 · **Dono:** AG00 · **Status:** a fazer
+### T-007 — ADR das metas de desempenho e da exportação single-threaded
+- **Marco:** M0 · **Dono:** AG07 · **Status:** a fazer
 - **Depende de:** T-002, T-005, T-006 · **Desbloqueia:** fechamento do M0
-- **Arquivos:** `docs/decisoes.md`, `docs/00_biblia_projeto.md`
-- **Pronto quando:** metas de fps e tamanho confirmadas ou ajustadas; decisão #4 (single-threaded) e hosting de teste com estado atualizado.
+- **Arquivos:** `docs/adr/`
+- **Pronto quando:** ADR com as medições de T-005/T-006, metas de fps e tamanho confirmadas ou ajustadas e recomendação sobre a decisão #4; o AG00 usa a ADR para atualizar `decisoes.md` e a Bíblia.
 
 ---
 
@@ -120,7 +120,7 @@
 - **Pronto quando:** pilares, loop, parâmetros do Anima e do ataque, 3 skills, 4 arquétipos, chefe, formato dos dados de onda e **lista de sinais expostos à UI** documentados (modelo AG01 §5).
 
 ### T-102 — Autoload de fluxo de cenas
-- **Marco:** M1 · **Dono:** AG00 · **Status:** a fazer
+- **Marco:** M1 · **Dono:** AG07 · **Status:** a fazer
 - **Depende de:** T-002 (mesmo arquivo) · **Desbloqueia:** T-113
 - **Arquivos:** `src/core/`, `project.godot` (autoload, cena principal)
 - **Pronto quando:** autoload troca entre Toque para começar → Partida → Resultado com cenas placeholder; partida recebe config e devolve resultado (sem `meta/` nem `backend/`).
@@ -224,7 +224,7 @@
 ### T-119 — Otimização do build Web
 - **Marco:** M1 · **Dono:** AG02 · **Status:** a fazer
 - **Depende de:** T-113, T-116 · **Desbloqueia:** T-120
-- **Arquivos:** `export_presets.cfg` (com autorização), `web/`
+- **Arquivos:** `export_presets.cfg`, `web/`
 - **Pronto quando:** download inicial ≤ ~15 MB (ou meta revisada); tela de carregamento na estética do jogo; primeiro frame < 5 s em 4G (estimado).
 
 ### T-120 — Validação do M1
