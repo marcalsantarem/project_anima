@@ -17,8 +17,8 @@
 | T-101 | `docs/gameplay.md` (parâmetros e sinais) | M1 | AG01 | feita |
 | T-102 | Autoload de fluxo de cenas | M1 | AG07 | feita |
 | T-103 | Protótipo cinza: arena, Anima, 1 inimigo | M1 | AG01 | feita |
-| T-104 | Ataque automático com pool | M1 | AG01 | pronta p/ briefing |
-| T-105 | Ondas por dados, HP do Núcleo, moedas, vitória/derrota | M1 | AG01 | a fazer |
+| T-104 | Ataque automático com pool | M1 | AG01 | feita |
+| T-105 | Ondas por dados, HP do Núcleo, moedas, vitória/derrota | M1 | AG01 | pronta p/ briefing |
 | T-106 | Tema base e componentes de UI | M1 | AG02 | feita |
 | T-107 | Overlay de debug Web (FPS, logs) | M1 | AG02 | pronta p/ briefing |
 | T-108 | Base de skills + skill de área | M1 | AG01 | a fazer |
@@ -41,10 +41,10 @@
 
 > **Decisão 21:** só o usuário libera briefings. A lista abaixo é sugestão; nada começa sem o OK dele.
 
-1. **T-104** (AG01, ataque automático com pool): T-103 feita.
+1. **T-105** (AG01, ondas, HP do Núcleo, moedas, vitória/derrota): T-104 feita.
 2. **T-121** (AG07, tema global) → depois **T-122** (AG07, arena no SceneFlow): mesmo dono, em sequência.
 3. **T-107** (AG02, overlay de debug) ou **T-006** (AG02, cena de estresse).
-- Paralelo possível: T-104 ‖ T-121/T-122 ‖ uma task do AG02 (arquivos diferentes).
+- Paralelo possível: T-105 ‖ T-121/T-122 ‖ uma task do AG02 (arquivos diferentes).
 
 ## Paralelismo e conflitos
 
@@ -152,14 +152,14 @@
 - **Pronto quando:** arena em retrato; Anima fixo no centro; inimigo corredor nasce na borda, anda até o centro e causa dano ao Núcleo; valores vêm de `.tres`.
 
 ### T-104 — Ataque automático com pool
-- **Marco:** M1 · **Dono:** AG01 · **Status:** pronta p/ briefing
+- **Marco:** M1 · **Dono:** AG01 · **Status:** feita
 - **Depende de:** T-103 · **Desbloqueia:** T-105
 - **Arquivos:** `src/match/anima/`, `src/match/projectiles/`, `data/`
 - **Pronto quando:** mira no inimigo mais próximo/prioritário; projéteis reutilizados por pool (sem instanciar por tiro); dano e morte do inimigo funcionam.
 - **Decisão:** projéteis inimigos sem ciano.
 
 ### T-105 — Ondas por dados, HP do Núcleo, moedas, vitória/derrota
-- **Marco:** M1 · **Dono:** AG01 · **Status:** a fazer
+- **Marco:** M1 · **Dono:** AG01 · **Status:** pronta p/ briefing
 - **Depende de:** T-104 · **Desbloqueia:** T-108, T-111, T-112, T-114
 - **Arquivos:** `src/match/waves/`, `src/match/arena/`, `data/waves/`
 - **Pronto quando:** spawner lê ondas de `.tres` (3 ondas de teste); sinais de HP, `Wave X/Y`, moedas e fim de partida emitidos; HP zero = derrota; última onda = vitória.

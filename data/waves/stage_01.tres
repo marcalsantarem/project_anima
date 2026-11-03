@@ -1,0 +1,76 @@
+[gd_resource type="Resource" script_class="StageData" load_steps=13 format=3]
+
+[ext_resource type="Script" path="res://src/match/waves/stage_data.gd" id="1"]
+[ext_resource type="Script" path="res://src/match/waves/wave_data.gd" id="2"]
+[ext_resource type="Script" path="res://src/match/waves/wave_entry.gd" id="3"]
+[ext_resource type="Resource" path="res://data/enemies/enemy_runner.tres" id="4"]
+
+[sub_resource type="Resource" id="e1"]
+script = ExtResource("3")
+enemy = ExtResource("4")
+count = 5
+interval = 1.2
+spawn_edge = 0
+start_delay = 0.5
+
+[sub_resource type="Resource" id="w1"]
+script = ExtResource("2")
+id = &"wave_01"
+entries = Array[ExtResource("3")]([SubResource("e1")])
+
+[sub_resource type="Resource" id="e2a"]
+script = ExtResource("3")
+enemy = ExtResource("4")
+count = 5
+interval = 1.0
+spawn_edge = 0
+start_delay = 0.5
+
+[sub_resource type="Resource" id="e2b"]
+script = ExtResource("3")
+enemy = ExtResource("4")
+count = 5
+interval = 1.0
+spawn_edge = 1
+start_delay = 1.0
+
+[sub_resource type="Resource" id="w2"]
+script = ExtResource("2")
+id = &"wave_02"
+entries = Array[ExtResource("3")]([SubResource("e2a"), SubResource("e2b")])
+
+[sub_resource type="Resource" id="e3a"]
+script = ExtResource("3")
+enemy = ExtResource("4")
+count = 8
+interval = 0.8
+spawn_edge = 4
+start_delay = 0.5
+
+[sub_resource type="Resource" id="e3b"]
+script = ExtResource("3")
+enemy = ExtResource("4")
+count = 4
+interval = 1.5
+spawn_edge = 2
+start_delay = 2.0
+
+[sub_resource type="Resource" id="e3c"]
+script = ExtResource("3")
+enemy = ExtResource("4")
+count = 4
+interval = 1.5
+spawn_edge = 3
+start_delay = 2.75
+
+[sub_resource type="Resource" id="w3"]
+script = ExtResource("2")
+id = &"wave_03"
+entries = Array[ExtResource("3")]([SubResource("e3a"), SubResource("e3b"), SubResource("e3c")])
+
+[resource]
+script = ExtResource("1")
+id = &"stage_01"
+waves = Array[ExtResource("2")]([SubResource("w1"), SubResource("w2"), SubResource("w3")])
+wave_break = 3.0
+boss_id = &""

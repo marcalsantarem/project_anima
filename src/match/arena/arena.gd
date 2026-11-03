@@ -1,22 +1,29 @@
 class_name Arena
 extends Node2D
-## Raiz da partida (protótipo cinza). O spawn periódico é provisório: a T-105 o troca por WaveData.
+## Raiz da partida. Recebe setup(config), roda as ondas da fase e emite match_ended uma vez.
 
 signal core_hp_changed(current: int, max_hp: int)
-
-enum Edge { TOP, BOTTOM, LEFT, RIGHT }
+signal wave_changed(current: int, total: int)
+signal coins_changed(amount: int)
+signal match_ended(result: MatchResult)
 
 const ENEMY_SCENE := preload("res://src/match/enemies/enemy.tscn")
 
-@export var spawn_enemy: EnemyData
-@export var spawn_interval: float = 1.5 ## s
 @export var spawn_margin: float = 64.0 ## px além da borda da tela
+## Desligável para testes e debug (spawn só manual).
+@export var waves_enabled := true
 
+var config: MatchConfig
+## Se nulo no _ready, é carregada de data/waves/<config.stage_id>.tres.
+var stage: StageData
+var waves: WaveRunner
 var is_over := false
+var coins := 0
+var enemies_killed := 0
+var elapsed := 0.0
 ## Inimigos vivos; compartilhado com a mira do Anima.
 var active_enemies: Array[Enemy] = []
 
-var _spawn_timer := 0.0
 var _rng := RandomNumberGenerator.new()
 
 @onready var anima: Anima = $Anima
@@ -24,26 +31,45 @@ var _rng := RandomNumberGenerator.new()
 @onready var _enemies: Node2D = $Enemies
 
 
+## Contrato do SceneFlow: chamado antes de entrar na árvore.
+func setup(p_config: MatchConfig) -> void:
+	config = p_config
+
+
 func _ready() -> void:
+	if config == null:
+		config = MatchConfig.new()
+	if stage == null:
+		stage = load(StageData.path_for(config.stage_id))
+	waves = WaveRunner.new(stage)
+	waves.spawn_requested.connect(_on_spawn_requested)
+	waves.wave_started.connect(func(c: int, t: int) -> void: wave_changed.emit(c, t))
+	waves.stage_cleared.connect(func() -> void: _end(MatchResult.Outcome.VICTORY))
+
 	projectiles.build(anima.data.projectile_pool_size, anima.data.projectile)
 	anima.setup_attack(active_enemies, projectiles)
 	anima.core_hp_changed.connect(func(c: int, m: int) -> void: core_hp_changed.emit(c, m))
-	anima.core_depleted.connect(_on_core_depleted)
+	anima.core_depleted.connect(func() -> void: _end(MatchResult.Outcome.DEFEAT))
 	get_viewport().size_changed.connect(_center_anima)
 	_center_anima()
+
 	core_hp_changed.emit(anima.core.current, anima.core.max_hp)
+	coins_changed.emit(coins)
+	if waves_enabled:
+		waves.start()
 
 
 func _physics_process(delta: float) -> void:
 	if is_over:
 		return
-	_spawn_timer += delta
-	if _spawn_timer >= spawn_interval:
-		_spawn_timer -= spawn_interval
-		spawn(spawn_enemy, _rng.randi_range(0, Edge.size() - 1) as Edge)
+	elapsed += delta
+	if waves_enabled:
+		waves.tick(delta, active_enemies.size())
 
 
-func spawn(enemy_data: EnemyData, edge: Edge) -> Enemy:
+func spawn(enemy_data: EnemyData, edge: WaveEntry.SpawnEdge) -> Enemy:
+	if edge == WaveEntry.SpawnEdge.RANDOM:
+		edge = _rng.randi_range(WaveEntry.SpawnEdge.TOP, WaveEntry.SpawnEdge.RIGHT) as WaveEntry.SpawnEdge
 	var enemy: Enemy = ENEMY_SCENE.instantiate()
 	enemy.setup(enemy_data, edge_point(edge, arena_size(), spawn_margin, _rng.randf()), anima.position)
 	enemy.died.connect(_on_enemy_died)
@@ -52,30 +78,51 @@ func spawn(enemy_data: EnemyData, edge: Edge) -> Enemy:
 	return enemy
 
 
-func _on_enemy_died(enemy: Enemy, _cause: Enemy.DeathCause) -> void:
-	active_enemies.erase(enemy)
-
-
 func arena_size() -> Vector2:
 	return get_viewport_rect().size
 
 
-## Ponto fora da tela na borda indicada. t (0..1) percorre a borda.
-static func edge_point(edge: Edge, size: Vector2, margin: float, t: float) -> Vector2:
+## Ponto fora da tela na borda indicada (não RANDOM). t (0..1) percorre a borda.
+static func edge_point(edge: WaveEntry.SpawnEdge, size: Vector2, margin: float, t: float) -> Vector2:
 	match edge:
-		Edge.TOP:
+		WaveEntry.SpawnEdge.TOP:
 			return Vector2(size.x * t, -margin)
-		Edge.BOTTOM:
+		WaveEntry.SpawnEdge.BOTTOM:
 			return Vector2(size.x * t, size.y + margin)
-		Edge.LEFT:
+		WaveEntry.SpawnEdge.LEFT:
 			return Vector2(-margin, size.y * t)
 		_:
 			return Vector2(size.x + margin, size.y * t)
 
 
+func _on_spawn_requested(enemy_data: EnemyData, edge: WaveEntry.SpawnEdge) -> void:
+	spawn(enemy_data, edge)
+
+
+func _on_enemy_died(enemy: Enemy, cause: Enemy.DeathCause) -> void:
+	active_enemies.erase(enemy)
+	if cause == Enemy.DeathCause.KILLED and not is_over:
+		enemies_killed += 1
+		coins += enemy.data.coin_drop
+		coins_changed.emit(coins)
+
+
+func _end(outcome: MatchResult.Outcome) -> void:
+	if is_over:
+		return
+	is_over = true
+	anima.auto_attack_enabled = false
+	# Diferido: pode ocorrer dentro de um callback de física.
+	_enemies.set_deferred("process_mode", Node.PROCESS_MODE_DISABLED)
+	var result := MatchResult.new()
+	result.outcome = outcome
+	result.wave_reached = waves.current_wave()
+	result.waves_total = waves.total_waves()
+	result.coins = coins
+	result.enemies_killed = enemies_killed
+	result.duration_s = elapsed
+	match_ended.emit(result)
+
+
 func _center_anima() -> void:
 	anima.position = arena_size() / 2.0
-
-
-func _on_core_depleted() -> void:
-	is_over = true

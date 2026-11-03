@@ -5,7 +5,7 @@
 | Marco | Status | Tasks feitas |
 |---|---|---|
 | M0 — Fundação | em andamento | 5/8 (63%) · 1 em validação |
-| M1 — Protótipo do combate | em andamento | 4/22 (18%) |
+| M1 — Protótipo do combate | em andamento | 5/22 (23%) |
 | M2 — Meta-jogo local | não quebrado | — |
 | M3 — Online | não quebrado | — |
 | M4 — Monetização e polimento | não quebrado | — |
@@ -43,7 +43,7 @@
 **Objetivo:** partida completa e divertida com placeholders (escopo DENTRO/FORA na Bíblia).
 
 **Critérios de fechamento:**
-- [ ] Arena em retrato com Anima fixo e ataque automático com pool (T-103, T-104)
+- [x] Arena em retrato com Anima fixo e ataque automático com pool (T-103, T-104)
 - [ ] 3 skills (área, controle, defesa) com cooldown, por toque, mouse e teclas `1` `2` `3` (T-108–T-110)
 - [ ] 4 arquétipos de inimigo e 1 chefe com fases (T-103, T-111, T-115)
 - [ ] Fase 1 com ~10 ondas + chefe, partida de 3–10 min (T-116)

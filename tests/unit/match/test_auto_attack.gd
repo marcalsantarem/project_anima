@@ -45,11 +45,11 @@ func test_enemy_damage_and_death() -> void:
 
 func test_anima_kills_runner_before_contact_using_pool() -> void:
 	var arena: Arena = ARENA_SCENE.instantiate()
-	arena.spawn_interval = 999.0 # só o spawn manual abaixo
+	arena.waves_enabled = false # só o spawn manual abaixo
 	add_child_autofree(arena)
 	await wait_physics_frames(1)
 	var pool_size := arena.projectiles.get_child_count()
-	var enemy := arena.spawn(RUNNER, Arena.Edge.TOP)
+	var enemy := arena.spawn(RUNNER, WaveEntry.SpawnEdge.TOP)
 	var dist := enemy.position.distance_to(arena.anima.position)
 	await wait_seconds(dist / RUNNER.speed + 0.5)
 	assert_false(is_instance_valid(enemy), "corredor morto")

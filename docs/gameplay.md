@@ -103,11 +103,15 @@ As ondas normais param enquanto o chefe está vivo. Ao derrotá-lo: vitória.
 Arquivo de dados: `data/waves/stage_01.tres` (`StageData`), com uma lista de `WaveData`.
 
 ```
-StageData: id, waves: Array[WaveData], boss_id, wave_break (s)
-WaveData:  id, entries: Array[{enemy_id, count, interval, spawn_edge, start_delay}]
+StageData: id, waves: Array[WaveData], wave_break (s), boss_id
+WaveData:  id, entries: Array[WaveEntry]
+WaveEntry: enemy (EnemyData), count, interval (s), spawn_edge, start_delay (s)
 ```
 
-- `spawn_edge`: `top | bottom | left | right | random`.
+- `spawn_edge`: `TOP | BOTTOM | LEFT | RIGHT | RANDOM` (enum `WaveEntry.SpawnEdge`).
+- `WaveEntry.enemy` aponta direto para o `.tres` do inimigo (sem tabela de `enemy_id`).
+- O i-ésimo inimigo de um grupo nasce em `start_delay + i × interval`.
+- A fase vem de `data/waves/<config.stage_id>.tres`. Hoje `stage_01` tem **3 ondas de teste** só com corredores; a curva abaixo entra na T-116.
 - Uma onda termina quando todos os inimigos dela nasceram **e** morreram. Depois vem o respiro `wave_break` (3 s).
 - A última onda é a do chefe.
 
@@ -126,14 +130,15 @@ Alvo de duração: ~5–7 min.
 
 ## Contrato de partida
 
-- **Entrada:** `MatchConfig` (`stage_id`, `anima_data`, `skills: Array[SkillData]` com 3 itens). No M1 vem com valores padrão; depois, o AG04 preenche.
-- **Saída:** `MatchResult` (`outcome: victory|defeat`, `wave_reached`, `waves_total`, `coins`, `enemies_killed`, `duration_s`).
+- **Raiz:** `Arena` (`src/match/arena/arena.tscn`). `setup(config)` antes de entrar na árvore; sem config, usa `MatchConfig.new()`.
+- **Entrada:** `MatchConfig` (`src/core/`, do AG07). Hoje só `stage_id` é lido; `anima_data` e `skills` entram depois (AG04).
+- **Saída:** `MatchResult` (`src/core/`; `outcome: VICTORY|DEFEAT`, `wave_reached`, `waves_total`, `coins`, `enemies_killed`, `duration_s`).
 - `src/match/` não conhece `meta/`, `backend/` nem nós de UI.
 - **Pausa:** a UI pausa via `get_tree().paused`; a partida respeita o process mode e não decide a pausa.
 
 ## Sinais expostos à UI
 
-Emitidos pelo nó raiz da partida (`Match`). Base: AG01 §9.
+Emitidos pelo nó raiz da partida (`Arena`). Na T-105 já existem `core_hp_changed`, `wave_changed`, `coins_changed` e `match_ended`. Base: AG01 §9.
 
 | Sinal | Quando |
 |---|---|
@@ -171,7 +176,7 @@ O `project.godot` é do AG07. Layers sugeridas:
 ## Limites de desempenho
 
 - Metas: 60 fps no PC; ≥ 50 fps no iPhone com ~150 inimigos e ~300 projéteis (a confirmar no M0).
-- Pools para projéteis e inimigos; nada de alocação por frame.
+- Pools para projéteis (feito) e inimigos (T-118, depois dos arquétipos da T-111 e de medir); nada de alocação por frame.
 - Busca de alvo e de densidade por intervalo (0,1 s), não por frame.
 - `CPUParticles2D` curtas; nada de partículas por projétil.
 
@@ -181,7 +186,7 @@ O `project.godot` é do AG07. Layers sugeridas:
 |---|---|---|
 | Arena, Anima, 1 inimigo | protótipo | T-103 |
 | Ataque automático com pool | protótipo | T-104 |
-| Ondas, HP do Núcleo, moedas, vitória/derrota | pendente | T-105 |
+| Ondas, HP do Núcleo, moedas, vitória/derrota | protótipo | T-105 |
 | Skill de área | pendente | T-108 |
 | Skill de controle | pendente | T-109 |
 | Skill de defesa | pendente | T-110 |
