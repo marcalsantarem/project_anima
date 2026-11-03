@@ -7,13 +7,13 @@
 | ID | Título | Marco | Dono | Status |
 |---|---|---|---|---|
 | T-001 | Layers de colisão nomeadas | M0 | AG07 | pronta p/ briefing |
-| T-002 | Instalar GUT e teste smoke headless | M0 | AG07 | a fazer |
-| T-003 | `docs/ui.md` (tokens, layout, fluxo de telas) | M0 | AG02 | pronta p/ briefing |
+| T-002 | Instalar GUT e teste smoke headless | M0 | AG03 | em andamento |
+| T-003 | `docs/ui.md` (tokens, layout, fluxo de telas) | M0 | AG02 | em andamento |
 | T-004 | Preset Web + HTML shell mínimo | M0 | AG02 | a fazer |
 | T-005 | Build vazio no Chrome PC e no iPhone | M0 | AG02 | bloqueada |
 | T-006 | Cena de estresse para confirmar metas de desempenho | M0 | AG02 | a fazer |
 | T-007 | ADR das metas de desempenho e da exportação single-threaded | M0 | AG07 | a fazer |
-| T-101 | `docs/gameplay.md` (parâmetros e sinais) | M1 | AG01 | pronta p/ briefing |
+| T-101 | `docs/gameplay.md` (parâmetros e sinais) | M1 | AG01 | em andamento |
 | T-102 | Autoload de fluxo de cenas | M1 | AG07 | a fazer |
 | T-103 | Protótipo cinza: arena, Anima, 1 inimigo | M1 | AG01 | a fazer |
 | T-104 | Ataque automático com pool | M1 | AG01 | a fazer |
@@ -36,17 +36,19 @@
 
 ## Próximas prontas p/ briefing
 
-1. **T-001** (AG07), **T-003** (AG02) e **T-101** (AG01): arquivos diferentes, podem rodar **em paralelo**.
+1. **T-001** (AG07): pronta, aguarda a sessão do AG07 ser aberta.
+2. **T-004** (AG02, preset Web): pode rodar em paralelo, em outra sessão.
+3. **T-102** (AG07): depois da T-001 (mesmo `project.godot`).
 2. Também paralelizável com elas: **T-004** (AG02, outra sessão; mexe em `export_presets.cfg` e `web/`).
 
 ## Paralelismo e conflitos
 
 - **Ondas paralelas possíveis:**
-  - M0: {T-001 → T-002} ‖ {T-003} ‖ {T-004 → T-005, T-006} ‖ {T-101}.
+  - M0: {T-001} ‖ {T-002} ‖ {T-003} ‖ {T-004 → T-005, T-006} ‖ {T-101}.
   - M1 início: {T-102} ‖ {T-103 → T-104 → T-105} ‖ {T-106, T-107}.
   - M1 meio: {T-108 → T-109 → T-110} ‖ {T-111} só com duas sessões do AG01 (pastas `skills/` × `enemies/`); {T-112, T-113} ‖ AG01; {T-114} após T-105.
 - **Não paralelizar:**
-  - T-001 e T-002 (ambas podem tocar `project.godot`);
+  - T-001 e T-102 (ambas em `project.godot`);
   - T-102 com qualquer task que mexa em `project.godot`;
   - T-112 e T-113 (ambas em `src/ui/`, mesmo dono: em sequência);
   - T-117 com T-112/T-113 (o game feel toca o HUD).
@@ -65,19 +67,21 @@
   - projeto abre sem erros.
 
 ### T-002 — Instalar GUT e teste smoke headless
-- **Marco:** M0 · **Dono:** AG07 · **Status:** a fazer
-- **Depende de:** T-001 (mesmo arquivo) · **Desbloqueia:** T-114, T-120
-- **Arquivos:** `addons/gut/`, `.gutconfig.json`, `tests/unit/test_smoke.gd`, `project.godot` (plugin)
+- **Marco:** M0 · **Dono:** AG03 · **Status:** em andamento
+- **Depende de:** — · **Desbloqueia:** T-114, T-120
+- **Arquivos:** `addons/gut/`, `.gutconfig.json`, `tests/unit/test_smoke.gd`
 - **Pronto quando:**
   - versão do GUT compatível com Godot 4.7.2 instalada;
   - o comando headless do `CLAUDE.md` roda e passa 1 teste smoke;
-  - comandos confirmados no `CLAUDE.md`.
+  - comandos repassados ao AG00 para o `CLAUDE.md`; `project.godot` não é alterado.
+- **Briefing:** BRF-004
 
 ### T-003 — `docs/ui.md`
-- **Marco:** M0 · **Dono:** AG02 · **Status:** pronta p/ briefing
+- **Marco:** M0 · **Dono:** AG02 · **Status:** em andamento
 - **Depende de:** — · **Desbloqueia:** T-106, T-112, T-113
 - **Arquivos:** `docs/ui.md`
 - **Pronto quando:** tokens (cores, tipografia, espaçamento), layout em retrato com safe area, posição dos botões de skill e fluxo de telas do M1 documentados.
+- **Briefing:** BRF-002
 
 ### T-004 — Preset Web + HTML shell mínimo
 - **Marco:** M0 · **Dono:** AG02 · **Status:** a fazer
@@ -114,14 +118,15 @@
 ## M1 — Protótipo do combate
 
 ### T-101 — `docs/gameplay.md`
-- **Marco:** M1 · **Dono:** AG01 · **Status:** pronta p/ briefing
+- **Marco:** M1 · **Dono:** AG01 · **Status:** em andamento
 - **Depende de:** — · **Desbloqueia:** T-103, T-112
 - **Arquivos:** `docs/gameplay.md`
 - **Pronto quando:** pilares, loop, parâmetros do Anima e do ataque, 3 skills, 4 arquétipos, chefe, formato dos dados de onda e **lista de sinais expostos à UI** documentados (modelo AG01 §5).
+- **Briefing:** BRF-003
 
 ### T-102 — Autoload de fluxo de cenas
 - **Marco:** M1 · **Dono:** AG07 · **Status:** a fazer
-- **Depende de:** T-002 (mesmo arquivo) · **Desbloqueia:** T-113
+- **Depende de:** T-001 (mesmo `project.godot`) · **Desbloqueia:** T-113
 - **Arquivos:** `src/core/`, `project.godot` (autoload, cena principal)
 - **Pronto quando:** autoload troca entre Toque para começar → Partida → Resultado com cenas placeholder; partida recebe config e devolve resultado (sem `meta/` nem `backend/`).
 

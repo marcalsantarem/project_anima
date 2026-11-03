@@ -4,8 +4,8 @@
 
 | Marco | Status | Tasks feitas |
 |---|---|---|
-| M0 — Fundação | em andamento | 0/7 (0%) |
-| M1 — Protótipo do combate | a fazer | 0/20 (0%) |
+| M0 — Fundação | em andamento | 0/7 (0%) · 2 em andamento |
+| M1 — Protótipo do combate | em andamento | 0/20 (0%) · 1 em andamento |
 | M2 — Meta-jogo local | não quebrado | — |
 | M3 — Online | não quebrado | — |
 | M4 — Monetização e polimento | não quebrado | — |
@@ -26,7 +26,7 @@
 - [ ] AG00 atualiza `decisoes.md` (#4 e hosting de teste) com base na ADR de T-007
 
 **Bloqueios:**
-- T-005 depende de decidir **como servir o link de teste para o iPhone** (lacuna: não há decisão registrada; proposta ao AG00).
+- T-005 depende de decidir **como servir o link de teste para o iPhone** (aguarda escolha do usuário).
 
 **Riscos:**
 
