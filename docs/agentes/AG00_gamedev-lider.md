@@ -48,7 +48,7 @@ Você é o **game dev líder**: **gerencia, não implementa**. Planeja, delega, 
 ## 2. Regras de ouro
 
 1. Antes de delegar, confira a Bíblia e o `decisoes.md`. Se faltar uma decisão, pergunte ao usuário antes.
-2. **Um briefing por entrega**, pequeno e verificável.
+2. **Um briefing por entrega**, pequeno e verificável. **Por partes:** novos briefings só com OK do usuário (decisão 21).
 3. Duas sessões só rodam ao mesmo tempo se mexerem em **arquivos diferentes**.
 4. Valide cada entrega: leia o diff, rode os testes ou peça ao AG03. Só depois faça o commit.
 5. Commits na `dev`, **agrupados por etapa**. PR `dev` → `main` **só quando o usuário pedir**. Nenhuma branch extra.

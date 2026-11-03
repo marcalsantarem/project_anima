@@ -9,9 +9,9 @@
 | T-001 | Layers de colisão nomeadas | M0 | AG07 | pronta p/ briefing |
 | T-002 | Instalar GUT e teste smoke headless | M0 | AG03 | feita |
 | T-003 | `docs/ui.md` (tokens, layout, fluxo de telas) | M0 | AG02 | feita |
-| T-004 | Preset Web + HTML shell mínimo | M0 | AG02 | em andamento |
+| T-004 | Preset Web + HTML shell mínimo | M0 | AG02 | feita |
 | T-005 | Build vazio no Chrome PC e no iPhone | M0 | AG02 | bloqueada |
-| T-006 | Cena de estresse para confirmar metas de desempenho | M0 | AG02 | a fazer |
+| T-006 | Cena de estresse para confirmar metas de desempenho | M0 | AG02 | pronta p/ briefing |
 | T-007 | ADR das metas de desempenho e da exportação single-threaded | M0 | AG07 | a fazer |
 | T-101 | `docs/gameplay.md` (parâmetros e sinais) | M1 | AG01 | feita |
 | T-102 | Autoload de fluxo de cenas | M1 | AG07 | a fazer |
@@ -19,7 +19,7 @@
 | T-104 | Ataque automático com pool | M1 | AG01 | a fazer |
 | T-105 | Ondas por dados, HP do Núcleo, moedas, vitória/derrota | M1 | AG01 | a fazer |
 | T-106 | Tema base e componentes de UI | M1 | AG02 | pronta p/ briefing |
-| T-107 | Overlay de debug Web (FPS, logs) | M1 | AG02 | a fazer |
+| T-107 | Overlay de debug Web (FPS, logs) | M1 | AG02 | pronta p/ briefing |
 | T-108 | Base de skills + skill de área | M1 | AG01 | a fazer |
 | T-109 | Skill de controle | M1 | AG01 | a fazer |
 | T-110 | Skill de defesa | M1 | AG01 | a fazer |
@@ -37,8 +37,9 @@
 ## Próximas prontas p/ briefing
 
 1. **T-001** (AG07): pronta, aguarda a sessão do AG07 ser aberta.
-2. **T-106** (AG02, tema e componentes): T-003 feita; pode rodar em paralelo à T-004 em outra sessão (arquivos diferentes). Usar fonte Outfit.
-3. **T-102** (AG07): depois da T-001 (mesmo `project.godot`).
+2. **T-106** (AG02, tema e componentes): T-003 feita; pode rodar em paralelo à T-006 (arquivos diferentes). Usar fonte Outfit (download aguarda OK do usuário).
+3. **T-006** (AG02, cena de estresse): T-004 feita; medição no PC já possível, no iPhone depende da T-005.
+4. **T-102** (AG07): depois da T-001 (mesmo `project.godot`).
 
 ## Paralelismo e conflitos
 
@@ -83,7 +84,7 @@
 - **Briefing:** BRF-002
 
 ### T-004 — Preset Web + HTML shell mínimo
-- **Marco:** M0 · **Dono:** AG02 · **Status:** em andamento
+- **Marco:** M0 · **Dono:** AG02 · **Status:** feita
 - **Depende de:** requisitos técnicos do AG07 (Compatibility, sem threads) · **Desbloqueia:** T-005, T-006, T-107
 - **Arquivos:** `export_presets.cfg`, `web/`
 - **Pronto quando:**
@@ -102,7 +103,7 @@
   - procedimento de deploy de teste documentado.
 
 ### T-006 — Cena de estresse para confirmar metas
-- **Marco:** M0 · **Dono:** AG02 · **Status:** a fazer
+- **Marco:** M0 · **Dono:** AG02 · **Status:** pronta p/ briefing
 - **Depende de:** T-004 (T-005 para medir no iPhone) · **Desbloqueia:** T-007, T-118
 - **Arquivos:** `tests/perf/` (cena isolada, sem lógica de jogo)
 - **Pronto quando:** cena com ~150 sprites móveis e ~300 projéteis em pool roda no build Web; fps medido no PC e no iPhone e registrado.
@@ -151,13 +152,13 @@
 
 ### T-106 — Tema base e componentes de UI
 - **Marco:** M1 · **Dono:** AG02 · **Status:** pronta p/ briefing
-- **Depende de:** T-003 · **Desbloqueia:** T-112, T-113
+- **Depende de:** T-003 · fonte Outfit baixada (aguarda OK do usuário; pode começar com fonte provisória) · **Desbloqueia:** T-112, T-113
 - **Arquivos:** `src/ui/theme/`, `src/ui/components/`
 - **Pronto quando:** tema base aplicado; botão, barra de vida e botão de skill com cooldown visual funcionam com toque, mouse e Input Actions; cena de demonstração.
 - **Decisão:** fonte Outfit.
 
 ### T-107 — Overlay de debug Web
-- **Marco:** M1 · **Dono:** AG02 · **Status:** a fazer
+- **Marco:** M1 · **Dono:** AG02 · **Status:** pronta p/ briefing
 - **Depende de:** T-004 · **Desbloqueia:** T-118
 - **Arquivos:** `src/ui/debug/`
 - **Pronto quando:** FPS, contagem de nós e últimos logs visíveis na tela; liga/desliga por Input Action; fora dos builds release ou desligado por padrão.

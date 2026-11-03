@@ -30,3 +30,5 @@ Ao mudar uma decisão, atualize esta tabela e, se for o caso, o `CLAUDE.md`.
 | 18 | Bíblia v1.0 | Decidido | Aprovada: pilares, roadmap M0–M4, escopo do M1 e metas iniciais de desempenho | Aprovada pelo dono do projeto em 2026-11-03 |
 | 19 | Agente de backlog | Decidido | AG06 gerencia backlog, tasks e marcos (docs/backlog.md, docs/marcos.md); responde ao AG00 | Definido pelo dono do projeto |
 | 20 | AG00 não implementa | Decidido | O líder só gerencia; trabalho técnico vai para agentes. Criado o AG07 Arquiteto Técnico, dono de `project.godot` e `src/core/` | Definido pelo dono do projeto |
+| 21 | Ritmo de delegação | Decidido | Trabalho por partes: o AG00 só envia novos briefings com OK do usuário; nada de disparar o marco inteiro | Definido pelo dono do projeto |
+| 22 | Hosting de teste | Decidido | Netlify | Definido pelo dono do projeto |
