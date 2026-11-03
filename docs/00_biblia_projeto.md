@@ -37,22 +37,25 @@
   - **Controle:** EMP, congelamento;
   - **Defesa:** escudo do Núcleo, invulnerabilidade.
 - Ondas (`Wave X/Y`) até o **chefe**. Se o HP do Núcleo chegar a zero, é derrota.
-- **Upgrades da partida:** entre ondas, o jogador compra upgrades temporários com as moedas da partida. Eles valem só para aquela partida.
+- **Upgrades da partida:** entre ondas, o jogador compra upgrades temporários com as **Partículas** da partida. Eles valem só para aquela partida.
 
 ## Progressão (decidida pelo usuário em 2026-11-03; detalhe no AG04)
 
 - **Nível da conta (do jogador):** sobe com XP das partidas. Ele desbloqueia os **slots de skill**:
   - a conta começa com **0 skills**;
-  - o **slot 2** abre no nível **5**;
-  - o **slot 3** abre no nível **10**;
+  - o **slot 1** abre no nível **3**, o **slot 2** no nível **7** e o **slot 3** no nível **12**;
   - os valores são ajustáveis no balanceamento.
-  - **[A DEFINIR]:** o nível que libera o slot 1 e a 1ª skill, e se a conta ganha outros prêmios por nível.
+  - **[A DEFINIR]:** se a conta ganha outros prêmios por nível.
 - **Skills:** são "poderes especiais" ativos, com cooldown. São desbloqueadas pela progressão e não são cards.
   - **[A DEFINIR]:** como cada skill evolui.
-- **Módulos:** são os equipamentos do Anima, equipados em slots e melhorados com o **gold** das fases. Têm raridade Comum → Raro → Épico → Lendário.
+- **Módulos:** são os equipamentos do Anima, equipados em slots e melhorados com **Gold**. Têm raridade Comum → Raro → Épico → Lendário.
   - **Fusão:** 3 módulos idênticos da mesma raridade viram 1 da raridade seguinte.
-- **Upgrades da partida:** comprados durante a partida, com as moedas dela, e perdidos ao fim.
-- **[A DEFINIR]:** se a moeda da partida e o gold são a mesma moeda, se a árvore de talentos continua e quais atributos os módulos dão (dano, velocidade de ataque, vida, armadura, regeneração, redução de cooldown).
+- **Upgrades da partida:** comprados durante a partida com **Partículas** e perdidos ao fim.
+- **Moedas:**
+  - **Gold:** a moeda do jogo (meta). A quantidade ganha varia a cada partida jogada.
+  - **Partículas:** a moeda da partida. Começa em zero e é zerada a cada partida.
+- **Árvore de talentos:** continua, comprada com Gold. O detalhe fica no AG04.
+- **[A DEFINIR]:** quais atributos os módulos dão (dano, velocidade de ataque, vida, armadura, regeneração, redução de cooldown).
 
 ## Roadmap
 
@@ -73,11 +76,11 @@
 | Anima | 1, com arte final de demo |
 | Ataque automático | 1 tipo de projétil |
 | Skills | **1**: a de área (meteoro ou onda de choque), já liberada no slot 1. Os slots 2 e 3 aparecem bloqueados |
-| Upgrades da partida | Versão simples: entre ondas, escolher 1 de 3 upgrades pagos com as moedas da partida |
+| Upgrades da partida | Versão simples: entre ondas, escolher 1 de 3 upgrades pagos com Partículas |
 | Visual | **Polido, nível de demo:** arte, VFX, partículas e game feel finais para esta fase (AG08 + AG09) |
 | Inimigos | 3–4 arquétipos (corredor, tanque, atirador, enxame) |
 | Fase | 1, com ~10 ondas e 1 chefe |
-| HUD | HP do Núcleo, `Wave X/Y`, moedas (contagem só na partida), pausa, botões de skill |
+| HUD | HP do Núcleo, `Wave X/Y`, Partículas, pausa, botões de skill |
 | Telas | Toque para começar → Partida → Resultado (vitória ou derrota) → Jogar de novo |
 | Plataforma | Chrome no PC e Safari no iPhone, retrato, toque + mouse + teclado |
 | Idioma | Português do Brasil |

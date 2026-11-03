@@ -53,6 +53,8 @@
 | T-137 | Trocar placeholders da partida pela arte final | M1 | AG01 | a fazer |
 | T-138 | Aplicar a arte da UI no HUD e nas telas | M1 | AG02 | a fazer |
 | T-139 | Ajustar a skill de área à opção escolhida | M1 | AG01 | bloqueada |
+| T-140 | Moeda da partida vira Partículas: sinais, código e `gameplay.md` | M1 | AG01 | pronta p/ briefing |
+| T-141 | Moeda da partida vira Partículas: HUD, telas e `ui.md` | M1 | AG02 | a fazer |
 
 ## Próximas prontas p/ briefing
 
@@ -61,7 +63,7 @@
 1. **T-126** (AG08, guia de estilo + mockup): caminho crítico de toda a arte e dos VFX; precisa da aprovação do usuário.
 2. **T-125** (AG01 + AG08, meteoro × onda de choque): gera a decisão do usuário que libera a T-139.
 3. **T-133** (AG04, upgrades da partida): libera a T-134 e a T-135.
-- Também prontas: **T-124** (AG07), **T-136** (AG02), **T-123** e **T-115** (AG01), **T-107** e **T-006** (AG02).
+- Também prontas: **T-140** (AG01, Partículas; antes da T-134), **T-124** (AG07), **T-136** (AG02), **T-123** e **T-115** (AG01), **T-107** e **T-006** (AG02).
 - Paralelo possível: T-126 ‖ T-133 ‖ T-124 ‖ T-136 (arquivos diferentes). A T-125 usa o AG08 junto com a T-126: na mesma sessão do AG08, em sequência.
 
 ## Paralelismo e conflitos
@@ -364,19 +366,19 @@
 - **Marco:** M1 · **Dono:** AG04 · **Status:** pronta p/ briefing
 - **Depende de:** — · **Desbloqueia:** T-134, T-128
 - **Arquivos:** `docs/meta.md` (seção de upgrades da partida)
-- **Pronto quando:** lista de upgrades da demo (efeito, custo em moedas da partida, peso no sorteio) e regra da oferta 1 de 3 documentadas, com valores coerentes com as moedas da fase 1.
+- **Pronto quando:** lista de upgrades da demo (efeito, custo em Partículas, peso no sorteio) e regra da oferta 1 de 3 documentadas, com valores coerentes com as Partículas ganhas na fase 1.
 
 ### T-134 — Lógica dos upgrades (1 de 3 entre ondas)
 - **Marco:** M1 · **Dono:** AG01 · **Status:** a fazer
-- **Depende de:** T-133, T-105 · **Desbloqueia:** T-135, T-116
+- **Depende de:** T-133, T-105, T-140 · **Desbloqueia:** T-135, T-116
 - **Arquivos:** `src/match/upgrades/`, `data/upgrades/`
-- **Pronto quando:** entre ondas, a partida segura o avanço e oferece 3 upgrades; comprar desconta moedas e aplica o efeito até o fim da partida; sinais para a UI; valores em `.tres`; testes GUT da compra e da aplicação.
+- **Pronto quando:** entre ondas, a partida segura o avanço e oferece 3 upgrades; comprar desconta Partículas e aplica o efeito até o fim da partida; sinais para a UI; valores em `.tres`; testes GUT da compra e da aplicação.
 
 ### T-135 — Tela de escolha de upgrade
 - **Marco:** M1 · **Dono:** AG02 · **Status:** a fazer
-- **Depende de:** T-134 (os sinais podem ser simulados antes) · **Desbloqueia:** T-138, T-120
+- **Depende de:** T-134, T-141 (os sinais podem ser simulados antes) · **Desbloqueia:** T-138, T-120
 - **Arquivos:** `src/ui/screens/` (ou `src/ui/upgrades/`)
-- **Pronto quando:** mostra as 3 opções com custo, bloqueia as que o jogador não pode pagar e permite pular; funciona com toque, mouse e teclado em retrato.
+- **Pronto quando:** mostra as 3 opções com custo em Partículas, bloqueia as que o jogador não pode pagar e permite pular; funciona com toque, mouse e teclado em retrato.
 
 ### T-136 — Slots 2 e 3 do HUD bloqueados (cadeado)
 - **Marco:** M1 · **Dono:** AG02 · **Status:** pronta p/ briefing
@@ -402,6 +404,19 @@
 - **Arquivos:** `src/match/skills/`, `data/skills/`
 - **Pronto quando:** a skill do slot 1 tem o comportamento da opção escolhida (área, dano e cooldown em dados); sinais para VFX e UI.
 
+### T-140 — Moeda da partida vira Partículas: sinais, código e `gameplay.md`
+- **Marco:** M1 · **Dono:** AG01 · **Status:** pronta p/ briefing
+- **Depende de:** decisão #29 · **Desbloqueia:** T-141, T-134
+- **Arquivos:** `src/match/`, `data/`, `docs/gameplay.md`, `tests/` (só os testes afetados, com aviso ao AG03)
+- **Pronto quando:** sinais, variáveis e dados da moeda da partida usam o nome Partículas; começa em 0 e zera a cada partida; testes GUT passam.
+- **Nota:** o identificador em código não deve colidir com nós de partículas do Godot nem com `src/fx/`; o AG07 confirma o nome (decisão do AG00).
+
+### T-141 — Moeda da partida vira Partículas: HUD, telas e `ui.md`
+- **Marco:** M1 · **Dono:** AG02 · **Status:** a fazer
+- **Depende de:** T-140 · **Desbloqueia:** T-135, T-138
+- **Arquivos:** `src/ui/hud/`, `src/ui/screens/`, `docs/ui.md`
+- **Pronto quando:** HUD e Resultado mostram "Partículas"; ligados aos sinais renomeados; nenhuma menção a "moedas" para a moeda da partida.
+
 ---
 
 ## Pendências a decidir
@@ -412,11 +427,13 @@
 
 - **M2:**
   - nível de conta (XP das partidas);
-  - desbloqueio dos slots: slot 2 no nível 5, slot 3 no nível 10 (ajustáveis);
+  - desbloqueio dos slots: slot 1 no nível 3, slot 2 no nível 7, slot 3 no nível 12 (ajustáveis; decisão #25 revisada);
   - skills de controle e defesa (T-109, T-110);
-  - módulos: equipamentos do Anima, melhorados com gold, com raridade;
+  - **Gold** (moeda do meta-jogo, decisão #29): calculado a partir do `MatchResult`, com ganho variável por partida;
+  - módulos: equipamentos do Anima, melhorados com Gold, com raridade;
   - fusão de módulos 3→1;
+  - **árvore de talentos comprada com Gold** (decisão #30);
   - save local.
-- **[A definir] para o M2:** nível que libera o slot 1 e a 1ª skill; evolução das skills; moeda da partida × gold; árvore de talentos; atributos dos módulos.
+- **[A definir] para o M2:** evolução das skills; atributos dos módulos; prêmios por nível de conta além dos slots.
 - **M3:** escolha do backend, conta guest, sincronização, economia no servidor, Remote Config.
 - **M4:** ads, loja, skins, áudio final, lojas nativas, mais fases, localização.

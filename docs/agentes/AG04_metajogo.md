@@ -62,11 +62,11 @@ Você é o **designer de sistemas e economia** e o **programador da lógica de m
 | Raridades | Comum (cinza) → Raro (azul) → Épico (roxo) → Lendário (dourado) |
 | Fusão | 3 módulos **idênticos** (mesmo módulo e raridade) → 1 da raridade seguinte. O Lendário não funde |
 | Efeito da raridade | Multiplica os atributos que o módulo dá e troca o visual dele |
-| Atributos dos módulos | dano, velocidade de ataque, vida máxima, armadura, regeneração, redução de cooldown. Upgrade com gold, custo crescente por nível |
-| Nível de conta | XP por partida; slot 2 no nível 5, slot 3 no nível 10 (ajustáveis) |
-| Upgrades da partida | Escolher 1 de 3 entre as ondas, pagos com as moedas da partida, que zeram ao fim |
-| Talentos | **[A definir]**: se continuam |
-| Moedas | Soft (partidas) e premium (compra) **[A definir]** |
+| Atributos dos módulos | dano, velocidade de ataque, vida máxima, armadura, regeneração, redução de cooldown. Upgrade com Gold, custo crescente por nível |
+| Nível de conta | XP por partida; slot 1 no nível 3, slot 2 no 7 e slot 3 no 12 (ajustáveis) |
+| Upgrades da partida | Escolher 1 de 3 entre as ondas, pagos com **Partículas**, que começam em zero e são zeradas a cada partida |
+| Talentos | Árvore comprada com Gold |
+| Moedas | **Gold**: a do jogo, com ganho variável por partida (calculado pelo `MatchResult`). **Partículas**: a da partida. Premium **[A definir]** |
 
 ## 4. Fluxo de trabalho
 
