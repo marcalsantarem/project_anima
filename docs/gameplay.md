@@ -53,8 +53,10 @@ Arquivos de dados: `data/anima/anima_default.tres` (`AnimaData`) e `data/project
 3 slots no M1. O 4º slot (`skill_4` / `Espaço`) fica para **depois do M1**.
 
 Cada skill é um `SkillData` (`data/skills/skill_<id>.tres`):
-`id, type (area|control|defense), cooldown, radius, damage, duration, effect_params, fx_id, sfx_id`.
-O comportamento fica em um script por `type`, que só lê o Resource. Skill nova = dados novos.
+`id, type (AREA|CONTROL|DEFENSE), cooldown, radius, damage, duration, windup, target_range, effect_params, fx_id, sfx_id`.
+O comportamento fica em um script por `type` (`SkillBehavior` → `AreaSkill`, ...), que só lê o Resource. Skill nova = dados novos; tipo novo = script novo + uma linha em `SkillController.behavior_for`.
+
+**Implementação (T-108):** `SkillController` (nó `Skills` da arena) guarda os slots (1-based), o cooldown (`SkillSlot`, lógica pura) e escuta `skill_1..3` em `_unhandled_input`. A UI aciona por `Arena.use_skill(slot) -> bool`. As skills do slot vêm do export `skills` da cena até o `MatchConfig` trazê-las (AG04).
 
 | Slot | Input Action | Skill (M1) | Tipo | Cooldown | Raio | Efeito |
 |---|---|---|---|---|---|---|
@@ -63,25 +65,30 @@ O comportamento fica em um script por `type`, que só lê o Resource. Skill nova
 | 3 | `skill_3` (`3`) | `skill_aegis` | defense | 20 s | — | escudo no Núcleo por 4 s, absorve até 50 de dano |
 
 - **Ao acionar:** valida o cooldown → aplica o efeito → emite `skill_used(slot)` e passa a emitir `cooldown_changed`. Acionar em cooldown não faz nada (a UI pode dar feedback de "indisponível").
-- **Alvo da área e do controle:** automático, no ponto de maior densidade de inimigos dentro do alcance (amostragem por intervalo). **[A definir]**: mira manual por toque/clique como alternativa, a testar no playtest.
+- **Sem alvo:** se não há inimigo ao alcance, a skill de área não dispara e **não gasta o cooldown**.
+- **Alvo da área e do controle:** automático, no ponto de maior densidade de inimigos dentro de `target_range` (calculado no acionamento; os centros candidatos são as posições dos inimigos).
+- **Área:** dano por distância (raio da skill + raio do inimigo), sem usar a layer `skill_areas`. **[A definir]**: mira manual por toque/clique como alternativa, a testar no playtest.
 - **Feedback:** antecipação curta (~0,1 s) + impacto forte; tremor leve **desligável**.
 - Cards e raridades (AG04, depois do M1) só alteram números e efeitos via `SkillData`. O gameplay não conhece cards.
 
 ## Inimigos
 
-Arquivo de dados: `data/enemies/enemy_<id>.tres` (`EnemyData`). Campos: `id, hp, speed, contact_damage, attack_range, fire_rate, projectile_speed, projectile_damage, target_priority, coin_drop, radius`.
+Arquivo de dados: `data/enemies/enemy_<id>.tres` (`EnemyData`). Campos: `id, hp, speed, contact_damage, attack_range, fire_rate, projectile (ProjectileData), target_priority, coin_drop, radius, group_min, group_max, group_spread, color`.
 
 | Arquétipo | `id` | HP | Velocidade | Ataque | Moedas |
 |---|---|---|---|---|---|
 | Corredor | `enemy_runner` | 20 | 140 px/s | contato, 5 de dano | 1 |
 | Tanque | `enemy_tank` | 120 | 50 px/s | contato, 20 de dano | 4 |
-| Atirador | `enemy_shooter` | 35 | 80 px/s | para a ~380 px do centro; 1 tiro a cada 1,5 s, 6 de dano, 300 px/s | 2 |
-| Enxame | `enemy_swarm` | 8 | 120 px/s | contato, 2 de dano; nasce em grupos de 5–8 | 1 cada |
+| Atirador | `enemy_shooter` | 35 | 80 px/s | para a 380 px do centro; 1 tiro a cada 1,5 s (`projectile_enemy_bolt`: 6 de dano, 300 px/s, losango magenta) | 2 |
+| Enxame | `enemy_swarm` | 8 | 120 px/s | contato, 2 de dano; nasce em grupos de 5–8, espalhados em 48 px | 1 cada |
 
 - **Estados:** `SPAWN → AVANÇA → ATACA → MORRE`, mais `CONGELADO` e `LENTO` (das skills de controle).
 - **Contato:** ao tocar a hurtbox do Anima, o inimigo causa `contact_damage` e morre (sem moedas).
 - **Justiça:** projéteis inimigos com cor e forma distintas das do jogador (ex.: losango quente × círculo frio) e mais lentos que os do jogador.
-- Inimigos em pool por arquétipo; fora da tela não fazem cálculos caros.
+- **Atirador:** um só script (`Enemy`); com `attack_range > 0` ele para no alcance (estado `ATTACK`) e atira com o pool `EnemyProjectiles` da arena (128, layer `enemy_projectiles`). Quem reage ao acerto é o Anima (mask), que consome o projétil.
+- **Grupo:** cada spawn de onda cria `group_min..group_max` inimigos (`Arena.spawn_group`). Só o enxame usa grupo > 1.
+- Inimigos em pool por arquétipo (T-118); fora da tela não fazem cálculos caros.
+- **Balanceamento:** só com o ataque automático, 2 tanques + 2 atiradores juntos já derrotam o Núcleo. A curva da T-116 deve contar com as skills.
 
 ## Chefe
 
@@ -111,7 +118,7 @@ WaveEntry: enemy (EnemyData), count, interval (s), spawn_edge, start_delay (s)
 - `spawn_edge`: `TOP | BOTTOM | LEFT | RIGHT | RANDOM` (enum `WaveEntry.SpawnEdge`).
 - `WaveEntry.enemy` aponta direto para o `.tres` do inimigo (sem tabela de `enemy_id`).
 - O i-ésimo inimigo de um grupo nasce em `start_delay + i × interval`.
-- A fase vem de `data/waves/<config.stage_id>.tres`. Hoje `stage_01` tem **3 ondas de teste** só com corredores; a curva abaixo entra na T-116.
+- A fase vem de `data/waves/<config.stage_id>.tres`. Hoje `stage_01` tem **3 ondas de teste** (corredores; a 3ª inclui 1 tanque, 1 atirador e 1 grupo de enxame); a curva abaixo entra na T-116.
 - Uma onda termina quando todos os inimigos dela nasceram **e** morreram. Depois vem o respiro `wave_break` (3 s).
 - A última onda é a do chefe.
 
@@ -187,8 +194,8 @@ O `project.godot` é do AG07. Layers sugeridas:
 | Arena, Anima, 1 inimigo | protótipo | T-103 |
 | Ataque automático com pool | protótipo | T-104 |
 | Ondas, HP do Núcleo, moedas, vitória/derrota | protótipo | T-105 |
-| Skill de área | pendente | T-108 |
+| Skill de área | protótipo | T-108 |
 | Skill de controle | pendente | T-109 |
 | Skill de defesa | pendente | T-110 |
-| Arquétipos (tanque, atirador, enxame) | pendente | T-111 |
+| Arquétipos (tanque, atirador, enxame) | protótipo | T-111 |
 | Chefe | pendente | T-115 |

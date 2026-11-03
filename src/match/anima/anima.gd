@@ -66,6 +66,11 @@ func _on_area_entered(area: Area2D) -> void:
 		var enemy := area as Enemy
 		core.take_damage(enemy.data.contact_damage)
 		enemy.die(Enemy.DeathCause.CONTACT)
+	elif area is Projectile:
+		var p := area as Projectile
+		if p.active:
+			core.take_damage(p.data.damage)
+			p.consume()
 
 
 func _draw() -> void:

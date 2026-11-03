@@ -33,7 +33,10 @@ func configure(p_data: ProjectileData) -> void:
 	queue_redraw()
 
 
-func fire(origin: Vector2, direction: Vector2, max_distance: float) -> void:
+## p_data troca o tipo do projétil (pool compartilhado entre atiradores).
+func fire(origin: Vector2, direction: Vector2, max_distance: float, p_data: ProjectileData = null) -> void:
+	if p_data != null and p_data != data:
+		configure(p_data)
 	position = origin
 	_direction = direction.normalized()
 	_distance_left = max_distance
@@ -75,11 +78,22 @@ func _on_area_entered(area: Area2D) -> void:
 		_expire()
 
 
+## Usado por quem recebe o acerto (Anima, escudo).
+func consume() -> void:
+	if active:
+		_expire()
+
+
 func _expire() -> void:
 	park()
 	expired.emit(self)
 
 
 func _draw() -> void:
-	if data:
+	if data == null:
+		return
+	if data.shape == ProjectileData.Shape.DIAMOND:
+		var r := data.radius
+		draw_colored_polygon(PackedVector2Array([Vector2(0, -r), Vector2(r, 0), Vector2(0, r), Vector2(-r, 0)]), data.color)
+	else:
 		draw_circle(Vector2.ZERO, data.radius, data.color)

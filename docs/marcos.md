@@ -5,7 +5,7 @@
 | Marco | Status | Tasks feitas |
 |---|---|---|
 | M0 — Fundação | em andamento | 5/8 (63%) · 1 em validação |
-| M1 — Protótipo do combate | em andamento | 5/22 (23%) |
+| M1 — Protótipo do combate | em andamento | 6/22 (27%) |
 | M2 — Meta-jogo local | não quebrado | — |
 | M3 — Online | não quebrado | — |
 | M4 — Monetização e polimento | não quebrado | — |

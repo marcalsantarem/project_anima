@@ -216,6 +216,16 @@ Boot/Loading (HTML shell) → Toque para começar → Partida ⇄ Pausa → Resu
 | Paleta de projéteis inimigos sem ciano | AG01 |
 | Leitura da safe area no Safari (`animaGetSafeArea()` já está no shell) | AG02 (T-005) |
 
+## 10b. HUD (implementação, T-112)
+
+- **Cena:** `src/ui/hud/hud.tscn` (`Hud`, CanvasLayer 10). O tema é aplicado na raiz `Root` até o tema global entrar no `project.godot` (T-121).
+- **Ligação:** `hud.bind(arena)` **antes** de a arena entrar na árvore, porque os valores iniciais saem no `_ready` dela. O HUD só escuta sinais; os `boss_*` são ligados se existirem.
+- **Skills:** o toque chama `Arena.use_skill(slot)` (com `SkillButton.inject_action = false`). Se a arena recusar, o botão treme. O teclado vai direto pelo Input Map ao `SkillController`.
+- **Pausa:** o botão emite `pause_requested` **e** injeta a action `pause`. A tela de pausa (T-113) deve ouvir **um** dos dois, não os dois.
+- **Fim da partida:** `match_ended` desativa as skills e o botão de pausa.
+- **Safe area:** `apply_safe_area()` roda no `_ready` e a cada `size_changed`. Na web lê `animaGetSafeArea()`; no mobile nativo usa `DisplayServer.get_display_safe_area()`; no desktop, 0 + `margin_screen`.
+- **Teste:** `src/ui/demo/hud_demo.tscn` (Arena + HUD).
+
 ## 11. Exportação Web
 
 - **Preset `Web`** (`export_presets.cfg`): sem threads, sem extensões, VRAM compression só desktop (o 2D usa textura sem compressão VRAM), resize policy *adaptive*, saída em `build/web/index.html`. Exclui `tests/`, `addons/gut/`, `docs/` e `build/`.

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/match/skills/skill_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"skill_pulse"
+type = 0
+cooldown = 10.0
+radius = 180.0
+damage = 60
+duration = 0.0
+windup = 0.1
+target_range = 600.0
+effect_params = {}
+fx_id = &"fx_pulse"
+sfx_id = &"sfx_pulse"

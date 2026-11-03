@@ -2,7 +2,7 @@ class_name ProjectilePool
 extends Node2D
 ## Pool fixo de projéteis. Tudo é instanciado em build(); disparar não aloca.
 
-const PROJECTILE_SCENE := preload("res://src/match/projectiles/projectile.tscn")
+@export var projectile_scene: PackedScene = preload("res://src/match/projectiles/projectile.tscn")
 
 var _items: Array[Projectile] = []
 var _free: Array[Projectile] = []
@@ -10,7 +10,7 @@ var _free: Array[Projectile] = []
 
 func build(size: int, data: ProjectileData) -> void:
 	for i in size:
-		var p: Projectile = PROJECTILE_SCENE.instantiate()
+		var p: Projectile = projectile_scene.instantiate()
 		add_child(p)
 		p.configure(data)
 		p.expired.connect(_on_expired)

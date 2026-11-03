@@ -2,8 +2,10 @@
 class_name SkillButton
 extends Control
 ## Botão circular de skill. docs/ui.md §5.1.
-## Não chama a skill: toque/clique disparam a Input Action `skill_<slot>`.
+## Não chama a skill: toque/clique emitem `activated(slot)` e, se `inject_action`, a Input Action `skill_<slot>`.
 ## O estado vem do gameplay: on_used() ← skill_used, set_cooldown() ← cooldown_changed, set_ready() ← skill_ready.
+
+signal activated(slot: int)
 
 enum State { READY, COOLDOWN, DISABLED }
 enum Icon { CIRCLE, DIAMOND, HEX }
@@ -24,6 +26,8 @@ const GLOW_PERIOD := 1.5
 	set(v):
 		icon = v
 		queue_redraw()
+## Desligue quando quem ouve `activated` já aciona a skill (ex.: HUD → Arena.use_skill).
+@export var inject_action := true
 
 var action := &"skill_1"
 var state := State.READY
@@ -128,13 +132,22 @@ func _unhandled_input(event: InputEvent) -> void:
 		_feedback_press()
 
 
+## Feedback de "indisponível" (ex.: o gameplay recusou o acionamento).
+func reject() -> void:
+	_shake()
+
+
 func _press() -> void:
 	_feedback_press()
-	_send_action(true)
+	if state != State.DISABLED:
+		activated.emit(slot)
+	if inject_action:
+		_send_action(true)
 
 
 func _release() -> void:
-	_send_action(false)
+	if inject_action:
+		_send_action(false)
 
 
 func _feedback_press() -> void:
