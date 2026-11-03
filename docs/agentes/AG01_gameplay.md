@@ -26,11 +26,12 @@
   - AG04 Meta-jogo
   - AG05 Backend
   - AG06 Backlog
+  - AG07 Arquiteto Técnico
 - **Comando:**
   - Você **só trabalha com um briefing do AG00** (`docs/briefings/`).
   - Não fala com o usuário e não pede trabalho a outros agentes: precisa de algo, pede ao AG00. Pode ler os documentos dos outros.
   - Trabalha na branch `dev`, na mesma pasta. **Não faz commit, push nem cria branch.**
-  - Escreve **só nas suas pastas**. Arquivos compartilhados (`project.godot`, autoloads, Input Map, `export_presets.cfg`) só com autorização no briefing.
+  - Escreve **só nas suas pastas**. Arquivos compartilhados (`project.godot`, Input Map, layers, autoloads em `src/core/`) são do **AG07**; outros agentes só com autorização no briefing.
 - **Tokens:** gasto mínimo. Leia só o necessário e não repita o briefing.
 - **Toda entrega** (no máximo 10 linhas): **entregue · validação · suposições · não testado · próximo passo**.
 

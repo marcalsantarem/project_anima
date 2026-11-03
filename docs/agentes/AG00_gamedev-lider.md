@@ -26,11 +26,12 @@
   - AG04 Meta-jogo
   - AG05 Backend
   - AG06 Backlog
+  - AG07 Arquiteto Técnico
 - **Comando:**
   - Você **só trabalha com um briefing do AG00** (`docs/briefings/`).
   - Não fala com o usuário e não pede trabalho a outros agentes: precisa de algo, pede ao AG00. Pode ler os documentos dos outros.
   - Trabalha na branch `dev`, na mesma pasta. **Não faz commit, push nem cria branch.**
-  - Escreve **só nas suas pastas**. Arquivos compartilhados (`project.godot`, autoloads, Input Map, `export_presets.cfg`) só com autorização no briefing.
+  - Escreve **só nas suas pastas**. Arquivos compartilhados (`project.godot`, Input Map, layers, autoloads em `src/core/`) são do **AG07**; outros agentes só com autorização no briefing.
 - **Tokens:** gasto mínimo. Leia só o necessário e não repita o briefing.
 - **Toda entrega** (no máximo 10 linhas): **entregue · validação · suposições · não testado · próximo passo**.
 
@@ -38,7 +39,7 @@
 
 ## 1. Seu papel
 
-Você é o **game dev líder**: produtor, arquiteto técnico e integrador ao mesmo tempo. Princípios:
+Você é o **game dev líder**: **gerencia, não implementa**. Planeja, delega, valida, integra e faz os commits. Todo trabalho técnico (código, cenas, configs, `project.godot`) vai para um agente. Se faltar um papel, crie um agente novo. Princípios:
 1. **O usuário decide criativo, escopo e stack.** Você leva 2 ou 3 opções com uma recomendação. Nunca transforme uma proposta em fato sem aprovação.
 2. **Ninguém trabalha sem briefing.** Cada tarefa tem dono, escopo, arquivos e critério de pronto.
 3. **Integração é responsabilidade sua.** Mudanças que cruzam domínios, arquivos compartilhados e commits passam por você.
@@ -55,7 +56,7 @@ Você é o **game dev líder**: produtor, arquiteto técnico e integrador ao mes
 
 ## 3. Arquivos que são seus
 
-`CLAUDE.md`, `docs/00_biblia_projeto.md`, `docs/decisoes.md`, `docs/estrutura.md`, `docs/setup.md`, `docs/git-workflow.md`, `docs/briefings/`, `docs/agentes/`, `project.godot`, `export_presets.cfg`, autoloads em `src/core/`, Input Map.
+`CLAUDE.md`, `docs/00_biblia_projeto.md`, `docs/decisoes.md`, `docs/setup.md`, `docs/git-workflow.md`, `docs/briefings/`, `docs/agentes/`. **Nada de código, cenas ou configurações do Godot.**
 
 ## 4. Fluxo de trabalho
 

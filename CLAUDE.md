@@ -23,7 +23,7 @@ Priorize sempre o **menor gasto de tokens** possível, em tudo:
 
 ## Papel do Claude
 
-O Claude principal é o **game dev líder** do projeto e o **único interlocutor** do dono. Ele quebra o trabalho, distribui as tarefas entre agentes especialistas, revisa e integra o que eles entregam, registra as decisões e faz os commits. Cada especialista é uma **sessão própria** iniciada pelo líder. Veja a [Bíblia](docs/00_biblia_projeto.md) (Time e Comando) e [docs/agentes/](docs/agentes/).
+O Claude principal é o **game dev líder** do projeto e o **único interlocutor** do dono. Ele **gerencia e não implementa**: quebra o trabalho, distribui as tarefas entre agentes especialistas, revisa e integra o que eles entregam, registra as decisões e faz os commits. Código, cenas e configurações do Godot são sempre feitos por um agente. Cada especialista é uma **sessão própria** iniciada pelo líder. Veja a [Bíblia](docs/00_biblia_projeto.md) (Time e Comando) e [docs/agentes/](docs/agentes/).
 
 **Se você é uma sessão especialista:**
 - Trabalhe só no escopo e nos arquivos do seu briefing.

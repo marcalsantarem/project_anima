@@ -46,7 +46,7 @@
 
 | Marco | Objetivo | Agentes |
 |---|---|---|
-| **M0 — Fundação** | Docs, ambiente, projeto Godot, exportação Web vazia rodando no PC e no iPhone | AG00, AG02 |
+| **M0 — Fundação** | Docs, ambiente, projeto Godot, exportação Web vazia rodando no PC e no iPhone | AG07, AG02, AG03 |
 | **M1 — Protótipo do combate** *(decidido como 1º marco jogável)* | Partida completa e divertida com placeholders | AG01, AG02, AG03 |
 | **M2 — Meta-jogo local** | Cards, fusão, atributos e talentos, com save local | AG04, AG02, AG05 (local) |
 | **M3 — Online** | Backend escolhido: conta guest, sincronização, economia no servidor, config remota | AG05, AG04 |
@@ -91,13 +91,14 @@ Proibido usar personagens, criaturas, nomes, ícones, sons, interface ou arte de
 
 | Código | Agente | Responsável por | Entra em |
 |---|---|---|---|
-| AG00 | Game Dev Líder | Plano, Bíblia, decisões, briefings, integração, arquivos compartilhados, commits | Sempre |
+| AG00 | Game Dev Líder | Gerencia (não implementa): plano, Bíblia, decisões, briefings, validação, integração, commits | Sempre |
 | AG01 | Gameplay / Combate | Arena, Anima, ataque automático, skills, inimigos, ondas, chefe | M1 |
-| AG02 | UI / Plataforma Web | HUD, telas, entrada, tema, exportação Web, desempenho no Safari | M0/M1 |
+| AG02 | UI / Plataforma Web | HUD, telas, entrada, tema, exportação Web (`export_presets.cfg`, `web/`), desempenho no Safari | M0/M1 |
 | AG03 | QA / Revisor | Testes, revisão, medições, veredito passa ou não passa | M1 |
 | AG04 | Meta-jogo / Dados | Cards, fusão, atributos, talentos, economia | M2 |
 | AG05 | Backend | Interface `Backend`, save, provedor online, segurança | M2/M3 |
 | AG06 | Backlog | Quebra dos marcos em tasks, quadro de status, andamento dos marcos e riscos | Sempre |
+| AG07 | Arquiteto Técnico | `project.godot` (Input Map, layers, autoloads), `src/core/`, arquitetura, contratos entre módulos, ADRs, metas de desempenho | Sempre |
 
 Equipe: 1 usuário + agentes de IA. O prazo é por marcos, sem datas fixas.
 
@@ -114,6 +115,7 @@ Cada agente roda numa **sessão própria** do Claude Code, com o nome do agente.
 | AG04_metajogo | [agentes/AG04_metajogo.md](agentes/AG04_metajogo.md) |
 | AG05_backend | [agentes/AG05_backend.md](agentes/AG05_backend.md) |
 | Backlog | [agentes/AG06_backlog.md](agentes/AG06_backlog.md) |
+| (nome a definir) | [agentes/AG07_arquiteto.md](agentes/AG07_arquiteto.md) |
 
 Regras:
 1. **Usuário → AG00 → agentes.** O usuário fala só com o AG00, que transforma o pedido em briefing e delega.
@@ -121,7 +123,7 @@ Regras:
 3. **A entrega volta ao AG00** no formato *entregue · validação · suposições · não testado · próximo passo*. O AG00 valida, integra, faz o commit e decide o próximo passo.
 4. **Agentes não pedem trabalho uns aos outros.** Se um precisa de algo, pede ao AG00. Todos podem ler os documentos uns dos outros.
 5. **Decisões criativas, de escopo e de stack** sobem ao usuário pelo AG00, com 2 ou 3 opções e uma recomendação.
-6. Cada agente escreve só nas suas pastas ([estrutura.md](estrutura.md)). `docs/00_*`, `decisoes.md`, `briefings/`, `agentes/` e os arquivos compartilhados são do AG00.
+6. Cada agente escreve só nas suas pastas ([estrutura.md](estrutura.md)). `docs/00_*`, `decisoes.md`, `briefings/` e `agentes/` são do AG00; os arquivos compartilhados do Godot são do AG07.
 7. Todos trabalham na `dev`, na mesma pasta. **Só o AG00 faz commit.** Sessões em paralelo só com arquivos diferentes.
 8. **Economia de tokens** em todas as interações.
 

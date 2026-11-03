@@ -29,3 +29,4 @@ Ao mudar uma decisão, atualize esta tabela e, se for o caso, o `CLAUDE.md`.
 | 17 | Economia de tokens | Decidido | Mínimo gasto de tokens em todas as interações (com o dono do projeto e entre agentes); commits por etapa concluída | Definido pelo dono do projeto |
 | 18 | Bíblia v1.0 | Decidido | Aprovada: pilares, roadmap M0–M4, escopo do M1 e metas iniciais de desempenho | Aprovada pelo dono do projeto em 2026-11-03 |
 | 19 | Agente de backlog | Decidido | AG06 gerencia backlog, tasks e marcos (docs/backlog.md, docs/marcos.md); responde ao AG00 | Definido pelo dono do projeto |
+| 20 | AG00 não implementa | Decidido | O líder só gerencia; trabalho técnico vai para agentes. Criado o AG07 Arquiteto Técnico, dono de `project.godot` e `src/core/` | Definido pelo dono do projeto |
