@@ -80,7 +80,7 @@ Proibido usar personagens, criaturas, nomes, ícones, sons, interface ou arte de
 
 ## Plataforma e restrições do navegador (detalhes no `CLAUDE.md`)
 
-- Godot 4.x, GDScript **[PROPOSTA]**, renderer Compatibility (WebGL 2), exportação **single-threaded**.
+- Godot 4.7, GDScript, testes com GUT, renderer Compatibility (WebGL 2), exportação **single-threaded**.
 - Metas iniciais (a confirmar no M0):
   - 60 fps no PC; **≥ 50 fps no iPhone** com ~150 inimigos e ~300 projéteis;
   - download inicial de **≤ ~15 MB**.
@@ -97,6 +97,7 @@ Proibido usar personagens, criaturas, nomes, ícones, sons, interface ou arte de
 | AG03 | QA / Revisor | Testes, revisão, medições, veredito passa ou não passa | M1 |
 | AG04 | Meta-jogo / Dados | Cards, fusão, atributos, talentos, economia | M2 |
 | AG05 | Backend | Interface `Backend`, save, provedor online, segurança | M2/M3 |
+| AG06 | Backlog | Quebra dos marcos em tasks, quadro de status, andamento dos marcos e riscos | Sempre |
 
 Equipe: 1 usuário + agentes de IA. O prazo é por marcos, sem datas fixas.
 
@@ -112,6 +113,7 @@ Cada agente roda numa **sessão própria** do Claude Code, com o nome do agente.
 | AG03_qa | [agentes/AG03_qa.md](agentes/AG03_qa.md) |
 | AG04_metajogo | [agentes/AG04_metajogo.md](agentes/AG04_metajogo.md) |
 | AG05_backend | [agentes/AG05_backend.md](agentes/AG05_backend.md) |
+| Backlog | [agentes/AG06_backlog.md](agentes/AG06_backlog.md) |
 
 Regras:
 1. **Usuário → AG00 → agentes.** O usuário fala só com o AG00, que transforma o pedido em briefing e delega.
@@ -125,5 +127,5 @@ Regras:
 
 ## Links
 
-- Decisões: [decisoes.md](decisoes.md) · Estrutura: [estrutura.md](estrutura.md) · Setup: [setup.md](setup.md) · Git: [git-workflow.md](git-workflow.md)
+- Backlog: [backlog.md](backlog.md) · Marcos: [marcos.md](marcos.md) · Decisões: [decisoes.md](decisoes.md) · Estrutura: [estrutura.md](estrutura.md) · Setup: [setup.md](setup.md) · Git: [git-workflow.md](git-workflow.md)
 - GDD original: [gdd.md](gdd.md) · Agentes: [agentes/](agentes/) · Briefings: `briefings/`

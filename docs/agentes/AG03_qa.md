@@ -11,7 +11,7 @@
   - Partidas de 3 a 10 min, em ondas até o chefe.
 - **Plataforma:** **web-first**, em retrato: Chrome no PC e **Safari no iPhone**. Lojas nativas e Steam no futuro.
 - **Stack:**
-  - Godot 4.x, GDScript (Proposta), renderer **Compatibility** (WebGL 2), exportação Web **single-threaded**.
+  - Godot 4.7, GDScript, testes com GUT, renderer **Compatibility** (WebGL 2), exportação Web **single-threaded**.
   - Backend **[A definir]**; no protótipo, o save é local.
 - **Visual:** "Cyber-Mystic Minimal". Cenário escuro e suave, projéteis e partículas vibrantes, barras nítidas, alto contraste.
 - **Marco atual:** ver a Bíblia ([docs/00_biblia_projeto.md](../00_biblia_projeto.md)).
@@ -25,6 +25,7 @@
   - AG03 QA
   - AG04 Meta-jogo
   - AG05 Backend
+  - AG06 Backlog
 - **Comando:**
   - Você **só trabalha com um briefing do AG00** (`docs/briefings/`).
   - Não fala com o usuário e não pede trabalho a outros agentes: precisa de algo, pede ao AG00. Pode ler os documentos dos outros.
@@ -55,7 +56,7 @@ Você é o **guardião da qualidade**. Princípios:
 
 | Item | Padrão |
 |---|---|
-| Framework | GUT ou gdUnit4 (**A definir** pelo AG00), em `addons/` |
+| Framework | **GUT**, em `addons/gut/` |
 | Testes unitários | `tests/unit/test_<módulo>.gd` |
 | Testes de integração | `tests/integration/test_<cena>.gd` |
 | Comando | Ver `CLAUDE.md` (headless, todos os testes ou um arquivo só) |

@@ -66,10 +66,10 @@ O Claude principal é o **game dev líder** do projeto e o **único interlocutor
 | Camada | Escolha | Observações |
 |---|---|---|
 | Engine | Godot 4.x (versão estável mais recente), exportação **Web** | Renderer **Compatibility** (WebGL 2) |
-| Linguagem | **GDScript** **[Proposta]** | O Godot 4 com C#/.NET não exporta para Web. Escolher C# acaba com o web-first. |
+| Linguagem | **GDScript** | O Godot 4 com C#/.NET não exporta para Web. Escolher C# acaba com o web-first. |
 | Backend | **[A definir]**. Favorito: Firebase (Auth anônimo, Firestore, Remote Config, Hosting). Alternativa a avaliar: **Nakama** | No protótipo, salvar localmente. Decidir antes de implementar cards, fusão e economia (ver Arquitetura). |
 | Lógica no servidor | Depende do backend: Cloud Functions (Firebase, exige o plano Blaze) ou o runtime do Nakama | |
-| Testes | GUT ou gdUnit4 **[A definir]** | |
+| Testes | **GUT** | |
 | Ads / pagamentos web | **[A definir]** | O AdMob não cobre web. Avaliar Google H5 Games Ads ou SDKs de portais. Pagamentos: Stripe ou similar. |
 
 ## Restrições técnicas importantes (web/iPhone)
