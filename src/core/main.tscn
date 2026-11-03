@@ -17,5 +17,8 @@ anchor_right = 0.5
 anchor_bottom = 0.5
 grow_horizontal = 2
 grow_vertical = 2
-text = "Project: Anima"
+text = "Project: Anima
+
+Criado por Marçal Santarem"
 horizontal_alignment = 1
+vertical_alignment = 1
