@@ -60,7 +60,7 @@
 | Arena | 1, em retrato |
 | Anima | 1, placeholder geométrico |
 | Ataque automático | 1 tipo de projétil |
-| Skills | 3: área, controle e defesa. O 4º slot (`Espaço`) está **[A DEFINIR]** |
+| Skills | 3: área, controle e defesa (slots 1 a 3). O 4º slot (`Espaço`) fica **fora do M1** |
 | Inimigos | 3–4 arquétipos (corredor, tanque, atirador, enxame) |
 | Fase | 1, com ~10 ondas e 1 chefe |
 | HUD | HP do Núcleo, `Wave X/Y`, moedas (contagem só na partida), pausa, botões de skill |
