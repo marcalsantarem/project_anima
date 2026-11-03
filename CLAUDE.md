@@ -95,7 +95,9 @@ Ainda não há código. As pastas já existem (com `.gitkeep`) e o projeto Godot
 - **Economia com autoridade no servidor**, depois que o backend for escolhido. O cliente web é totalmente manipulável. Por isso, fusão, gasto e ganho de moedas e abertura de caixas devem ser validados no servidor. O cliente só exibe o estado.
 - **Fluxo de cenas:** Boot (auth + config) → Menu/Hangar (meta) → Partida (arena) → Resultado. A partida não conversa com o backend: ela produz um resultado que o meta-jogo envia.
 
-## Comandos [Previstos — ajuste quando o projeto existir]
+## Comandos
+
+`godot` = `"/c/Program Files/Godot/Godot_v4.7.2-stable_win64.exe"` (Godot 4.7.2 nesta máquina; não está no PATH). Testes e export ainda não configurados.
 
 ```bash
 # Abrir o editor

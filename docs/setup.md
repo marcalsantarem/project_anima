@@ -2,8 +2,8 @@
 
 ## Obrigatório agora
 
-- **Godot 4.x**, versão estável mais recente, na edição **padrão** (não a .NET).
-- **Export templates do Godot**, da mesma versão do editor. Instale pelo menu *Editor → Manage Export Templates*.
+- **Godot 4.7.2** padrão (não .NET) ✅ instalado em `C:Program FilesGodot`.
+- **Export templates 4.7.2** ⏳ pendente: *Editor → Manage Export Templates → Download and Install*.
 - **Git**.
 
 ## Recomendado
