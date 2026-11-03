@@ -32,3 +32,9 @@ Ao mudar uma decisão, atualize esta tabela e, se for o caso, o `CLAUDE.md`.
 | 20 | AG00 não implementa | Decidido | O líder só gerencia; trabalho técnico vai para agentes. Criado o AG07 Arquiteto Técnico, dono de `project.godot` e `src/core/` | Definido pelo dono do projeto |
 | 21 | Ritmo de delegação | Decidido | Trabalho por partes: o AG00 só envia novos briefings com OK do usuário; nada de disparar o marco inteiro | Definido pelo dono do projeto |
 | 22 | Hosting de teste | Decidido | Netlify | Definido pelo dono do projeto |
+| 23 | M1 vira demo polida | Decidido | O M1 é uma fase só, mas com visual e game feel finais, para divulgar como demo. Isso vem do objetivo comercial: lançar nas lojas com receita | Definido pelo dono do projeto em 2026-11-03 |
+| 24 | Agentes de arte | Decidido | Criados o AG08 Diretor de Arte (estilo, paleta, sprites, ícones, arte da UI) e o AG09 VFX (shaders, partículas, impactos) | Definido pelo dono do projeto em 2026-11-03 |
+| 25 | Nível de conta e slots | Decidido | A conta começa sem skills; o slot 2 abre no nível 5 e o slot 3 no nível 10 (ajustáveis). Skills são poderes com cooldown, não cards | Definido pelo dono do projeto em 2026-11-03 |
+| 26 | Módulos e fusão | Decidido | Módulos são os equipamentos do Anima, melhorados com gold, com raridade e fusão 3→1. Os cards de skill do GDD saem | Definido pelo dono do projeto em 2026-11-03 |
+| 27 | Upgrades da partida | Decidido | Upgrades temporários comprados com as moedas da partida. Na demo: escolher 1 de 3 entre as ondas | Definido pelo dono do projeto em 2026-11-03 |
+| 28 | Skills da demo | Decidido | O M1 tem 1 skill (área, meteoro ou onda de choque) no slot 1; as skills de controle e defesa (T-109, T-110) vão para o M2 | Definido pelo dono do projeto em 2026-11-03 |

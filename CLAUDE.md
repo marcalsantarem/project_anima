@@ -52,12 +52,11 @@ O Claude principal é o **game dev líder** do projeto e o **único interlocutor
 - O ataque básico é automático e mira no inimigo mais próximo ou de maior prioridade.
 - O jogador age por **Skills Ativas com cooldown**: área, controle de grupo e defensiva. No mobile são botões de toque; no PC, clique ou as teclas `1`, `2`, `3` e `Espaço`.
 - A partida avança por ondas (`Wave X/Y`) até o chefe e termina se o HP do Núcleo chegar a zero. Cada sessão dura de 3 a 10 minutos.
-- **Meta-jogo:**
-  - As skills são **Cards** com raridade Comum → Raro → Épico → Lendário.
-  - **Fusão:** 3 cards idênticos da mesma raridade viram 1 card da raridade seguinte.
-  - Atributos permanentes: dano, velocidade de ataque, vida, armadura, regeneração e redução de cooldown.
-  - Árvore de talentos comprada com moedas.
-- **Monetização:** rewarded ads (multiplicar moedas ou reviver), skins cosméticas e moeda premium para caixas de cards.
+- **Progressão** (detalhe na seção "Progressão" da Bíblia; substitui os cards do GDD):
+  - **Nível da conta:** desbloqueia os slots de skill (slot 2 no nível 5, slot 3 no nível 10). A conta começa sem skills.
+  - **Módulos:** são os equipamentos do Anima, melhorados com gold, com raridade e **fusão** (3 iguais viram 1 da raridade seguinte).
+  - **Upgrades da partida:** comprados entre ondas com as moedas da partida; valem só para ela.
+- **Monetização:** rewarded ads (multiplicar moedas ou reviver), skins cosméticas e moeda premium.
 - **Visual:** "Cyber-Mystic Minimal", top-down. Cenário escuro e suave contrastando com projéteis e partículas vibrantes. Interface em **modo retrato**.
 - O Archero serve só de **referência de gênero e de retenção**. Não copie arte, nomes, assets nem o visual de jogos existentes.
 

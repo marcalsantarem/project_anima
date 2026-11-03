@@ -22,42 +22,62 @@
 | T-106 | Tema base e componentes de UI | M1 | AG02 | feita |
 | T-107 | Overlay de debug Web (FPS, logs) | M1 | AG02 | pronta p/ briefing |
 | T-108 | Base de skills + skill de área | M1 | AG01 | feita |
-| T-109 | Skill de controle | M1 | AG01 | pronta p/ briefing |
-| T-110 | Skill de defesa | M1 | AG01 | a fazer |
+| T-109 | Skill de controle | M2 | AG01 | a fazer |
+| T-110 | Skill de defesa | M2 | AG01 | a fazer |
 | T-111 | Arquétipos: tanque, atirador, enxame | M1 | AG01 | feita |
 | T-112 | HUD ligado aos sinais | M1 | AG02 | feita |
 | T-113 | Telas: toque para começar, pausa, resultado | M1 | AG02 | feita |
 | T-114 | Testes GUT de ondas, dano e cooldowns | M1 | AG03 | feita |
 | T-115 | Chefe da fase 1 | M1 | AG01 | pronta p/ briefing |
 | T-116 | Fase 1 completa (~10 ondas + chefe) | M1 | AG01 | a fazer |
-| T-117 | Game feel | M1 | AG01 | a fazer |
+| T-117 | Game feel | M1 | AG01 + AG09 | a fazer |
 | T-118 | Desempenho no iPhone (150 inimigos / 300 projéteis) | M1 | AG01 | a fazer |
 | T-119 | Otimização do build Web | M1 | AG02 | a fazer |
 | T-120 | Validação do M1 | M1 | AG03 | a fazer |
-| T-121 | Tema global no `project.godot` | M1 | AG07 | pronta p/ briefing |
-| T-122 | Ligar a arena real ao SceneFlow | M1 | AG07 | pronta p/ briefing |
+| T-121 | Tema global no `project.godot` | M1 | AG07 | feita |
+| T-122 | Ligar a arena real ao SceneFlow | M1 | AG07 | feita |
 | T-123 | Seed no `Arena._rng` para testes determinísticos | M1 | AG01 | pronta p/ briefing |
+| T-124 | Pasta `src/fx/` em `docs/estrutura.md` | M1 | AG07 | pronta p/ briefing |
+| T-125 | Proposta da skill de área: meteoro × onda de choque | M1 | AG01 + AG08 | pronta p/ briefing |
+| T-126 | Guia de estilo `docs/arte.md` + mockup da arena | M1 | AG08 | pronta p/ briefing |
+| T-127 | Arte do Anima, inimigos, chefe, projéteis e fundo | M1 | AG08 | a fazer |
+| T-128 | Ícones e arte da UI | M1 | AG08 | a fazer |
+| T-129 | `docs/vfx.md` + pool de efeitos | M1 | AG09 | a fazer |
+| T-130 | VFX do ataque, acertos e mortes | M1 | AG09 | a fazer |
+| T-131 | VFX da skill e do chefe | M1 | AG09 | a fazer |
+| T-132 | Modo de efeitos reduzidos | M1 | AG09 | a fazer |
+| T-133 | Dados e balanceamento dos upgrades da partida | M1 | AG04 | pronta p/ briefing |
+| T-134 | Lógica dos upgrades (1 de 3 entre ondas) | M1 | AG01 | a fazer |
+| T-135 | Tela de escolha de upgrade | M1 | AG02 | a fazer |
+| T-136 | Slots 2 e 3 do HUD bloqueados (cadeado) | M1 | AG02 | pronta p/ briefing |
+| T-137 | Trocar placeholders da partida pela arte final | M1 | AG01 | a fazer |
+| T-138 | Aplicar a arte da UI no HUD e nas telas | M1 | AG02 | a fazer |
+| T-139 | Ajustar a skill de área à opção escolhida | M1 | AG01 | bloqueada |
 
 ## Próximas prontas p/ briefing
 
 > **Decisão 21:** só o usuário libera briefings. A lista abaixo é sugestão; nada começa sem o OK dele.
 
-1. **T-109** (AG01, skill de controle) → **T-110**; **T-123** (AG01, seed) é pequena e pode vir antes. **T-115** (AG01, chefe) em paralelo só com outra sessão do AG01.
-2. **T-121** (AG07, tema global) → depois **T-122** (AG07, arena no SceneFlow).
-3. **T-107** (AG02, overlay de debug) ou **T-006** (AG02, cena de estresse); o AG02 está livre.
-- Paralelo possível: AG01 ‖ T-121/T-122 ‖ T-107 (arquivos diferentes).
+1. **T-126** (AG08, guia de estilo + mockup): caminho crítico de toda a arte e dos VFX; precisa da aprovação do usuário.
+2. **T-125** (AG01 + AG08, meteoro × onda de choque): gera a decisão do usuário que libera a T-139.
+3. **T-133** (AG04, upgrades da partida): libera a T-134 e a T-135.
+- Também prontas: **T-124** (AG07), **T-136** (AG02), **T-123** e **T-115** (AG01), **T-107** e **T-006** (AG02).
+- Paralelo possível: T-126 ‖ T-133 ‖ T-124 ‖ T-136 (arquivos diferentes). A T-125 usa o AG08 junto com a T-126: na mesma sessão do AG08, em sequência.
 
 ## Paralelismo e conflitos
 
-- **Ondas paralelas possíveis:**
-  - M0: {T-001} ‖ {T-002} ‖ {T-003} ‖ {T-004 → T-005, T-006} ‖ {T-101}.
-  - M1 início: {T-102} ‖ {T-103 → T-104 → T-105} ‖ {T-106, T-107}.
-  - M1 meio: {T-108 → T-109 → T-110} ‖ {T-111} só com duas sessões do AG01 (pastas `skills/` × `enemies/`); {T-112, T-113} ‖ AG01; {T-114} após T-105.
+- **Feito até aqui:** M0 e o núcleo do M1 (T-101 a T-108, T-111 a T-114, T-121, T-122).
+- **Trilhas paralelas do M1 (demo):**
+  - Arte: T-126 → {T-127, T-128} (AG08, em sequência na mesma sessão; T-125 entra antes ou depois da T-126).
+  - VFX: T-124 → T-129 → T-130 → T-131 → T-132 (AG09; a T-124 é do AG07).
+  - Upgrades: T-133 (AG04) → T-134 (AG01) → T-135 (AG02).
+  - Combate: T-123, T-115, T-139, T-116, T-137 (AG01, em sequência; `skills/` × `enemies/` só em paralelo com duas sessões).
+  - UI: T-136 → T-135 → T-138 (AG02, `src/ui/`, em sequência); T-107 e T-006 em outra sessão.
 - **Não paralelizar:**
-  - T-001 e T-102 (ambas em `project.godot`);
-  - T-102 com qualquer task que mexa em `project.godot`;
-  - T-112 e T-113 (ambas em `src/ui/`, mesmo dono: em sequência);
-  - T-117 com T-112/T-113 (o game feel toca o HUD).
+  - T-134 com T-139 ou T-116 (mesmo dono e `src/match/`);
+  - T-135, T-136 e T-138 (mesma pasta `src/ui/`);
+  - T-137 com outras tasks do AG01 que mexam nas cenas de `match/`;
+  - T-117: as partes do AG01, AG09 e AG02 em briefings separados, cada uma nos seus arquivos.
 
 ---
 
@@ -131,7 +151,7 @@
 
 ---
 
-## M1 — Protótipo do combate
+## M1 — Demo do combate
 
 ### T-101 — `docs/gameplay.md`
 - **Marco:** M1 · **Dono:** AG01 · **Status:** feita
@@ -180,22 +200,22 @@
 
 ### T-108 — Base de skills + skill de área
 - **Marco:** M1 · **Dono:** AG01 · **Status:** feita
-- **Depende de:** T-105 · **Desbloqueia:** T-109
+- **Depende de:** T-105 · **Desbloqueia:** T-109 (M2), T-139
 - **Arquivos:** `src/match/skills/`, `data/skills/`
 - **Pronto quando:** sistema de skill com cooldown acionado por Input Action (slot 1); skill de área causa dano na região; sinais de cooldown para a UI.
 - **Decisão:** slots de skill numerados a partir de 1 (1-based).
 
 ### T-109 — Skill de controle
-- **Marco:** M1 · **Dono:** AG01 · **Status:** pronta p/ briefing
+- **Marco:** M2 (movida do M1, decisão #28) · **Dono:** AG01 · **Status:** a fazer
 - **Depende de:** T-108 · **Desbloqueia:** T-110
 - **Arquivos:** `src/match/skills/`, `data/skills/`
-- **Pronto quando:** slot 2 aplica lentidão/atordoamento em área; efeito visível e com duração por dados.
+- **Pronto quando:** slot 2 (desbloqueado por nível de conta) aplica lentidão/atordoamento em área; efeito visível e com duração por dados.
 
 ### T-110 — Skill de defesa
-- **Marco:** M1 · **Dono:** AG01 · **Status:** a fazer
-- **Depende de:** T-109 · **Desbloqueia:** T-116
+- **Marco:** M2 (movida do M1, decisão #28) · **Dono:** AG01 · **Status:** a fazer
+- **Depende de:** T-109 · **Desbloqueia:** —
 - **Arquivos:** `src/match/skills/`, `data/skills/`
-- **Pronto quando:** slot 3 protege o Núcleo (escudo ou invulnerabilidade) por tempo definido em dados.
+- **Pronto quando:** slot 3 (desbloqueado por nível de conta) protege o Núcleo (escudo ou invulnerabilidade) por tempo definido em dados.
 
 ### T-111 — Arquétipos: tanque, atirador, enxame
 - **Marco:** M1 · **Dono:** AG01 · **Status:** feita
@@ -225,26 +245,29 @@
 
 ### T-115 — Chefe da fase 1
 - **Marco:** M1 · **Dono:** AG01 · **Status:** pronta p/ briefing
-- **Depende de:** T-111 · **Desbloqueia:** T-116
+- **Depende de:** T-111 · **Desbloqueia:** T-116, T-127 (arte do chefe), T-131
 - **Arquivos:** `src/match/enemies/boss/`, `data/enemies/boss_*.tres`
-- **Pronto quando:** chefe com fases por vida, ao menos 2 padrões de ataque e aviso visual antes de cada padrão.
+- **Pronto quando:** chefe com fases por vida, ao menos 2 padrões de ataque e aviso visual (telegraph) antes de cada padrão; vencível com 1 skill + upgrades da partida.
 
 ### T-116 — Fase 1 completa
 - **Marco:** M1 · **Dono:** AG01 · **Status:** a fazer
-- **Depende de:** T-110, T-111, T-115 · **Desbloqueia:** T-117, T-118, T-120
+- **Depende de:** T-111, T-115, T-134, T-139 · **Desbloqueia:** T-117, T-118, T-120
 - **Arquivos:** `data/waves/stage_01*`
 - **Pronto quando:** ~10 ondas + chefe; partida de 3–10 min; curva de dificuldade descrita em `docs/gameplay.md`.
-- **Nota:** o balanceamento das ondas conta com as skills.
+- **Nota:** o balanceamento conta com **1 skill (slot 1) + upgrades da partida** (decisões #27 e #28); os valores de upgrade vêm da T-133.
 
 ### T-117 — Game feel
-- **Marco:** M1 · **Dono:** AG01 (com AG02 no HUD) · **Status:** a fazer
-- **Depende de:** T-112, T-116 · **Desbloqueia:** T-120
-- **Arquivos:** `src/match/`, `src/ui/hud/` (parte do AG02, em briefing próprio)
-- **Pronto quando:** flash de acerto, tremor de câmera, números de dano e feedback de skill pronta/usada; sem alocação por frame.
+- **Marco:** M1 · **Dono:** AG01 + AG09 (com AG02 no HUD) · **Status:** a fazer
+- **Depende de:** T-112, T-116, T-130 · **Desbloqueia:** T-120
+- **Arquivos:** AG01: `src/match/` · AG09: `src/fx/` · AG02: `src/ui/hud/` (cada parte em briefing próprio, sem paralelo nos mesmos arquivos)
+- **Pronto quando:**
+  - AG01: tremor de câmera, hit-stop, números de dano e sinais de feedback;
+  - AG09: flash de acerto e feedback visual de skill pronta/usada, via pool;
+  - sem alocação por frame; nível de demo aprovado pelo usuário.
 
 ### T-118 — Desempenho no iPhone
 - **Marco:** M1 · **Dono:** AG01 (medição com AG03) · **Status:** a fazer
-- **Depende de:** T-006, T-107, T-116 · **Desbloqueia:** T-120
+- **Depende de:** T-006, T-107, T-116, T-132 · **Desbloqueia:** T-120
 - **Arquivos:** `src/match/`
 - **Pronto quando:** ≥ 50 fps no iPhone com ~150 inimigos e ~300 projéteis (ou a meta revisada em T-007); medições registradas.
 - **Proposta (AG01):** pool de inimigos (reutilizar instâncias em vez de instanciar/liberar por spawn).
@@ -257,18 +280,18 @@
 
 ### T-120 — Validação do M1
 - **Marco:** M1 · **Dono:** AG03 · **Status:** a fazer
-- **Depende de:** T-113, T-114, T-116, T-117, T-118, T-119 · **Desbloqueia:** fechamento do M1
+- **Depende de:** T-113, T-114, T-116, T-117, T-118, T-119, T-131, T-132, T-135, T-136, T-137, T-138 · **Desbloqueia:** fechamento do M1
 - **Arquivos:** `docs/qa/QA-001_m1.md`
-- **Pronto quando:** checklist AG03 §5 executado (partida completa, simulação de 5 min, build medido, checklist do iPhone para o usuário); veredito passa/não passa.
+- **Pronto quando:** checklist AG03 §5 executado (partida completa, simulação de 5 min, build medido, checklist do iPhone para o usuário); **qualidade visual de demo** conferida contra `docs/arte.md` e `docs/vfx.md` (arte final em tudo, sem placeholder, efeitos reduzidos funcionando); veredito passa/não passa.
 
 ### T-121 — Tema global no `project.godot`
-- **Marco:** M1 · **Dono:** AG07 · **Status:** pronta p/ briefing
+- **Marco:** M1 · **Dono:** AG07 · **Status:** feita
 - **Depende de:** T-106 · **Desbloqueia:** T-112, T-113
 - **Arquivos:** `project.godot`
 - **Pronto quando:** o tema base do AG02 é o tema global do projeto; telas existentes abrem com a fonte Outfit sem erros.
 
 ### T-122 — Ligar a arena real ao SceneFlow
-- **Marco:** M1 · **Dono:** AG07 · **Status:** pronta p/ briefing
+- **Marco:** M1 · **Dono:** AG07 · **Status:** feita
 - **Depende de:** T-102, T-103 · **Desbloqueia:** T-113
 - **Arquivos:** `src/core/`
 - **Pronto quando:** o SceneFlow abre a arena real (no lugar do placeholder), chama `setup(config)` e vai para o Resultado ao receber `match_ended`.
@@ -282,11 +305,118 @@
 - **Pronto quando:** a arena aceita uma seed (por exemplo, via `setup(config)`); com a mesma seed, duas execuções geram os mesmos spawns; os testes do AG03 podem fixá-la.
 - **Origem:** sugestão do AG03.
 
+### T-124 — Pasta `src/fx/` em `docs/estrutura.md`
+- **Marco:** M1 · **Dono:** AG07 · **Status:** pronta p/ briefing
+- **Depende de:** — · **Desbloqueia:** T-129
+- **Arquivos:** `docs/estrutura.md`, `src/fx/.gitkeep`
+- **Pronto quando:** `src/fx/` (efeitos, shaders, pool), `assets/ui/` e `assets/backgrounds/` documentados; regra de dependência definida (`fx/` reage a sinais e não altera o estado de `match/`).
+
+### T-125 — Proposta da skill de área: meteoro × onda de choque
+- **Marco:** M1 · **Dono:** AG01 + AG08 · **Status:** pronta p/ briefing
+- **Depende de:** — · **Desbloqueia:** T-139, T-128 (ícone), T-131
+- **Arquivos:** `docs/gameplay.md` (seção da skill, AG01); esboço visual em `assets/` (AG08)
+- **Pronto quando:** as 2 opções descritas (jogabilidade, leitura visual, custo de VFX no iPhone), com recomendação; **o usuário decide via AG00**.
+
+### T-126 — Guia de estilo `docs/arte.md` + mockup da arena
+- **Marco:** M1 · **Dono:** AG08 · **Status:** pronta p/ briefing
+- **Depende de:** — (alinhar com os tokens do `docs/ui.md`) · **Desbloqueia:** T-127, T-128, T-129
+- **Arquivos:** `docs/arte.md`, mockup em `assets/backgrounds/`, `assets/LICENSES.md`
+- **Pronto quando:** paleta, formas, silhuetas por arquétipo, tamanhos, nomes e checklist de asset documentados; mockup da arena em retrato com Anima, inimigos, projéteis e HUD; **aprovado pelo usuário**.
+
+### T-127 — Arte do Anima, inimigos, chefe, projéteis e fundo
+- **Marco:** M1 · **Dono:** AG08 · **Status:** a fazer
+- **Depende de:** T-126 (o chefe também depende da T-115) · **Desbloqueia:** T-137
+- **Arquivos:** `assets/sprites/`, `assets/backgrounds/`, `assets/LICENSES.md`
+- **Pronto quando:** Anima, 4 arquétipos, chefe, projéteis (inimigos sem ciano) e fundo seguem o `docs/arte.md`; silhuetas distintas; tamanhos para 720×1280; licenças registradas.
+
+### T-128 — Ícones e arte da UI
+- **Marco:** M1 · **Dono:** AG08 · **Status:** a fazer
+- **Depende de:** T-126, T-125 (ícone da skill), T-133 (ícones dos upgrades) · **Desbloqueia:** T-138
+- **Arquivos:** `assets/ui/`
+- **Pronto quando:** ícone da skill, cadeado dos slots, ícones dos upgrades, botões, barras e painéis no estilo do guia; legíveis no toque no iPhone.
+
+### T-129 — `docs/vfx.md` + pool de efeitos
+- **Marco:** M1 · **Dono:** AG09 · **Status:** a fazer
+- **Depende de:** T-124, T-126 · **Desbloqueia:** T-130, T-131, T-132
+- **Arquivos:** `docs/vfx.md`, `src/fx/`
+- **Pronto quando:** catálogo de efeitos com os sinais de que cada um depende; pool de efeitos reutilizável (sem instanciar por evento), com teste ou cena de demonstração.
+
+### T-130 — VFX do ataque, acertos e mortes
+- **Marco:** M1 · **Dono:** AG09 · **Status:** a fazer
+- **Depende de:** T-129 · **Desbloqueia:** T-117, T-132
+- **Arquivos:** `src/fx/`, `assets/vfx/`
+- **Pronto quando:** rastro/brilho do projétil, impacto e morte de inimigo via pool, ligados por sinais; custo medido no build Web.
+- **Nota:** se faltar algum sinal em `match/`, pedir ao AG00 (vira task do AG01).
+
+### T-131 — VFX da skill e do chefe
+- **Marco:** M1 · **Dono:** AG09 · **Status:** a fazer
+- **Depende de:** T-129, T-139, T-115 · **Desbloqueia:** T-132, T-120
+- **Arquivos:** `src/fx/`, `assets/vfx/`
+- **Pronto quando:** telegraph e impacto da skill escolhida; telegraphs e efeitos dos padrões do chefe; custo medido.
+
+### T-132 — Modo de efeitos reduzidos
+- **Marco:** M1 · **Dono:** AG09 · **Status:** a fazer
+- **Depende de:** T-130, T-131 · **Desbloqueia:** T-118, T-120
+- **Arquivos:** `src/fx/`
+- **Pronto quando:** uma configuração reduz partículas, brilho e tremor sem perder a leitura dos telegraphs; ganho de fps medido.
+
+### T-133 — Dados e balanceamento dos upgrades da partida
+- **Marco:** M1 · **Dono:** AG04 · **Status:** pronta p/ briefing
+- **Depende de:** — · **Desbloqueia:** T-134, T-128
+- **Arquivos:** `docs/meta.md` (seção de upgrades da partida)
+- **Pronto quando:** lista de upgrades da demo (efeito, custo em moedas da partida, peso no sorteio) e regra da oferta 1 de 3 documentadas, com valores coerentes com as moedas da fase 1.
+
+### T-134 — Lógica dos upgrades (1 de 3 entre ondas)
+- **Marco:** M1 · **Dono:** AG01 · **Status:** a fazer
+- **Depende de:** T-133, T-105 · **Desbloqueia:** T-135, T-116
+- **Arquivos:** `src/match/upgrades/`, `data/upgrades/`
+- **Pronto quando:** entre ondas, a partida segura o avanço e oferece 3 upgrades; comprar desconta moedas e aplica o efeito até o fim da partida; sinais para a UI; valores em `.tres`; testes GUT da compra e da aplicação.
+
+### T-135 — Tela de escolha de upgrade
+- **Marco:** M1 · **Dono:** AG02 · **Status:** a fazer
+- **Depende de:** T-134 (os sinais podem ser simulados antes) · **Desbloqueia:** T-138, T-120
+- **Arquivos:** `src/ui/screens/` (ou `src/ui/upgrades/`)
+- **Pronto quando:** mostra as 3 opções com custo, bloqueia as que o jogador não pode pagar e permite pular; funciona com toque, mouse e teclado em retrato.
+
+### T-136 — Slots 2 e 3 do HUD bloqueados (cadeado)
+- **Marco:** M1 · **Dono:** AG02 · **Status:** pronta p/ briefing
+- **Depende de:** T-112 · **Desbloqueia:** T-138, T-120
+- **Arquivos:** `src/ui/hud/`
+- **Pronto quando:** slots 2 e 3 visíveis com cadeado e sem ação (toque e teclas `2`/`3` ignorados); ícone provisório até a T-128.
+
+### T-137 — Trocar placeholders da partida pela arte final
+- **Marco:** M1 · **Dono:** AG01 · **Status:** a fazer
+- **Depende de:** T-127 · **Desbloqueia:** T-120
+- **Arquivos:** `src/match/` (cenas)
+- **Pronto quando:** Anima, inimigos, chefe, projéteis e fundo usam a arte final; colisões continuam corretas; nenhum placeholder geométrico.
+
+### T-138 — Aplicar a arte da UI no HUD e nas telas
+- **Marco:** M1 · **Dono:** AG02 · **Status:** a fazer
+- **Depende de:** T-128, T-135, T-136 · **Desbloqueia:** T-120
+- **Arquivos:** `src/ui/`
+- **Pronto quando:** HUD, telas e tela de upgrade usam os ícones e a arte final; legibilidade conferida no iPhone.
+
+### T-139 — Ajustar a skill de área à opção escolhida
+- **Marco:** M1 · **Dono:** AG01 · **Status:** bloqueada
+- **Depende de:** T-125 (**decisão do usuário: meteoro ou onda de choque**) · **Desbloqueia:** T-116, T-131
+- **Arquivos:** `src/match/skills/`, `data/skills/`
+- **Pronto quando:** a skill do slot 1 tem o comportamento da opção escolhida (área, dano e cooldown em dados); sinais para VFX e UI.
+
 ---
 
-## Depois (M2+, sem tasks)
+## Pendências a decidir
 
-- 4º slot de skill (`Espaço`) — **[A definir]**, depende de decisão do usuário.
-- Cards, raridades e fusão; atributos permanentes; árvore de talentos; save local (M2).
-- Escolha do backend, conta guest, sincronização, economia no servidor, Remote Config (M3).
-- Ads, loja, skins, arte e áudio finais, mais fases, localização (M4).
+- **Voltar ao título a partir do Resultado:** hoje "Jogar de novo" vai direto para a partida. Exigiria um sinal novo no ResultScreen (AG02). Decisão do usuário via AG00.
+
+## Depois (M2+; só T-109 e T-110 já têm task)
+
+- **M2:**
+  - nível de conta (XP das partidas);
+  - desbloqueio dos slots: slot 2 no nível 5, slot 3 no nível 10 (ajustáveis);
+  - skills de controle e defesa (T-109, T-110);
+  - módulos: equipamentos do Anima, melhorados com gold, com raridade;
+  - fusão de módulos 3→1;
+  - save local.
+- **[A definir] para o M2:** nível que libera o slot 1 e a 1ª skill; evolução das skills; moeda da partida × gold; árvore de talentos; atributos dos módulos.
+- **M3:** escolha do backend, conta guest, sincronização, economia no servidor, Remote Config.
+- **M4:** ads, loja, skins, áudio final, lojas nativas, mais fases, localização.

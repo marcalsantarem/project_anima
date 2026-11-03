@@ -16,7 +16,7 @@
 - **Visual:** "Cyber-Mystic Minimal". Cenário escuro e suave, projéteis e partículas vibrantes, barras nítidas, alto contraste.
 - **Marco atual:** ver a Bíblia ([docs/00_biblia_projeto.md](../00_biblia_projeto.md)).
 - **Originalidade:** referências de gênero e estrutura, **nunca cópia**. Nada de arte, nomes, ícones, sons ou interface do Archero ou de outros jogos.
-- **IDs:** em minúsculas (snake_case), iguais em dados, cenas e código. Prefixos: `anima_`, `skill_`, `enemy_`, `boss_`, `wave_`, `stage_`, `card_`, `stat_`, `talent_`, `fx_`, `sfx_`, `mus_`, `ui_`.
+- **IDs:** em minúsculas (snake_case), iguais em dados, cenas e código. Prefixos: `anima_`, `skill_`, `enemy_`, `boss_`, `wave_`, `stage_`, `module_`, `upgrade_`, `stat_`, `talent_`, `fx_`, `sfx_`, `mus_`, `ui_`.
 - **Fonte da verdade:** usuário > Bíblia > [docs/decisoes.md](../decisoes.md) > documento do agente dono. Itens em "Proposta" ou "A definir" não são regra.
 - **Time:**
   - AG00 Game Dev Líder
@@ -27,6 +27,8 @@
   - AG05 Backend
   - AG06 Backlog
   - AG07 Arquiteto Técnico
+  - AG08 Diretor de Arte
+  - AG09 VFX
 - **Comando:**
   - Você **só trabalha com um briefing do AG00** (`docs/briefings/`).
   - Não fala com o usuário e não pede trabalho a outros agentes: precisa de algo, pede ao AG00. Pode ler os documentos dos outros.

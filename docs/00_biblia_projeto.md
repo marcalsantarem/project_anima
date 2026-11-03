@@ -1,6 +1,6 @@
 # Project: Anima
 
-> **Status:** v1.0, **APROVADA pelo usuário em 2026-11-03**.
+> **Status:** v1.1, **APROVADA pelo usuário em 2026-11-03**. A v1.1 traz a nova progressão, o M1 como demo polida e os agentes AG08 e AG09.
 > Mantida pelo AG00 (Game Dev Líder). Hierarquia de verdade: usuário > esta Bíblia > [decisoes.md](decisoes.md) > documento do agente dono.
 > Itens **[A DEFINIR]** não têm decisão. Itens **[PROPOSTA]** aguardam aprovação. Ninguém inventa fatos além do que está aqui.
 > O GDD original está em [gdd.md](gdd.md).
@@ -12,7 +12,7 @@
 
 **Pilares:**
 1. **Timing é tudo:** sem movimento, a habilidade do jogador está em **quando** usar cada skill. Poucas decisões, todas importantes.
-2. **Progressão que se sente:** cada fusão e cada nível muda números **e** o visual da skill.
+2. **Progressão que se sente:** cada nível, módulo e upgrade muda números **e** o visual.
 3. **Clareza no caos:** centenas de projéteis, e mesmo assim tudo legível numa tela de celular.
 4. **Zero atrito:** abriu o link, está jogando, no PC ou no iPhone.
 
@@ -37,30 +37,44 @@
   - **Controle:** EMP, congelamento;
   - **Defesa:** escudo do Núcleo, invulnerabilidade.
 - Ondas (`Wave X/Y`) até o **chefe**. Se o HP do Núcleo chegar a zero, é derrota.
-- **Meta:**
-  - Cards de skill: Comum → Raro → Épico → Lendário. **Fusão de 3 cards idênticos** gera a raridade seguinte.
-  - Atributos permanentes: dano, velocidade de ataque, vida, armadura, regeneração, redução de cooldown.
-  - Árvore de talentos comprada com moedas.
+- **Upgrades da partida:** entre ondas, o jogador compra upgrades temporários com as moedas da partida. Eles valem só para aquela partida.
+
+## Progressão (decidida pelo usuário em 2026-11-03; detalhe no AG04)
+
+- **Nível da conta (do jogador):** sobe com XP das partidas. Ele desbloqueia os **slots de skill**:
+  - a conta começa com **0 skills**;
+  - o **slot 2** abre no nível **5**;
+  - o **slot 3** abre no nível **10**;
+  - os valores são ajustáveis no balanceamento.
+  - **[A DEFINIR]:** o nível que libera o slot 1 e a 1ª skill, e se a conta ganha outros prêmios por nível.
+- **Skills:** são "poderes especiais" ativos, com cooldown. São desbloqueadas pela progressão e não são cards.
+  - **[A DEFINIR]:** como cada skill evolui.
+- **Módulos:** são os equipamentos do Anima, equipados em slots e melhorados com o **gold** das fases. Têm raridade Comum → Raro → Épico → Lendário.
+  - **Fusão:** 3 módulos idênticos da mesma raridade viram 1 da raridade seguinte.
+- **Upgrades da partida:** comprados durante a partida, com as moedas dela, e perdidos ao fim.
+- **[A DEFINIR]:** se a moeda da partida e o gold são a mesma moeda, se a árvore de talentos continua e quais atributos os módulos dão (dano, velocidade de ataque, vida, armadura, regeneração, redução de cooldown).
 
 ## Roadmap
 
 | Marco | Objetivo | Agentes |
 |---|---|---|
 | **M0 — Fundação** | Docs, ambiente, projeto Godot, exportação Web vazia rodando no PC e no iPhone | AG07, AG02, AG03 |
-| **M1 — Protótipo do combate** *(decidido como 1º marco jogável)* | Partida completa e divertida com placeholders | AG01, AG02, AG03 |
-| **M2 — Meta-jogo local** | Cards, fusão, atributos e talentos, com save local | AG04, AG02, AG05 (local) |
+| **M1 — Demo do combate** *(1º marco jogável)* | 1 fase completa, divertida e **visualmente polida, pronta para divulgar como demo** | AG01, AG02, AG03, AG08, AG09 |
+| **M2 — Meta-jogo local** | Nível de conta, slots e skills (controle e defesa), módulos, fusão de módulos, save local | AG04, AG01, AG02, AG05 (local), AG08 |
 | **M3 — Online** | Backend escolhido: conta guest, sincronização, economia no servidor, config remota | AG05, AG04 |
-| **M4 — Monetização e polimento** | Ads, loja, skins, arte e áudio finais | **[A DEFINIR]** |
+| **M4 — Monetização e lançamento** | Ads, loja, skins, áudio final, lojas nativas | **[A DEFINIR]** |
 
-## Escopo atual: M1 (protótipo do combate)
+## Escopo atual: M1 (demo do combate)
 
 ### DENTRO
 | Área | Quantidade |
 |---|---|
 | Arena | 1, em retrato |
-| Anima | 1, placeholder geométrico |
+| Anima | 1, com arte final de demo |
 | Ataque automático | 1 tipo de projétil |
-| Skills | 3: área, controle e defesa (slots 1 a 3). O 4º slot (`Espaço`) fica **fora do M1** |
+| Skills | **1**: a de área (meteoro ou onda de choque), já liberada no slot 1. Os slots 2 e 3 aparecem bloqueados |
+| Upgrades da partida | Versão simples: entre ondas, escolher 1 de 3 upgrades pagos com as moedas da partida |
+| Visual | **Polido, nível de demo:** arte, VFX, partículas e game feel finais para esta fase (AG08 + AG09) |
 | Inimigos | 3–4 arquétipos (corredor, tanque, atirador, enxame) |
 | Fase | 1, com ~10 ondas e 1 chefe |
 | HUD | HP do Núcleo, `Wave X/Y`, moedas (contagem só na partida), pausa, botões de skill |
@@ -69,11 +83,11 @@
 | Idioma | Português do Brasil |
 
 ### FORA (até depois do M1)
-Cards e fusão, atributos, talentos, save, backend, contas, ads, compras, skins, arte e áudio finais, mais de uma fase, localização, builds nativos.
+Nível de conta, skills de controle e defesa, módulos e fusão, talentos, save, backend, contas, ads, compras, skins, áudio final, mais de uma fase, localização, builds nativos.
 
 ## Referências (gênero e estrutura, **nunca para copiar**)
 
-- **Archero:** malha de retenção e progressão (cards, farm, sessões curtas) e a clareza da vista de cima.
+- **Archero:** malha de retenção e progressão (equipamentos, farm, sessões curtas) e a clareza da vista de cima.
 - **Gêneros:** tower/base defense, bullet hell e survivor-likes, pela densidade de inimigos e projéteis.
 
 Proibido usar personagens, criaturas, nomes, ícones, sons, interface ou arte de qualquer jogo existente.
@@ -95,10 +109,12 @@ Proibido usar personagens, criaturas, nomes, ícones, sons, interface ou arte de
 | AG01 | Gameplay / Combate | Arena, Anima, ataque automático, skills, inimigos, ondas, chefe | M1 |
 | AG02 | UI / Plataforma Web | HUD, telas, entrada, tema, exportação Web (`export_presets.cfg`, `web/`), desempenho no Safari | M0/M1 |
 | AG03 | QA / Revisor | Testes, revisão, medições, veredito passa ou não passa | M1 |
-| AG04 | Meta-jogo / Dados | Cards, fusão, atributos, talentos, economia | M2 |
+| AG04 | Meta-jogo / Dados | Nível de conta, módulos, fusão, upgrades da partida (dados e balanceamento), economia | M1/M2 |
 | AG05 | Backend | Interface `Backend`, save, provedor online, segurança | M2/M3 |
 | AG06 | Backlog | Quebra dos marcos em tasks, quadro de status, andamento dos marcos e riscos | Sempre |
 | AG07 | Arquiteto Técnico | `project.godot` (Input Map, layers, autoloads), `src/core/`, arquitetura, contratos entre módulos, ADRs, metas de desempenho | Sempre |
+| AG08 | Diretor de Arte | Direção visual, paleta, sprites, ícones, fundo da arena, arte da UI, guia de estilo (`docs/arte.md`) | M1 em diante |
+| AG09 | VFX | Shaders, partículas, brilho, impactos, telegraphs e feedback visual, dentro do orçamento do iPhone | M1 em diante |
 
 Equipe: 1 usuário + agentes de IA. O prazo é por marcos, sem datas fixas.
 
@@ -115,7 +131,9 @@ Cada agente roda numa **sessão própria** do Claude Code, com o nome do agente.
 | AG04_metajogo | [agentes/AG04_metajogo.md](agentes/AG04_metajogo.md) |
 | AG05_backend | [agentes/AG05_backend.md](agentes/AG05_backend.md) |
 | Backlog | [agentes/AG06_backlog.md](agentes/AG06_backlog.md) |
-| (nome a definir) | [agentes/AG07_arquiteto.md](agentes/AG07_arquiteto.md) |
+| Arquiteto | [agentes/AG07_arquiteto.md](agentes/AG07_arquiteto.md) |
+| (a criar) | [agentes/AG08_arte.md](agentes/AG08_arte.md) |
+| (a criar) | [agentes/AG09_vfx.md](agentes/AG09_vfx.md) |
 
 Regras:
 1. **Usuário → AG00 → agentes.** O usuário fala só com o AG00, que transforma o pedido em briefing e delega.
