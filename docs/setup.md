@@ -3,7 +3,7 @@
 ## Obrigatório agora
 
 - **Godot 4.7.2** padrão (não .NET) ✅ instalado em `C:\Program Files\Godot`.
-- **Export templates 4.7.2** ⏳ pendente: *Editor → Manage Export Templates → Download and Install*.
+- **Export templates 4.7.2 (Web)** ✅ instalados. Para reinstalar: *Editor → Gerenciar Modelos de Exportação → Baixar e Instalar* (pacote único com todas as plataformas). O editor desta máquina está em pt-BR.
 - **Git**.
 
 ## Recomendado
