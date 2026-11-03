@@ -125,7 +125,7 @@ FASE 9  Desempenho no iPhone e testes (com o AG03)
 
 ## 9. Sinais expostos (contrato com o AG02)
 
-`core_hp_changed(current, max)`, `wave_changed(current, total)`, `cooldown_changed(slot, remaining, total)`, `skill_ready(slot)`, `coins_changed(amount)`, `boss_spawned(id)`, `boss_hp_changed(current, max)`, `match_ended(result)`.
+O contrato oficial fica em [docs/gameplay.md](../gameplay.md) (seção de sinais). Resumo: `core_hp_changed`, `wave_changed`, `cooldown_changed(slot, remaining, total)` (no máximo ~10×/s), `skill_used(slot)`, `skill_ready`, `coins_changed(total)`, `boss_spawned`, `boss_hp_changed`, `match_ended`.
 Mudar este contrato exige aprovação do AG00.
 
 ## 10. Game feel (checklist)
