@@ -13,15 +13,20 @@ const ENEMY_SCENE := preload("res://src/match/enemies/enemy.tscn")
 @export var spawn_margin: float = 64.0 ## px além da borda da tela
 
 var is_over := false
+## Inimigos vivos; compartilhado com a mira do Anima.
+var active_enemies: Array[Enemy] = []
 
 var _spawn_timer := 0.0
 var _rng := RandomNumberGenerator.new()
 
 @onready var anima: Anima = $Anima
+@onready var projectiles: ProjectilePool = $Projectiles
 @onready var _enemies: Node2D = $Enemies
 
 
 func _ready() -> void:
+	projectiles.build(anima.data.projectile_pool_size, anima.data.projectile)
+	anima.setup_attack(active_enemies, projectiles)
 	anima.core_hp_changed.connect(func(c: int, m: int) -> void: core_hp_changed.emit(c, m))
 	anima.core_depleted.connect(_on_core_depleted)
 	get_viewport().size_changed.connect(_center_anima)
@@ -41,8 +46,14 @@ func _physics_process(delta: float) -> void:
 func spawn(enemy_data: EnemyData, edge: Edge) -> Enemy:
 	var enemy: Enemy = ENEMY_SCENE.instantiate()
 	enemy.setup(enemy_data, edge_point(edge, arena_size(), spawn_margin, _rng.randf()), anima.position)
+	enemy.died.connect(_on_enemy_died)
 	_enemies.add_child(enemy)
+	active_enemies.append(enemy)
 	return enemy
+
+
+func _on_enemy_died(enemy: Enemy, _cause: Enemy.DeathCause) -> void:
+	active_enemies.erase(enemy)
 
 
 func arena_size() -> Vector2:

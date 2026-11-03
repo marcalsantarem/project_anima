@@ -15,11 +15,11 @@
 | T-007 | ADR das metas de desempenho e da exportação single-threaded | M0 | AG07 | a fazer |
 | T-008 | Deploy automático Web (GitHub Actions → Netlify) | M0 | AG02 | feita |
 | T-101 | `docs/gameplay.md` (parâmetros e sinais) | M1 | AG01 | feita |
-| T-102 | Autoload de fluxo de cenas | M1 | AG07 | pronta p/ briefing |
-| T-103 | Protótipo cinza: arena, Anima, 1 inimigo | M1 | AG01 | pronta p/ briefing |
-| T-104 | Ataque automático com pool | M1 | AG01 | a fazer |
+| T-102 | Autoload de fluxo de cenas | M1 | AG07 | feita |
+| T-103 | Protótipo cinza: arena, Anima, 1 inimigo | M1 | AG01 | feita |
+| T-104 | Ataque automático com pool | M1 | AG01 | pronta p/ briefing |
 | T-105 | Ondas por dados, HP do Núcleo, moedas, vitória/derrota | M1 | AG01 | a fazer |
-| T-106 | Tema base e componentes de UI | M1 | AG02 | pronta p/ briefing |
+| T-106 | Tema base e componentes de UI | M1 | AG02 | feita |
 | T-107 | Overlay de debug Web (FPS, logs) | M1 | AG02 | pronta p/ briefing |
 | T-108 | Base de skills + skill de área | M1 | AG01 | a fazer |
 | T-109 | Skill de controle | M1 | AG01 | a fazer |
@@ -34,16 +34,17 @@
 | T-118 | Desempenho no iPhone (150 inimigos / 300 projéteis) | M1 | AG01 | a fazer |
 | T-119 | Otimização do build Web | M1 | AG02 | a fazer |
 | T-120 | Validação do M1 | M1 | AG03 | a fazer |
+| T-121 | Tema global no `project.godot` | M1 | AG07 | pronta p/ briefing |
+| T-122 | Ligar a arena real ao SceneFlow | M1 | AG07 | pronta p/ briefing |
 
 ## Próximas prontas p/ briefing
 
 > **Decisão 21:** só o usuário libera briefings. A lista abaixo é sugestão; nada começa sem o OK dele.
 
-1. **T-103** (AG01, protótipo cinza): T-001 e T-101 feitas.
-2. **T-102** (AG07, fluxo de cenas): T-001 feita.
-3. **T-106** (AG02, tema e componentes): fonte Outfit aguarda OK do usuário (pode começar com fonte provisória).
-4. Também prontas: **T-006** (AG02, cena de estresse), **T-107** (AG02, overlay de debug).
-- Paralelo possível: T-103 ‖ T-102 ‖ uma task do AG02 (arquivos diferentes). T-106, T-006 e T-107 são do AG02: em sessões diferentes ou em sequência.
+1. **T-104** (AG01, ataque automático com pool): T-103 feita.
+2. **T-121** (AG07, tema global) → depois **T-122** (AG07, arena no SceneFlow): mesmo dono, em sequência.
+3. **T-107** (AG02, overlay de debug) ou **T-006** (AG02, cena de estresse).
+- Paralelo possível: T-104 ‖ T-121/T-122 ‖ uma task do AG02 (arquivos diferentes).
 
 ## Paralelismo e conflitos
 
@@ -139,19 +140,19 @@
 - **Briefing:** BRF-003
 
 ### T-102 — Autoload de fluxo de cenas
-- **Marco:** M1 · **Dono:** AG07 · **Status:** pronta p/ briefing
+- **Marco:** M1 · **Dono:** AG07 · **Status:** feita
 - **Depende de:** T-001 (mesmo `project.godot`) · **Desbloqueia:** T-113
 - **Arquivos:** `src/core/`, `project.godot` (autoload, cena principal)
 - **Pronto quando:** autoload troca entre Toque para começar → Partida → Resultado com cenas placeholder; partida recebe config e devolve resultado (sem `meta/` nem `backend/`).
 
 ### T-103 — Protótipo cinza: arena, Anima, 1 inimigo
-- **Marco:** M1 · **Dono:** AG01 · **Status:** pronta p/ briefing
+- **Marco:** M1 · **Dono:** AG01 · **Status:** feita
 - **Depende de:** T-001, T-101 · **Desbloqueia:** T-104
 - **Arquivos:** `src/match/arena/`, `src/match/anima/`, `src/match/enemies/`, `data/enemies/enemy_runner.tres`
 - **Pronto quando:** arena em retrato; Anima fixo no centro; inimigo corredor nasce na borda, anda até o centro e causa dano ao Núcleo; valores vêm de `.tres`.
 
 ### T-104 — Ataque automático com pool
-- **Marco:** M1 · **Dono:** AG01 · **Status:** a fazer
+- **Marco:** M1 · **Dono:** AG01 · **Status:** pronta p/ briefing
 - **Depende de:** T-103 · **Desbloqueia:** T-105
 - **Arquivos:** `src/match/anima/`, `src/match/projectiles/`, `data/`
 - **Pronto quando:** mira no inimigo mais próximo/prioritário; projéteis reutilizados por pool (sem instanciar por tiro); dano e morte do inimigo funcionam.
@@ -164,8 +165,8 @@
 - **Pronto quando:** spawner lê ondas de `.tres` (3 ondas de teste); sinais de HP, `Wave X/Y`, moedas e fim de partida emitidos; HP zero = derrota; última onda = vitória.
 
 ### T-106 — Tema base e componentes de UI
-- **Marco:** M1 · **Dono:** AG02 · **Status:** pronta p/ briefing
-- **Depende de:** T-003 · fonte Outfit baixada (aguarda OK do usuário; pode começar com fonte provisória) · **Desbloqueia:** T-112, T-113
+- **Marco:** M1 · **Dono:** AG02 · **Status:** feita
+- **Depende de:** T-003 · **Desbloqueia:** T-112, T-113, T-121
 - **Arquivos:** `src/ui/theme/`, `src/ui/components/`
 - **Pronto quando:** tema base aplicado; botão, barra de vida e botão de skill com cooldown visual funcionam com toque, mouse e Input Actions; cena de demonstração.
 - **Decisão:** fonte Outfit.
@@ -210,7 +211,7 @@
 
 ### T-113 — Telas: toque para começar, pausa, resultado
 - **Marco:** M1 · **Dono:** AG02 · **Status:** a fazer
-- **Depende de:** T-102, T-106, T-112 (mesma pasta) · **Desbloqueia:** T-120
+- **Depende de:** T-102, T-106, T-112 (mesma pasta), T-121, T-122 · **Desbloqueia:** T-120
 - **Arquivos:** `src/ui/screens/`
 - **Pronto quando:** toque para começar libera o áudio; pausa manual e ao perder o foco da aba; resultado de vitória/derrota com moedas e "Jogar de novo".
 
@@ -255,6 +256,18 @@
 - **Depende de:** T-113, T-114, T-116, T-117, T-118, T-119 · **Desbloqueia:** fechamento do M1
 - **Arquivos:** `docs/qa/QA-001_m1.md`
 - **Pronto quando:** checklist AG03 §5 executado (partida completa, simulação de 5 min, build medido, checklist do iPhone para o usuário); veredito passa/não passa.
+
+### T-121 — Tema global no `project.godot`
+- **Marco:** M1 · **Dono:** AG07 · **Status:** pronta p/ briefing
+- **Depende de:** T-106 · **Desbloqueia:** T-112, T-113
+- **Arquivos:** `project.godot`
+- **Pronto quando:** o tema base do AG02 é o tema global do projeto; telas existentes abrem com a fonte Outfit sem erros.
+
+### T-122 — Ligar a arena real ao SceneFlow
+- **Marco:** M1 · **Dono:** AG07 · **Status:** pronta p/ briefing
+- **Depende de:** T-102, T-103 · **Desbloqueia:** T-113
+- **Arquivos:** `src/core/`
+- **Pronto quando:** o SceneFlow abre a arena real (no lugar do placeholder), chama `setup(config)` e vai para o Resultado ao receber `match_ended`.
 
 ---
 

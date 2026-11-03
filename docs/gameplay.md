@@ -29,22 +29,24 @@
 
 ## Anima e ataque automático
 
-Arquivo de dados: `data/anima/anima_default.tres` (`AnimaData`).
+Arquivos de dados: `data/anima/anima_default.tres` (`AnimaData`) e `data/projectiles/projectile_anima_basic.tres` (`ProjectileData`).
 
 | Campo | Valor | Notas |
 |---|---|---|
-| `core_hp_max` | 100 | HP do Núcleo |
-| `hurtbox_radius` | 40 px | hurtbox circular |
-| `fire_rate` | 2 tiros/s | |
-| `projectile_speed` | 900 px/s | |
-| `projectile_damage` | 10 | |
-| `attack_range` | 600 px | fora do alcance, não atira |
-| `target_scan_interval` | 0,1 s | busca de alvo por intervalo, não por frame |
-| `pierce` | 0 | número de alvos extras atravessados |
-| `projectile_pool_size` | 64 | pré-alocados; nada de `instantiate`/`queue_free` por tiro |
+| `AnimaData.core_hp_max` | 100 | HP do Núcleo |
+| `AnimaData.hurtbox_radius` | 40 px | hurtbox circular |
+| `AnimaData.fire_rate` | 2 tiros/s | |
+| `AnimaData.attack_range` | 600 px | fora do alcance, não atira; também é a distância máxima do projétil |
+| `AnimaData.target_scan_interval` | 0,1 s | busca de alvo por intervalo, não por frame |
+| `AnimaData.projectile_pool_size` | 64 | pré-alocados; nada de `instantiate`/`queue_free` por tiro |
+| `ProjectileData.speed` | 900 px/s | |
+| `ProjectileData.damage` | 10 | |
+| `ProjectileData.radius` | 6 px | |
+| `ProjectileData.pierce` | 0 | número de alvos extras atravessados |
+| `ProjectileData.color` | ciano | exclusivo do jogador; projéteis inimigos **sem ciano** |
 
 **Mira:** maior `target_priority` primeiro (campo do inimigo); empate → mais próximo. Só considera inimigos dentro do alcance e visíveis.
-**Projétil:** acerta cada alvo uma vez; some ao sair da tela, ao passar do alcance ou ao esgotar o `pierce`, e volta ao pool.
+**Projétil:** tiro em linha reta (sem teleguiado); acerta cada alvo uma vez; some ao passar do alcance ou ao esgotar o `pierce` e volta ao pool. Inativo, fica estacionado fora da arena (sem ligar e desligar a colisão). Pool esgotado = o tiro é pulado, o pool não cresce.
 
 ## Skills
 
@@ -178,7 +180,7 @@ O `project.godot` é do AG07. Layers sugeridas:
 | Sistema | Status | Task |
 |---|---|---|
 | Arena, Anima, 1 inimigo | protótipo | T-103 |
-| Ataque automático com pool | pendente | T-104 |
+| Ataque automático com pool | protótipo | T-104 |
 | Ondas, HP do Núcleo, moedas, vitória/derrota | pendente | T-105 |
 | Skill de área | pendente | T-108 |
 | Skill de controle | pendente | T-109 |

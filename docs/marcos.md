@@ -5,7 +5,7 @@
 | Marco | Status | Tasks feitas |
 |---|---|---|
 | M0 — Fundação | em andamento | 5/8 (63%) · 1 em validação |
-| M1 — Protótipo do combate | em andamento | 1/20 (5%) |
+| M1 — Protótipo do combate | em andamento | 4/22 (18%) |
 | M2 — Meta-jogo local | não quebrado | — |
 | M3 — Online | não quebrado | — |
 | M4 — Monetização e polimento | não quebrado | — |
@@ -48,7 +48,8 @@
 - [ ] 4 arquétipos de inimigo e 1 chefe com fases (T-103, T-111, T-115)
 - [ ] Fase 1 com ~10 ondas + chefe, partida de 3–10 min (T-116)
 - [ ] HUD completo ligado por sinais (T-112)
-- [ ] Fluxo Toque para começar → Partida → Resultado → Jogar de novo, com pausa ao perder foco (T-102, T-113)
+- [ ] Fluxo Toque para começar → Partida → Resultado → Jogar de novo, com pausa ao perder foco (T-102 ✔, T-122, T-113)
+- [ ] Tema global com fonte Outfit aplicado (T-106 ✔, T-121)
 - [ ] Testes GUT passando headless (T-114)
 - [ ] ≥ 50 fps no iPhone na carga-alvo e build ≤ ~15 MB (ou metas revisadas no M0) (T-118, T-119)
 - [ ] Veredito "passa" do AG03 (T-120) e aval do usuário sobre a diversão

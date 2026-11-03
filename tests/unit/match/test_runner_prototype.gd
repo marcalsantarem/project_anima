@@ -30,6 +30,7 @@ func test_runner_reaches_core_and_deals_contact_damage() -> void:
 	var arena: Arena = ARENA_SCENE.instantiate()
 	arena.spawn_interval = 999.0 # só o spawn manual abaixo
 	add_child_autofree(arena)
+	arena.anima.auto_attack_enabled = false # isola o contato do ataque automático
 	await wait_physics_frames(1)
 	var enemy := arena.spawn(RUNNER, Arena.Edge.TOP)
 	# Distância até o centro + margem, dividida pela velocidade, com folga.
