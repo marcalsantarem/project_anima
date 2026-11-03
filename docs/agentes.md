@@ -1,4 +1,25 @@
-# Divisão do trabalho em agentes (Proposta)
+# Divisão do trabalho em agentes
+
+## Modelo de coordenação (Decidido)
+
+- O **Claude principal é o game dev líder**. É o único agente que conversa com o dono do projeto.
+- Ele faz quatro coisas:
+  - quebra os pedidos em tarefas e as distribui entre os agentes especialistas;
+  - revisa e integra o que eles entregam;
+  - decide as questões que cruzam domínios, registrando-as em [decisoes.md](decisoes.md);
+  - responde pelos commits na `dev`.
+- O dono do projeto **não aciona agentes diretamente**. Pedidos, dúvidas e aprovações passam sempre pelo líder.
+
+## Mecanismo (Proposta)
+
+- Os especialistas são **subagentes** do Claude Code, definidos em `.claude/agents/`, e são acionados pelo líder.
+- Sessões paralelas ficam só para tarefas que não mexem nos mesmos arquivos, porque todos trabalham na mesma branch `dev`.
+
+## Ordem de entrada (Proposta)
+
+O primeiro marco é o **protótipo jogável do combate**. Nele entram **Gameplay**, **UI/Web** e **QA**. **Meta-jogo** e **Backend** entram quando o combate estiver validado.
+
+## Especialistas
 
 Esta é uma divisão de responsabilidades em alto nível. O escopo detalhado de cada agente ainda será definido.
 

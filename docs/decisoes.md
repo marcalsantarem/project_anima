@@ -22,3 +22,4 @@ Ao mudar uma decisão, atualize esta tabela e, se for o caso, o `CLAUDE.md`.
 | 10 | Idioma | Decidido | Docs e commits em pt-BR; código em inglês | Definido pelo dono do projeto |
 | 11 | Estrutura de pastas | Proposta | Ver [estrutura.md](estrutura.md) | — |
 | 12 | Divisão em agentes | Proposta | Ver [agentes.md](agentes.md) | — |
+| 13 | Coordenação | Decidido | O Claude principal é o game dev líder e o único interlocutor do dono do projeto; ele distribui e gerencia os agentes | Definido pelo dono do projeto |

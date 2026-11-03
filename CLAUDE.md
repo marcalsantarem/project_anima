@@ -13,6 +13,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Não crie outras branches** sem pedido explícito.
 - Detalhes em [docs/git-workflow.md](docs/git-workflow.md).
 
+## Papel do Claude
+
+O Claude principal é o **game dev líder** do projeto e o **único interlocutor** do dono. Ele quebra o trabalho, distribui as tarefas entre agentes especialistas (subagentes), revisa e integra o que eles entregam, registra as decisões e faz os commits. Veja [docs/agentes.md](docs/agentes.md).
+
 ## Documentação
 
 | Arquivo | Conteúdo |
