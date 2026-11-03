@@ -177,7 +177,7 @@ O `project.godot` é do AG07. Layers sugeridas:
 
 | Sistema | Status | Task |
 |---|---|---|
-| Arena, Anima, 1 inimigo | pendente | T-103 |
+| Arena, Anima, 1 inimigo | protótipo | T-103 |
 | Ataque automático com pool | pendente | T-104 |
 | Ondas, HP do Núcleo, moedas, vitória/derrota | pendente | T-105 |
 | Skill de área | pendente | T-108 |

@@ -6,16 +6,17 @@
 
 | ID | Título | Marco | Dono | Status |
 |---|---|---|---|---|
-| T-001 | Layers de colisão nomeadas | M0 | AG07 | pronta p/ briefing |
+| T-001 | Layers de colisão nomeadas | M0 | AG07 | feita |
 | T-002 | Instalar GUT e teste smoke headless | M0 | AG03 | feita |
 | T-003 | `docs/ui.md` (tokens, layout, fluxo de telas) | M0 | AG02 | feita |
 | T-004 | Preset Web + HTML shell mínimo | M0 | AG02 | feita |
-| T-005 | Build vazio no Chrome PC e no iPhone | M0 | AG02 | bloqueada |
+| T-005 | Build vazio no Chrome PC e no iPhone | M0 | AG02 | em validação |
 | T-006 | Cena de estresse para confirmar metas de desempenho | M0 | AG02 | pronta p/ briefing |
 | T-007 | ADR das metas de desempenho e da exportação single-threaded | M0 | AG07 | a fazer |
+| T-008 | Deploy automático Web (GitHub Actions → Netlify) | M0 | AG02 | feita |
 | T-101 | `docs/gameplay.md` (parâmetros e sinais) | M1 | AG01 | feita |
-| T-102 | Autoload de fluxo de cenas | M1 | AG07 | a fazer |
-| T-103 | Protótipo cinza: arena, Anima, 1 inimigo | M1 | AG01 | a fazer |
+| T-102 | Autoload de fluxo de cenas | M1 | AG07 | pronta p/ briefing |
+| T-103 | Protótipo cinza: arena, Anima, 1 inimigo | M1 | AG01 | pronta p/ briefing |
 | T-104 | Ataque automático com pool | M1 | AG01 | a fazer |
 | T-105 | Ondas por dados, HP do Núcleo, moedas, vitória/derrota | M1 | AG01 | a fazer |
 | T-106 | Tema base e componentes de UI | M1 | AG02 | pronta p/ briefing |
@@ -36,10 +37,13 @@
 
 ## Próximas prontas p/ briefing
 
-1. **T-001** (AG07): pronta, aguarda a sessão do AG07 ser aberta.
-2. **T-106** (AG02, tema e componentes): T-003 feita; pode rodar em paralelo à T-006 (arquivos diferentes). Usar fonte Outfit (download aguarda OK do usuário).
-3. **T-006** (AG02, cena de estresse): T-004 feita; medição no PC já possível, no iPhone depende da T-005.
-4. **T-102** (AG07): depois da T-001 (mesmo `project.godot`).
+> **Decisão 21:** só o usuário libera briefings. A lista abaixo é sugestão; nada começa sem o OK dele.
+
+1. **T-103** (AG01, protótipo cinza): T-001 e T-101 feitas.
+2. **T-102** (AG07, fluxo de cenas): T-001 feita.
+3. **T-106** (AG02, tema e componentes): fonte Outfit aguarda OK do usuário (pode começar com fonte provisória).
+4. Também prontas: **T-006** (AG02, cena de estresse), **T-107** (AG02, overlay de debug).
+- Paralelo possível: T-103 ‖ T-102 ‖ uma task do AG02 (arquivos diferentes). T-106, T-006 e T-107 são do AG02: em sessões diferentes ou em sequência.
 
 ## Paralelismo e conflitos
 
@@ -58,12 +62,12 @@
 ## M0 — Fundação
 
 ### T-001 — Layers de colisão nomeadas
-- **Marco:** M0 · **Dono:** AG07 · **Status:** pronta p/ briefing
+- **Marco:** M0 · **Dono:** AG07 · **Status:** feita
 - **Depende de:** — · **Desbloqueia:** T-103
 - **Arquivos:** `project.godot`
 - **Pronto quando:**
-  - layers 2D nomeadas (sugestão: `anima`, `core`, `enemy`, `player_projectile`, `enemy_projectile`, `skill_area`);
-  - tabela de layers e máscaras registrada em `docs/estrutura.md` ou `docs/arquitetura.md`;
+  - layers 2D nomeadas: `anima`, `enemies`, `player_projectiles`, `enemy_projectiles`, `skill_areas`, `shield`;
+  - tabela de layers e máscaras registrada em `docs/arquitetura.md`;
   - projeto abre sem erros.
 
 ### T-002 — Instalar GUT e teste smoke headless
@@ -94,8 +98,9 @@
 - **Briefing:** BRF-005
 
 ### T-005 — Build vazio no Chrome PC e no iPhone
-- **Marco:** M0 · **Dono:** AG02 · **Status:** bloqueada
-- **Depende de:** T-004 · **decisão pendente: como servir o link de teste** (hosting de preview ou servidor local na rede) · **Desbloqueia:** T-007
+- **Marco:** M0 · **Dono:** AG02 · **Status:** em validação
+- **Depende de:** T-004, T-008 · **Desbloqueia:** T-007
+- **Situação:** build no ar em dev--projectanimagame.netlify.app e conferido no PC; falta o teste do usuário no iPhone.
 - **Arquivos:** `web/`, `docs/setup.md` (seção de deploy de teste, com autorização)
 - **Pronto quando:**
   - build abre no Chrome do PC sem erros no console;
@@ -114,6 +119,14 @@
 - **Arquivos:** `docs/adr/`
 - **Pronto quando:** ADR com as medições de T-005/T-006, metas de fps e tamanho confirmadas ou ajustadas e recomendação sobre a decisão #4; o AG00 usa a ADR para atualizar `decisoes.md` e a Bíblia.
 
+### T-008 — Deploy automático Web (GitHub Actions → Netlify)
+- **Marco:** M0 · **Dono:** AG02 · **Status:** feita
+- **Depende de:** T-004 · **Desbloqueia:** T-005
+- **Arquivos:** `.github/workflows/deploy-web.yml`
+- **Pronto quando:** push em `dev` publica em dev--projectanimagame.netlify.app; push em `main` publica em projectanimagame.netlify.app.
+- **Briefing:** BRF-006, BRF-007
+- **Obs.:** entregue fora do backlog e registrado depois.
+
 ---
 
 ## M1 — Protótipo do combate
@@ -126,13 +139,13 @@
 - **Briefing:** BRF-003
 
 ### T-102 — Autoload de fluxo de cenas
-- **Marco:** M1 · **Dono:** AG07 · **Status:** a fazer
+- **Marco:** M1 · **Dono:** AG07 · **Status:** pronta p/ briefing
 - **Depende de:** T-001 (mesmo `project.godot`) · **Desbloqueia:** T-113
 - **Arquivos:** `src/core/`, `project.godot` (autoload, cena principal)
 - **Pronto quando:** autoload troca entre Toque para começar → Partida → Resultado com cenas placeholder; partida recebe config e devolve resultado (sem `meta/` nem `backend/`).
 
 ### T-103 — Protótipo cinza: arena, Anima, 1 inimigo
-- **Marco:** M1 · **Dono:** AG01 · **Status:** a fazer
+- **Marco:** M1 · **Dono:** AG01 · **Status:** pronta p/ briefing
 - **Depende de:** T-001, T-101 · **Desbloqueia:** T-104
 - **Arquivos:** `src/match/arena/`, `src/match/anima/`, `src/match/enemies/`, `data/enemies/enemy_runner.tres`
 - **Pronto quando:** arena em retrato; Anima fixo no centro; inimigo corredor nasce na borda, anda até o centro e causa dano ao Núcleo; valores vêm de `.tres`.

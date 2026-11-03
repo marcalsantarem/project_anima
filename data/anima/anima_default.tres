@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="AnimaData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/match/anima/anima_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+core_hp_max = 100
+hurtbox_radius = 40.0

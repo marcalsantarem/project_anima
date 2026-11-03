@@ -4,7 +4,7 @@
 
 | Marco | Status | Tasks feitas |
 |---|---|---|
-| M0 — Fundação | em andamento | 3/7 (43%) |
+| M0 — Fundação | em andamento | 5/8 (63%) · 1 em validação |
 | M1 — Protótipo do combate | em andamento | 1/20 (5%) |
 | M2 — Meta-jogo local | não quebrado | — |
 | M3 — Online | não quebrado | — |
@@ -17,16 +17,17 @@
 **Já feito antes do backlog:** Bíblia v1.0, docs dos agentes, projeto Godot 4.7.2 com Input Map, export templates Web instalados.
 
 **Critérios de fechamento:**
-- [ ] Layers de colisão nomeadas e documentadas (T-001)
+- [x] Layers de colisão nomeadas e documentadas (T-001)
 - [x] GUT roda headless com 1 teste passando (T-002)
 - [x] `docs/ui.md` escrito (T-003)
 - [x] Preset Web single-threaded exporta sem erros (T-004)
-- [ ] Build vazio abre no Chrome do PC e no Safari do iPhone, com link de teste documentado (T-005)
+- [x] Deploy automático de teste no Netlify (T-008)
+- [ ] Build vazio abre no Chrome do PC e no Safari do iPhone (T-005: PC ok, falta o iPhone)
 - [ ] Metas de fps e tamanho confirmadas por medição, com ADR (T-006, T-007)
-- [ ] AG00 atualiza `decisoes.md` (#4 e hosting de teste) com base na ADR de T-007
+- [ ] AG00 atualiza `decisoes.md` (#4) com base na ADR de T-007
 
 **Bloqueios:**
-- T-005 depende de decidir **como servir o link de teste para o iPhone** (aguarda escolha do usuário).
+- Nenhum. T-005 aguarda só o teste do usuário no iPhone.
 
 **Riscos:**
 
@@ -34,8 +35,7 @@
 |---|---|---|---|
 | GUT sem versão compatível com Godot 4.7.2 | média | médio | Testar a versão mais recente do GUT cedo (T-002); alternativa: gdUnit4 (subir decisão) |
 | Safari do iOS com problemas no build (gestos, viewport, WebGL 2) | média | alto | Validar build vazio já no M0 (T-005) antes de qualquer gameplay |
-| Sem hosting de teste, o iPhone não é validado | alta | alto | Decidir o meio de teste antes de T-005 |
-| Build acima de ~15 MB: wasm com 37,7 MB brutos (~9,7 MB com gzip) | alta | alto | Escolher hosting que sirva gzip/brotli; avaliar build customizado do Godot sem módulos não usados (T-007, T-119) |
+| Build acima de ~15 MB: wasm com 37,7 MB brutos (~9,7 MB com gzip) | alta | alto | Confirmar que o Netlify serve o wasm comprimido (gzip/brotli); avaliar build customizado do Godot sem módulos não usados (T-007, T-119) |
 | Metas de desempenho irreais no iPhone | média | alto | Cena de estresse no M0 (T-006) e revisão das metas em T-007 |
 
 ## M1 — Protótipo do combate

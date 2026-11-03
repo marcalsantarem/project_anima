@@ -1,0 +1,13 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://src/match/arena/arena.gd" id="1"]
+[ext_resource type="PackedScene" path="res://src/match/anima/anima.tscn" id="2"]
+[ext_resource type="Resource" path="res://data/enemies/enemy_runner.tres" id="3"]
+
+[node name="Arena" type="Node2D"]
+script = ExtResource("1")
+spawn_enemy = ExtResource("3")
+
+[node name="Enemies" type="Node2D" parent="."]
+
+[node name="Anima" parent="." instance=ExtResource("2")]
