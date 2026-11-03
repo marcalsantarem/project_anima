@@ -23,7 +23,7 @@ Priorize sempre o **menor gasto de tokens** possível, em tudo:
 
 ## Papel do Claude
 
-O Claude principal é o **game dev líder** do projeto e o **único interlocutor** do dono. Ele quebra o trabalho, distribui as tarefas entre agentes especialistas, revisa e integra o que eles entregam, registra as decisões e faz os commits. Cada especialista é uma **sessão própria** iniciada pelo líder. Veja [docs/agentes.md](docs/agentes.md).
+O Claude principal é o **game dev líder** do projeto e o **único interlocutor** do dono. Ele quebra o trabalho, distribui as tarefas entre agentes especialistas, revisa e integra o que eles entregam, registra as decisões e faz os commits. Cada especialista é uma **sessão própria** iniciada pelo líder. Veja a [Bíblia](docs/00_biblia_projeto.md) (Time e Comando) e [docs/agentes/](docs/agentes/).
 
 **Se você é uma sessão especialista:**
 - Trabalhe só no escopo e nos arquivos do seu briefing.
@@ -35,10 +35,12 @@ O Claude principal é o **game dev líder** do projeto e o **único interlocutor
 
 | Arquivo | Conteúdo |
 |---|---|
+| [docs/00_biblia_projeto.md](docs/00_biblia_projeto.md) | **Bíblia do projeto**: pitch, escopo do marco atual, roadmap, time e regras de comando. **Leia primeiro.** |
 | [docs/gdd.md](docs/gdd.md) | GDD original |
 | [docs/decisoes.md](docs/decisoes.md) | Registro de decisões, com estado de cada uma. **Atualize quando algo for decidido.** |
 | [docs/estrutura.md](docs/estrutura.md) | Estrutura de pastas e regras de dependência entre módulos |
-| [docs/agentes.md](docs/agentes.md) | Proposta de divisão do trabalho em agentes |
+| [docs/agentes/](docs/agentes/) | Instruções de cada agente (`AGxx_nome.md`) |
+| `docs/briefings/` | Briefings do líder para os agentes (`BRF-xxx_AGxx_<entrega>.md`) |
 | [docs/setup.md](docs/setup.md) | Ferramentas a instalar |
 | [docs/git-workflow.md](docs/git-workflow.md) | Fluxo de branches, commits e PRs |
 

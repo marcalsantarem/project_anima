@@ -18,7 +18,7 @@ tests/
   unit/          Testes de lógica pura (principalmente src/meta).
   integration/   Testes que instanciam cenas.
 web/             HTML shell customizado da exportação Web e scripts JS (bridges).
-docs/            GDD, decisões, regras e planejamento.
+docs/            Bíblia, GDD, decisões, regras, agentes/ (instruções) e briefings/.
 build/           Saída das exportações (ignorada pelo git).
 ```
 
