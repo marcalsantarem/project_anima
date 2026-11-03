@@ -21,29 +21,39 @@ Regras:
 - No código, use constantes, nunca números soltos. Quando surgir a necessidade, elas ficam em `src/core/`.
 - Layers novas (por exemplo `pickups`) só entram com uma task do AG07.
 
-## Fluxo de cenas (T-102)
+## Tema global (T-121)
 
-Autoload **`SceneFlow`** (`src/core/scene_flow.gd`): **Toque para começar → Partida → Resultado → Toque para começar**.
+`project.godot` → `[gui] theme/custom="res://src/ui/theme/anima_theme.tres"` (tema do AG02, com a fonte Outfit). Vale para toda a UI.
 
-| Cena | Arquivo | Estado |
+## Fluxo de cenas (T-102, T-122)
+
+Cena principal: `src/core/main.tscn` (**Boot**), que chama `SceneFlow.go_to_title()`. Auth e config entram aqui no futuro.
+
+Autoload **`SceneFlow`** (`src/core/scene_flow.gd`): **Título → Partida → Resultado → Partida**.
+
+| Cena | Arquivo | Ligação |
 |---|---|---|
-| Toque para começar | `src/core/main.tscn` (cena principal) | placeholder; final: AG02 (T-113) |
-| Partida | `MatchConfig.match_scene_path` | placeholder em `src/core/placeholder/`; final: arena do AG01 |
-| Resultado | `SceneFlow.RESULT_SCENE` | placeholder; final: AG02 |
+| Título | `src/ui/screens/title_screen.tscn` | `start_requested` → `start_match()` |
+| Partida | nó `Match` = HUD + Pausa + Arena (`MatchConfig.match_scene_path`) | `match_ended` → Resultado; `PauseScreen.restart_requested` → `start_match(config)` |
+| Resultado | `src/ui/screens/result_screen.tscn` | `show_result(result)`; `play_again_requested` → `start_match(last_config)` |
 
 API:
-- `SceneFlow.start_match(config: MatchConfig = null)`: instancia a partida, chama `setup(config)` e troca a cena.
-- `SceneFlow.go_to_title()`: volta à tela inicial.
-- `SceneFlow.last_result: MatchResult`: o resultado mais recente, lido pela tela de resultado.
-- Sinal `SceneFlow.scene_changed(scene_path)`: emitido depois de cada troca. Trocas pedidas durante uma troca são ignoradas.
+- `start_match(config: MatchConfig = null)`:
+  - instancia a Arena e chama `setup(config)`;
+  - monta HUD e Pausa e chama `bind(arena)` **antes** de a Arena entrar na árvore;
+  - troca a cena.
+- `go_to_title()`.
+- `current_arena() -> Node`: a Arena em andamento ou `null`.
+- `last_result: MatchResult`, `last_config: MatchConfig`.
+- Sinal `scene_changed(scene_path)`, emitido depois de cada troca:
+  - as trocas pedidas durante uma troca são ignoradas;
+  - toda troca despausa a árvore.
 
-**Contrato da cena de partida** (nó raiz):
-- `setup(config: MatchConfig)`: chamado **antes** de o nó entrar na árvore.
-- Sinal `match_ended(result: MatchResult)`: emitido **uma vez**. O `SceneFlow` leva à tela de resultado.
-- A partida não chama o `SceneFlow` nem conhece `meta/`, `backend/` ou a UI.
+**Contrato da cena de partida** (nó raiz da Arena):
+- `setup(config: MatchConfig)`: chamado antes de entrar na árvore.
+- Sinal `match_ended(result: MatchResult)`: emitido uma vez.
+- A partida não chama o `SceneFlow` nem conhece `meta/`, `backend/` ou a UI. A montagem com a UI segue [ui.md](ui.md) §10c.
 
 **Tipos** (`src/core/`, `RefCounted`):
-- `MatchConfig`: `stage_id`, `match_scene_path`. O AG04 adiciona `anima_data` e `skills` quando esses tipos existirem.
+- `MatchConfig`: `stage_id`, `match_scene_path` (padrão: `res://src/match/arena/arena.tscn`). O AG04 adiciona `anima_data` e `skills`.
 - `MatchResult`: `outcome` (`Outcome.VICTORY|DEFEAT`), `wave_reached`, `waves_total`, `coins`, `enemies_killed`, `duration_s`.
-
-**Entrada:** as telas placeholder herdam de `TapScreen`, que avança com toque, clique ou `ui_accept`. Na web, o primeiro toque é o gesto que destrava o áudio.

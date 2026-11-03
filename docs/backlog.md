@@ -26,7 +26,7 @@
 | T-110 | Skill de defesa | M1 | AG01 | a fazer |
 | T-111 | Arquétipos: tanque, atirador, enxame | M1 | AG01 | feita |
 | T-112 | HUD ligado aos sinais | M1 | AG02 | feita |
-| T-113 | Telas: toque para começar, pausa, resultado | M1 | AG02 | em andamento |
+| T-113 | Telas: toque para começar, pausa, resultado | M1 | AG02 | feita |
 | T-114 | Testes GUT de ondas, dano e cooldowns | M1 | AG03 | feita |
 | T-115 | Chefe da fase 1 | M1 | AG01 | pronta p/ briefing |
 | T-116 | Fase 1 completa (~10 ondas + chefe) | M1 | AG01 | a fazer |
@@ -44,9 +44,8 @@
 
 1. **T-109** (AG01, skill de controle) → **T-110**; **T-123** (AG01, seed) é pequena e pode vir antes. **T-115** (AG01, chefe) em paralelo só com outra sessão do AG01.
 2. **T-121** (AG07, tema global) → depois **T-122** (AG07, arena no SceneFlow).
-3. **T-107** (AG02, overlay de debug) ou **T-006** (AG02, cena de estresse), em outra sessão, enquanto a T-113 anda.
-- Em andamento: **T-113** (AG02).
-- Paralelo possível: AG01 ‖ T-121/T-122 ‖ T-107 (arquivos diferentes). A T-122 mexe em `src/core/`; a T-113 em `src/ui/screens/`: sem conflito.
+3. **T-107** (AG02, overlay de debug) ou **T-006** (AG02, cena de estresse); o AG02 está livre.
+- Paralelo possível: AG01 ‖ T-121/T-122 ‖ T-107 (arquivos diferentes).
 
 ## Paralelismo e conflitos
 
@@ -212,7 +211,7 @@
 - **Pronto quando:** HP do Núcleo, `Wave X/Y`, moedas, pausa e 3 botões de skill reagem só por sinais; funciona em retrato com safe area.
 
 ### T-113 — Telas: toque para começar, pausa, resultado
-- **Marco:** M1 · **Dono:** AG02 · **Status:** em andamento
+- **Marco:** M1 · **Dono:** AG02 · **Status:** feita
 - **Depende de:** T-102, T-106, T-112 (mesma pasta), T-121, T-122 · **Desbloqueia:** T-120
 - **Arquivos:** `src/ui/screens/`
 - **Pronto quando:** toque para começar libera o áudio; pausa manual e ao perder o foco da aba; resultado de vitória/derrota com moedas e "Jogar de novo".
@@ -274,6 +273,7 @@
 - **Arquivos:** `src/core/`
 - **Pronto quando:** o SceneFlow abre a arena real (no lugar do placeholder), chama `setup(config)` e vai para o Resultado ao receber `match_ended`.
 - **Notas:** chamar `hud.bind(arena)` antes de a arena entrar na árvore; `DEFAULT_MATCH_SCENE` ainda aponta para o placeholder.
+- **Contrato de montagem (`docs/ui.md` §10c):** montar HUD + PauseScreen junto da arena; chamar `bind` antes de a arena entrar na árvore; ligar `restart_requested` → `start_match`.
 
 ### T-123 — Seed no `Arena._rng` para testes determinísticos
 - **Marco:** M1 · **Dono:** AG01 · **Status:** pronta p/ briefing
