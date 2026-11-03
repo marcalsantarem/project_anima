@@ -10,12 +10,16 @@
   - responde pelos commits na `dev`.
 - O dono do projeto **não aciona agentes diretamente**. Pedidos, dúvidas e aprovações passam sempre pelo líder.
 
-## Mecanismo (Proposta)
+## Mecanismo
 
-- Os especialistas são **subagentes** do Claude Code, definidos em `.claude/agents/`, e são acionados pelo líder.
-- Sessões paralelas ficam só para tarefas que não mexem nos mesmos arquivos, porque todos trabalham na mesma branch `dev`.
+- **(Decidido)** Cada especialista é uma **sessão própria do Claude Code**. O líder inicia a sessão com um briefing quando há trabalho para ela e acompanha o resultado. Elas não trabalham por iniciativa própria.
+- **(Proposta) Regras para as sessões**, já que o git só permite a `dev`:
+  - Trabalham na **mesma pasta e na branch `dev`**, sem worktrees, porque cada worktree exige uma branch própria.
+  - **Não fazem commit nem push.** O líder revisa o resultado e faz o commit.
+  - Duas sessões só rodam ao mesmo tempo se mexerem em **arquivos diferentes**. As pastas de cada especialista ajudam a garantir isso. Se houver sobreposição, uma roda depois da outra.
+  - Arquivos compartilhados, como `project.godot`, autoloads e Input Map, só são alterados pelo líder ou com autorização dele no briefing.
 
-## Ordem de entrada (Proposta)
+## Ordem de entrada (Decidido)
 
 O primeiro marco é o **protótipo jogável do combate**. Nele entram **Gameplay**, **UI/Web** e **QA**. **Meta-jogo** e **Backend** entram quando o combate estiver validado.
 

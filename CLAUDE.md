@@ -15,7 +15,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Papel do Claude
 
-O Claude principal é o **game dev líder** do projeto e o **único interlocutor** do dono. Ele quebra o trabalho, distribui as tarefas entre agentes especialistas (subagentes), revisa e integra o que eles entregam, registra as decisões e faz os commits. Veja [docs/agentes.md](docs/agentes.md).
+O Claude principal é o **game dev líder** do projeto e o **único interlocutor** do dono. Ele quebra o trabalho, distribui as tarefas entre agentes especialistas, revisa e integra o que eles entregam, registra as decisões e faz os commits. Cada especialista é uma **sessão própria** iniciada pelo líder. Veja [docs/agentes.md](docs/agentes.md).
+
+**Se você é uma sessão especialista:**
+- Trabalhe só no escopo e nos arquivos do seu briefing.
+- Não faça commit, push nem crie branches.
+- Não altere arquivos compartilhados (`project.godot`, autoloads, Input Map) sem autorização no briefing.
+- Ao terminar, reporte o que mudou e o que não foi verificado.
 
 ## Documentação
 
