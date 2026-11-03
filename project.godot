@@ -57,6 +57,15 @@ debug_toggle={
 ]
 }
 
+[layer_names]
+
+2d_physics/layer_1="anima"
+2d_physics/layer_2="enemies"
+2d_physics/layer_3="player_projectiles"
+2d_physics/layer_4="enemy_projectiles"
+2d_physics/layer_5="skill_areas"
+2d_physics/layer_6="shield"
+
 [rendering]
 
 renderer/rendering_method="gl_compatibility"
