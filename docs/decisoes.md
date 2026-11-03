@@ -27,3 +27,4 @@ Ao mudar uma decisão, atualize esta tabela e, se for o caso, o `CLAUDE.md`.
 | 15 | Regras das sessões | Proposta | Mesma pasta na `dev`, sem commits (o líder commita), paralelas só com arquivos diferentes | Compatibilizar sessões paralelas com a regra de branch única |
 | 16 | 1º marco | Decidido | Protótipo jogável do combate, com Gameplay, UI/Web e QA | Validar a diversão antes do meta-jogo e do backend |
 | 17 | Economia de tokens | Decidido | Mínimo gasto de tokens em todas as interações (com o dono do projeto e entre agentes); commits por etapa concluída | Definido pelo dono do projeto |
+| 18 | Bíblia v1.0 | Decidido | Aprovada: pilares, roadmap M0–M4, escopo do M1 e metas iniciais de desempenho | Aprovada pelo dono do projeto em 2026-11-03 |

@@ -1,6 +1,6 @@
 # Project: Anima
 
-> **Status:** v0.1, **rascunho** (2026-11-03). Ainda não foi aprovada pelo usuário.
+> **Status:** v1.0, **APROVADA pelo usuário em 2026-11-03**.
 > Mantida pelo AG00 (Game Dev Líder). Hierarquia de verdade: usuário > esta Bíblia > [decisoes.md](decisoes.md) > documento do agente dono.
 > Itens **[A DEFINIR]** não têm decisão. Itens **[PROPOSTA]** aguardam aprovação. Ninguém inventa fatos além do que está aqui.
 > O GDD original está em [gdd.md](gdd.md).
@@ -10,7 +10,7 @@
 > Um receptáculo neutro no centro da arena resiste a hordas que chegam de todos os lados. Ele dispara sozinho; você escolhe **o momento** de liberar meteoros, ondas de congelamento e escudos. Entre as partidas, funde cards, evolui atributos e dá ao Anima uma alma, e um visual, só seus.
 > Partidas de 3 a 10 minutos, no navegador, sem instalar nada.
 
-**Pilares [PROPOSTA]:**
+**Pilares:**
 1. **Timing é tudo:** sem movimento, a habilidade do jogador está em **quando** usar cada skill. Poucas decisões, todas importantes.
 2. **Progressão que se sente:** cada fusão e cada nível muda números **e** o visual da skill.
 3. **Clareza no caos:** centenas de projéteis, e mesmo assim tudo legível numa tela de celular.
@@ -42,7 +42,7 @@
   - Atributos permanentes: dano, velocidade de ataque, vida, armadura, regeneração, redução de cooldown.
   - Árvore de talentos comprada com moedas.
 
-## Roadmap [PROPOSTA]
+## Roadmap
 
 | Marco | Objetivo | Agentes |
 |---|---|---|
