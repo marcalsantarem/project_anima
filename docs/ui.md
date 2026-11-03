@@ -50,7 +50,7 @@ Com aspect `expand`, telas mais altas ganham altura extra. Essa altura vai para 
 
 ### 3.2 Tipografia
 
-- **Fonte [Proposta]:** *Outfit* (sans-serif geométrica, OFL), em `assets/fonts/`. Alternativa: *Exo 2* (OFL).
+- **Fonte (aprovada):** *Outfit* (sans-serif geométrica, OFL), em `assets/fonts/`, com o `OFL.txt` ao lado.
 - **Pesos:** só 2 (Regular e Bold), para reduzir o tamanho do build.
 - **Números do HUD:** algarismos tabulares (largura fixa), para não "tremerem" na contagem.
 
@@ -118,7 +118,7 @@ y=1280 └───────────────────────�
 - **3 botões circulares de Ø 128 px** (acima do mínimo de 88), com centros em x = 180 / 360 / 540 e espaço de 52 px entre eles.
 - Centro vertical: `1280 − safe_bottom − 24 − 64` (≈ y 1192 sem safe area).
 - **Ordem:** 1 = área, 2 = controle, 3 = defesa. A defesa fica à direita, mais perto do polegar direito **[Proposta]**.
-- **4º slot (`Espaço`):** o [gameplay.md](gameplay.md) o deixa para depois do M1. Se entrar, os 4 botões ficam em x = 108 / 276 / 444 / 612 com Ø 120 px, ou o 4º vai acima do centro em Ø 104 px. Decisão do AG00.
+- **4º slot (`Espaço`): fica para Depois** (fora do M1). Quando entrar, os 4 botões ficam em x = 108 / 276 / 444 / 612 com Ø 120 px, ou o 4º vai acima do centro em Ø 104 px. Decisão do AG00.
 - **Área de toque = o círculo inteiro.** Toques entre os botões não fazem nada (sem "dedo gordo" acionando o vizinho).
 
 ## 5. Componentes
@@ -169,14 +169,14 @@ Os sinais são emitidos pelo nó raiz `Match`.
 
 - A UI **só ouve** esses sinais. Ela não lê nós da arena nem faz cálculos de jogo.
 - `MatchResult`: `outcome` (`victory`|`defeat`), `wave_reached`, `waves_total`, `coins`, `enemies_killed`, `duration_s`.
-- **Pendência com o AG01:** confirmar se `slot` começa em 1 (como na tabela de skills do gameplay.md) ou em 0.
+- **`slot` é 1-based** (1 a 3) e casa com `skill_1`..`skill_3`.
 
 ## 7. Entrada
 
 | Ação (Input Map) | Toque / mouse | Teclado |
 |---|---|---|
 | `skill_1`..`skill_3` | botão de skill | `1` `2` `3` |
-| `skill_4` | [A definir] | `Espaço` |
+| `skill_4` | Depois (fora do M1) | `Espaço` |
 | `pause` | botão ⏸ | `Esc` |
 | `ui_accept` (telas) | botão | `Enter` / `Espaço` |
 
@@ -201,4 +201,28 @@ Boot/Loading (HTML shell) → Toque para começar → Partida ⇄ Pausa → Resu
 - **Perda de foco** (troca de aba ou app, `NOTIFICATION_APPLICATION_FOCUS_OUT` / `visibilitychange`): abre a Pausa automaticamente. A volta **não** retoma sozinha; o jogador toca em Continuar.
 - **Sem menu/hangar no M1** (meta-jogo fora do escopo). "Jogar de novo" volta direto à partida.
 - Transições entre telas: fade de 200 ms.
-- Textos em pt-BR, guardados em um s�
+- Textos em pt-BR, guardados em um só lugar (prontos para `tr()` no futuro) **[Proposta]**.
+
+## 9. Safe area
+
+- **Fonte do valor [Proposta]:** o HTML shell lê `env(safe-area-inset-*)` via CSS (com `viewport-fit=cover`) e o Godot recebe os valores por `JavaScriptBridge`. Fora da web, ou se falhar, usa `DisplayServer.get_display_safe_area()`; se nada vier, aplica a margem fixa de 24 px.
+- Os insets são convertidos de px CSS para px da resolução base e aplicados como margem nos contêineres `HudTop` e `HudSkills` (e nas telas). A zona de combate não muda.
+- A confirmar no iPhone (T-005): se o Safari reporta os insets em tela cheia e em modo navegador.
+
+## 10. Pendências
+
+| Item | Com quem |
+|---|---|
+| Paleta de projéteis inimigos sem ciano | AG01 |
+| Leitura da safe area no Safari (`animaGetSafeArea()` já está no shell) | AG02 (T-005) |
+
+## 11. Exportação Web
+
+- **Preset `Web`** (`export_presets.cfg`): sem threads, sem extensões, VRAM compression só desktop (o 2D usa textura sem compressão VRAM), resize policy *adaptive*, saída em `build/web/index.html`. Exclui `tests/`, `addons/gut/`, `docs/` e `build/`.
+- **Shell** `web/shell.html`:
+  - viewport sem zoom com `viewport-fit=cover`;
+  - página `position: fixed`, `overscroll-behavior: none`, `touch-action: none`;
+  - bloqueio de pinça, duplo toque, rolagem e menu de contexto;
+  - tela de carregamento com os tokens do tema;
+  - `window.animaGetSafeArea()` devolve um JSON com os insets em px CSS.
+- **Teste local:** sirva `build/web/` por HTTP (ex.: `python -m http.server -d build/web 8000`); `file://` não funciona.

@@ -7,18 +7,18 @@
 | ID | Título | Marco | Dono | Status |
 |---|---|---|---|---|
 | T-001 | Layers de colisão nomeadas | M0 | AG07 | pronta p/ briefing |
-| T-002 | Instalar GUT e teste smoke headless | M0 | AG03 | em andamento |
-| T-003 | `docs/ui.md` (tokens, layout, fluxo de telas) | M0 | AG02 | em andamento |
-| T-004 | Preset Web + HTML shell mínimo | M0 | AG02 | a fazer |
+| T-002 | Instalar GUT e teste smoke headless | M0 | AG03 | feita |
+| T-003 | `docs/ui.md` (tokens, layout, fluxo de telas) | M0 | AG02 | feita |
+| T-004 | Preset Web + HTML shell mínimo | M0 | AG02 | em andamento |
 | T-005 | Build vazio no Chrome PC e no iPhone | M0 | AG02 | bloqueada |
 | T-006 | Cena de estresse para confirmar metas de desempenho | M0 | AG02 | a fazer |
 | T-007 | ADR das metas de desempenho e da exportação single-threaded | M0 | AG07 | a fazer |
-| T-101 | `docs/gameplay.md` (parâmetros e sinais) | M1 | AG01 | em andamento |
+| T-101 | `docs/gameplay.md` (parâmetros e sinais) | M1 | AG01 | feita |
 | T-102 | Autoload de fluxo de cenas | M1 | AG07 | a fazer |
 | T-103 | Protótipo cinza: arena, Anima, 1 inimigo | M1 | AG01 | a fazer |
 | T-104 | Ataque automático com pool | M1 | AG01 | a fazer |
 | T-105 | Ondas por dados, HP do Núcleo, moedas, vitória/derrota | M1 | AG01 | a fazer |
-| T-106 | Tema base e componentes de UI | M1 | AG02 | a fazer |
+| T-106 | Tema base e componentes de UI | M1 | AG02 | pronta p/ briefing |
 | T-107 | Overlay de debug Web (FPS, logs) | M1 | AG02 | a fazer |
 | T-108 | Base de skills + skill de área | M1 | AG01 | a fazer |
 | T-109 | Skill de controle | M1 | AG01 | a fazer |
@@ -37,9 +37,8 @@
 ## Próximas prontas p/ briefing
 
 1. **T-001** (AG07): pronta, aguarda a sessão do AG07 ser aberta.
-2. **T-004** (AG02, preset Web): pode rodar em paralelo, em outra sessão.
+2. **T-106** (AG02, tema e componentes): T-003 feita; pode rodar em paralelo à T-004 em outra sessão (arquivos diferentes). Usar fonte Outfit.
 3. **T-102** (AG07): depois da T-001 (mesmo `project.godot`).
-2. Também paralelizável com elas: **T-004** (AG02, outra sessão; mexe em `export_presets.cfg` e `web/`).
 
 ## Paralelismo e conflitos
 
@@ -67,7 +66,7 @@
   - projeto abre sem erros.
 
 ### T-002 — Instalar GUT e teste smoke headless
-- **Marco:** M0 · **Dono:** AG03 · **Status:** em andamento
+- **Marco:** M0 · **Dono:** AG03 · **Status:** feita
 - **Depende de:** — · **Desbloqueia:** T-114, T-120
 - **Arquivos:** `addons/gut/`, `.gutconfig.json`, `tests/unit/test_smoke.gd`
 - **Pronto quando:**
@@ -77,20 +76,21 @@
 - **Briefing:** BRF-004
 
 ### T-003 — `docs/ui.md`
-- **Marco:** M0 · **Dono:** AG02 · **Status:** em andamento
+- **Marco:** M0 · **Dono:** AG02 · **Status:** feita
 - **Depende de:** — · **Desbloqueia:** T-106, T-112, T-113
 - **Arquivos:** `docs/ui.md`
 - **Pronto quando:** tokens (cores, tipografia, espaçamento), layout em retrato com safe area, posição dos botões de skill e fluxo de telas do M1 documentados.
 - **Briefing:** BRF-002
 
 ### T-004 — Preset Web + HTML shell mínimo
-- **Marco:** M0 · **Dono:** AG02 · **Status:** a fazer
+- **Marco:** M0 · **Dono:** AG02 · **Status:** em andamento
 - **Depende de:** requisitos técnicos do AG07 (Compatibility, sem threads) · **Desbloqueia:** T-005, T-006, T-107
 - **Arquivos:** `export_presets.cfg`, `web/`
 - **Pronto quando:**
   - preset "Web": Compatibility, Thread Support desligado;
   - shell com meta viewport sem zoom, `touch-action: none` e bloqueio de gestos do Safari;
   - `--export-release "Web"` gera `build/web/index.html` sem erros; tamanho do build medido.
+- **Briefing:** BRF-005
 
 ### T-005 — Build vazio no Chrome PC e no iPhone
 - **Marco:** M0 · **Dono:** AG02 · **Status:** bloqueada
@@ -118,7 +118,7 @@
 ## M1 — Protótipo do combate
 
 ### T-101 — `docs/gameplay.md`
-- **Marco:** M1 · **Dono:** AG01 · **Status:** em andamento
+- **Marco:** M1 · **Dono:** AG01 · **Status:** feita
 - **Depende de:** — · **Desbloqueia:** T-103, T-112
 - **Arquivos:** `docs/gameplay.md`
 - **Pronto quando:** pilares, loop, parâmetros do Anima e do ataque, 3 skills, 4 arquétipos, chefe, formato dos dados de onda e **lista de sinais expostos à UI** documentados (modelo AG01 §5).
@@ -141,6 +141,7 @@
 - **Depende de:** T-103 · **Desbloqueia:** T-105
 - **Arquivos:** `src/match/anima/`, `src/match/projectiles/`, `data/`
 - **Pronto quando:** mira no inimigo mais próximo/prioritário; projéteis reutilizados por pool (sem instanciar por tiro); dano e morte do inimigo funcionam.
+- **Decisão:** projéteis inimigos sem ciano.
 
 ### T-105 — Ondas por dados, HP do Núcleo, moedas, vitória/derrota
 - **Marco:** M1 · **Dono:** AG01 · **Status:** a fazer
@@ -149,10 +150,11 @@
 - **Pronto quando:** spawner lê ondas de `.tres` (3 ondas de teste); sinais de HP, `Wave X/Y`, moedas e fim de partida emitidos; HP zero = derrota; última onda = vitória.
 
 ### T-106 — Tema base e componentes de UI
-- **Marco:** M1 · **Dono:** AG02 · **Status:** a fazer
+- **Marco:** M1 · **Dono:** AG02 · **Status:** pronta p/ briefing
 - **Depende de:** T-003 · **Desbloqueia:** T-112, T-113
 - **Arquivos:** `src/ui/theme/`, `src/ui/components/`
 - **Pronto quando:** tema base aplicado; botão, barra de vida e botão de skill com cooldown visual funcionam com toque, mouse e Input Actions; cena de demonstração.
+- **Decisão:** fonte Outfit.
 
 ### T-107 — Overlay de debug Web
 - **Marco:** M1 · **Dono:** AG02 · **Status:** a fazer
@@ -165,6 +167,7 @@
 - **Depende de:** T-105 · **Desbloqueia:** T-109
 - **Arquivos:** `src/match/skills/`, `data/skills/`
 - **Pronto quando:** sistema de skill com cooldown acionado por Input Action (slot 1); skill de área causa dano na região; sinais de cooldown para a UI.
+- **Decisão:** slots de skill numerados a partir de 1 (1-based).
 
 ### T-109 — Skill de controle
 - **Marco:** M1 · **Dono:** AG01 · **Status:** a fazer
@@ -183,6 +186,7 @@
 - **Depende de:** T-105 · **Desbloqueia:** T-115, T-116
 - **Arquivos:** `src/match/enemies/`, `data/enemies/`, `src/match/projectiles/` (projétil inimigo)
 - **Pronto quando:** 3 novos arquétipos com comportamento distinto; atirador usa pool de projéteis inimigos; todos por `.tres`.
+- **Decisão:** projéteis inimigos sem ciano.
 
 ### T-112 — HUD ligado aos sinais
 - **Marco:** M1 · **Dono:** AG02 · **Status:** a fazer

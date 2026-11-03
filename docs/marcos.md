@@ -4,8 +4,8 @@
 
 | Marco | Status | Tasks feitas |
 |---|---|---|
-| M0 — Fundação | em andamento | 0/7 (0%) · 2 em andamento |
-| M1 — Protótipo do combate | em andamento | 0/20 (0%) · 1 em andamento |
+| M0 — Fundação | em andamento | 2/7 (29%) · 1 em andamento |
+| M1 — Protótipo do combate | em andamento | 1/20 (5%) |
 | M2 — Meta-jogo local | não quebrado | — |
 | M3 — Online | não quebrado | — |
 | M4 — Monetização e polimento | não quebrado | — |
@@ -18,8 +18,8 @@
 
 **Critérios de fechamento:**
 - [ ] Layers de colisão nomeadas e documentadas (T-001)
-- [ ] GUT roda headless com 1 teste passando (T-002)
-- [ ] `docs/ui.md` escrito (T-003)
+- [x] GUT roda headless com 1 teste passando (T-002)
+- [x] `docs/ui.md` escrito (T-003)
 - [ ] Preset Web single-threaded exporta sem erros (T-004)
 - [ ] Build vazio abre no Chrome do PC e no Safari do iPhone, com link de teste documentado (T-005)
 - [ ] Metas de fps e tamanho confirmadas por medição, com ADR (T-006, T-007)
