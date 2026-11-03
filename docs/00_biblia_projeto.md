@@ -129,5 +129,6 @@ Regras:
 
 ## Links
 
+- Jogo: [produção](https://projectanimagame.netlify.app) · [dev](https://dev--projectanimagame.netlify.app)
 - Backlog: [backlog.md](backlog.md) · Marcos: [marcos.md](marcos.md) · Decisões: [decisoes.md](decisoes.md) · Estrutura: [estrutura.md](estrutura.md) · Setup: [setup.md](setup.md) · Git: [git-workflow.md](git-workflow.md)
 - GDD original: [gdd.md](gdd.md) · Agentes: [agentes/](agentes/) · Briefings: `briefings/`

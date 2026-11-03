@@ -28,3 +28,9 @@
 ## Testes no iPhone
 
 A inspeção remota do Safari exige um Mac. No Windows, os testes são feitos por **link de preview**, com logs exibidos dentro da própria página (overlay de debug).
+
+## Deploy (Netlify via GitHub Actions)
+
+- Produção (`main`): https://projectanimagame.netlify.app
+- Desenvolvimento (`dev`): https://dev--projectanimagame.netlify.app
+- O build roda no GitHub Actions, e o Netlify não está ligado ao Git. Os secrets de repositório são `NETLIFY_SITE_ID` e `NETLIFY_AUTH_TOKEN`.
