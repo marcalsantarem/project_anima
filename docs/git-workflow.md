@@ -14,7 +14,8 @@ Regras definidas pelo dono do projeto. Elas valem para qualquer pessoa ou agente
 
 ## Commits
 
-- O Claude pode fazer commit e push na `dev` **por conta própria** quando fizer sentido: ao concluir uma etapa, para salvar trabalho funcional ou antes de uma mudança arriscada.
+- O Claude líder faz commit e push na `dev` **por conta própria**, agrupando o trabalho: ao concluir uma etapa ou antes de uma mudança arriscada. Evite um commit por pequena alteração.
+- As sessões especialistas não fazem commit.
 - Mensagens em português, curtas e no imperativo. Exemplo: `Adiciona lógica de fusão de cards`.
 - Cada commit deve deixar o projeto abrindo no editor sem erros.
 

@@ -6,9 +6,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 >
 > **Status:** fase de ideação. Quase nada aqui é definitivo. Itens marcados **[Proposta]** são sugestões ainda não aprovadas e itens **[A definir]** estão em aberto. Não trate uma proposta como decisão: pergunte antes de agir com base nela.
 
+## Economia de tokens (regra obrigatória)
+
+Priorize sempre o **menor gasto de tokens** possível, em tudo:
+- **Respostas e relatórios:** curtos e diretos, sem repetir contexto já conhecido.
+- **Leitura:** só leia o necessário (trechos em vez de arquivos inteiros, buscas direcionadas).
+- **Briefings:** objetivos. O líder garante que as sessões especialistas sigam esta mesma regra.
+- **Commits:** agrupe o trabalho e faça commit ao fechar uma etapa, não a cada pequena alteração.
+
 ## Git (regras obrigatórias)
 
-- **Trabalhe e faça commit somente na branch `dev`.** Faça commit e push na `dev` por conta própria sempre que fizer sentido salvar o trabalho.
+- **Trabalhe e faça commit somente na branch `dev`.** O líder faz commit e push por conta própria ao concluir uma etapa de trabalho.
 - **A `main` é protegida.** Nunca faça commit nem push nela; ela só recebe mudanças por Pull Request de `dev` → `main`, aberto **apenas quando o dono do projeto pedir**.
 - **Não crie outras branches** sem pedido explícito.
 - Detalhes em [docs/git-workflow.md](docs/git-workflow.md).

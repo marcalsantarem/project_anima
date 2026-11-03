@@ -25,7 +25,7 @@ O primeiro marco é o **protótipo jogável do combate**. Nele entram **Gameplay
 
 ## Especialistas
 
-Esta é uma divisão de responsabilidades em alto nível. O escopo detalhado de cada agente ainda será definido.
+O papel de cada agente está detalhado em `docs/agentes/AGxx_nome.md`, e as regras comuns em [agentes/_regras-comuns.md](agentes/_regras-comuns.md). Códigos: AG01 Gameplay, AG02 UI/Web, AG03 QA, AG04 Meta-jogo, AG05 Backend.
 
 ## Imprescindíveis
 

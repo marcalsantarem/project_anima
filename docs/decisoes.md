@@ -25,4 +25,5 @@ Ao mudar uma decisão, atualize esta tabela e, se for o caso, o `CLAUDE.md`.
 | 13 | Coordenação | Decidido | O Claude principal é o game dev líder e o único interlocutor do dono do projeto; ele distribui e gerencia os agentes | Definido pelo dono do projeto |
 | 14 | Forma dos agentes | Decidido | Sessões próprias do Claude Code, iniciadas pelo líder quando há trabalho | Definido pelo dono do projeto |
 | 15 | Regras das sessões | Proposta | Mesma pasta na `dev`, sem commits (o líder commita), paralelas só com arquivos diferentes | Compatibilizar sessões paralelas com a regra de branch única |
+| 17 | Economia de tokens | Decidido | Mínimo gasto de tokens em todas as interações (com o dono do projeto e entre agentes); commits por etapa concluída | Definido pelo dono do projeto |
 | 16 | 1º marco | Decidido | Protótipo jogável do combate, com Gameplay, UI/Web e QA | Validar a diversão antes do meta-jogo e do backend |
