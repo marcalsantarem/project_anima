@@ -21,14 +21,14 @@
 | T-105 | Ondas por dados, HP do Núcleo, moedas, vitória/derrota | M1 | AG01 | feita |
 | T-106 | Tema base e componentes de UI | M1 | AG02 | feita |
 | T-107 | Overlay de debug Web (FPS, logs) | M1 | AG02 | pronta p/ briefing |
-| T-108 | Base de skills + skill de área | M1 | AG01 | pronta p/ briefing |
-| T-109 | Skill de controle | M1 | AG01 | a fazer |
+| T-108 | Base de skills + skill de área | M1 | AG01 | feita |
+| T-109 | Skill de controle | M1 | AG01 | pronta p/ briefing |
 | T-110 | Skill de defesa | M1 | AG01 | a fazer |
-| T-111 | Arquétipos: tanque, atirador, enxame | M1 | AG01 | pronta p/ briefing |
-| T-112 | HUD ligado aos sinais | M1 | AG02 | pronta p/ briefing |
-| T-113 | Telas: toque para começar, pausa, resultado | M1 | AG02 | a fazer |
-| T-114 | Testes GUT de ondas, dano e cooldowns | M1 | AG03 | pronta p/ briefing |
-| T-115 | Chefe da fase 1 | M1 | AG01 | a fazer |
+| T-111 | Arquétipos: tanque, atirador, enxame | M1 | AG01 | feita |
+| T-112 | HUD ligado aos sinais | M1 | AG02 | feita |
+| T-113 | Telas: toque para começar, pausa, resultado | M1 | AG02 | em andamento |
+| T-114 | Testes GUT de ondas, dano e cooldowns | M1 | AG03 | feita |
+| T-115 | Chefe da fase 1 | M1 | AG01 | pronta p/ briefing |
 | T-116 | Fase 1 completa (~10 ondas + chefe) | M1 | AG01 | a fazer |
 | T-117 | Game feel | M1 | AG01 | a fazer |
 | T-118 | Desempenho no iPhone (150 inimigos / 300 projéteis) | M1 | AG01 | a fazer |
@@ -36,16 +36,17 @@
 | T-120 | Validação do M1 | M1 | AG03 | a fazer |
 | T-121 | Tema global no `project.godot` | M1 | AG07 | pronta p/ briefing |
 | T-122 | Ligar a arena real ao SceneFlow | M1 | AG07 | pronta p/ briefing |
+| T-123 | Seed no `Arena._rng` para testes determinísticos | M1 | AG01 | pronta p/ briefing |
 
 ## Próximas prontas p/ briefing
 
 > **Decisão 21:** só o usuário libera briefings. A lista abaixo é sugestão; nada começa sem o OK dele.
 
-1. **T-108** (AG01, base de skills + área). **T-111** (AG01, arquétipos) também está pronta: em paralelo só com outra sessão do AG01 (`skills/` × `enemies/`).
+1. **T-109** (AG01, skill de controle) → **T-110**; **T-123** (AG01, seed) é pequena e pode vir antes. **T-115** (AG01, chefe) em paralelo só com outra sessão do AG01.
 2. **T-121** (AG07, tema global) → depois **T-122** (AG07, arena no SceneFlow).
-3. **T-112** (AG02, HUD), de preferência após a T-121; também prontas: **T-107**, **T-006** (AG02).
-4. **T-114** (AG03, testes GUT): ondas, dano e vitória/derrota já; cooldown após a T-108.
-- Paralelo possível: T-108 ‖ T-121/T-122 ‖ T-112 ‖ T-114 (arquivos diferentes).
+3. **T-107** (AG02, overlay de debug) ou **T-006** (AG02, cena de estresse), em outra sessão, enquanto a T-113 anda.
+- Em andamento: **T-113** (AG02).
+- Paralelo possível: AG01 ‖ T-121/T-122 ‖ T-107 (arquivos diferentes). A T-122 mexe em `src/core/`; a T-113 em `src/ui/screens/`: sem conflito.
 
 ## Paralelismo e conflitos
 
@@ -179,14 +180,14 @@
 - **Pronto quando:** FPS, contagem de nós e últimos logs visíveis na tela; liga/desliga por Input Action; fora dos builds release ou desligado por padrão.
 
 ### T-108 — Base de skills + skill de área
-- **Marco:** M1 · **Dono:** AG01 · **Status:** pronta p/ briefing
+- **Marco:** M1 · **Dono:** AG01 · **Status:** feita
 - **Depende de:** T-105 · **Desbloqueia:** T-109
 - **Arquivos:** `src/match/skills/`, `data/skills/`
 - **Pronto quando:** sistema de skill com cooldown acionado por Input Action (slot 1); skill de área causa dano na região; sinais de cooldown para a UI.
 - **Decisão:** slots de skill numerados a partir de 1 (1-based).
 
 ### T-109 — Skill de controle
-- **Marco:** M1 · **Dono:** AG01 · **Status:** a fazer
+- **Marco:** M1 · **Dono:** AG01 · **Status:** pronta p/ briefing
 - **Depende de:** T-108 · **Desbloqueia:** T-110
 - **Arquivos:** `src/match/skills/`, `data/skills/`
 - **Pronto quando:** slot 2 aplica lentidão/atordoamento em área; efeito visível e com duração por dados.
@@ -198,32 +199,33 @@
 - **Pronto quando:** slot 3 protege o Núcleo (escudo ou invulnerabilidade) por tempo definido em dados.
 
 ### T-111 — Arquétipos: tanque, atirador, enxame
-- **Marco:** M1 · **Dono:** AG01 · **Status:** pronta p/ briefing
+- **Marco:** M1 · **Dono:** AG01 · **Status:** feita
 - **Depende de:** T-105 · **Desbloqueia:** T-115, T-116
 - **Arquivos:** `src/match/enemies/`, `data/enemies/`, `src/match/projectiles/` (projétil inimigo)
 - **Pronto quando:** 3 novos arquétipos com comportamento distinto; atirador usa pool de projéteis inimigos; todos por `.tres`.
 - **Decisão:** projéteis inimigos sem ciano.
 
 ### T-112 — HUD ligado aos sinais
-- **Marco:** M1 · **Dono:** AG02 · **Status:** pronta p/ briefing
+- **Marco:** M1 · **Dono:** AG02 · **Status:** feita
 - **Depende de:** T-101, T-105, T-106 (sinais de skill de T-108 podem ser simulados) · **Desbloqueia:** T-117
 - **Arquivos:** `src/ui/hud/`
 - **Pronto quando:** HP do Núcleo, `Wave X/Y`, moedas, pausa e 3 botões de skill reagem só por sinais; funciona em retrato com safe area.
 
 ### T-113 — Telas: toque para começar, pausa, resultado
-- **Marco:** M1 · **Dono:** AG02 · **Status:** a fazer
+- **Marco:** M1 · **Dono:** AG02 · **Status:** em andamento
 - **Depende de:** T-102, T-106, T-112 (mesma pasta), T-121, T-122 · **Desbloqueia:** T-120
 - **Arquivos:** `src/ui/screens/`
 - **Pronto quando:** toque para começar libera o áudio; pausa manual e ao perder o foco da aba; resultado de vitória/derrota com moedas e "Jogar de novo".
+- **Nota:** ouvir só um aviso de pausa (evitar pausa duplicada entre a pausa manual e a perda de foco).
 
 ### T-114 — Testes GUT de ondas, dano e cooldowns
-- **Marco:** M1 · **Dono:** AG03 · **Status:** pronta p/ briefing
+- **Marco:** M1 · **Dono:** AG03 · **Status:** feita
 - **Depende de:** T-002, T-105 (cooldown após T-108) · **Desbloqueia:** T-120
 - **Arquivos:** `tests/unit/`, `tests/integration/`
 - **Pronto quando:** testes cobrem leitura de ondas, dano/HP do Núcleo, vitória/derrota e cooldown; rodam headless e passam.
 
 ### T-115 — Chefe da fase 1
-- **Marco:** M1 · **Dono:** AG01 · **Status:** a fazer
+- **Marco:** M1 · **Dono:** AG01 · **Status:** pronta p/ briefing
 - **Depende de:** T-111 · **Desbloqueia:** T-116
 - **Arquivos:** `src/match/enemies/boss/`, `data/enemies/boss_*.tres`
 - **Pronto quando:** chefe com fases por vida, ao menos 2 padrões de ataque e aviso visual antes de cada padrão.
@@ -233,6 +235,7 @@
 - **Depende de:** T-110, T-111, T-115 · **Desbloqueia:** T-117, T-118, T-120
 - **Arquivos:** `data/waves/stage_01*`
 - **Pronto quando:** ~10 ondas + chefe; partida de 3–10 min; curva de dificuldade descrita em `docs/gameplay.md`.
+- **Nota:** o balanceamento das ondas conta com as skills.
 
 ### T-117 — Game feel
 - **Marco:** M1 · **Dono:** AG01 (com AG02 no HUD) · **Status:** a fazer
@@ -270,6 +273,14 @@
 - **Depende de:** T-102, T-103 · **Desbloqueia:** T-113
 - **Arquivos:** `src/core/`
 - **Pronto quando:** o SceneFlow abre a arena real (no lugar do placeholder), chama `setup(config)` e vai para o Resultado ao receber `match_ended`.
+- **Notas:** chamar `hud.bind(arena)` antes de a arena entrar na árvore; `DEFAULT_MATCH_SCENE` ainda aponta para o placeholder.
+
+### T-123 — Seed no `Arena._rng` para testes determinísticos
+- **Marco:** M1 · **Dono:** AG01 · **Status:** pronta p/ briefing
+- **Depende de:** T-105 · **Desbloqueia:** T-120 (simulação reproduzível)
+- **Arquivos:** `src/match/arena/`
+- **Pronto quando:** a arena aceita uma seed (por exemplo, via `setup(config)`); com a mesma seed, duas execuções geram os mesmos spawns; os testes do AG03 podem fixá-la.
+- **Origem:** sugestão do AG03.
 
 ---
 

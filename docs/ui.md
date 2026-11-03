@@ -226,6 +226,21 @@ Boot/Loading (HTML shell) → Toque para começar → Partida ⇄ Pausa → Resu
 - **Safe area:** `apply_safe_area()` roda no `_ready` e a cada `size_changed`. Na web lê `animaGetSafeArea()`; no mobile nativo usa `DisplayServer.get_display_safe_area()`; no desktop, 0 + `margin_screen`.
 - **Teste:** `src/ui/demo/hud_demo.tscn` (Arena + HUD).
 
+## 10c. Telas (implementação, T-113)
+
+Cenas independentes em `src/ui/screens/`, com o tema na raiz (via `ScreenKit`). O SceneFlow liga as telas na T-122.
+
+| Tela | Cena | Contrato |
+|---|---|---|
+| Toque para começar | `title_screen.tscn` (`TitleScreen`) | sinal `start_requested`, emitido uma vez no primeiro toque, clique ou tecla. O gesto é tratado em `_input` (mesmo evento do navegador) para destravar o áudio. |
+| Pausa | `pause_screen.tscn` (`PauseScreen`, CanvasLayer 20, `PROCESS_MODE_ALWAYS`) | `open()`, `close()`, `is_open()`, `bind(arena)` (desliga no `match_ended`); sinais `resumed` e `restart_requested`. Usa `get_tree().paused`. |
+| Resultado | `result_screen.tscn` (`ResultScreen`) | `show_result(result: MatchResult)`, antes ou depois de entrar na árvore; sinal `play_again_requested`. |
+
+- **Pausa — entrada única:** a tela ouve **só a action `pause`** (Esc + botão do HUD, que injeta a action). Ela **não** ouve `Hud.pause_requested`.
+- **Perda de foco:** `NOTIFICATION_APPLICATION_FOCUS_OUT` / `WM_WINDOW_FOCUS_OUT` e, na web, `visibilitychange` abrem a pausa. A volta não retoma sozinha.
+- **Recomeçar:** despausa e emite `restart_requested`. Quem ouve (SceneFlow) inicia uma partida nova.
+- **Teste do fluxo:** `src/ui/demo/screens_demo.tscn` (Título → Partida → Pausa → Resultado → Jogar de novo).
+
 ## 11. Exportação Web
 
 - **Preset `Web`** (`export_presets.cfg`): sem threads, sem extensões, VRAM compression só desktop (o 2D usa textura sem compressão VRAM), resize policy *adaptive*, saída em `build/web/index.html`. Exclui `tests/`, `addons/gut/`, `docs/` e `build/`.
