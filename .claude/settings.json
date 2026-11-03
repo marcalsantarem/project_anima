@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(\"/c/Program Files/Godot/Godot_v4.7.2-stable_win64.exe\" *)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Edit(/src/**)", "Write(/src/**)",
+      "Edit(/data/**)", "Write(/data/**)",
+      "Edit(/assets/**)", "Write(/assets/**)",
+      "Edit(/tests/**)", "Write(/tests/**)",
+      "Edit(/docs/**)", "Write(/docs/**)",
+      "Edit(/web/**)", "Write(/web/**)",
+      "Edit(/project.godot)",
+      "Edit(/export_presets.cfg)"
+    ]
+  }
+}

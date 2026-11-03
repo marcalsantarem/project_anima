@@ -5,7 +5,7 @@ O projeto Godot fica na **raiz do repositório**: quando for criado, o `project.
 ```
 addons/          Plugins de terceiros (ex.: framework de testes). Não editar.
 assets/          Arquivos de mídia brutos, sem lógica.
-  sprites/  audio/  fonts/  vfx/
+  sprites/  ui/  backgrounds/  audio/  fonts/  vfx/
 data/            Resources (.tres) de balanceamento e conteúdo. Nenhuma lógica aqui.
   skills/  cards/  enemies/  waves/  stats/
 src/
@@ -14,6 +14,7 @@ src/
   match/         A partida: arena, Anima, ataque automático, skills, inimigos, ondas, projéteis.
   meta/          Lógica pura fora da partida: cards, fusão, atributos, talentos, economia.
   ui/            HUD, menus, hangar e componentes visuais reutilizáveis.
+  fx/            Efeitos visuais: cenas `fx_*.tscn`, shaders `.gdshader` e o pool de efeitos.
 tests/
   unit/          Testes de lógica pura (principalmente src/meta).
   integration/   Testes que instanciam cenas.
@@ -28,5 +29,6 @@ build/           Saída das exportações (ignorada pelo git).
 - `meta/` não depende de cenas nem de rede.
 - Somente `backend/` conversa com serviços externos.
 - `ui/` pode ler de todos, mas a lógica fica nos módulos de domínio.
+- `fx/` é só visual: não depende de `match/`, `meta/` nem `backend/` e não altera o estado do jogo. `match/` e `ui/` acionam os efeitos (por sinal ou pelo pool), passando posição, cor e escala.
 
 As pastas vazias têm um `.gitkeep`. Remova-o quando a pasta ganhar arquivos.
