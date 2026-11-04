@@ -611,8 +611,14 @@ func build_header() -> Dictionary:
 		"seed": _seed,
 		"build": "",
 	}
+	if vp:
+		var ui := ScreenKit.safe_area(vp)
+		h["ui_insets"] = {"top": roundi(ui.top), "bottom": roundi(ui.bottom), "bottom_raw": roundi(ui.bottom_raw),
+			"left": roundi(ui.left), "right": roundi(ui.right), "css_k": snappedf(ui.css_k, 0.001),
+			"covers_bottom": ui.covers_bottom}
 	if OS.has_feature("web"):
-		h["web"] = MatchRecorder.web_env()
+		h["web"] = MatchRecorder.web_env().duplicate()
+		h["web"]["viewport"] = MatchRecorder.web_viewport()
 		h["build"] = str(h["web"].get("build", "")) if h["web"].get("build") != null else ""
 	return h
 
@@ -627,6 +633,42 @@ static func web_env() -> Dictionary:
 		var data = JSON.parse_string(str(JavaScriptBridge.eval(JS_ENV, true)))
 		_web_env_cache = data if data is Dictionary else {"error": "sem dados"}
 	return _web_env_cache
+
+
+## Medidas do viewport do shell (animaViewportInfo, T-172), lidas na hora (mudam com a barra do Safari).
+static func web_viewport() -> Dictionary:
+	if not OS.has_feature("web"):
+		return {}
+	var raw = JavaScriptBridge.eval("window.animaViewportInfo ? animaViewportInfo() : ''", true)
+	var data = JSON.parse_string(str(raw)) if raw else null
+	return data if data is Dictionary else {}
+
+
+## Linhas curtas do viewport para o overlay ?debug=1 (mesmos números do cabeçalho). Vazio fora da web.
+static func viewport_lines(v: Dictionary) -> PackedStringArray:
+	var out := PackedStringArray()
+	if v.is_empty():
+		return out
+	var vv: Array = v.get("vv") if v.get("vv") is Array else [0, 0, 0, 1]
+	var c: Array = v.get("canvas", [0, 0, 0])
+	var sa: Dictionary = v.get("safe", {})
+	var inner: Array = v.get("inner", [0, 0])
+	var scr: Array = v.get("screen", [0, 0])
+	out.append("in %sx%s app %s out %s cli %s" % [_n(inner[0]), _n(inner[1]), _n(v.get("app_h")),
+		_n(v.get("outer_h")), _n(v.get("client_h"))])
+	out.append("vv %sx%s +%s s%s scr %sx%s" % [_n(vv[0]), _n(vv[1]), _n(vv[2]), _n(vv[3]), _n(scr[0]), _n(scr[1])])
+	out.append("svh %s dvh %s lvh %s %s" % [_n(v.get("svh")), _n(v.get("dvh")), _n(v.get("lvh")),
+		"standalone" if v.get("standalone") else "aba"])
+	out.append("cv %s..%s h%s safe %s/%s cobre %s" % [_n(c[0]), _n(c[1]), _n(c[2]), _n(sa.get("top", 0)),
+		_n(sa.get("bottom", 0)), "sim" if sa.get("covers_bottom", false) else "não"])
+	return out
+
+
+static func _n(v: Variant) -> String:
+	if v == null:
+		return "-"
+	var f := float(v)
+	return str(int(f)) if is_equal_approx(f, roundf(f)) else str(snappedf(f, 0.1))
 
 
 ## Antes de cada partida: last → prev_1 → prev_2 → prev_3 (o mais antigo sai).

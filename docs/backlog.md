@@ -84,7 +84,7 @@
 | T-169 | Bandeja até a borda inferior, menos espaço sob os Módulos, Anima centralizado na área livre | M1 | AG02 + AG01 | feita |
 | T-170 | Tela de logo do estúdio (preta, ~1 s) antes da splash de carregamento | M1 | AG02 | feita |
 | T-171 | Logo horizontal do estúdio na base da tela de título; remover o crédito "Criado por Marçal Santarem" | M1 | AG02 | feita |
-| T-172 | Canvas até a borda inferior no Safari do iPhone, sem faixa e sem somar a safe area duas vezes; diagnóstico no log | M1 | AG02 | pronta p/ briefing |
+| T-172 | Canvas até a borda inferior no Safari do iPhone, sem faixa e sem somar a safe area duas vezes; diagnóstico no log | M1 | AG02 | feita (falta confirmar no iPhone) |
 | T-173 | Meteoro: reavaliar o alvo perto do impacto (2 dos 6 lançamentos contra a horda acertaram 0 inimigos, 1 acertou 1) | M1 | AG01 | pronta p/ briefing |
 | T-148 | Sinais da Arena para VFX (projectile_fired, projectile_hit, enemy_died, particles_gained, skill_cast, boss_telegraph_started, boss_phase_changed) | M1 | AG01 | feita |
 

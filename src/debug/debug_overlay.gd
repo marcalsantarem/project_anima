@@ -84,6 +84,7 @@ func refresh() -> void:
 	lines.append("draw %d  nós %d  mem %.1f MB" % [int(s.get("draw_calls", 0)), int(s.get("nodes", 0)),
 		float(s.get("mem_static_mb", 0.0))])
 	lines.append(">50ms %d  erros %d" % [recorder.frames.over_50, recorder.errors.size()])
+	lines.append_array(MatchRecorder.viewport_lines(MatchRecorder.web_viewport()))
 	for e in recorder.errors.tail(3):
 		lines.append(str(e.get("msg", "")).left(48))
 	label.text = "\n".join(lines)

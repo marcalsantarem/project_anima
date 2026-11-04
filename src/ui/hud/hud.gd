@@ -23,7 +23,7 @@ const TRAY_HEIGHT := 266
 ## Altura do HUD de cima (pausa/ONDA/Partículas + barra de Energia) sem safe area e sem a barra do chefe.
 ## O fundo da arena passa por trás do topo; o gameplay usa isto para não pôr alvos sob o HUD (docs/ui.md §4.4).
 const TOP_INSET := 164
-## Respiro entre a faixa de upgrades e os slots; embaixo dos slots ficam SPACE_XS + safe area (BRF-066).
+## Respiro entre a faixa de upgrades e os slots; embaixo dos slots, max(SPACE_XS, inset da UI) (T-172).
 const SKILLS_TOP_PAD := UiTokens.SPACE_XS
 ## Altura extra do topo com a barra "Boss" visível (gap 16 + barra 36). top_inset() já soma quando ela aparece.
 const BOSS_BAR_INSET := 52
@@ -371,7 +371,7 @@ func apply_safe_area() -> void:
 	_upgrade_margin.add_theme_constant_override("margin_top", UPGRADE_BAND_PAD)
 	_upgrade_margin.add_theme_constant_override("margin_bottom", UPGRADE_BAND_PAD)
 	_skills_margin.add_theme_constant_override("margin_top", SKILLS_TOP_PAD)
-	_skills_margin.add_theme_constant_override("margin_bottom", UiTokens.SPACE_XS + int(s.bottom))
+	_skills_margin.add_theme_constant_override("margin_bottom", int(_bottom_pad(s)))
 	_top_scrim.offset_bottom = top_inset()
 
 
@@ -383,7 +383,13 @@ func top_inset() -> float:
 
 ## Altura ocupada pela bandeja inferior, com a safe area (px da resolução base).
 func tray_height() -> float:
-	return TRAY_HEIGHT + safe_insets().bottom
+	return TRAY_HEIGHT - UiTokens.SPACE_XS + _bottom_pad(safe_insets())
+
+
+## Folga entre a base dos slots e a borda inferior (T-172): SPACE_XS sem safe area; com ela, a inset da UI
+## (ScreenKit.ui_bottom_inset, já reduzida), sem somar as duas. O fundo da bandeja segue até a borda.
+func _bottom_pad(s: Dictionary) -> float:
+	return maxf(UiTokens.SPACE_XS, roundf(float(s.bottom)))
 
 
 # --- Sinais da Arena ---

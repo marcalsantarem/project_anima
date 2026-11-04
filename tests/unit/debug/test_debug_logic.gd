@@ -152,3 +152,16 @@ func test_settings_persist_overlay_state() -> void:
 	DirAccess.remove_absolute(DebugSettings.path)
 	DebugSettings.path = old
 	DebugSettings.reset()
+
+
+## T-172: linhas do viewport no overlay ?debug=1 (mesmos números de header.web.viewport).
+func test_viewport_lines() -> void:
+	assert_eq(MatchRecorder.viewport_lines({}).size(), 0, "fora da web: nada")
+	var v := {"inner": [375.0, 768.0], "app_h": 812.0, "outer_h": 812.0, "client_h": 768.0,
+		"vv": [375.0, 768.0, 0.0, 1.0], "screen": [375.0, 812.0], "svh": 768.0, "dvh": 768.0, "lvh": 812.0,
+		"canvas": [0.0, 812.0, 812.0], "standalone": false,
+		"safe": {"top": 44.0, "bottom": 34.0, "covers_bottom": true}}
+	var lines := MatchRecorder.viewport_lines(v)
+	assert_eq(lines.size(), 4)
+	assert_eq(lines[0], "in 375x768 app 812 out 812 cli 768")
+	assert_eq(lines[3], "cv 0..812 h812 safe 44/34 cobre sim")

@@ -99,14 +99,30 @@ static func format_time(seconds: float) -> String:
 	return "%02d:%02d" % [s / 60, s % 60]
 
 
+## Inset inferior usado pela UI quando o canvas cobre a borda (T-172, docs/ui.md §9.1): o indicador de
+## início é uma linha fina, então basta max(SAFE_BOTTOM_MIN, SAFE_BOTTOM_FACTOR × inset).
+const SAFE_BOTTOM_MIN := 12.0
+const SAFE_BOTTOM_FACTOR := 0.5
+
+
+## Regra da inset inferior (px da resolução base): 0 sem inset; 0 se o canvas não cobre a borda inferior
+## (a faixa fora do canvas já é a zona do indicador); senão max(12, 0,5 × inset).
+static func ui_bottom_inset(raw: float, covers_bottom: bool) -> float:
+	if raw <= 0.0 or not covers_bottom:
+		return 0.0
+	return maxf(SAFE_BOTTOM_MIN, SAFE_BOTTOM_FACTOR * raw)
+
+
 ## Safe area (docs/ui.md §9). Insets em px da resolução base: {top, bottom, left, right}, mais
 ## `css_k` (px da resolução base por px CSS; fora da web, por px da janela) para medir como o shell.
+## `bottom` já é o valor para a UI (ui_bottom_inset); `bottom_raw` é a inset informada e `covers_bottom`
+## diz se o canvas chega à borda inferior. A simulação recebe a inset bruta em "bottom" (e, opcional,
+## "covers_bottom", padrão true).
 static func safe_area(vp: Viewport) -> Dictionary:
+	var out := {"top": 0.0, "bottom": 0.0, "left": 0.0, "right": 0.0, "css_k": 1.0, "covers_bottom": true}
 	if not simulated_safe_area.is_empty():
-		var sim := {"top": 0.0, "bottom": 0.0, "left": 0.0, "right": 0.0, "css_k": 1.0}
-		sim.merge(simulated_safe_area, true)
-		return sim
-	var out := {"top": 0.0, "bottom": 0.0, "left": 0.0, "right": 0.0, "css_k": 1.0}
+		out.merge(simulated_safe_area, true)
+		return _finish_bottom(out)
 	var visible_size := vp.get_visible_rect().size
 	var win := Vector2(DisplayServer.window_get_size())
 	if win.y > 0.0:
@@ -119,6 +135,7 @@ static func safe_area(vp: Viewport) -> Dictionary:
 			out.css_k = k
 			for side in ["top", "bottom", "left", "right"]:
 				out[side] = float(data.get(side, 0.0)) * k
+			out.covers_bottom = bool(data.get("covers_bottom", true))
 	elif OS.has_feature("mobile"):
 		var screen := Rect2(Vector2.ZERO, DisplayServer.screen_get_size())
 		var safe := Rect2(DisplayServer.get_display_safe_area())
@@ -127,4 +144,10 @@ static func safe_area(vp: Viewport) -> Dictionary:
 		out.bottom = (screen.end.y - safe.end.y) * k
 		out.left = safe.position.x * k
 		out.right = (screen.end.x - safe.end.x) * k
+	return _finish_bottom(out)
+
+
+static func _finish_bottom(out: Dictionary) -> Dictionary:
+	out.bottom_raw = float(out.bottom)
+	out.bottom = ui_bottom_inset(out.bottom_raw, bool(out.covers_bottom))
 	return out

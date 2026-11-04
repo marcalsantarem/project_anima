@@ -103,7 +103,7 @@ y=0    ┌───────────────────────�
        │ [up][up][up][up][up]         │  fileira de upgrades 5 × 128×80 (T-135), padding 6
        ├──────────────────────────────┤
        │   (1)      (2)      (3)      │  skills Ø 144 (+6 sombra), gap 8 acima, cy ≈ 1194
-       │  8 px + safe area (home bar) │  fundo da bandeja até a borda
+       │ max(8, inset da UI) (§9.1)   │  fundo da bandeja até a borda
 y=1280 └──────────────────────────────┘
 ```
 
@@ -127,7 +127,7 @@ y=1280 └───────────────────────�
 
 ### 4.3 Bandeja inferior (`Hud/Tray`)
 
-- Painel `bg_panel_alt` de largura total com contorno superior `ink`; vai até a borda inferior, cobrindo a safe area (a safe area entra como margem interna; os botões ficam acima dela). Pilha (BRF-066): contorno 4 + faixa 96 (6 + 80 + 6 + contorno 4) + respiro 8 (`Hud.SKILLS_TOP_PAD`) + slot 150 (Ø 144 + sombra 6) + 8 + safe area.
+- Painel `bg_panel_alt` de largura total com contorno superior `ink`; vai até a borda inferior, cobrindo a safe area (a safe area entra como margem interna; os botões ficam acima dela). Pilha (BRF-066): contorno 4 + faixa 96 (6 + 80 + 6 + contorno 4) + respiro 8 (`Hud.SKILLS_TOP_PAD`) + slot 150 (Ø 144 + sombra 6) + max(8, inset inferior da UI) (§9.1, T-172).
 - **Fileira de upgrades** (`Hud.upgrade_row`, decisão 35): faixa `tray_band` com 80 px úteis (padding 6, `Hud.UPGRADE_BAND_PAD`), 5 botões `UpgradeButton` de 128×80 com gap 12 e margem 16 (5×128 + 4×12 = 688 = 720 − 2×16), na ordem `UpgradeButton.IDS` (§5.4). A faixa fica abaixo da arena: não cobre inimigos nem os slots.
 - **3 slots de skill de Ø 144 px**, gap 66, centros em x = 150 / 360 / 570, cy ≈ 1194 sem safe area.
 - Slots 2 e 3 bloqueados com cadeado e "NV 7"/"NV 12" (T-136). Os níveis vêm de `Hud.slot_unlock_levels` (padrão do M1 `[0, 7, 12]`, 0 = liberado); no M2 o meta-jogo passa a lista com `set_slot_unlock_levels()` conforme o nível da conta.
@@ -254,6 +254,26 @@ Boot/Loading (HTML shell) → Toque para começar → Partida ⇄ Pausa → Resu
 - Os insets são convertidos de px CSS para px da resolução base e aplicados como margem nos contêineres `HudTop` e `HudSkills` (e nas telas). A zona de combate não muda.
 - A confirmar no iPhone (T-005): se o Safari reporta os insets em tela cheia e em modo navegador.
 
+### 9.1 Altura do canvas e inset inferior (T-172)
+
+- **Altura:** o shell faz `window.innerHeight` (que o Godot usa no canvas) devolver a **maior** entre o `innerHeight` nativo, `visualViewport.height` (sem zoom) e as sondas `100svh`/`100dvh`/`100lvh`, limitada à altura da tela (`screen`, na orientação atual). O mesmo valor vira `--app-h` em `html`, `body`, `#status` e `#brand` (logo preto e splash cobrem a tela inteira). Atualiza em `resize`, `orientationchange` e `visualViewport` `resize`/`scroll` (avisando o Godot com um `resize`).
+- **Inset inferior sem dupla contagem** (`ScreenKit.ui_bottom_inset`): o shell informa `covers_bottom` (base do canvas ≥ altura da tela − 1).
+  - cobre: a UI usa `max(12, 0,5 × inset)` px da resolução base acima da borda (o indicador de início é uma linha fina); o fundo da bandeja vai até a borda;
+  - não cobre (o Safari recusou): inset inferior **0** (a faixa fora do canvas já é a zona do indicador);
+  - `ScreenKit.safe_area()` devolve `bottom` (já pela regra), `bottom_raw` e `covers_bottom`. HUD: folga sob os slots = `max(8, bottom)`; `tray_height() = 266 − 8 + max(8, bottom)` (a Arena segue por ela, via `SceneFlow`).
+
+```
+iPhone 375×812 CSS (k = 1,92 px do jogo/CSS; jogo 720×1559)
+antes (T-170)                              agora (T-172, canvas cobre)
+┌ canvas 768 CSS ──────────┐               ┌ canvas 812 CSS ──────────┐
+│ ...                      │               │ ...                      │
+│ (1) (2) (3)  slots       │               │ (1) (2) (3)  slots       │
+│ 8 + 65 (safe) = 73 jogo  │               │ max(12; 0,5×65) = 33 jogo│
+└──────────────────────────┘ y 768         └──────────────────────────┘ y 812 = tela
+  faixa fora do canvas 44 CSS ≈ 85 jogo
+└ tela 812 ┘   total ≈ 158 jogo                total ≈ 33 jogo (+ sombra 6 do slot)
+```
+
 ## 9b. Debug e logs (T-107, BRF-063)
 
 - **Resultado:** botão secundário **"Logs"** (200×64), abaixo de "Voltar ao título". Abre o `LogViewer`.
@@ -301,7 +321,7 @@ Cenas independentes em `src/ui/screens/`, com o tema na raiz (via `ScreenKit`). 
 - **Shell** `web/shell.html`:
   - viewport sem zoom com `viewport-fit=cover`;
   - página `position: fixed`, `overscroll-behavior: none`, `touch-action: none`; fundo da página `#5A4A9A` (`UiTokens.BG_PANEL_ALT`, a bandeja do HUD), para que uma sobra no rodapé não mostre o lilás da splash; o degradê fica só em `#status`;
-  - canvas `position: fixed` no canto (tamanho inline do Godot, policy *adaptive* + stretch `expand` = janela inteira). Se `window.innerHeight` vier menor que a área visível (`#viewport-probe`, `100dvh`, inclui a safe area com `viewport-fit=cover`; caso visto no Safari do iPhone), o shell faz `innerHeight` devolver a altura da sonda (limitada a `screen.height`), e o canvas cobre o rodapé (T-170);
+  - canvas `position: fixed` no canto (tamanho inline do Godot, policy *adaptive* + stretch `expand` = janela inteira). Altura pela regra do §9.1 (T-170, T-172);
   - **ordem das etapas: logo do estúdio → splash B → título** (T-170, decisão 44). `#brand`: preto puro (`#000`, `100dvh`, safe areas) por cima da splash, logo `assets/branding/anima_games_logo.webp` em base64 (largura `min(60vw, 420px, 60vh)`); fade-in 200 ms, 1 s parado, fade-out 250 ms (≈1,5 s; corte seco com `prefers-reduced-motion`). O engine carrega em paralelo desde o início; se o jogo ficar pronto antes, o título só aparece quando o logo sai (`animaBrand.whenDone`); erro ou falta de WebGL 2 cortam o logo na hora (`animaBrand.stop`). `theme-color` `#000000` no logo e `#8E72EC` a partir da splash;
   - bloqueio de pinça, duplo toque, rolagem e menu de contexto;
   - **splash B** (BRF-053; arte em `assets/splash/`, `docs/arte.md` §9.3), **toda inline** no HTML, porque o export Web do Godot não copia arquivos extras de `web/`: fundo em gradiente CSS + estrelas em SVG (`slice`), anéis em SVG presos ao núcleo, disco de xadrez, brilho e sombra em CSS, e o `splash_logo_core.webp` em base64 (uma cópia, num `<img>` oculto) fatiado em cristal (flutua; parado com `prefers-reduced-motion`), pedestal e título. Sem WebP, o título vira texto. Peso do `index.html`: ~73 KB com o logo do estúdio (era ~46 KB), sem requisições externas. Para trocar a arte, substitua o base64 pelo novo `.webp` (mesmo tamanho 560×760);

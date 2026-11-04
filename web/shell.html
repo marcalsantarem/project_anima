@@ -30,15 +30,22 @@
 	/* Largura do logotipo (W) e unidade da arte (1 u = 1 px do splash_logo_core 560x760). */
 	--w: min(86vw, 440px, calc((100vh - 64px) * 0.55));
 	--w: min(86vw, 440px, calc((100dvh - 64px) * 0.55));
+	--w: min(86vw, 440px, calc((var(--app-h, 100dvh) - 64px) * 0.55));
 	--u: calc(var(--w) / 560);
 }
 
 /* Página travada: sem scroll, zoom, pull-to-refresh, seleção ou menu de toque. */
+/* Altura = --app-h (definida pelo script "Altura da janela", a mesma que o Godot usa no canvas; T-172). */
 html, body {
 	position: fixed;
-	inset: 0;
-	width: 100%;
+	top: 0;
+	left: 0;
+	width: 100vw;
 	height: 100%;
+	height: -webkit-fill-available;
+	height: 100vh;
+	height: 100lvh;
+	height: var(--app-h, 100lvh);
 	margin: 0;
 	padding: 0;
 	overflow: hidden;
@@ -83,22 +90,29 @@ html, body {
 	padding-left: env(safe-area-inset-left, 0px);
 }
 
-/* Sonda da altura visível real (inclui a safe area com viewport-fit=cover). */
-#viewport-probe {
+/* Sondas de altura (svh/dvh/lvh; incluem a safe area com viewport-fit=cover). Lidas pelo script
+   "Altura da janela" e pelo diagnóstico animaViewportInfo(). */
+.vh-probe {
 	position: fixed;
 	top: 0;
 	left: 0;
 	width: 1px;
 	height: 100vh;
-	height: 100dvh;
 	visibility: hidden;
 	pointer-events: none;
 }
+#probe-svh { height: 100svh; }
+#probe-dvh { height: 100dvh; }
+#probe-lvh { height: 100lvh; }
 
 /* Tela de carregamento. Fonte do sistema para não baixar nada antes do jogo. */
 #status {
 	position: fixed;
 	inset: 0;
+	bottom: auto;
+	height: 100vh;
+	height: 100lvh;
+	height: var(--app-h, 100lvh);
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
@@ -356,8 +370,10 @@ html, body {
 	justify-content: center;
 	align-items: center;
 	box-sizing: border-box;
+	bottom: auto;
 	height: 100vh;
-	height: 100dvh;
+	height: 100lvh;
+	height: var(--app-h, 100lvh);
 	padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
 	background: #000;
 	z-index: 2;
@@ -411,7 +427,9 @@ html, body {
 		</noscript>
 
 		<div id="safe-area-probe"></div>
-		<div id="viewport-probe"></div>
+		<div id="probe-svh" class="vh-probe"></div>
+		<div id="probe-dvh" class="vh-probe"></div>
+		<div id="probe-lvh" class="vh-probe"></div>
 
 		<div id="status">
 			<svg id="status-sparks" viewBox="0 0 720 1560" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><path d="M96 340.0 Q97.8 348.2 106 350.0 Q97.8 351.8 96 360.0 Q94.2 351.8 86 350.0 Q94.2 348.2 96 340.0 Z" fill="#FFC93D" opacity="0.8"/><path d="M628 432.0 Q629.44 438.56 636 440.0 Q629.44 441.44 628 448.0 Q626.56 441.44 620 440.0 Q626.56 438.56 628 432.0 Z" fill="#FFC93D" opacity="0.7"/><path d="M80 893.0 Q81.26 898.74 87 900.0 Q81.26 901.26 80 907.0 Q78.74 901.26 73 900.0 Q78.74 898.74 80 893.0 Z" fill="#FFC93D" opacity="0.6"/><path d="M650 989.0 Q651.98 998.02 661 1000.0 Q651.98 1001.98 650 1011.0 Q648.02 1001.98 639 1000.0 Q648.02 998.02 650 989.0 Z" fill="#FFC93D" opacity="0.8"/><path d="M180 1314.0 Q181.08 1318.92 186 1320.0 Q181.08 1321.08 180 1326.0 Q178.92 1321.08 174 1320.0 Q178.92 1318.92 180 1314.0 Z" fill="#FFC93D" opacity="0.5"/><path d="M560 1282.0 Q561.44 1288.56 568 1290.0 Q561.44 1291.44 560 1298.0 Q558.56 1291.44 552 1290.0 Q558.56 1288.56 560 1282.0 Z" fill="#FFC93D" opacity="0.6"/></svg>
@@ -503,34 +521,95 @@ window.animaBrand = (function () {
 	}, { passive: false });
 }());
 
-// Altura da janela para o Godot (T-170): no Safari do iPhone, window.innerHeight pode vir menor que a área
-// visível (100dvh com viewport-fit=cover), e o canvas não cobre o rodapé/safe area inferior. Se a sonda
-// for maior, o Godot (que dimensiona o canvas por innerHeight) passa a ver a altura da sonda.
+// Altura da janela para o Godot (T-170, T-172; docs/ui.md §9.1). O Godot dimensiona o canvas por
+// window.innerHeight, que no Safari do iPhone pode vir menor que a tela (log do dono: 768 de 812). A altura
+// usada é a MAIOR entre innerHeight, visualViewport.height e as sondas 100svh/100dvh/100lvh, limitada à
+// altura da tela (screen, na orientação atual). A mesma altura vira --app-h (html, body, splash e logo).
+// Simulação para capturas (docs/debug.md): ?simih=768 limita o innerHeight nativo; ?simsafe=t,r,b,l fixa a
+// safe area em px CSS.
 (function () {
-	const probe = document.getElementById('viewport-probe');
+	const params = new URLSearchParams(location.search);
+	const simIh = parseFloat(params.get('simih')) || 0;
+	const simSafe = (params.get('simsafe') || '').split(',').map(parseFloat);
+	if (simSafe.length === 4 && simSafe.every((v) => v >= 0)) {
+		const st = document.getElementById('safe-area-probe').style;
+		['Top', 'Right', 'Bottom', 'Left'].forEach((side, i) => st.setProperty('padding-' + side.toLowerCase(), simSafe[i] + 'px'));
+	}
+	const probe = (id) => {
+		const el = document.getElementById(id);
+		return el ? Math.round(el.getBoundingClientRect().height) : 0;
+	};
 	const desc = Object.getOwnPropertyDescriptor(window, 'innerHeight')
 		|| Object.getOwnPropertyDescriptor(Window.prototype, 'innerHeight');
-	if (!desc || !desc.get || !desc.configurable) {
-		return;
-	}
-	const nativeHeight = () => desc.get.call(window);
-	try {
-		Object.defineProperty(window, 'innerHeight', {
-			configurable: true,
-			get: function () {
-				const h = nativeHeight();
-				const visible = Math.round(probe.getBoundingClientRect().height);
-				return visible > h + 1 && visible <= screen.height + 1 ? visible : h;
-			},
+	const canHook = !!(desc && desc.get && desc.configurable);
+	const nativeHeight = () => {
+		const h = canHook ? desc.get.call(window) : window.innerHeight;
+		return simIh > 0 ? Math.min(h, simIh) : h;
+	};
+	// Altura da tela na orientação atual (o iOS não troca screen.width/height ao girar).
+	const screenHeight = () => {
+		const portrait = window.matchMedia ? window.matchMedia('(orientation: portrait)').matches
+			: window.innerWidth <= nativeHeight();
+		return portrait ? Math.max(screen.width, screen.height) : Math.min(screen.width, screen.height);
+	};
+	const vvHeight = () => {
+		const vv = window.visualViewport;
+		return vv && Math.abs(vv.scale - 1) < 0.01 ? Math.round(vv.height) : 0;
+	};
+	const appHeight = () => {
+		const h = nativeHeight();
+		const cap = screenHeight() + 1;
+		let best = h;
+		[vvHeight(), probe('probe-svh'), probe('probe-dvh'), probe('probe-lvh')].forEach((v) => {
+			if (v > best && v <= cap) {
+				best = v;
+			}
 		});
-	} catch (e) {
-		// Sem override: segue com a altura nativa (a cor de fundo da página cobre a sobra).
+		return best;
+	};
+	window.animaAppHeight = appHeight;
+	window.animaNativeInnerHeight = nativeHeight;
+	window.animaScreenHeight = screenHeight;
+	if (canHook || simIh > 0) {
+		try {
+			Object.defineProperty(window, 'innerHeight', { configurable: true, get: appHeight });
+		} catch (e) {
+			// Sem override: segue com a altura nativa (a cor de fundo da página cobre a sobra).
+		}
+	}
+	let last = 0;
+	let relaying = false;
+	const sync = () => {
+		const h = appHeight();
+		if (h === last) {
+			return;
+		}
+		last = h;
+		document.documentElement.style.setProperty('--app-h', h + 'px');
+		// A barra do Safari pode mudar o visualViewport sem 'resize' na janela: avisa o Godot.
+		if (!relaying) {
+			relaying = true;
+			window.dispatchEvent(new Event('resize'));
+			relaying = false;
+		}
+	};
+	sync();
+	window.addEventListener('resize', sync);
+	window.addEventListener('orientationchange', () => setTimeout(sync, 250));
+	if (window.visualViewport) {
+		window.visualViewport.addEventListener('resize', sync);
+		window.visualViewport.addEventListener('scroll', sync);
 	}
 }());
 
 // Safe area em px CSS, para o Godot ler via JavaScriptBridge.eval("animaGetSafeArea()") (docs/ui.md §9).
+// covers_bottom: o canvas chega à borda inferior da tela (bottom ≥ altura da tela − 1). Sem isso, o Godot
+// zera a inset inferior (a faixa fora do canvas já é a zona do indicador de início).
 window.animaGetSafeArea = function () {
 	const s = getComputedStyle(document.getElementById('safe-area-probe'));
+	const canvas = document.getElementById('canvas');
+	const r = canvas ? canvas.getBoundingClientRect() : null;
+	const bottom = r && r.height > 0 ? r.bottom : window.innerHeight;
 	return JSON.stringify({
 		top: parseFloat(s.paddingTop) || 0,
 		right: parseFloat(s.paddingRight) || 0,
@@ -538,6 +617,30 @@ window.animaGetSafeArea = function () {
 		left: parseFloat(s.paddingLeft) || 0,
 		width: window.innerWidth,
 		height: window.innerHeight,
+		covers_bottom: bottom >= window.animaScreenHeight() - 1,
+	});
+};
+
+// Diagnóstico do viewport (T-172): cabeçalho do log e overlay ?debug=1 usam estes mesmos números.
+window.animaViewportInfo = function () {
+	const vv = window.visualViewport;
+	const canvas = document.getElementById('canvas');
+	const r = canvas ? canvas.getBoundingClientRect() : { top: 0, bottom: 0, height: 0 };
+	const ph = (id) => Math.round(document.getElementById(id).getBoundingClientRect().height);
+	const round = (v) => Math.round(v * 10) / 10;
+	return JSON.stringify({
+		inner: [window.innerWidth, window.animaNativeInnerHeight()],
+		app_h: window.innerHeight,
+		outer_h: window.outerHeight,
+		vv: vv ? [round(vv.width), round(vv.height), round(vv.offsetTop), round(vv.scale)] : null,
+		client_h: document.documentElement.clientHeight,
+		screen: [screen.width, screen.height],
+		svh: ph('probe-svh'),
+		dvh: ph('probe-dvh'),
+		lvh: ph('probe-lvh'),
+		canvas: [round(r.top), round(r.bottom), round(r.height)],
+		standalone: !!((window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || navigator.standalone),
+		safe: JSON.parse(window.animaGetSafeArea()),
 	});
 };
 		</script>
