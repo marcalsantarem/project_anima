@@ -25,6 +25,10 @@ const TOP_SCRIM_ALPHA := 0.35
 ## Padrão do M1 (decisão 25): slot 1 liberado; 2 e 3 bloqueados até os níveis 7 e 12.
 const M1_UNLOCK_LEVELS: Array[int] = [0, 7, 12]
 
+## Ícone por slot (índice 0 = slot 1), caminho do PNG = `SkillData.icon` da skill do slot (decisão 37).
+## Vazio ou inexistente = arte padrão do SkillButton (`ui_icon_skill_pulse` no slot 1). Troque em tempo
+## de execução com set_slot_icon(slot, textura) — o HUD não lê src/match/.
+@export var slot_icon_paths: Array[String] = [UiArt.SKILL_METEOR_PATH, "", ""]
 ## Nível de desbloqueio por slot (índice 0 = slot 1). 0 = liberado; > 0 = bloqueado com "NV x".
 ## No M2 o meta-jogo passa a lista conforme o nível da conta (set_slot_unlock_levels).
 @export var slot_unlock_levels: Array[int] = M1_UNLOCK_LEVELS.duplicate()
@@ -252,6 +256,7 @@ func _build_tray() -> void:
 		var sb := SkillButton.new()
 		sb.slot = i + 1
 		sb.icon = SKILL_ICONS[i]
+		sb.icon_texture = UiArt.load_icon(slot_icon_paths[i] if i < slot_icon_paths.size() else "")
 		sb.inject_action = false
 		sb.activated.connect(_on_skill_pressed)
 		skills_row.add_child(sb)
@@ -263,6 +268,13 @@ func _build_tray() -> void:
 func set_slot_unlock_levels(levels: Array[int]) -> void:
 	slot_unlock_levels = levels.duplicate()
 	_apply_slot_locks()
+
+
+## Ícone do slot (ex.: `SkillData.icon`). null volta à arte padrão do botão.
+func set_slot_icon(slot: int, texture: Texture2D) -> void:
+	var sb := _skill(slot)
+	if sb:
+		sb.icon_texture = texture
 
 
 func _apply_slot_locks() -> void:

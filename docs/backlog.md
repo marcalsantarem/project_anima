@@ -43,7 +43,7 @@
 | T-127 | Arte do Anima, inimigos, chefe, projéteis e fundo | M1 | AG08 | feita |
 | T-128 | Ícones e arte da UI | M1 | AG08 | feita |
 | T-129 | `docs/vfx.md` + pool de efeitos | M1 | AG09 | feita |
-| T-130 | VFX do ataque, acertos e mortes | M1 | AG09 | feita (falta ligar na partida) |
+| T-130 | VFX do ataque, acertos e mortes | M1 | AG09 | feita |
 | T-131 | VFX da skill e do chefe | M1 | AG09 | a fazer |
 | T-132 | Modo de efeitos reduzidos | M1 | AG09 | a fazer |
 | T-133 | Dados e balanceamento dos upgrades da partida | M1 | AG04 | feita |

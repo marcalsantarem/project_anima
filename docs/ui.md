@@ -161,7 +161,7 @@ Teste: `tests/unit/ui/test_hud_layout.gd` confere as constantes contra o layout.
 - Na transição `cooldown → ready` (`skill_ready`): flash `accent` + escala 1,08 → 1,0 em 200 ms.
 - **Badge da tecla:** quadradinho `badge` no canto superior direito com a tecla do Input Map (ou o número do slot), sempre visível (mockup aprovado).
 - **Toque e clique** disparam a mesma Input Action (§7). O botão não chama a skill diretamente.
-- Arte (T-138): molduras `ui_skill_frame_ready/cooldown/locked` (pronta tem halo fixo + halo pulsante desenhado), ícone `ui_icon_skill_pulse` (88 px) no `Icon.CIRCLE` ou `icon_texture`, cadeado `ui_icon_lock` (64 px), véu `ui_skill_cooldown_mask` como setor texturizado (buffers reaproveitados). `disabled` usa a moldura cinza e o ícone a 55%. Losango/hexágono desenhados só como fallback sem arte.
+- Arte (T-138): molduras `ui_skill_frame_ready/cooldown/locked` (pronta tem halo fixo + halo pulsante desenhado), ícone por `icon_texture` (88 px; fallback `ui_icon_skill_pulse` no `Icon.CIRCLE`). No HUD (BRF-050, decisão 37) o ícone vem de `Hud.slot_icon_paths` (slot 1 = `ui_icon_skill_meteor.png`, o mesmo PNG de `SkillData.icon`; caminho inexistente cai no fallback) ou de `Hud.set_slot_icon(slot, tex)`, sem ler `src/match/`; cadeado `ui_icon_lock` (64 px), véu `ui_skill_cooldown_mask` como setor texturizado (buffers reaproveitados). `disabled` usa a moldura cinza e o ícone a 55%. Losango/hexágono desenhados só como fallback sem arte.
 
 ### 5.2 `Bar` (HP do Núcleo / chefe)
 

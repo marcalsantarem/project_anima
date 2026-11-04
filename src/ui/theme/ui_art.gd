@@ -5,7 +5,9 @@ class_name UiArt
 const PAUSE := preload("res://assets/ui/ui_icon_pause.png")
 const LOCK := preload("res://assets/ui/ui_icon_lock.png")
 const PARTICLE := preload("res://assets/ui/ui_icon_particle.png")
-const SKILL_PULSE := preload("res://assets/ui/ui_icon_skill_pulse.png")
+const SKILL_PULSE := preload("res://assets/ui/ui_icon_skill_pulse.png") ## fallback do slot sem ícone
+## Ícone da skill de área atual (decisão 37). Carregado por caminho: se faltar, o slot cai no SKILL_PULSE.
+const SKILL_METEOR_PATH := "res://assets/ui/ui_icon_skill_meteor.png"
 
 const UPGRADE_ICONS := {
 	&"upgrade_atk_power": preload("res://assets/ui/ui_icon_upgrade_atk_power.png"),
@@ -42,6 +44,13 @@ const BAR_SHINE_HEIGHT := 8.0
 const PANEL := preload("res://assets/ui/ui_panel.png")
 const BUTTON_BIG_NORMAL := preload("res://assets/ui/ui_button_big_normal.png")
 const BUTTON_BIG_PRESSED := preload("res://assets/ui/ui_button_big_pressed.png")
+
+
+## Textura do caminho, ou null se vazio/inexistente (quem chama decide o fallback).
+static func load_icon(path: String) -> Texture2D:
+	if path.is_empty() or not ResourceLoader.exists(path):
+		return null
+	return load(path) as Texture2D
 
 
 static func upgrade_icon(id: StringName) -> Texture2D:

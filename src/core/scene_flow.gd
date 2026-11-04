@@ -15,6 +15,8 @@ const PAUSE_SCENE := "res://src/ui/screens/pause_screen.tscn"
 ## Nome do nó raiz que agrupa Arena, HUD e Pausa.
 const MATCH_ROOT_NAME := &"Match"
 const ARENA_NODE_NAME := &"Arena"
+const FX_POOL_NODE_NAME := &"FxPool"
+const FX_DIRECTOR_NODE_NAME := &"FxDirector"
 
 ## Último resultado recebido.
 var last_result: MatchResult
@@ -52,8 +54,25 @@ func start_match(config: MatchConfig = null) -> void:
 	pause.restart_requested.connect(func() -> void: start_match(config), CONNECT_ONE_SHOT)
 	arena.match_ended.connect(_on_match_ended, CONNECT_ONE_SHOT)
 	_link_bottom_inset(arena, hud)
+	_link_fx(arena, match_root)
 	match_root.add_child(arena)
 	_swap(match_root, config.match_scene_path)
+
+
+## Efeitos (docs/vfx.md §1.1): pool como filho direto da Arena (Y-sort com as entidades; decalques
+## em z −1 acima do piso em z −10) e director no nó da partida, ligado depois do `_ready` da Arena.
+## Instâncias pré-criadas aqui, fora da partida. Sem opção de efeitos reduzidos ainda (T-132).
+func _link_fx(arena: Arena, match_root: Node) -> void:
+	var pool := FxPool.new()
+	pool.name = FX_POOL_NODE_NAME
+	pool.setup_default()
+	arena.add_child(pool)
+	var director := FxDirector.new()
+	director.name = FX_DIRECTOR_NODE_NAME
+	director.pool = pool
+	director.reduced_effects = false
+	match_root.add_child(director)
+	arena.ready.connect(func() -> void: director.bind(arena), CONNECT_ONE_SHOT)
 
 
 ## Liga a base da Arena à altura da bandeja do HUD (com a safe area), também ao redimensionar.

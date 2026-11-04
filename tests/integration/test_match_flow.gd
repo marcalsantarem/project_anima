@@ -50,6 +50,27 @@ func test_full_flow_with_real_arena() -> void:
 	assert_not_null(SceneFlow.current_arena(), "Jogar de novo abre nova partida")
 
 
+func test_match_wires_fx_pool_and_director() -> void:
+	SceneFlow.start_match()
+	await wait_for_signal(SceneFlow.scene_changed, 2)
+	var arena := SceneFlow.current_arena() as Arena
+	assert_not_null(arena)
+	if arena == null:
+		return
+	var pool := arena.get_node_or_null(NodePath(SceneFlow.FX_POOL_NODE_NAME)) as FxPool
+	var director := get_tree().current_scene.get_node_or_null(NodePath(SceneFlow.FX_DIRECTOR_NODE_NAME)) as FxDirector
+	assert_not_null(pool, "FxPool filho da Arena")
+	assert_not_null(director, "FxDirector na partida")
+	if pool == null or director == null:
+		return
+	assert_eq(director.pool, pool)
+	assert_gt(pool.capacity(&"fx_death"), 0, "pool pré-criado")
+	assert_has(director.connected_signals(), &"enemy_died", "director ligado à Arena")
+	assert_eq(pool.active_count(&"fx_death"), 0)
+	arena.enemy_died.emit(Vector2(360, 400), &"enemy_runner", 0)
+	assert_eq(pool.active_count(&"fx_death"), 1, "enemy_died aciona fx_death")
+
+
 func test_restart_from_pause_starts_new_match() -> void:
 	SceneFlow.start_match()
 	await wait_for_signal(SceneFlow.scene_changed, 2)
