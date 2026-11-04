@@ -46,7 +46,7 @@
 - [x] Arena em retrato com Anima fixo e ataque automático com pool (T-103, T-104)
 - [ ] 1 skill de área no slot 1 (meteoro ou onda de choque, decisão do usuário), com cooldown por toque, mouse e tecla `1` (T-108 ✔, T-125, T-139)
 - [ ] Slots 2 e 3 visíveis e bloqueados com cadeado (T-136)
-- [ ] Upgrades da partida: escolher 1 de 3 entre ondas, pagos com Partículas (T-133, T-134, T-135)
+- [ ] Upgrades da partida: 5 botões de compra em tempo real acima das skills, pagos com Partículas (T-133, T-134, T-135)
 - [ ] Moeda da partida chamada Partículas nos sinais, no HUD e nos docs (T-140, T-141)
 - [ ] 4 arquétipos de inimigo e 1 chefe com fases (T-103 ✔, T-111 ✔, T-115)
 - [ ] Fase 1 com ~10 ondas + chefe, balanceada com 1 skill + upgrades, partida de 3–10 min (T-116)

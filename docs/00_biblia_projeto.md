@@ -37,7 +37,7 @@
   - **Controle:** EMP, congelamento;
   - **Defesa:** escudo do Núcleo, invulnerabilidade.
 - Ondas (`Wave X/Y`) até o **chefe**. Se o HP do Núcleo chegar a zero, é derrota.
-- **Upgrades da partida:** entre ondas, o jogador compra upgrades temporários com as **Partículas** da partida. Eles valem só para aquela partida.
+- **Upgrades da partida:** em **tempo real**, por uma **fileira de 5 botões acima das skills** (Atk power, Atk spd, Defesa, Vida máxima, Cooldown), pagos com as **Partículas** da partida. Cada toque compra 1 nível, com custo crescente; valem só para aquela partida.
 
 ## Progressão (decidida pelo usuário em 2026-11-03; detalhe no AG04)
 
@@ -76,7 +76,7 @@
 | Anima | 1, com arte final de demo |
 | Ataque automático | 1 tipo de projétil |
 | Skills | **1**: a de área (meteoro ou onda de choque), já liberada no slot 1. Os slots 2 e 3 aparecem bloqueados |
-| Upgrades da partida | Versão simples: entre ondas, escolher 1 de 3 upgrades pagos com Partículas |
+| Upgrades da partida | Fileira de 5 botões de compra em tempo real, acima das skills, pagos com Partículas |
 | Visual | **Polido, nível de demo:** arte, VFX, partículas e game feel finais para esta fase (AG08 + AG09) |
 | Inimigos | 3–4 arquétipos (corredor, tanque, atirador, enxame) |
 | Fase | 1, com ~10 ondas e 1 chefe |

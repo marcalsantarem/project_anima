@@ -47,8 +47,8 @@
 | T-131 | VFX da skill e do chefe | M1 | AG09 | a fazer |
 | T-132 | Modo de efeitos reduzidos | M1 | AG09 | a fazer |
 | T-133 | Dados e balanceamento dos upgrades da partida | M1 | AG04 | pronta p/ briefing |
-| T-134 | Lógica dos upgrades (1 de 3 entre ondas) | M1 | AG01 | a fazer |
-| T-135 | Tela de escolha de upgrade | M1 | AG02 | a fazer |
+| T-134 | Lógica dos upgrades em tempo real (5 atributos) | M1 | AG01 | a fazer |
+| T-135 | Fileira de 5 botões de upgrade no HUD | M1 | AG02 | a fazer |
 | T-136 | Slots 2 e 3 do HUD bloqueados (cadeado) | M1 | AG02 | pronta p/ briefing |
 | T-137 | Trocar placeholders da partida pela arte final | M1 | AG01 | a fazer |
 | T-138 | Aplicar a arte da UI no HUD e nas telas | M1 | AG02 | a fazer |
@@ -70,6 +70,7 @@
 2. **T-143** (AG08, fonte da arte final): gera a decisão 34. Pode ir junto da T-142 no mesmo disparo.
 3. **T-125** (AG01 + AG08, meteoro × onda de choque): libera a T-139.
 4. **T-133** (AG04, upgrades da partida): libera a T-134 e a T-135.
+- Mockup aprovado: **A "Jardim Arcano"** (decisão 36). A HUD deve ter a fileira de upgrades (decisão 35); a T-145 e a T-128 devem considerá-la.
 - Também prontas: **T-146** (AG07), **T-140** (AG01), **T-136** (AG02), **T-123** e **T-115** (AG01), **T-107** e **T-006** (AG02).
 
 ## Paralelismo e conflitos
@@ -79,7 +80,7 @@
   - Arte: {T-142, T-143} → {T-127, T-128} (AG08, em sequência).
   - Refatorações do novo estilo: T-142 → T-144 (AG01, `src/match/`) e T-142 → T-145 (AG02, `src/ui/`).
   - VFX: T-124 → T-129 → T-130 → T-131 → T-132 (AG09; a T-124 é do AG07).
-  - Upgrades: T-133 (AG04) → T-134 (AG01) → T-135 (AG02).
+  - Upgrades: T-133 (AG04) → T-134 (AG01) → T-135 (AG02, HUD).
   - Combate: T-123, T-115, T-139, T-116, T-137 (AG01, em sequência; `skills/` × `enemies/` só em paralelo com duas sessões).
   - UI: T-136 → T-135 → T-138 (AG02, `src/ui/`, em sequência); T-107 e T-006 em outra sessão.
 - **Não paralelizar:**
@@ -411,19 +412,19 @@
 - **Marco:** M1 · **Dono:** AG04 · **Status:** pronta p/ briefing
 - **Depende de:** — · **Desbloqueia:** T-134, T-128
 - **Arquivos:** `docs/meta.md` (seção de upgrades da partida)
-- **Pronto quando:** lista de upgrades da demo (efeito, custo em Partículas, peso no sorteio) e regra da oferta 1 de 3 documentadas, com valores coerentes com as Partículas ganhas na fase 1.
+- **Pronto quando:** os 5 upgrades (Atk power, Atk spd, Defesa, Vida máxima, Cooldown) com efeito por nível, nível máximo e curva de custo em Partículas documentados, com valores coerentes com as Partículas ganhas na fase 1 e com tetos que não quebrem o balanceamento (ex.: redução de cooldown).
 
-### T-134 — Lógica dos upgrades (1 de 3 entre ondas)
+### T-134 — Lógica dos upgrades em tempo real (5 atributos)
 - **Marco:** M1 · **Dono:** AG01 · **Status:** a fazer
 - **Depende de:** T-133, T-105, T-140 · **Desbloqueia:** T-135, T-116
 - **Arquivos:** `src/match/upgrades/`, `data/upgrades/`
-- **Pronto quando:** entre ondas, a partida segura o avanço e oferece 3 upgrades; comprar desconta Partículas e aplica o efeito até o fim da partida; sinais para a UI; valores em `.tres`; testes GUT da compra e da aplicação.
+- **Pronto quando:** `Arena.buy_upgrade(id)->bool` compra 1 nível durante a partida, sem pausar; desconta Partículas e aplica o efeito até o fim; custo cresce por nível e há nível máximo; sinais `upgrade_changed(id, level, next_cost)` e `can_afford` para a UI; valores em `.tres`; testes GUT da compra e da aplicação.
 
-### T-135 — Tela de escolha de upgrade
+### T-135 — Fileira de 5 botões de upgrade no HUD
 - **Marco:** M1 · **Dono:** AG02 · **Status:** a fazer
 - **Depende de:** T-134, T-141 (os sinais podem ser simulados antes) · **Desbloqueia:** T-138, T-120
-- **Arquivos:** `src/ui/screens/` (ou `src/ui/upgrades/`)
-- **Pronto quando:** mostra as 3 opções com custo em Partículas, bloqueia as que o jogador não pode pagar e permite pular; funciona com toque, mouse e teclado em retrato.
+- **Arquivos:** `src/ui/hud/`, `src/ui/components/`
+- **Pronto quando:** fileira de 5 botões acima da linha de skills (Atk power, Atk spd, Defesa, Vida máxima, Cooldown), cada um com ícone, nível e custo em Partículas; desabilitado quando não há Partículas ou no nível máximo; alvo de toque de 44 px ou mais; funciona com toque, mouse e teclado em retrato; não cobre inimigos nem as skills.
 
 ### T-136 — Slots 2 e 3 do HUD bloqueados (cadeado)
 - **Marco:** M1 · **Dono:** AG02 · **Status:** pronta p/ briefing

@@ -56,7 +56,7 @@ O Claude principal é o **game dev líder** do projeto e o **único interlocutor
   - **Nível da conta:** desbloqueia os slots de skill (slot 1 no nível 3, slot 2 no 7 e slot 3 no 12). A conta começa sem skills.
   - **Moedas:** **Gold** é a do jogo (meta), com ganho variável por partida. **Partículas** é a da partida: começa em zero e é zerada a cada partida.
   - **Módulos:** são os equipamentos do Anima, melhorados com Gold, com raridade e **fusão** (3 iguais viram 1 da raridade seguinte).
-  - **Upgrades da partida:** comprados entre ondas com Partículas; valem só para ela.
+  - **Upgrades da partida:** 5 botões em tempo real acima das skills (Atk power, Atk spd, Defesa, Vida máxima, Cooldown), pagos com Partículas; valem só para a partida.
   - **Árvore de talentos:** comprada com Gold.
 - **Monetização:** rewarded ads (multiplicar moedas ou reviver), skins cosméticas e moeda premium.
 - **Visual:** tema Cyber-Mystic em **2D cartoon casual**: colorido, formas arredondadas, contorno e sombra suave, **câmera 3/4**. O Anima é um núcleo (objeto) no centro, pronto para skins. UI com botões grandes e molduras por raridade. Interface em **modo retrato**. Guia em `docs/arte.md`.

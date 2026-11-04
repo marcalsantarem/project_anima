@@ -1,6 +1,6 @@
 # Arte — Project: Anima
 
-> Dono: AG08. Estado: **[Proposta]** até o usuário escolher um dos mockups (T-142). Base: decisões 31–34. As cores de UI são do [docs/ui.md](ui.md) (dono AG02); a retematização da UI é a T-145.
+> Dono: AG08. Estado: **Aprovado** (decisões 31–36): a demo usa o mockup A "Jardim Arcano" (claro); o B "Noite Rúnica" (escuro) fica para a 2ª fase. A HUD ganha a fileira de 5 upgrades acima das skills (decisão 35), ausente nos mockups. As cores de UI são do [docs/ui.md](ui.md) (dono AG02); a retematização da UI é a T-145.
 > Mockups (PNG 720×1280, fonte SVG gerada por script): [`mockup_cartoon_a.png`](../assets/backgrounds/mockup_cartoon_a.png) e [`mockup_cartoon_b.png`](../assets/backgrounds/mockup_cartoon_b.png).
 
 ## 1. Direção: Cyber-Mystic em 2D cartoon casual
@@ -130,7 +130,7 @@ Pedestal cilíndrico neutro (`vessel`) com aro ciano + **cristal losango ciano f
 
 **Limite honesto da arte por agente:** consigo formas geométricas arredondadas, contorno, sombra chapada e UI muito bem; não consigo pintura, volume suave convincente, personagens com personalidade forte nem animação quadro a quadro de qualidade. Também não "vejo" enquanto desenho: cada ajuste exige renderizar e conferir. Para o nível "vende em screenshot", isso não basta sozinho.
 
-### 9.2 Recomendação [Proposta]
+### 9.2 Decisão (decisão 34): agentes no M1, refino depois
 
 1. **M1 (demo):** arte dos **agentes**, no estilo do mockup escolhido. Custo zero, já cumpre legibilidade e o visual cartoon, e destrava T-144/T-145.
 2. **Arte de loja (M2+):** contratar **artista** para Anima, inimigos, chefe e ícones, usando o `docs/arte.md` e os mockups como brief. UI, molduras, FX e fundos podem continuar com os agentes.

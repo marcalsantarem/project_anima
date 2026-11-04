@@ -64,7 +64,7 @@ Você é o **designer de sistemas e economia** e o **programador da lógica de m
 | Efeito da raridade | Multiplica os atributos que o módulo dá e troca o visual dele |
 | Atributos dos módulos | dano, velocidade de ataque, vida máxima, armadura, regeneração, redução de cooldown. Upgrade com Gold, custo crescente por nível |
 | Nível de conta | XP por partida; slot 1 no nível 3, slot 2 no 7 e slot 3 no 12 (ajustáveis) |
-| Upgrades da partida | Escolher 1 de 3 entre as ondas, pagos com **Partículas**, que começam em zero e são zeradas a cada partida |
+| Upgrades da partida | 5 atributos comprados em tempo real (Atk power, Atk spd, Defesa, Vida máxima, Cooldown), com custo crescente, pagos com **Partículas**, que começam em zero e são zeradas a cada partida |
 | Talentos | Árvore comprada com Gold |
 | Moedas | **Gold**: a do jogo, com ganho variável por partida (calculado pelo `MatchResult`). **Partículas**: a da partida. Premium **[A definir]** |
 
