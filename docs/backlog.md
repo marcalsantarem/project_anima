@@ -46,14 +46,14 @@
 | T-130 | VFX do ataque, acertos e mortes | M1 | AG09 | a fazer |
 | T-131 | VFX da skill e do chefe | M1 | AG09 | a fazer |
 | T-132 | Modo de efeitos reduzidos | M1 | AG09 | a fazer |
-| T-133 | Dados e balanceamento dos upgrades da partida | M1 | AG04 | pronta p/ briefing |
+| T-133 | Dados e balanceamento dos upgrades da partida | M1 | AG04 | feita |
 | T-134 | Lógica dos upgrades em tempo real (5 atributos) | M1 | AG01 | a fazer |
 | T-135 | Fileira de 5 botões de upgrade no HUD | M1 | AG02 | a fazer |
-| T-136 | Slots 2 e 3 do HUD bloqueados (cadeado) | M1 | AG02 | pronta p/ briefing |
+| T-136 | Slots 2 e 3 do HUD bloqueados (cadeado) | M1 | AG02 | feita |
 | T-137 | Trocar placeholders da partida pela arte final | M1 | AG01 | a fazer |
 | T-138 | Aplicar a arte da UI no HUD e nas telas | M1 | AG02 | a fazer |
 | T-139 | Ajustar a skill de área à opção escolhida | M1 | AG01 | bloqueada |
-| T-140 | Moeda da partida vira Partículas: sinais, código e `gameplay.md` | M1 | AG01 | pronta p/ briefing |
+| T-140 | Moeda da partida vira Partículas: sinais, código e `gameplay.md` | M1 | AG01 | feita |
 | T-141 | Moeda da partida vira Partículas: HUD, telas e `ui.md` | M1 | AG02 | a fazer |
 | T-142 | Novo guia de estilo 2D cartoon 3/4 + mockups PNG | M1 | AG08 | pronta p/ briefing |
 | T-143 | Pipeline e fonte da arte final (opções e custos) | M1 | AG08 | pronta p/ briefing |
@@ -409,7 +409,7 @@
 - **Pronto quando:** uma configuração reduz partículas, brilho e tremor sem perder a leitura dos telegraphs; ganho de fps medido.
 
 ### T-133 — Dados e balanceamento dos upgrades da partida
-- **Marco:** M1 · **Dono:** AG04 · **Status:** pronta p/ briefing
+- **Marco:** M1 · **Dono:** AG04 · **Status:** feita
 - **Depende de:** — · **Desbloqueia:** T-134, T-128
 - **Arquivos:** `docs/meta.md` (seção de upgrades da partida)
 - **Pronto quando:** os 5 upgrades (Atk power, Atk spd, Defesa, Vida máxima, Cooldown) com efeito por nível, nível máximo e curva de custo em Partículas documentados, com valores coerentes com as Partículas ganhas na fase 1 e com tetos que não quebrem o balanceamento (ex.: redução de cooldown).
@@ -427,7 +427,7 @@
 - **Pronto quando:** fileira de 5 botões acima da linha de skills (Atk power, Atk spd, Defesa, Vida máxima, Cooldown), cada um com ícone, nível e custo em Partículas; desabilitado quando não há Partículas ou no nível máximo; alvo de toque de 44 px ou mais; funciona com toque, mouse e teclado em retrato; não cobre inimigos nem as skills.
 
 ### T-136 — Slots 2 e 3 do HUD bloqueados (cadeado)
-- **Marco:** M1 · **Dono:** AG02 · **Status:** pronta p/ briefing
+- **Marco:** M1 · **Dono:** AG02 · **Status:** feita
 - **Depende de:** T-112 · **Desbloqueia:** T-138, T-120
 - **Arquivos:** `src/ui/hud/`
 - **Pronto quando:** slots 2 e 3 visíveis com cadeado e sem ação (toque e teclas `2`/`3` ignorados); ícone provisório até a T-128.
@@ -451,7 +451,7 @@
 - **Pronto quando:** a skill do slot 1 tem o comportamento da opção escolhida (área, dano e cooldown em dados); sinais para VFX e UI.
 
 ### T-140 — Moeda da partida vira Partículas: sinais, código e `gameplay.md`
-- **Marco:** M1 · **Dono:** AG01 · **Status:** pronta p/ briefing
+- **Marco:** M1 · **Dono:** AG01 · **Status:** feita
 - **Depende de:** decisão #29 · **Desbloqueia:** T-141, T-134
 - **Arquivos:** `src/match/`, `data/`, `docs/gameplay.md`, `tests/` (só os testes afetados, com aviso ao AG03)
 - **Pronto quando:** sinais, variáveis e dados da moeda da partida usam o nome Partículas; começa em 0 e zera a cada partida; testes GUT passam.
