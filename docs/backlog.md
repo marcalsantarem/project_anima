@@ -65,6 +65,13 @@
 | T-150 | Chefe ogro: ataque corpo a corpo, sem minions, defesa como escudo e lançamento | M1 | AG01 | feita |
 | T-151 | Arte do chefe ogro (humanoide grande e gordo) | M1 | AG08 | feita |
 | T-152 | Barra de vida grande e vermelha "Boss" no topo do HUD | M1 | AG02 | feita |
+| T-153 | Arte das pílulas do topo (ONDA e Partículas) e do botão secundário | M1 | AG08 | pronta p/ briefing |
+| T-154 | Texto "MAX" na pílula de custo dos upgrades (hoje desenhado por código) | M1 | AG08 + AG02 | pronta p/ briefing |
+| T-155 | "Voltar ao título" a partir da tela de Resultado | M1 | AG02 + AG07 | aguarda decisão do dono |
+| T-156 | Chão: quebrar a repetição das pedrinhas do tile | M1 | AG08 + AG01 | depende do teste no iPhone |
+| T-157 | Ajustar o escurecimento do topo (degradê do chão + do HUD) | M1 | AG02 + AG01 | depende do teste no iPhone |
+| T-158 | Teste no iPhone: splash, título, partida e chefe (ajustes saem daqui) | M1 | usuário + AG00 | a fazer |
+| T-159 | Remover o ícone provisório do `skill_pulse` e deixar o do meteoro como padrão | M1 | AG02 | pronta p/ briefing |
 | T-148 | Sinais da Arena para VFX (projectile_fired, projectile_hit, enemy_died, particles_gained, skill_cast, boss_telegraph_started, boss_phase_changed) | M1 | AG01 | feita |
 
 ## Próximas prontas p/ briefing
@@ -375,6 +382,47 @@
 - **Marco:** M1 · **Dono:** AG02 · **Status:** feita
 - **Depende de:** decisão 39 (usa `boss_hp_changed`, já existente) · **Desbloqueia:** —
 - **Pronto quando:** barra vermelha grande no topo da tela com o rótulo "Boss", de tamanho próximo ao da barra do Núcleo; aparece só quando o chefe entra.
+
+### T-153 — Arte das pílulas do topo e do botão secundário
+- **Marco:** M1 · **Dono:** AG08 · **Status:** pronta p/ briefing
+- **Depende de:** — · **Desbloqueia:** aplicação pelo AG02 (parte de T-138)
+- **Arquivos:** `assets/ui/`, `assets/LICENSES.md`
+- **Pronto quando:** PNGs 2x no estilo do HUD para a pílula "ONDA x/y", a pílula de Partículas (com a estrela) e o botão secundário (branco), em 9-patch com margens documentadas; hoje essas peças são `StyleBoxFlat` por código.
+
+### T-154 — Texto "MAX" na pílula de custo
+- **Marco:** M1 · **Dono:** AG08 + AG02 · **Status:** pronta p/ briefing
+- **Depende de:** — · **Desbloqueia:** —
+- **Arquivos:** `assets/ui/` (AG08), `src/ui/components/upgrade_button.gd` (AG02)
+- **Pronto quando:** o README e o PNG de `ui_upgrade_cost_pill_max` ficam de acordo (ou a pílula sem texto, ou com "MAX"); a UI não desenha o texto duas vezes.
+
+### T-155 — Voltar ao título a partir do Resultado
+- **Marco:** M1 · **Dono:** AG02 + AG07 · **Status:** aguarda decisão do dono
+- **Depende de:** decisão (hoje o Resultado só tem "Jogar de novo") · **Desbloqueia:** —
+- **Arquivos:** `src/ui/screens/` (AG02), `src/core/scene_flow.gd` (AG07)
+- **Pronto quando:** o Resultado oferece também "Voltar ao título" (botão secundário), o fluxo muda para a cena de título sem reiniciar o jogo e sem vazar a partida; testes de fluxo.
+
+### T-156 — Chão sem repetição visível
+- **Marco:** M1 · **Dono:** AG08 + AG01 · **Status:** depende do teste no iPhone
+- **Depende de:** T-158 (se o repetir a cada 240 px incomodar) · **Desbloqueia:** —
+- **Arquivos:** `assets/backgrounds/` (AG08), `src/match/arena/arena_floor.gd` (AG01)
+- **Pronto quando:** as pedrinhas do `floor_tile` deixam de formar padrão visível (tile maior de 8×8 ou pedrinhas espalhadas por código com a semente da arena), sem custo relevante de memória.
+
+### T-157 — Escurecimento do topo
+- **Marco:** M1 · **Dono:** AG02 + AG01 · **Status:** depende do teste no iPhone
+- **Depende de:** T-158 · **Desbloqueia:** —
+- **Arquivos:** `src/ui/hud/` (AG02), `src/match/arena/arena_floor.gd` (AG01)
+- **Pronto quando:** o degradê do chão (`floor_top_shade`) e o do HUD (`TOP_SCRIM_ALPHA`) somam um escurecimento que dá leitura sem esconder o chão; um só dono do valor.
+
+### T-158 — Teste no iPhone
+- **Marco:** M1 · **Dono:** usuário + AG00 · **Status:** a fazer
+- **Depende de:** deploys da dev concluídos · **Desbloqueia:** T-156, T-157, T-118
+- **Pronto quando:** testado no iPhone: carregamento (splash em celular, incluindo o corte à direita visto na captura), título, partida, upgrades, meteoro, chefe e Resultado; lista de ajustes entregue ao AG00.
+
+### T-159 — Ícone do meteoro como padrão no HUD
+- **Marco:** M1 · **Dono:** AG02 · **Status:** pronta p/ briefing
+- **Depende de:** — · **Desbloqueia:** —
+- **Arquivos:** `src/ui/`
+- **Pronto quando:** o ícone do meteoro vem de uma fonte única (hoje por caminho no HUD, ver `Hud.slot_icon_paths`); o `ui_icon_skill_pulse.png` e o `skill_pulse` provisório deixam de aparecer no jogo e nas demos; o número de recarga continua legível sobre o ícone (que ocupa pouco do quadro de 88 px).
 
 ### T-148 — Sinais da Arena para VFX
 - **Marco:** M1 · **Dono:** AG01 · **Status:** feita
