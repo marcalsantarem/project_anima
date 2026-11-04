@@ -76,7 +76,7 @@
 | T-161 | Aplicar o ícone verde de Partículas no HUD, Resultado, botões de upgrade e efeitos (hoje dourado) | M1 | AG02 + AG09 | pronta p/ briefing |
 | T-162 | Arte do ícone de Moeda (moeda dourada) e do glossário na UI (para o M2) | M2 | AG08 | a fazer |
 | T-163 | Textos do jogo e docs com os nomes oficiais (Módulo, Fragmento, Núcleo, Moeda); decidir a colisão de "Núcleo" | M2 | AG00 + AG04 + AG02 | a fazer |
-| T-164 | Rótulo da vida do Anima: "NÚCLEO" vira "ENERGIA" no HUD, Resultado e docs de UI | M1 | AG02 | pronta p/ briefing |
+| T-164 | Rótulo da vida do Anima: "NÚCLEO" vira "ENERGIA" no HUD, Resultado e docs de UI | M1 | AG02 | feita |
 | T-148 | Sinais da Arena para VFX (projectile_fired, projectile_hit, enemy_died, particles_gained, skill_cast, boss_telegraph_started, boss_phase_changed) | M1 | AG01 | feita |
 
 ## Próximas prontas p/ briefing
@@ -451,7 +451,7 @@
 - **Pronto quando:** textos e docs usam Módulo, Fragmento, Núcleo (talento) e Moeda onde hoje dizem skill, módulo, talento e Gold; identificadores de código inalterados.
 
 ### T-164 — Rótulo "ENERGIA"
-- **Marco:** M1 · **Dono:** AG02 · **Status:** pronta p/ briefing
+- **Marco:** M1 · **Dono:** AG02 · **Status:** feita
 - **Depende de:** decisão 41 · **Desbloqueia:** T-163
 - **Arquivos:** `src/ui/`, `docs/ui.md`, `tests/` (da UI)
 - **Pronto quando:** a barra de vida do Anima mostra "ENERGIA x / y" (e qualquer texto ao jogador que diga "Núcleo" para a vida do Anima); identificadores de código inalterados; testes e demos ajustados.

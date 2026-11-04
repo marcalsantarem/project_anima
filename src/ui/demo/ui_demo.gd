@@ -46,7 +46,7 @@ func _build() -> void:
 	margin.add_child(col)
 
 	col.add_child(_label("Demo de UI", &"LabelTitle"))
-	col.add_child(_label("HP do Núcleo", &"LabelCaption"))
+	col.add_child(_label("Energia do Anima", &"LabelCaption"))
 	_core_bar = UiBar.new()
 	_core_bar.color_mode = UiBar.ColorMode.CORE_HP
 	_core_bar.set_value(_core_hp, CORE_MAX)

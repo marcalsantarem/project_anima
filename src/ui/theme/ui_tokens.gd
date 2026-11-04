@@ -74,7 +74,7 @@ const ANIM_UI := 0.2
 const FONT_PATH := "res://assets/fonts/Outfit-Variable.ttf"
 
 
-## Cor do HP do Núcleo por faixa: > 50% / 25–50% / < 25%.
+## Cor da Energia (vida do Anima) por faixa: > 50% / 25–50% / < 25%.
 static func core_hp_color(ratio: float) -> Color:
 	if ratio > 0.5:
 		return CORE_HP_HIGH

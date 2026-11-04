@@ -1,7 +1,7 @@
 @tool
 class_name UiBar
 extends Control
-## Barra de vida (Núcleo ou chefe). docs/ui.md §5.2.
+## Barra de vida (Energia do Anima ou chefe). docs/ui.md §5.2.
 ## Arte em assets/ui/ (ui_bar_*); trilho de `track_height` (36 px por padrão), centrado no controle.
 ## O preenchimento vai direto ao valor; a "barra fantasma" vai atrás e mostra a perda.
 
@@ -18,7 +18,7 @@ const GHOST_TIME := 0.3
 	set(v):
 		fill_color = v
 		queue_redraw()
-## Texto antes dos números (ex.: "NÚCLEO ").
+## Texto antes dos números (ex.: "ENERGIA ").
 @export var label_prefix := "":
 	set(v):
 		label_prefix = v

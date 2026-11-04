@@ -2,7 +2,7 @@ class_name Hud
 extends CanvasLayer
 ## HUD da partida (docs/ui.md §4–6). Só escuta os sinais da Arena; toques chamam Arena.use_skill(slot).
 ## Chame bind(arena) ANTES de a arena entrar na árvore: os valores iniciais saem no _ready dela.
-## Layout cartoon (T-145): topo = pausa · pílula "ONDA x/y" · pílula de Partículas, barra do Núcleo;
+## Layout cartoon (T-145): topo = pausa · pílula "ONDA x/y" · pílula de Partículas, barra de Energia;
 ## bandeja inferior = fileira de 5 upgrades (T-135) + 3 slots de skill (Ø 144, centros 150/360/570).
 
 ## Pedido de pausa (botão). O botão também injeta a action `pause`; a tela de pausa (T-113) ouve um dos dois.
@@ -17,12 +17,12 @@ const CORE_ICON_SIZE := Vector2(36, 44)
 const UPGRADE_BAND_PAD := 10
 ## Altura da bandeja inferior (upgrades + skills) sem safe area, em px da resolução base (docs/ui.md §4.4).
 const TRAY_HEIGHT := 282
-## Altura do HUD de cima (pausa/ONDA/Partículas + barra do Núcleo) sem safe area e sem a barra do chefe.
+## Altura do HUD de cima (pausa/ONDA/Partículas + barra de Energia) sem safe area e sem a barra do chefe.
 ## O fundo da arena passa por trás do topo; o gameplay usa isto para não pôr alvos sob o HUD (docs/ui.md §4.4).
 const TOP_INSET := 164
 ## Altura extra do topo com a barra "Boss" visível (gap 16 + barra 36). top_inset() já soma quando ela aparece.
 const BOSS_BAR_INSET := 52
-## Trilho da barra "Boss": ~89% do trilho do Núcleo (36), decisão 39.
+## Trilho da barra "Boss": ~89% do trilho da Energia (36), decisão 39.
 const BOSS_TRACK_HEIGHT := 32.0
 const BOSS_BAR_HEIGHT := 36
 const BOSS_FILL_TIME := 0.15
@@ -191,18 +191,18 @@ func _build_top() -> void:
 	_particles_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	particles_row.add_child(_particles_label)
 
-	# Linha 2: cristal + barra do Núcleo
+	# Linha 2: cristal + barra de Energia
 	var row2 := _hbox(UiTokens.SPACE_XS)
 	top_col.add_child(row2)
 	row2.add_child(_icon(CORE_ICON_SIZE, _draw_crystal))
 	_core_bar = UiBar.new()
 	_core_bar.color_mode = UiBar.ColorMode.CORE_HP
-	_core_bar.label_prefix = "NÚCLEO "
+	_core_bar.label_prefix = "ENERGIA "
 	_core_bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_core_bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row2.add_child(_core_bar)
 
-	# Linha 3: barra "Boss" (decisão 39), mesma largura útil da do Núcleo; aparece com o chefe.
+	# Linha 3: barra "Boss" (decisão 39), mesma largura útil da de Energia; aparece com o chefe.
 	var row3 := _hbox(UiTokens.SPACE_XS)
 	row3.name = "BossRow"
 	row3.visible = false
@@ -331,7 +331,7 @@ func _icon(min_size: Vector2, painter: Callable) -> Control:
 	return c
 
 
-## Cristal do Núcleo, ciano com contorno.
+## Cristal da barra de Energia, ciano com contorno.
 func _draw_crystal(c: Control) -> void:
 	var w := c.size.x * 0.5
 	var h := c.size.y * 0.5

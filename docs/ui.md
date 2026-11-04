@@ -41,10 +41,10 @@ Fonte única: `src/ui/theme/ui_tokens.gd`. Estilo das decisões 31–36 e do [do
 | `text_primary` | `#FFFFFF` + contorno `ink` | texto sobre painéis e arena |
 | `text_secondary` | `#E2DAFF` | rótulos, legendas |
 | `text_on_light` | `#3A2A55` | texto de botão claro/ciano |
-| `accent` | `#2FE6D2` (ciano) | foco, skill pronta, botão principal, cristal do Núcleo |
+| `accent` | `#2FE6D2` (ciano) | foco, skill pronta, botão principal, cristal da barra de Energia |
 | `skill_fill` / `badge` / `locked` | `#957CE6` / `#CDF1FF` / `#9D98AE` | slot de skill, badge da tecla, bloqueado/desabilitado |
 | `bar_track` | `#5B4A7A` | trilho das barras |
-| `core_hp` | `#6CF0A4` → `#FFC93D` → `#FF5A6E` | HP do Núcleo: > 50% / 25–50% / < 25% |
+| `core_hp` | `#6CF0A4` → `#FFC93D` → `#FF5A6E` | Energia: > 50% / 25–50% / < 25% |
 | `boss_hp` | `#FF5A6E` (= `danger`) | barra "Boss" (decisão 39) |
 | `danger` | `#FF5A6E` | dano, derrota |
 | `particles` | `#FFC93D` | estrela de Partículas, "Vitória" |
@@ -94,7 +94,7 @@ y=0    ┌───────────────────────�
        │  safe area topo (notch)      │
        ├──────────────────────────────┤ ← topo do HUD = safe_top + 16
        │ [II]   (ONDA 3/10)  (★ 1.250)│  linha 1: 88 px
-       │ ◆ [NÚCLEO 1.170 / 1.500 ███] │  linha 2: 44 px
+       │ ◆ [ENERGIA 1.170 / 1.500 ██] │  linha 2: 44 px
        │   [Boss ████████ 2.140/2.500]│  linha 3: 36 px (só com chefe, +52)
        ├──────────────────────────────┤ ← y 164 (216 c/ chefe) + safe_top
        │       ZONA DE COMBATE        │  Anima no centro; a arena encolhe (AG01)
@@ -113,8 +113,8 @@ y=1280 └───────────────────────�
 | Pausa | linha 1, à esquerda | **88×88**, botão claro | "II"; também `Esc` |
 | "ONDA X/Y" | linha 1, centro | pílula `bg_panel`, `font_hud` | pulso de escala (200 ms) ao trocar de onda |
 | Partículas | linha 1, à direita | pílula `surface`, estrela `particles` (`StarIcon`) + número `particles` | total de Partículas da partida, com milhar |
-| HP do Núcleo | linha 2, largura total | altura 40 px, cristal `accent` à esquerda | texto "NÚCLEO atual / máx", cor por faixa, flash `danger` e barra fantasma |
-| Barra "Boss" | linha 3, mesma largura útil da barra do Núcleo | controle 36 px, trilho 32 px (~89% do Núcleo) | vermelha (`boss_hp`), rótulo "Boss" à esquerda e "atual / máx" à direita, com contorno; fade de 200 ms ao aparecer (`boss_spawned` ou `boss_hp_changed`) e ao sumir (`boss_defeated`, vida 0 ou `match_ended`); queda do preenchimento em 150 ms (BRF-058) |
+| Energia (vida do Anima) | linha 2, largura total | altura 40 px, cristal `accent` à esquerda | texto "ENERGIA atual / máx" (decisão 41), cor por faixa, flash `danger` e barra fantasma |
+| Barra "Boss" | linha 3, mesma largura útil da barra de Energia | controle 36 px, trilho 32 px (~89% da Energia) | vermelha (`boss_hp`), rótulo "Boss" à esquerda e "atual / máx" à direita, com contorno; fade de 200 ms ao aparecer (`boss_spawned` ou `boss_hp_changed`) e ao sumir (`boss_defeated`, vida 0 ou `match_ended`); queda do preenchimento em 150 ms (BRF-058) |
 
 - **Sem faixa de fundo (BRF-039):** o fundo da arena passa por trás do topo; os elementos ficam sobrepostos a ele. Para leitura, um degradê `ink` (alfa 0,35 → 0) cobre só a altura do topo (`Hud/Root/TopScrim`). Pílulas e barra mantêm o contorno.
 
@@ -164,7 +164,7 @@ Teste: `tests/unit/ui/test_hud_layout.gd` confere as constantes contra o layout.
 - **Toque e clique** disparam a mesma Input Action (§7). O botão não chama a skill diretamente.
 - Arte (T-138): molduras `ui_skill_frame_ready/cooldown/locked` (pronta tem halo fixo + halo pulsante desenhado), ícone por `icon_texture` (88 px; fallback `ui_icon_skill_pulse` no `Icon.CIRCLE`). No HUD (BRF-050, decisão 37) o ícone vem de `Hud.slot_icon_paths` (slot 1 = `ui_icon_skill_meteor.png`, o mesmo PNG de `SkillData.icon`; caminho inexistente cai no fallback) ou de `Hud.set_slot_icon(slot, tex)`, sem ler `src/match/`; cadeado `ui_icon_lock` (64 px), véu `ui_skill_cooldown_mask` como setor texturizado (buffers reaproveitados). `disabled` usa a moldura cinza e o ícone a 55%. Losango/hexágono desenhados só como fallback sem arte.
 
-### 5.2 `Bar` (HP do Núcleo / chefe)
+### 5.2 `Bar` (Energia / chefe)
 
 - Arte (T-138): trilho `ui_bar_track` (altura fixa 36, centrado no controle), preenchimento `ui_bar_fill` branco (24 px, 4 px de folga) tingido pelo token (`core_hp_*`, `boss_hp`), brilho `ui_bar_shine`; texto `label_prefix` + "atual / máx" com contorno. Opções: `track_height` (escala trilho, preenchimento e brilho), `title` (rótulo à esquerda; números vão para a direita) e `fill_time` (queda animada). Barra "Boss": trilho 32, `fill_time` 0,15 s.
 - **Interpolação:** o preenchimento principal vai direto ao novo valor, e uma "barra fantasma" clara vai atrás em ~300 ms, mostrando quanto foi perdido.
@@ -186,7 +186,7 @@ Teste: `tests/unit/ui/test_hud_layout.gd` confere as constantes contra o layout.
 - Teclado: `focus_mode = ALL` (Tab/setas) com anel `accent` por fora; `Enter` compra. **`Espaço` nunca compra** (é `skill_4`): o botão ignora eventos que casam com `skill_*`/`pause`. Clique/toque soltam o foco, para o anel só aparecer pelo teclado.
 - Nomes (`accessibility_name`): Atk power, Atk spd, Defesa, Vida máxima, Cooldown. Arte (T-138): molduras `ui_upgrade_btn_normal/disabled/max` (canvas 132×90 em (−2, −2), sombra até y = 88), ícone `ui_icon_upgrade_*` Ø 40 em (31, 28) (`icon_texture` sobrescreve), pílula `ui_upgrade_cost_pill(_max)` em (9, 52) com estrela `ui_icon_particle` 20 px; sem Partículas = ícone a 55%.
 - Desenho só quando o estado muda (sem `_process`, StyleBoxes em cache).
-- **HUD (T-138):** pausa = `ui_icon_pause` (64 px, alvo de toque 88 px); estrela de Partículas (`StarIcon`) usa `ui_icon_particle` no HUD e no Resultado. Pílulas do topo e cristal do Núcleo continuam desenhados (sem arte).
+- **HUD (T-138):** pausa = `ui_icon_pause` (64 px, alvo de toque 88 px); estrela de Partículas (`StarIcon`) usa `ui_icon_particle` no HUD e no Resultado. Pílulas do topo e cristal da barra de Energia continuam desenhados (sem arte).
 
 **Sem tooltips (BRF-039):** nenhum controle do HUD ou das telas usa `tooltip_text`; no toque o Godot exibia o tooltip sobre os botões. A descrição fica só em `accessibility_name`.
 
@@ -196,7 +196,7 @@ Os sinais são emitidos pelo nó raiz `Match`.
 
 | Sinal | Consumidor | Efeito |
 |---|---|---|
-| `core_hp_changed(current, max)` | Bar HP do Núcleo | valor, cor por faixa, flash de dano |
+| `core_hp_changed(current, max)` | Bar de Energia | valor, cor por faixa, flash de dano |
 | `wave_changed(current, total)` | rótulo "ONDA X/Y" | texto + pulso |
 | `skill_used(slot)` | SkillButton[slot] | flash de acionamento (§5.1) |
 | `cooldown_changed(slot, remaining, total)` | SkillButton[slot] | estado `cooldown`, setor e segundos (≤ ~10×/s, interpolado) |
