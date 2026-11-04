@@ -5,6 +5,8 @@ extends Node2D
 signal skill_used(slot: int)
 signal cooldown_changed(slot: int, remaining: float, total: float)
 signal skill_ready(slot: int)
+## Efeito aplicado no chão (impacto do meteoro): posição de tela (âncora no chão), raio no chão.
+signal skill_cast(slot: int, at: Vector2, radius: float)
 
 const ACTIONS: Array[StringName] = [&"skill_1", &"skill_2", &"skill_3"]
 const COOLDOWN_EMIT_INTERVAL := 0.1 ## s; no máximo ~10 emissões/s por slot
@@ -28,6 +30,7 @@ func setup(context: SkillContext) -> void:
 		_behaviors.append(behavior)
 		if behavior:
 			behavior.setup(data, context)
+			behavior.cast.connect(_on_cast.bind(_slots.size()))
 			add_child(behavior)
 
 
@@ -37,10 +40,16 @@ static func behavior_for(data: SkillData) -> SkillBehavior:
 		return null
 	match data.type:
 		SkillData.Type.AREA:
+			if data.delivery == SkillData.Delivery.METEOR:
+				return MeteorSkill.new()
 			return AreaSkill.new()
 		_:
 			push_warning("Skill sem comportamento: %s" % data.id)
 			return null
+
+
+func _on_cast(at: Vector2, radius: float, slot: int) -> void:
+	skill_cast.emit(slot, at, radius)
 
 
 func slot_count() -> int:

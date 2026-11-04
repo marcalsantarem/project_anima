@@ -1,0 +1,9 @@
+# BRF-047 — AG08 — T-128 (ajuste) Ícone e arte do meteoro de fogo
+**Contexto:** decisão 37: a skill do slot 1 é um **meteoro de fogo** (cai na área alvo e explode com raio e dano). O ícone atual em `assets/ui/` é o do `skill_pulse` provisório (explosão/estrela). O AG01 implementa a skill agora; o AG09 faz os efeitos de impacto (chama, fumaça, brilho) em código, então você faz só os sprites base.
+**Fazer:**
+1. **Ícone da skill de área** no estilo da UI (`assets/ui/README.md`): um meteoro de fogo (rocha com chama laranja/amarela e rastro) legível em 44 px, para a moldura circular do slot 1; mantenha o mesmo nome de arquivo do ícone atual **ou** crie `ui_icon_skill_meteor.png` e avise o nome na entrega (o AG02 ajusta o uso depois). Atualize o gerador `assets/ui/_src/gen_ui.py` (hoje há `G_SKILL_PULSE`; substitua ou acrescente `G_SKILL_METEOR`).
+2. **Sprites do meteoro em jogo**, em `assets/sprites/` (2x, fundo transparente, escala 0,5, âncora documentada no `assets/sprites/README.md`): `skill_meteor.png` (rocha em chamas caindo, vista 3/4, com a cauda de fogo voltada para cima; âncora no centro da rocha) e `skill_meteor_crater.png` (marca de impacto no chão: elipse com rachaduras e brasas, achatada na proporção 0,75 do chão 3/4, âncora no centro). Cores quentes (laranja, amarelo, vermelho), sem ciano; contorno escuro como os demais sprites; legíveis sobre o chão creme.
+Atualize `assets/LICENSES.md` (edição pontual), o README e o gerador `assets/sprites/_src/gen_sprites.py` (edição pontual: outros agentes não o usam, mas mantenha os sprites antigos byte a byte).
+**Arquivos permitidos:** `assets/ui/`, `assets/sprites/`, `assets/LICENSES.md`, `docs/arte.md` (nota curta). Não edite cenas nem scripts.
+**Validação:** confira os PNG em folha de contato, em 1x e a 44 px (ícone).
+**Entrega:** no máximo 8 linhas, com nomes, tamanhos e âncoras.

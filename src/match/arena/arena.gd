@@ -16,6 +16,15 @@ signal boss_hp_changed(current: int, max_hp: int)
 signal boss_defeated
 ## Estado de um upgrade da partida. next_cost = -1 no nível máximo (contrato em docs/gameplay.md).
 signal upgrade_changed(id: StringName, level: int, max_level: int, next_cost: int)
+## Sinais para VFX/áudio (docs/vfx.md). Posições = âncora no chão, em coordenadas de tela da Arena;
+## raios em px no chão (GroundPlane). Nenhum é emitido por quadro: só nos eventos.
+signal projectile_fired(from: Vector2, dir: Vector2) ## tiro do Anima; dir em tela, normalizada
+signal projectile_hit(at: Vector2, target_kind: StringName) ## &"enemy" | &"boss" | &"core"
+signal enemy_died(at: Vector2, archetype_id: StringName, cause: int) ## cause = Enemy.DeathCause
+signal particles_gained(at: Vector2, amount: int)
+signal skill_cast(slot: int, at: Vector2, radius: float)
+signal boss_telegraph_started(pattern_id: StringName, duration: float, at: Vector2, radius: float)
+signal boss_phase_changed(phase: int) ## 0-based
 
 ## Upgrades da partida, na ordem da fileira do HUD.
 const UPGRADE_IDS: Array[StringName] = [
@@ -79,6 +88,9 @@ func _ready() -> void:
 	anima.upgrades = upgrades
 	projectiles.build(anima.data.projectile_pool_size, anima.data.projectile)
 	enemy_projectiles.build(enemy_projectile_pool_size, enemy_projectile)
+	projectiles.projectile_fired.connect(projectile_fired.emit)
+	projectiles.projectile_hit.connect(projectile_hit.emit)
+	enemy_projectiles.projectile_hit.connect(projectile_hit.emit)
 	anima.setup_attack(active_enemies, projectiles)
 	anima.core_hp_changed.connect(func(c: int, m: int) -> void: core_hp_changed.emit(c, m))
 	anima.core_depleted.connect(func() -> void: _end(MatchResult.Outcome.DEFEAT))
@@ -86,6 +98,7 @@ func _ready() -> void:
 	skills.skill_used.connect(func(slot: int) -> void: skill_used.emit(slot))
 	skills.cooldown_changed.connect(func(slot: int, r: float, t: float) -> void: cooldown_changed.emit(slot, r, t))
 	skills.skill_ready.connect(func(slot: int) -> void: skill_ready.emit(slot))
+	skills.skill_cast.connect(skill_cast.emit)
 	get_viewport().size_changed.connect(_layout)
 	_layout()
 
@@ -144,6 +157,9 @@ func _bind_boss(boss: Boss) -> void:
 	boss.rng.seed = _rng.randi()
 	boss.hp_changed.connect(func(c: int, m: int) -> void: boss_hp_changed.emit(c, m))
 	boss.summon_requested.connect(_on_boss_summon)
+	boss.phase_changed.connect(boss_phase_changed.emit)
+	boss.telegraph_started.connect(func(pattern_id: StringName, duration: float) -> void:
+		boss_telegraph_started.emit(pattern_id, duration, boss.position, boss.current_pattern.telegraph_radius))
 	boss_spawned.emit(boss.data.id)
 	boss_hp_changed.emit(boss.hp, boss.data.hp)
 
@@ -229,10 +245,13 @@ func _on_spawn_requested(enemy_data: EnemyData, edge: WaveEntry.SpawnEdge) -> vo
 
 func _on_enemy_died(enemy: Enemy, cause: Enemy.DeathCause) -> void:
 	active_enemies.erase(enemy)
+	enemy_died.emit(enemy.position, enemy.data.id, cause)
 	if cause == Enemy.DeathCause.KILLED and not is_over:
 		enemies_killed += 1
 		particles += enemy.data.particle_drop
 		_emit_particles()
+		if enemy.data.particle_drop > 0:
+			particles_gained.emit(enemy.position, enemy.data.particle_drop)
 		if enemy is Boss:
 			boss_defeated.emit()
 			_end(MatchResult.Outcome.VICTORY)

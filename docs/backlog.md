@@ -43,7 +43,7 @@
 | T-127 | Arte do Anima, inimigos, chefe, projéteis e fundo | M1 | AG08 | feita |
 | T-128 | Ícones e arte da UI | M1 | AG08 | feita |
 | T-129 | `docs/vfx.md` + pool de efeitos | M1 | AG09 | feita |
-| T-130 | VFX do ataque, acertos e mortes | M1 | AG09 | a fazer |
+| T-130 | VFX do ataque, acertos e mortes | M1 | AG09 | feita (falta ligar na partida) |
 | T-131 | VFX da skill e do chefe | M1 | AG09 | a fazer |
 | T-132 | Modo de efeitos reduzidos | M1 | AG09 | a fazer |
 | T-133 | Dados e balanceamento dos upgrades da partida | M1 | AG04 | feita |
@@ -52,7 +52,7 @@
 | T-136 | Slots 2 e 3 do HUD bloqueados (cadeado) | M1 | AG02 | feita |
 | T-137 | Trocar placeholders da partida pela arte final | M1 | AG01 | feita (sem chefe) |
 | T-138 | Aplicar a arte da UI no HUD e nas telas | M1 | AG02 | feita |
-| T-139 | Meteoro de fogo como skill de área (decisão 37) | M1 | AG01 | a fazer |
+| T-139 | Meteoro de fogo como skill de área (decisão 37) | M1 | AG01 | feita |
 | T-140 | Moeda da partida vira Partículas: sinais, código e `gameplay.md` | M1 | AG01 | feita |
 | T-141 | Moeda da partida vira Partículas: HUD, telas e `ui.md` | M1 | AG02 | feita |
 | T-142 | Novo guia de estilo 2D cartoon 3/4 + mockups PNG | M1 | AG08 | pronta p/ briefing |
@@ -61,7 +61,7 @@
 | T-145 | Retema da UI no estilo cartoon (tokens, tema, fonte) | M1 | AG02 | feita |
 | T-146 | Remover mockups rejeitados e excluir referências do export Web | M1 | AG07 | feita |
 | T-147 | Anima com skin trocável (Resource de aparência) | M2 | AG01 | a fazer |
-| T-148 | Sinais da Arena para VFX (projectile_fired, projectile_hit, enemy_died, particles_gained, skill_cast, boss_telegraph_started, boss_phase_changed) | M1 | AG01 | pronta p/ briefing |
+| T-148 | Sinais da Arena para VFX (projectile_fired, projectile_hit, enemy_died, particles_gained, skill_cast, boss_telegraph_started, boss_phase_changed) | M1 | AG01 | feita |
 
 ## Próximas prontas p/ briefing
 
@@ -354,7 +354,7 @@
 - **Pronto quando:** mockups A/B removidos; filtro do preset Web exclui mockups e referências; export e testes OK.
 
 ### T-148 — Sinais da Arena para VFX
-- **Marco:** M1 · **Dono:** AG01 · **Status:** pronta p/ briefing
+- **Marco:** M1 · **Dono:** AG01 · **Status:** feita
 - **Depende de:** T-129 (lista em `docs/vfx.md`), T-139 (o `skill_cast` do meteoro) · **Desbloqueia:** T-130, T-131
 - **Arquivos:** `src/match/`, `docs/gameplay.md`, `tests/` (da arena)
 - **Pronto quando:** a Arena emite `projectile_fired(from, dir)`, `projectile_hit(at, target_kind)`, `enemy_died(at, archetype_id, cause)`, `particles_gained(at, amount)`, `skill_cast(slot, at, radius)`, `boss_telegraph_started(pattern_id, duration, at, radius)` e `boss_phase_changed(phase)`, sem custo por quadro; documentados e testados.
@@ -452,7 +452,7 @@
 - **Pronto quando:** HUD, telas e tela de upgrade usam os ícones e a arte final; legibilidade conferida no iPhone.
 
 ### T-139 — Meteoro de fogo como skill de área (decisão 37)
-- **Marco:** M1 · **Dono:** AG01 · **Status:** a fazer (desbloqueada pela decisão 37; depois da T-116, mesmos arquivos)
+- **Marco:** M1 · **Dono:** AG01 · **Status:** feita
 - **Depende de:** decisão 37 (feita) · **Desbloqueia:** T-131, T-128 (troca do ícone)
 - **Arquivos:** `src/match/skills/`, `data/skills/`
 - **Pronto quando:** a skill do slot 1 é um meteoro de fogo: cai na posição alvo (inimigo mais denso ou mais próximo, regra a documentar), explode com **raio e dano em dados** (`radius`, `damage`, cooldown), pensados para receber upgrades depois; telegraph no chão antes de cair; sinais para VFX e UI; substitui `skill_pulse`; testes.

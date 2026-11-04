@@ -4,7 +4,7 @@ extends GutTest
 
 const RUNNER := preload("res://data/enemies/enemy_runner.tres")
 const TANK := preload("res://data/enemies/enemy_tank.tres")
-const PULSE := preload("res://data/skills/skill_pulse.tres")
+const METEOR := preload("res://data/skills/skill_meteor.tres")
 const ARENA_SCENE := preload("res://src/match/arena/arena.tscn")
 const HUD_SCENE := preload("res://src/ui/hud/hud.tscn")
 const TWEEN_WAIT := UiTokens.ANIM_UI + 0.15
@@ -98,7 +98,7 @@ func test_victory_reaches_hud_and_result() -> void:
 func test_skill_touch_cooldown_cycle_in_hud() -> void:
 	_start(null, false)
 	await wait_physics_frames(1)
-	_parked_enemy(TANK) # aguenta 2 pulsos
+	_parked_enemy(TANK) # aguenta 2 meteoros
 	var button := hud._skill(1)
 	hud._on_skill_pressed(1) # toque no botão
 	assert_signal_emitted_with_parameters(arena, "skill_used", [1])
@@ -108,7 +108,7 @@ func test_skill_touch_cooldown_cycle_in_hud() -> void:
 	arena.skills.get_slot(1).remaining = 0.05
 	await wait_physics_frames(6)
 	assert_eq(button.state, SkillButton.State.READY)
-	await wait_seconds(PULSE.windup + 0.1)
+	await wait_seconds(METEOR.telegraph_time + 0.1)
 	hud._on_skill_pressed(1)
 	assert_signal_emit_count(arena, "skill_used", 2, "pronta de novo após o cooldown")
 
@@ -123,7 +123,7 @@ func test_cooldown_updates_are_throttled_and_decreasing() -> void:
 	# 1 no uso + ~10/s (SkillController.COOLDOWN_EMIT_INTERVAL)
 	assert_between(n, 8, 13, "emissões em 1 s: %d" % n)
 	var last: Array = get_signal_parameters(arena, "cooldown_changed")
-	assert_almost_eq(last[1], PULSE.cooldown - 1.0, 0.2)
+	assert_almost_eq(last[1], METEOR.cooldown - 1.0, 0.2)
 	assert_almost_eq(hud._skill(1)._remaining, last[1], 0.2, "HUD recebe o restante (interpola entre emissões)")
 
 

@@ -70,14 +70,14 @@ Arquivos de dados: `data/anima/anima_default.tres` (`AnimaData`) e `data/project
 3 slots no M1. O 4º slot (`skill_4` / `Espaço`) fica para **depois do M1**.
 
 Cada skill é um `SkillData` (`data/skills/skill_<id>.tres`):
-`id, type (AREA|CONTROL|DEFENSE), cooldown, radius, damage, duration, windup, target_range, effect_params, fx_id, sfx_id`.
+`id, type (AREA|CONTROL|DEFENSE), delivery (INSTANT|METEOR), cooldown, radius, damage, duration, windup, target_range, effect_params, fx_id, sfx_id, icon` + grupo Meteoro (`telegraph_time, fall_time, fall_height, crater_time, meteor_texture/anchor, crater_texture/anchor`).
 O comportamento fica em um script por `type` (`SkillBehavior` → `AreaSkill`, ...), que só lê o Resource. Skill nova = dados novos; tipo novo = script novo + uma linha em `SkillController.behavior_for`.
 
 **Implementação (T-108):** `SkillController` (nó `Skills` da arena) guarda os slots (1-based), o cooldown (`SkillSlot`, lógica pura) e escuta `skill_1..3` em `_unhandled_input`. A UI aciona por `Arena.use_skill(slot) -> bool`. As skills do slot vêm do export `skills` da cena até o `MatchConfig` trazê-las (AG04).
 
 | Slot | Input Action | Skill (M1) | Tipo | Cooldown | Raio | Efeito |
 |---|---|---|---|---|---|---|
-| 1 | `skill_1` (`1`) | `skill_pulse` | area | 10 s | 180 px | 60 de dano instantâneo |
+| 1 | `skill_1` (`1`) | `skill_meteor` | area (METEOR) | 10 s | 160 px | 40 de dano no impacto, 0,6 s após o acionamento |
 | 2 | `skill_2` (`2`) | `skill_stasis` | control | 15 s | 220 px | congela por 2,5 s; `effect_params.slow_after` = 0,5 por 1,5 s |
 | 3 | `skill_3` (`3`) | `skill_aegis` | defense | 20 s | — | escudo no Núcleo por 4 s, absorve até 50 de dano |
 
@@ -86,6 +86,14 @@ O comportamento fica em um script por `type` (`SkillBehavior` → `AreaSkill`, .
 - **Alvo da área e do controle:** automático, no ponto de maior densidade de inimigos dentro de `target_range` (calculado no acionamento; os centros candidatos são as posições dos inimigos).
 - **Área:** dano por distância (raio da skill + raio do inimigo), sem usar a layer `skill_areas`. **[A definir]**: mira manual por toque/clique como alternativa, a testar no playtest.
 - **Feedback:** antecipação curta (~0,1 s) + impacto forte; tremor leve **desligável**.
+
+### Meteoro de fogo (T-139, decisão 37)
+
+- `MeteorSkill` (estende `AreaSkill`), escolhido por `delivery = METEOR`. A `skill_pulse` saiu da partida; o `.tres` fica só para os testes do `AreaSkill` instantâneo.
+- **Alvo:** o inimigo ao alcance (`target_range`) com mais vizinhos no `radius` (no chão); empate, inclusive todos sozinhos, = o mais próximo do Anima. O ponto é **adiantado**: posição prevista desse inimigo após `telegraph_time` (só se ele está avançando; atirador parado = posição atual). O ponto fica fixo depois do acionamento.
+- **Tempo:** telegraph no chão (elipse que enche) por `telegraph_time` = 0,6 s; o meteoro cai nos últimos `fall_time` = 0,35 s (de `fall_height` = 360 px acima, acelerando); no impacto, dano em área no chão e `skill_cast`; a cratera fica `crater_time` = 0,5 s. Nada é alocado na animação (nós criados no `_ready`).
+- **Arte:** `assets/sprites/skill_meteor.png` (âncora 64,164) e `skill_meteor_crater.png` (âncora 128,96, escalada para largura 1x = 2 × raio × 1,07); sem textura, desenho provisório por código. `icon` = `assets/ui/ui_icon_skill_meteor.png` (o HUD ainda não lê esse campo: AG02).
+- **Balanceamento:** 40 de dano mata enxame (8), corredor (20) e atirador (35); tanque (120) leva 1/3. Raio 160 cobre um grupo de enxame (espalhamento 48). Com 1 uso a cada 10 s, limpa grupos sem resolver as ondas 5+ (12–14 corredores vindos de bordas diferentes). Upgrades futuros: `radius`, `damage`, `cooldown` são campos separados; `upgrade_cooldown` já vale.
 - Cards e raridades (AG04, depois do M1) só alteram números e efeitos via `SkillData`. O gameplay não conhece cards.
 
 ## Inimigos
@@ -144,7 +152,7 @@ WaveEntry: enemy (EnemyData), count, interval (s), spawn_edge, start_delay (s)
 - **Chefe na onda 10, com acompanhantes** (T-116), e não numa onda 11 só dele: o "Onda 10/10" bate com o fim da fase e os acompanhantes mantêm pressão enquanto o jogador foca o chefe. `StageData.boss_id = boss_warden` (informativo).
 - **Vitória ao derrotar o chefe** (`Arena._on_enemy_died`), mesmo com acompanhantes vivos. Derrota: HP do Núcleo = 0.
 
-**Curva da fase 1 (`stage_01`, T-116).** Balanceada para **1 skill (slot 1, `skill_pulse`) + upgrades da partida**, independente do tipo da skill de área (T-139). Um arquétipo novo a cada 2–3 ondas. Partículas pela média do enxame (5–8 por grupo, média 6,5); "tempo" = último spawn + tempo de limpeza estimado (sem simulação de combate).
+**Curva da fase 1 (`stage_01`, T-116).** Balanceada para **1 skill (slot 1, hoje `skill_meteor`; antes `skill_pulse`) + upgrades da partida**, independente do tipo da skill de área (T-139). Um arquétipo novo a cada 2–3 ondas. Partículas pela média do enxame (5–8 por grupo, média 6,5); "tempo" = último spawn + tempo de limpeza estimado (sem simulação de combate).
 
 | Onda | Composição | Inimigos | Partículas | Acumulado | Tempo est. |
 |---|---|---|---|---|---|
@@ -187,6 +195,20 @@ Emitidos pelo nó raiz da partida (`Arena`). Na T-105 já existem `core_hp_chang
 | `boss_defeated` | chefe abatido (antes do `match_ended` de vitória) |
 | `upgrade_changed(id: StringName, level: int, max_level: int, next_cost: int)` | ver "Upgrades da partida (T-134)" abaixo |
 | `match_ended(result: MatchResult)` | vitória ou derrota (uma vez) |
+
+### Sinais para VFX (T-148)
+
+Também na `Arena`, só em eventos (nenhum por quadro; as ligações são feitas uma vez no `_ready`/spawn). **Posições** = âncora no chão em coordenadas de tela da Arena (regra do `GroundPlane`); **raios** em px no chão. Consumidos pelo `FxDirector` (AG09, `docs/vfx.md`).
+
+| Sinal | Quando |
+|---|---|
+| `projectile_fired(from: Vector2, dir: Vector2)` | tiro do Anima (`dir` em tela, normalizada). Tiros inimigos não emitem |
+| `projectile_hit(at: Vector2, target_kind: StringName)` | acerto de projétil: `&"enemy"`, `&"boss"` (tiro do Anima) ou `&"core"` (tiro inimigo no Núcleo) |
+| `enemy_died(at: Vector2, archetype_id: StringName, cause: int)` | toda morte; `cause` = `Enemy.DeathCause` (KILLED 0, CONTACT 1) |
+| `particles_gained(at: Vector2, amount: int)` | abate com `particle_drop > 0` (depois de `particles_changed`) |
+| `skill_cast(slot: int, at: Vector2, radius: float)` | impacto da skill de área (meteoro), não no acionamento |
+| `boss_telegraph_started(pattern_id: StringName, duration: float, at: Vector2, radius: float)` | início do aviso de um padrão; `at` = posição do chefe, `radius` = `telegraph_radius` |
+| `boss_phase_changed(phase: int)` | troca de fase do chefe (0-based) |
 
 ### Upgrades da partida (T-134)
 
@@ -235,7 +257,8 @@ O `project.godot` é do AG07. Layers sugeridas:
 | Arena, Anima, 1 inimigo | protótipo | T-103 |
 | Ataque automático com pool | protótipo | T-104 |
 | Ondas, HP do Núcleo, Partículas, vitória/derrota | protótipo | T-105 |
-| Skill de área | protótipo | T-108 |
+| Skill de área (meteoro) | protótipo | T-108, T-139 |
+| Sinais para VFX | protótipo | T-148 |
 | Skill de controle | pendente | T-109 |
 | Skill de defesa | pendente | T-110 |
 | Arquétipos (tanque, atirador, enxame) | protótipo | T-111 |

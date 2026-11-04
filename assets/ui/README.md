@@ -14,6 +14,7 @@ Fonte: `_src/gen_ui.py` (SVG por código → Chrome headless). Para regenerar, r
 | `ui_icon_upgrade_max_hp.png` | 128×128 | 64×64 | Vida máxima: coração com "+", círculo rosa |
 | `ui_icon_upgrade_cooldown.png` | 128×128 | 64×64 | Cooldown: ampulheta, círculo verde-água |
 | `ui_icon_skill_pulse.png` | 128×128 | 64×64 (~88 na moldura) | Skill de área atual (pulso). **Provisório até a T-125**: para trocar, edite só `G_SKILL_PULSE` no script |
+| `ui_icon_skill_meteor.png` | 128×128 | 64×64 (~88 na moldura) | Skill do slot 1: meteoro de fogo (BRF-047). Substitui o `ui_icon_skill_pulse.png`, mantido até o AG02 trocar o uso. Fonte: `G_SKILL_METEOR` |
 | `ui_icon_lock.png` | 128×128 | 64×64 | Cadeado dos slots bloqueados (acima do texto "NV 7"/"NV 12") |
 | `ui_icon_particle.png` | 64×64 | 32×32 (18–24 na pílula) | Estrela de Partículas (custo, contador) |
 | `ui_icon_pause.png` | 128×128 | 64×64 | Botão de pausa completo (quadrado branco + barras), canto superior esquerdo |

@@ -1,7 +1,9 @@
 extends GutTest
 
 const RUNNER := preload("res://data/enemies/enemy_runner.tres")
+const TANK := preload("res://data/enemies/enemy_tank.tres")
 const PULSE := preload("res://data/skills/skill_pulse.tres")
+const METEOR := preload("res://data/skills/skill_meteor.tres")
 const ARENA_SCENE := preload("res://src/match/arena/arena.tscn")
 const ENEMY_SCENE := preload("res://src/match/enemies/enemy.tscn")
 
@@ -28,6 +30,70 @@ func test_pulse_data_matches_gameplay_doc() -> void:
 	assert_eq(PULSE.cooldown, 10.0)
 	assert_eq(PULSE.radius, 180.0)
 	assert_eq(PULSE.damage, 60)
+
+
+func test_meteor_data_matches_gameplay_doc() -> void:
+	assert_eq(METEOR.type, SkillData.Type.AREA)
+	assert_eq(METEOR.delivery, SkillData.Delivery.METEOR)
+	assert_eq(METEOR.cooldown, 10.0)
+	assert_eq(METEOR.radius, 160.0)
+	assert_eq(METEOR.damage, 40)
+	assert_eq(METEOR.telegraph_time, 0.6)
+	assert_true(METEOR.fall_time > 0.0 and METEOR.fall_time <= METEOR.telegraph_time)
+
+
+func test_meteor_uses_art_and_crater_covers_radius() -> void:
+	assert_not_null(METEOR.meteor_texture)
+	assert_not_null(METEOR.crater_texture)
+	var k := MeteorSkill.crater_scale(METEOR.crater_texture.get_width(), METEOR.radius)
+	var width_1x := METEOR.crater_texture.get_width() * SpriteArt.SCALE.x * k
+	assert_almost_eq(width_1x, 2.0 * METEOR.radius * MeteorSkill.CRATER_FIT, 0.01)
+
+
+func test_behavior_by_delivery() -> void:
+	var m := SkillController.behavior_for(METEOR)
+	var a := SkillController.behavior_for(PULSE)
+	assert_true(m is MeteorSkill)
+	assert_true(a is AreaSkill and not a is MeteorSkill)
+	m.free()
+	a.free()
+
+
+func test_arena_slot_1_is_meteor() -> void:
+	var arena := _arena()
+	await wait_physics_frames(1)
+	assert_eq(arena.skills.get_slot(1).data.id, &"skill_meteor")
+
+
+func test_lead_point_predicts_advancing_enemy() -> void:
+	var e := _enemy_at(Vector2(0, -400))
+	e.target_position = Vector2.ZERO
+	var p := MeteorSkill.lead_point(e, 0.5)
+	assert_almost_eq(GroundPlane.distance(e.position, p), RUNNER.speed * 0.5, 0.01)
+	e.state = Enemy.State.ATTACK
+	assert_eq(MeteorSkill.lead_point(e, 0.5), e.position, "parado: sem previsão")
+
+
+func test_densest_falls_back_to_nearest() -> void:
+	var far := _enemy_at(Vector2(0, 500))
+	var near := _enemy_at(Vector2(300, 0))
+	assert_eq(AreaSkill.densest_enemy(Vector2.ZERO, [far, near] as Array[Enemy], 600.0, 160.0), near)
+	assert_null(AreaSkill.densest_enemy(Vector2.ZERO, [far] as Array[Enemy], 100.0, 160.0))
+
+
+func test_meteor_hits_only_after_telegraph_and_emits_cast() -> void:
+	var arena := _arena()
+	await wait_physics_frames(1)
+	var e := arena.spawn(TANK, WaveEntry.SpawnEdge.TOP)
+	e.position = arena.anima.position + Vector2(0, -300)
+	e.target_position = e.position
+	assert_true(arena.use_skill(1))
+	await wait_seconds(METEOR.telegraph_time - METEOR.fall_time * 0.5)
+	assert_eq(e.hp, TANK.hp, "sem dano durante o telegraph")
+	assert_signal_not_emitted(arena, "skill_cast")
+	await wait_seconds(METEOR.fall_time * 0.5 + 0.1)
+	assert_eq(e.hp, TANK.hp - METEOR.damage)
+	assert_signal_emitted_with_parameters(arena, "skill_cast", [1, e.position, METEOR.radius])
 
 
 func test_slot_cooldown_cycle() -> void:
@@ -81,9 +147,9 @@ func test_use_skill_kills_cluster_and_starts_cooldown() -> void:
 		enemies.append(e)
 	assert_true(arena.use_skill(1))
 	assert_signal_emitted_with_parameters(arena, "skill_used", [1])
-	assert_signal_emitted_with_parameters(arena, "cooldown_changed", [1, PULSE.cooldown, PULSE.cooldown])
+	assert_signal_emitted_with_parameters(arena, "cooldown_changed", [1, METEOR.cooldown, METEOR.cooldown])
 	assert_false(arena.use_skill(1), "em cooldown")
-	await wait_seconds(PULSE.windup + 0.1)
+	await wait_seconds(METEOR.telegraph_time + 0.1)
 	for e in enemies:
 		assert_false(is_instance_valid(e), "morto pela área")
 	assert_eq(arena.particles, 3 * RUNNER.particle_drop)
@@ -108,7 +174,7 @@ func test_cooldown_ends_with_skill_ready() -> void:
 	arena.skills.get_slot(1).remaining = 0.05 # encurta a espera
 	await wait_physics_frames(6)
 	assert_signal_emitted_with_parameters(arena, "skill_ready", [1])
-	assert_signal_emitted_with_parameters(arena, "cooldown_changed", [1, 0.0, PULSE.cooldown])
+	assert_signal_emitted_with_parameters(arena, "cooldown_changed", [1, 0.0, METEOR.cooldown])
 
 
 func test_input_action_triggers_slot() -> void:

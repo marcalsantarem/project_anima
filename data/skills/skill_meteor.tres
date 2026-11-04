@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://src/match/skills/skill_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/skill_meteor.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/sprites/skill_meteor_crater.png" id="3"]
+[ext_resource type="Texture2D" path="res://assets/ui/ui_icon_skill_meteor.png" id="4"]
+
+[resource]
+script = ExtResource("1")
+id = &"skill_meteor"
+type = 0
+delivery = 1
+cooldown = 10.0
+radius = 160.0
+damage = 40
+duration = 0.0
+windup = 0.0
+target_range = 600.0
+effect_params = {}
+fx_id = &"fx_skill_cast"
+sfx_id = &"sfx_meteor"
+telegraph_time = 0.6
+fall_time = 0.35
+fall_height = 360.0
+crater_time = 0.5
+icon = ExtResource("4")
+meteor_texture = ExtResource("2")
+meteor_anchor = Vector2(64, 164)
+crater_texture = ExtResource("3")
+crater_anchor = Vector2(128, 96)

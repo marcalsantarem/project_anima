@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/fx/fx_effect.gd" id="1"]
+
+[node name="fx_trail" type="Node2D"]
+script = ExtResource("1")
+style = 3
+duration = 0.16
+radius = 70.0
+dot_count = 0
+height = 44.0
+outline_width = 3.0
+default_color = Color(0.1843, 0.902, 0.8235, 1)

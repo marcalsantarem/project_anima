@@ -119,6 +119,38 @@ PICKUP = ('<path d="M260 589 Q262 598 271 600 Q262 602 260 611 Q258 602 249 600 
           'stroke="#725A1B" stroke-width="2.5" stroke-linejoin="round"/><circle cx="258" cy="598" r="2" fill="#FFF"/>')
 SHADOW = '<ellipse cx="32" cy="16" rx="30" ry="10" fill="#6B4E8C" opacity="0.22"/>'
 
+# ---------- Skill do slot 1: meteoro de fogo (BRF-047, decisão 37). Cores quentes, sem ciano ----------
+M_OUT = "#5A1A10"   # contorno escuro quente
+M_ROCK = ("M15 80 L19 69 L29 64 L40 66 L48 74 L49 87 L42 97 L28 99 L18 93 Z")  # rocha, centro ~(32,82)
+METEOR = (
+    '<circle cx="32" cy="80" r="26" fill="#FF7A2A" opacity="0.22"/>'
+    f'<path d="M13 84 Q11 54 21 32 Q24 44 27 41 Q27 20 32 4 Q37 22 38 38 Q41 33 44 26 Q53 52 51 84 Z" '
+    f'fill="#FF4A2A" stroke="{M_OUT}" stroke-width="3" stroke-linejoin="round"/>'
+    '<path d="M18 84 Q17 60 25 45 Q28 53 31 50 Q31 33 34 21 Q38 37 38 49 Q42 45 44 41 Q48 62 46 84 Z" fill="#FF9A2A"/>'
+    '<path d="M23 84 Q22 68 28 57 Q30 62 32 60 Q32 47 35 39 Q38 52 38 61 Q41 65 41 84 Z" fill="#FFE066"/>'
+    f'<defs><clipPath id="mr"><path d="{M_ROCK}"/></clipPath></defs>'
+    f'<path d="{M_ROCK}" fill="#8A4A36"/>'
+    '<g clip-path="url(#mr)"><ellipse cx="40" cy="92" rx="20" ry="13" fill="#4A2018" opacity="0.55"/>'
+    '<path d="M14 76 Q32 60 50 76 L50 68 L14 68 Z" fill="#FFB020" opacity="0.55"/></g>'
+    '<path d="M24 76 L30 82 L28 90 M30 82 L39 80 L44 86" fill="none" stroke="#FFB020" stroke-width="2.4" '
+    'stroke-linecap="round" stroke-linejoin="round"/>'
+    f'<path d="{M_ROCK}" fill="none" stroke="{M_OUT}" stroke-width="3.5" stroke-linejoin="round"/>'
+    '<ellipse cx="23" cy="75" rx="4" ry="2.2" fill="#FFE9C2" opacity="0.7" transform="rotate(-30 23 75)"/>')
+CRATER = (  # 1x 128x96, centro (64,48); proporção 0,75 do chão 3/4
+    '<ellipse cx="64" cy="48" rx="60" ry="45" fill="#5A2E1E" opacity="0.28"/>'
+    f'<ellipse cx="64" cy="48" rx="44" ry="33" fill="#6E3A26" stroke="{M_OUT}" stroke-width="3.5"/>'
+    '<ellipse cx="64" cy="50" rx="32" ry="24" fill="#3E1C12"/>'
+    '<ellipse cx="64" cy="52" rx="18" ry="13" fill="#FF6A2A" opacity="0.55"/>'
+    '<ellipse cx="64" cy="53" rx="9" ry="6.5" fill="#FFC93D" opacity="0.8"/>'
+    + "".join(f'<path d="{d}" fill="none" stroke="{M_OUT}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>'
+              f'<path d="{d}" fill="none" stroke="#FF9A2A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>'
+              for d in ("M36 40 L22 33 L12 36", "M92 40 L106 32 L116 34", "M42 70 L34 80 L24 82",
+                        "M86 70 L96 79 L104 80", "M64 18 L60 9 L64 4", "M64 82 L68 89"))
+    + "".join(f'<circle cx="{x}" cy="{y}" r="{r}" fill="{c}" stroke="{M_OUT}" stroke-width="1.5"/>'
+              for x, y, r, c in ((18, 52, 3, "#FFC93D"), (110, 54, 2.6, "#FF7A2A"), (40, 12, 2.4, "#FF7A2A"),
+                                 (92, 14, 3, "#FFC93D"), (52, 90, 2.4, "#FFC93D"), (84, 88, 2.2, "#FF7A2A")))
+    + '<ellipse cx="44" cy="30" rx="10" ry="3.5" fill="#FFE9C2" opacity="0.35" transform="rotate(-18 44 30)"/>')
+
 
 def place(content, ax, ay, gx, gy, s=1.0):
     """Leva o ponto de chão (gx, gy) do mockup para a âncora (ax, ay) do canvas 1x."""
@@ -140,6 +172,8 @@ SPRITES = {
     "projectile_enemy": (32, 32, PROJ_ENEMY),
     "pickup_particle": (32, 32, place(PICKUP, 16, 28, 260, 614)),
     "shadow_ground": (64, 32, SHADOW),
+    "skill_meteor": (64, 112, METEOR),
+    "skill_meteor_crater": (128, 96, CRATER),
 }
 
 
@@ -212,7 +246,11 @@ def render(svg_path, png_path, w, h):
 if __name__ == "__main__":
     jobs = [(n, w, h, svg(w, h, c), SPR) for n, (w, h, c) in SPRITES.items()]
     jobs += [(n, w, h, svg(w, h, c), BG) for n, (w, h, c) in FLOOR_PARTS.items()]
+    import sys
+    only = set(sys.argv[1:])  # opcional: gera só os nomes passados (ex.: skill_meteor skill_meteor_crater)
     for name, w, h, text, outdir in jobs:
+        if only and name not in only:
+            continue
         sp = HERE / f"{name}.svg"
         sp.write_text(text, encoding="utf-8")
         render(sp, outdir / f"{name}.png", w * SCALE, h * SCALE)

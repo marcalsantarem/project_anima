@@ -19,6 +19,8 @@ Fonte: `_src/gen_sprites.py` (SVG por código → Chrome headless). Para regener
 | `projectile_enemy.png` | 64×64 | 32×32 | (32, 32) centro | Projétil inimigo (magenta, sem ciano). Aponta para +X |
 | `pickup_particle.png` | 64×64 | 32×32 | (32, 56) chão | Partícula dropada (moeda da partida) |
 | `shadow_ground.png` | 128×64 | 64×32 | (64, 32) centro | Sombra elíptica opcional (`#6B4E8C` a 22%). Escalar para a largura do §5 |
+| `skill_meteor.png` | 128×224 | 64×112 | (64, 164) centro da rocha | Meteoro de fogo caindo (BRF-047), cauda para cima. Cai na vertical: a rocha chega ao centro da cratera. Chama/fumaça/brilho do impacto são do AG09 |
+| `skill_meteor_crater.png` | 256×192 | 128×96 | (128, 96) centro | Marca de impacto no chão (elipse 0,75, rachaduras e brasas). Abaixo dos inimigos; escalar para o raio da skill (largura 1x ≈ 2 × raio × 1,07) |
 
 ### Fundo em tela cheia (BRF-040)
 

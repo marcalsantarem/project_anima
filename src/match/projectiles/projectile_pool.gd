@@ -1,6 +1,10 @@
 class_name ProjectilePool
 extends Node2D
 ## Pool fixo de projéteis. Tudo é instanciado em build(); disparar não aloca.
+## Repassa `fired`/`hit` de todos os projéteis (ligados uma vez, no build).
+
+signal projectile_fired(from: Vector2, dir: Vector2)
+signal projectile_hit(at: Vector2, target_kind: StringName)
 
 @export var projectile_scene: PackedScene = preload("res://src/match/projectiles/projectile.tscn")
 
@@ -14,6 +18,8 @@ func build(size: int, data: ProjectileData) -> void:
 		add_child(p)
 		p.configure(data)
 		p.expired.connect(_on_expired)
+		p.fired.connect(projectile_fired.emit)
+		p.hit.connect(projectile_hit.emit)
 		_items.append(p)
 		_free.append(p)
 

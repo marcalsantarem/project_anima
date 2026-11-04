@@ -51,6 +51,20 @@ def star16(r_out=30.0, r_in=14.0, n=8):
 G_SKILL_PULSE = (f'<circle r="27" fill="{CYAN}" opacity="0.3"/>'
                  f'<polygon points="{star16()}" fill="#FFFFFF" stroke="{INK}" stroke-width="3" stroke-linejoin="round"/>'
                  f'<circle r="11" fill="{CYAN}" stroke="{INK}" stroke-width="2.5"/><circle cx="-3.5" cy="-3.5" r="3" fill="#E8FFFC"/>')
+# Skill do slot 1: meteoro de fogo (BRF-047, decisão 37). Desenhado com a cauda para cima e girado 40° (cauda para cima-direita).
+_M_ROCK = "M-11 8 L-7 0 L1 -2 L9 2 L12 10 L8 18 L-1 21 L-9 17 Z"
+G_SKILL_METEOR = ('<circle r="27" fill="#FF8A3D" opacity="0.3"/>'
+                  '<g transform="rotate(40) translate(0 4.5)">'
+                  f'<path d="M-14 10 Q-16 -8 -7 -20 Q-5 -12 -3 -14 Q-2 -24 0 -32 Q4 -22 4 -14 Q7 -18 9 -21 Q17 -6 14 10 Z" '
+                  f'fill="#FF4A2A" stroke="{INK}" stroke-width="3" stroke-linejoin="round"/>'
+                  '<path d="M-10 10 Q-11 -4 -4 -12 Q-2 -6 0 -8 Q0 -18 2 -24 Q5 -14 5 -7 Q8 -10 9 -12 Q13 0 10 10 Z" fill="#FFA02A"/>'
+                  '<path d="M-6 10 Q-7 2 -2 -4 Q0 0 1 -2 Q1 -10 3 -14 Q6 -4 5 2 Q7 4 7 10 Z" fill="#FFE066"/>'
+                  f'<defs><clipPath id="mr"><path d="{_M_ROCK}"/></clipPath></defs>'
+                  f'<path d="{_M_ROCK}" fill="#8A4A36"/>'
+                  '<g clip-path="url(#mr)"><ellipse cx="5" cy="18" rx="12" ry="8" fill="#4A2018" opacity="0.55"/></g>'
+                  '<path d="M-5 6 L0 11 L-2 16 M0 11 L6 10" fill="none" stroke="#FFB020" stroke-width="2.2" '
+                  'stroke-linecap="round" stroke-linejoin="round"/>'
+                  f'<path d="{_M_ROCK}" fill="none" stroke="{INK}" stroke-width="3" stroke-linejoin="round"/></g>')
 G_LOCK = ('<path d="M-10 -2 v-8 a10 10 0 0 1 20 0 v8" fill="none" stroke="#3A2A55" stroke-width="9"/>'
           '<path d="M-10 -2 v-8 a10 10 0 0 1 20 0 v8" fill="none" stroke="#E8EEF8" stroke-width="4"/>'
           '<rect x="-16" y="-4" width="32" height="24" rx="5" fill="#E8EEF8" stroke="#3A2A55" stroke-width="3"/>'
@@ -134,6 +148,7 @@ def big_btn(pressed):
 ASSETS = {f"ui_icon_upgrade_{k}": (64, 64, upgrade_icon(c, g)) for k, (c, g) in UPGRADES.items()}
 ASSETS.update({
     "ui_icon_skill_pulse": (64, 64, at(32, 32, 1.0, G_SKILL_PULSE)),
+    "ui_icon_skill_meteor": (64, 64, at(32, 32, 1.0, G_SKILL_METEOR)),
     "ui_icon_lock": (64, 64, at(32, 35, 1.25, G_LOCK)),
     "ui_icon_particle": (32, 32, at(16, 16, 1.3, G_PARTICLE)),
     "ui_icon_pause": (64, 64, PAUSE),
@@ -181,7 +196,11 @@ def contact_sheet():
 
 
 if __name__ == "__main__":
+    import sys
+    only = set(sys.argv[1:])  # opcional: gera só os nomes passados (a folha de contato sempre é refeita)
     for name, (w, h, inner) in ASSETS.items():
+        if only and name not in only:
+            continue
         sp = HERE / f"{name}.svg"
         sp.write_text(svg(w, h, inner), encoding="utf-8")
         render(sp, UI / f"{name}.png", w * SCALE, h * SCALE)

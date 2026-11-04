@@ -9,6 +9,7 @@ extends Node2D
 ## Tipos da demo: id → [cena, instâncias]. Orçamento em docs/vfx.md.
 const DEFAULT_TYPES := {
 	&"fx_muzzle": [preload("res://src/fx/fx_muzzle.tscn"), 6],
+	&"fx_trail": [preload("res://src/fx/fx_trail.tscn"), 8],
 	&"fx_hit": [preload("res://src/fx/fx_hit.tscn"), 24],
 	&"fx_death": [preload("res://src/fx/fx_death.tscn"), 16],
 	&"fx_pickup": [preload("res://src/fx/fx_pickup.tscn"), 12],
@@ -36,6 +37,7 @@ func setup_default() -> void:
 
 ## Pré-cria `count` instâncias de `scene` (raiz FxEffect). Chamar fora da partida.
 func register(type: StringName, scene: PackedScene, count: int) -> void:
+	FxEffect.prepare_textures()
 	var list: Array[FxEffect] = []
 	if _pools.has(type):
 		list = _pools[type]
@@ -79,6 +81,13 @@ func active_count(type: StringName) -> int:
 		if fx.active:
 			n += 1
 	return n
+
+
+## Raio da cena do tipo (para converter um raio de gameplay em `size`). 0 se não existe.
+func base_radius(type: StringName) -> float:
+	if not _pools.has(type) or (_pools[type] as Array).is_empty():
+		return 0.0
+	return (_pools[type][0] as FxEffect).radius
 
 
 func stop_all() -> void:

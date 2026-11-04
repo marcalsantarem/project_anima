@@ -106,7 +106,8 @@ Pedestal cilíndrico neutro (`vessel`) com aro ciano + **cristal losango ciano f
 | Anima / skins | `assets/sprites/` | `anima_default_base.png`, `anima_default_crystal.png` |
 | Inimigos / chefe | `assets/sprites/` | `enemy_runner.png`, `boss_warden.png` |
 | Projéteis / moeda | `assets/sprites/` | `projectile_player.png`, `pickup_particle.png` |
-| Ícones / UI | `assets/ui/` | `ui_icon_skill_pulse.png`, `ui_frame_epic.png` |
+| Skills (sprites base) | `assets/sprites/` | `skill_meteor.png`, `skill_meteor_crater.png` (cores quentes, sem ciano: o efeito é do jogador, mas o fogo lê melhor em laranja; BRF-047) |
+| Ícones / UI | `assets/ui/` | `ui_icon_skill_meteor.png`, `ui_frame_epic.png` |
 | Fundos | `assets/backgrounds/` | `floor_tile.png`, `floor_ring.png`, `floor_pillar.png` (tela cheia em peças, BRF-040; ver `assets/sprites/README.md`) |
 | Atlas | `assets/sprites/atlas/` | `atlas_enemies.png` |
 

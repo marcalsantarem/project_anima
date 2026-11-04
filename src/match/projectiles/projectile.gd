@@ -3,6 +3,14 @@ extends Area2D
 ## Projétil reutilizável. Fica estacionado fora da arena enquanto inativo, sem alocar.
 
 signal expired(projectile: Projectile)
+## Disparo: origem (âncora no chão, tela) e direção em tela normalizada.
+signal fired(from: Vector2, dir: Vector2)
+## Acerto: posição do projétil (âncora no chão, tela) e tipo do alvo (TARGET_*).
+signal hit(at: Vector2, target_kind: StringName)
+
+const TARGET_ENEMY := &"enemy"
+const TARGET_BOSS := &"boss"
+const TARGET_CORE := &"core"
 
 ## Ponto de estacionamento fora de qualquer arena.
 const PARKED_POSITION := Vector2(-100000.0, -100000.0)
@@ -62,6 +70,7 @@ func fire(origin: Vector2, direction: Vector2, max_distance: float, p_data: Proj
 	active = true
 	visible = true
 	set_physics_process(true)
+	fired.emit(origin, direction.normalized())
 
 
 func park() -> void:
@@ -89,15 +98,17 @@ func _on_area_entered(area: Area2D) -> void:
 			return
 	_hit_ids[_hit_count] = enemy_id
 	_hit_count += 1
+	hit.emit(position, TARGET_BOSS if enemy is Boss else TARGET_ENEMY)
 	enemy.take_damage(damage)
 	_hits_left -= 1
 	if _hits_left <= 0:
 		_expire()
 
 
-## Usado por quem recebe o acerto (Anima, escudo).
-func consume() -> void:
+## Usado por quem recebe o acerto (Anima, escudo). Emite `hit` com o tipo do alvo.
+func consume(target_kind: StringName = TARGET_CORE) -> void:
 	if active:
+		hit.emit(position, target_kind)
 		_expire()
 
 

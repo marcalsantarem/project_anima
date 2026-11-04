@@ -24,9 +24,9 @@ func can_activate() -> bool:
 
 
 func activate() -> void:
-	_target = densest_point(context.anima.position, context.enemies, data.target_range, data.radius)
+	_target = _pick_target()
 	position = _target
-	_windup_left = data.windup
+	_windup_left = _windup_time()
 	_fx_left = 0.0
 	visible = true
 	set_physics_process(true)
@@ -40,16 +40,42 @@ func _physics_process(delta: float) -> void:
 		_windup_left -= delta
 		if _windup_left <= 0.0:
 			_impact()
+		else:
+			_on_windup_tick()
 		return
 	_fx_left -= delta
 	if _fx_left <= 0.0:
 		visible = false
 		set_physics_process(false)
+		_on_finished()
+
+
+## Ponto do efeito (subclasses podem mudar a regra).
+func _pick_target() -> Vector2:
+	return densest_point(context.anima.position, context.enemies, data.target_range, data.radius)
+
+
+func _windup_time() -> float:
+	return data.windup
+
+
+func _fx_time() -> float:
+	return IMPACT_FX_TIME
+
+
+## Ganchos visuais (sem regra): a cada passo da antecipação e ao fim do efeito.
+func _on_windup_tick() -> void:
+	pass
+
+
+func _on_finished() -> void:
+	pass
 
 
 func _impact() -> void:
 	apply_damage(_target, context.enemies, data.radius, data.damage)
-	_fx_left = IMPACT_FX_TIME
+	_fx_left = _fx_time()
+	cast.emit(_target, data.radius)
 	queue_redraw()
 
 
@@ -69,7 +95,14 @@ static func apply_damage(center: Vector2, enemies: Array[Enemy], radius: float, 
 
 ## Centro, entre os inimigos ao alcance, que cobre mais inimigos no raio. Empate: o mais próximo da origem.
 static func densest_point(origin: Vector2, enemies: Array[Enemy], target_range: float, radius: float) -> Vector2:
-	var best := origin
+	var e := densest_enemy(origin, enemies, target_range, radius)
+	return e.position if e else origin
+
+
+## Inimigo ao alcance com mais vizinhos (ele incluso) dentro do raio, no chão. Empate (inclusive
+## todos sozinhos): o mais próximo da origem. null se ninguém está ao alcance.
+static func densest_enemy(origin: Vector2, enemies: Array[Enemy], target_range: float, radius: float) -> Enemy:
+	var best: Enemy = null
 	var best_count := 0
 	var best_dist_sq := INF
 	var range_sq := target_range * target_range
@@ -82,11 +115,10 @@ static func densest_point(origin: Vector2, enemies: Array[Enemy], target_range: 
 			continue
 		var count := 0
 		for other in enemies:
-			if is_instance_valid(other) and other.state != Enemy.State.DEAD \
-					and GroundPlane.distance_squared(candidate.position, other.position) <= radius_sq:
+			if is_instance_valid(other) and other.state != Enemy.State.DEAD 					and GroundPlane.distance_squared(candidate.position, other.position) <= radius_sq:
 				count += 1
 		if count > best_count or (count == best_count and dist_sq < best_dist_sq):
-			best = candidate.position
+			best = candidate
 			best_count = count
 			best_dist_sq = dist_sq
 	return best

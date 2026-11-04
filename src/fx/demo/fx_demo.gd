@@ -1,17 +1,37 @@
 extends Node2D
-## Demonstração do FxPool (T-129): dispara os efeitos básicos em loop sobre um piso creme.
-## Clique ou toque alterna o modo de efeitos reduzidos. Não depende de match/.
+## Demo do FxDirector (T-130): este nó faz papel de "arena falsa" (sinais de usuário com os
+## nomes da Arena) e dispara o fluxo disparo → impacto → morte → coleta, além de dano no Núcleo,
+## skill, telegraph e fase do chefe. Clique/toque alterna o modo reduzido. Não depende de match/.
+## Medição (docs/vfx.md §3): rodar com `-- --fx-bench` simula ~150 inimigos e ~300 projéteis e
+## imprime o tempo médio de quadro com e sem efeitos (`--fx-reduced` mede o modo reduzido).
 
 const FLOOR := Color("#F6E9CF")
-const CENTER := Vector2(360, 640)
-const DEATH_COLORS: Array[Color] = [Color("#FF8A3D"), Color("#E8344E"), Color("#FF3DB4"), Color("#9B5CFF")]
+const CENTER := Vector2(360, 690)
+const ARCHETYPES: Array[StringName] = [&"enemy_runner", &"enemy_tank", &"enemy_shooter", &"enemy_swarm"]
+const BENCH_ENEMIES := 150
+const BENCH_PROJECTILES := 300
+const BENCH_PHASE_FRAMES := 600
+const BENCH_WARMUP_FRAMES := 60
 
 var pool: FxPool
+var director: FxDirector
 var _t := 0.0
 var _step := 0
+var _core_hp := 100
+var _bench := false
+var _bench_fx := true
+var _bench_frames := 0
+var _bench_usec := 0
+var _bench_emit_usec := 0
+var _bench_last := 0
+var _bench_result := {}
+var _enemies: PackedVector2Array = PackedVector2Array()
+var _shots: PackedVector2Array = PackedVector2Array()
 
 
 func _ready() -> void:
+	for s: StringName in FxDirector.SIGNALS:
+		add_user_signal(s)
 	var floor_rect := ColorRect.new() # z -10 como o piso da arena: decalques (z -1) ficam por cima
 	floor_rect.color = FLOOR
 	floor_rect.size = Vector2(720, 1280)
@@ -21,9 +41,22 @@ func _ready() -> void:
 	pool = FxPool.new()
 	add_child(pool)
 	pool.setup_default()
+	director = FxDirector.new()
+	director.pool = pool
+	director.core_anchor = CENTER
+	add_child(director)
+	director.bind(self)
+	emit_signal(&"core_hp_changed", _core_hp, 100)
+	_bench = OS.get_cmdline_user_args().has("--fx-bench")
+	director.reduced_effects = OS.get_cmdline_user_args().has("--fx-reduced")
+	if _bench:
+		_setup_bench()
 
 
 func _process(delta: float) -> void:
+	if _bench:
+		_bench_step()
+		return
 	_t += delta
 	if _t < 0.15:
 		return
@@ -32,32 +65,97 @@ func _process(delta: float) -> void:
 	_step += 1
 
 
+## Um passo do fluxo: cada alvo recebe disparo → (0,15 s) impacto → (morte + coleta).
 func _fire(i: int) -> void:
 	var ang := i * 0.9
-	var far := CENTER + Vector2(cos(ang) * 250, sin(ang) * 250 * 0.75)
-	pool.play(&"fx_muzzle", CENTER)
-	pool.play(&"fx_hit", far)
+	var target := CENTER + Vector2(cos(ang) * 250, sin(ang) * 250 * 0.75)
+	emit_signal(&"projectile_fired", CENTER, (target - CENTER).normalized())
+	var prev_ang := (i - 1) * 0.9
+	var prev := CENTER + Vector2(cos(prev_ang) * 250, sin(prev_ang) * 250 * 0.75)
+	emit_signal(&"projectile_hit", prev, &"enemy")
 	if i % 2 == 0:
-		pool.play(&"fx_death", far + Vector2(-60, 40), DEATH_COLORS[(i / 2) % DEATH_COLORS.size()])
-		pool.play(&"fx_pickup", far + Vector2(40, -30))
-	if i % 7 == 0:
-		pool.play(&"fx_telegraph", Vector2(360, 300))
-		pool.play(&"fx_upgrade", CENTER)
-	if i % 9 == 0:
-		pool.play(&"fx_skill_cast", CENTER)
+		emit_signal(&"enemy_died", prev, ARCHETYPES[(i / 2) % ARCHETYPES.size()], 0)
+		emit_signal(&"particles_gained", prev, 1 + i % 3)
 	if i % 5 == 0:
-		pool.play(&"fx_core_pulse", CENTER)
+		_core_hp = 100 if _core_hp <= 10 else _core_hp - 5
+		emit_signal(&"core_hp_changed", _core_hp, 100)
+	if i % 9 == 0:
+		emit_signal(&"skill_cast", 0, CENTER, 200.0)
+	if i % 14 == 0:
+		emit_signal(&"boss_telegraph_started", &"pattern_ring", 1.2, Vector2(360, 320), 110.0)
+	if i % 28 == 14:
+		emit_signal(&"boss_phase_changed", 2)
 
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed:
-		pool.reduced_effects = not pool.reduced_effects
+		director.reduced_effects = not director.reduced_effects
 
 
 func _draw() -> void:
+	if _bench:
+		for p in _enemies:
+			draw_circle(p, 14, Color("#FF8A3D"))
+		for p in _shots:
+			draw_circle(p, 5, Color("#2FE6D2"))
 	# Marcador do Anima: base elíptica + cristal ciano (só referência de escala).
 	draw_set_transform(CENTER, 0.0, Vector2(1, 0.75))
 	draw_circle(Vector2.ZERO, 46, Color("#6B4E8C", 0.22))
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 	draw_circle(CENTER + Vector2(0, -40), 26, Color("#2FE6D2").darkened(0.55))
 	draw_circle(CENTER + Vector2(0, -40), 22, Color("#2FE6D2"))
+
+
+# --- medição -------------------------------------------------------------------------------
+
+func _setup_bench() -> void:
+	Engine.max_fps = 0
+	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
+	_enemies.resize(BENCH_ENEMIES)
+	_shots.resize(BENCH_PROJECTILES)
+	for i in BENCH_ENEMIES:
+		_enemies[i] = CENTER + Vector2.from_angle(i * 2.4) * (120 + (i * 37) % 260) * Vector2(1, 0.75)
+	_bench_last = Time.get_ticks_usec()
+
+
+## Por quadro: 300 projéteis andando; ~5 disparos, ~5 acertos, ~1 morte + coleta por quadro
+## (≈ 300 tiros/s a 60 fps). Fase 1 com efeitos, fase 2 com o diretor desligado.
+func _bench_step() -> void:
+	var now := Time.get_ticks_usec()
+	if _bench_frames >= BENCH_WARMUP_FRAMES: # descarta aquecimento (janela, shaders)
+		_bench_usec += now - _bench_last
+	_bench_last = now
+	_bench_frames += 1
+	var f := _bench_frames
+	for i in BENCH_PROJECTILES:
+		_shots[i] = CENTER + Vector2.from_angle(i * 0.37) * float((f * 6 + i * 13) % 400)
+	queue_redraw()
+	var t0 := Time.get_ticks_usec()
+	if _bench_fx:
+		for k in 5:
+			var e := _enemies[(f * 5 + k) % BENCH_ENEMIES]
+			emit_signal(&"projectile_fired", CENTER, (e - CENTER).normalized())
+			emit_signal(&"projectile_hit", e, &"enemy")
+		var d := _enemies[(f * 7) % BENCH_ENEMIES]
+		emit_signal(&"enemy_died", d, ARCHETYPES[f % 4], 0)
+		emit_signal(&"particles_gained", d, 1)
+	if f > BENCH_WARMUP_FRAMES:
+		_bench_emit_usec += Time.get_ticks_usec() - t0
+	if f == BENCH_PHASE_FRAMES:
+		var key := ("fx_on" if _bench_fx else "fx_off") + ("_reduced" if director.reduced_effects else "")
+		_bench_result[key + "_signals_ms"] = _bench_emit_usec / float(f - BENCH_WARMUP_FRAMES) / 1000.0
+		_bench_result[key + "_draw_calls"] = Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)
+		_bench_emit_usec = 0
+		_bench_result[key] = _bench_usec / float(f - BENCH_WARMUP_FRAMES) / 1000.0
+		if _bench_fx:
+			var alive := 0
+			for t: StringName in FxPool.DEFAULT_TYPES:
+				alive += pool.active_count(t)
+			_bench_result["fx_alive"] = alive
+			_bench_fx = false
+			pool.stop_all()
+			_bench_frames = 0
+			_bench_usec = 0
+		else:
+			print("FX_BENCH ", _bench_result)
+			get_tree().quit()
