@@ -6,9 +6,9 @@
 [resource]
 script = ExtResource("1")
 id = &"enemy_tank"
-hp = 120
+hp = 90
 speed = 50.0
-contact_damage = 20
+contact_damage = 15
 attack_range = 0.0
 fire_rate = 0.0
 target_priority = 0

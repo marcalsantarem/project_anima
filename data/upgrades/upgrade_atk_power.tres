@@ -9,4 +9,4 @@ stat = &"stat_damage"
 per_level = 0.1
 mode = 0
 max_level = 10
-costs = PackedInt32Array(5, 7, 10, 14, 20, 27, 38, 53, 74, 104)
+costs = PackedInt32Array(4, 6, 8, 11, 16, 22, 31, 43, 60, 83)

@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://src/match/enemies/boss/boss_data.gd" id="1"]
 [ext_resource type="Script" path="res://src/match/enemies/boss/boss_pattern.gd" id="2"]
-[ext_resource type="Resource" path="res://data/projectiles/projectile_enemy_bolt.tres" id="3"]
+[ext_resource type="Resource" path="res://data/projectiles/projectile_boss_bolt.tres" id="3"]
 [ext_resource type="Resource" path="res://data/enemies/enemy_swarm.tres" id="4"]
 [ext_resource type="Texture2D" path="res://assets/sprites/boss_warden.png" id="tex_sprite"]
 [ext_resource type="Texture2D" path="res://assets/sprites/boss_warden_ring.png" id="tex_ring"]
@@ -47,7 +47,7 @@ summon_radius = 70.0
 [resource]
 script = ExtResource("1")
 id = &"boss_warden"
-hp = 1200
+hp = 2500
 speed = 60.0
 contact_damage = 30
 attack_range = 420.0

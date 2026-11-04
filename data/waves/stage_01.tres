@@ -104,7 +104,7 @@ entries = Array[ExtResource("3")]([SubResource("w04_e1"), SubResource("w04_e2"),
 [sub_resource type="Resource" id="w05_e1"]
 script = ExtResource("3")
 enemy = ExtResource("4")
-count = 6
+count = 5
 interval = 1.7
 spawn_edge = 2
 start_delay = 0.5
@@ -112,7 +112,7 @@ start_delay = 0.5
 [sub_resource type="Resource" id="w05_e2"]
 script = ExtResource("3")
 enemy = ExtResource("4")
-count = 6
+count = 5
 interval = 1.7
 spawn_edge = 3
 start_delay = 1.4
@@ -141,7 +141,7 @@ entries = Array[ExtResource("3")]([SubResource("w05_e1"), SubResource("w05_e2"),
 [sub_resource type="Resource" id="w06_e1"]
 script = ExtResource("3")
 enemy = ExtResource("4")
-count = 6
+count = 5
 interval = 1.7
 spawn_edge = 0
 start_delay = 0.5
@@ -149,7 +149,7 @@ start_delay = 0.5
 [sub_resource type="Resource" id="w06_e2"]
 script = ExtResource("3")
 enemy = ExtResource("4")
-count = 6
+count = 5
 interval = 1.7
 spawn_edge = 1
 start_delay = 1.4
@@ -178,7 +178,7 @@ entries = Array[ExtResource("3")]([SubResource("w06_e1"), SubResource("w06_e2"),
 [sub_resource type="Resource" id="w07_e1"]
 script = ExtResource("3")
 enemy = ExtResource("4")
-count = 6
+count = 5
 interval = 1.8
 spawn_edge = 2
 start_delay = 0.5
@@ -186,7 +186,7 @@ start_delay = 0.5
 [sub_resource type="Resource" id="w07_e2"]
 script = ExtResource("3")
 enemy = ExtResource("4")
-count = 6
+count = 5
 interval = 1.8
 spawn_edge = 3
 start_delay = 1.4
@@ -210,7 +210,7 @@ start_delay = 2.0
 [sub_resource type="Resource" id="w07_e5"]
 script = ExtResource("3")
 enemy = ExtResource("6")
-count = 3
+count = 2
 interval = 4.5
 spawn_edge = 4
 start_delay = 3.0
@@ -255,7 +255,7 @@ start_delay = 2.0
 [sub_resource type="Resource" id="w08_e5"]
 script = ExtResource("3")
 enemy = ExtResource("6")
-count = 3
+count = 2
 interval = 4.5
 spawn_edge = 4
 start_delay = 4.0
@@ -300,7 +300,7 @@ start_delay = 2.0
 [sub_resource type="Resource" id="w09_e5"]
 script = ExtResource("3")
 enemy = ExtResource("6")
-count = 4
+count = 3
 interval = 4.0
 spawn_edge = 4
 start_delay = 3.0
@@ -343,5 +343,5 @@ entries = Array[ExtResource("3")]([SubResource("w10_e1"), SubResource("w10_e2"),
 script = ExtResource("1")
 id = &"stage_01"
 waves = Array[ExtResource("2")]([SubResource("w01"), SubResource("w02"), SubResource("w03"), SubResource("w04"), SubResource("w05"), SubResource("w06"), SubResource("w07"), SubResource("w08"), SubResource("w09"), SubResource("w10")])
-wave_break = 3.0
+wave_break = 5.0
 boss_id = &"boss_warden"

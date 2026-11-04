@@ -36,7 +36,7 @@
 | T-120 | Validação do M1 | M1 | AG03 | a fazer |
 | T-121 | Tema global no `project.godot` | M1 | AG07 | feita |
 | T-122 | Ligar a arena real ao SceneFlow | M1 | AG07 | feita |
-| T-123 | Seed no `Arena._rng` para testes determinísticos | M1 | AG01 | pronta p/ briefing |
+| T-123 | Seed no `Arena._rng` para testes determinísticos | M1 | AG01 | feita |
 | T-124 | Pasta `src/fx/` em `docs/estrutura.md` | M1 | AG07 | pronta p/ briefing |
 | T-125 | Proposta da skill de área: meteoro × onda de choque | M1 | AG01 + AG08 | decidida (meteoro de fogo, decisão 37) |
 | T-126 | Guia de estilo `docs/arte.md` + mockup da arena | M1 | AG08 | pronta p/ briefing |

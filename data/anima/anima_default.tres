@@ -8,7 +8,7 @@
 
 [resource]
 script = ExtResource("1")
-core_hp_max = 100
+core_hp_max = 160
 hurtbox_radius = 40.0
 fire_rate = 2.0
 attack_range = 600.0

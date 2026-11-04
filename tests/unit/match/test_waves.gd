@@ -94,9 +94,9 @@ func test_victory_after_last_wave_with_particles() -> void:
 
 
 func test_defeat_when_core_hp_reaches_zero() -> void:
-	# 100 HP / 5 de contato = 20 corredores; 25 garantem a derrota.
-	var arena := _run_arena(_stage([25]), false)
-	await wait_for_signal(arena.match_ended, 30.0)
+	# HP do Núcleo / dano de contato do corredor (+5 de folga) garantem a derrota.
+	var arena := _run_arena(_stage([_runners_to_defeat()]), false)
+	await wait_for_signal(arena.match_ended, 60.0)
 	assert_signal_emit_count(arena, "match_ended", 1)
 	var result: MatchResult = get_signal_parameters(arena, "match_ended")[0]
 	assert_eq(result.outcome, MatchResult.Outcome.DEFEAT)
@@ -104,3 +104,9 @@ func test_defeat_when_core_hp_reaches_zero() -> void:
 	assert_eq(result.particles, 0)
 	await wait_physics_frames(5)
 	assert_signal_emit_count(arena, "match_ended", 1, "emitido uma vez só")
+
+
+## Corredores cujo dano de contato somado passa do HP do Núcleo (+5 de folga).
+func _runners_to_defeat() -> int:
+	var anima: AnimaData = load("res://data/anima/anima_default.tres")
+	return ceili(float(anima.core_hp_max) / RUNNER.contact_damage) + 5

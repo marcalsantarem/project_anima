@@ -25,19 +25,19 @@ Base: decisão 35 (5 botões em tempo real, pagos com **Partículas**, valem só
 ### Custo
 
 Mesma curva para os 5 upgrades, independente por upgrade:
-`custo(N) = ceil(5 × 1,4^(N−1))`, onde `N` é o nível que está sendo comprado (1–10).
+`custo(N) = ceil(4 × 1,4^(N−1))` (BRF-051: multiplicador 5 → 4 para os upgrades chegarem mais cedo), onde `N` é o nível que está sendo comprado (1–10).
 
 | Nível comprado | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
 |---|---|---|---|---|---|---|---|---|---|---|
-| Custo (Partículas) | 5 | 7 | 10 | 14 | 20 | 27 | 38 | 53 | 74 | 104 |
-| Acumulado | 5 | 12 | 22 | 36 | 56 | 83 | 121 | 174 | 248 | 352 |
+| Custo (Partículas) | 4 | 6 | 8 | 11 | 16 | 22 | 31 | 43 | 60 | 83 |
+| Acumulado | 4 | 10 | 18 | 29 | 45 | 67 | 98 | 141 | 201 | 284 |
 
 - **A tabela é a fonte da verdade** (evita erro de arredondamento de float no `ceil`). Guardar como lista de inteiros no `.tres`.
 - Compra = transação: só aplica se `particles ≥ custo` e `L < 10`; desconta e sobe o nível juntos. Senão, não faz nada (o botão mostra indisponível / MAX).
 
 ### Formato sugerido para o `.tres` (T-134, AG01)
 
-`UpgradeData`: `id: StringName`, `stat: StringName`, `per_level: float`, `mode` (`ADD_PCT_BASE` | `ADD_FLAT` | `REDUCTION_PCT`), `max_level: int = 10`, `costs: PackedInt32Array = [5, 7, 10, 14, 20, 27, 38, 53, 74, 104]`.
+`UpgradeData`: `id: StringName`, `stat: StringName`, `per_level: float`, `mode` (`ADD_PCT_BASE` | `ADD_FLAT` | `REDUCTION_PCT`), `max_level: int = 10`, `costs: PackedInt32Array` (nos `.tres`: [4, 6, 8, 11, 16, 22, 31, 43, 60, 83]).
 
 | id | stat | per_level | mode |
 |---|---|---|---|
@@ -57,8 +57,8 @@ Hoje `stage_01` tem 3 ondas de teste, que dão ~5, ~10 e ~16 Partículas (corred
 | Acumulado | 5 | 15 | 31 | 53 | 81 | 115 | 155 | 201 | 253 | — |
 
 - Os 50 do chefe só chegam no fim, então o gasto útil é **~250 Partículas** (o que o enxame invocado pelo chefe der é extra).
-- **Distribuído:** ~19 níveis (Nv 4 em todos = 180, mais o Nv 5 em três = 240). Ex.: dano 14, cadência 2,64/s → DPS ~37 (base 20, +85%).
-- **Focado:** um upgrade chega ao Nv 8–9 (174–248) e sobra pouco para o resto.
-- **MAX** em um upgrade custa 352 (mais que a fase 1 inteira); os 5 no MAX custam 1760. O MAX é meta de fases mais longas, não da fase 1.
+- **Distribuído:** ~24 níveis (Nv 5 em todos = 225). Ex.: dano 15, cadência 2,8/s → DPS ~42 (base 20, +110%). Na simulação do BRF-051 o bot compra ~25–28 níveis na partida (inclui o que o chefe e as invocações dão).
+- **Focado:** um upgrade chega ao Nv 9–10 (201–284) e sobra pouco para o resto.
+- **MAX** em um upgrade custa 284 (mais que a fase 1 antes do chefe); os 5 no MAX custam 1420. O MAX é meta de fases mais longas, não da fase 1.
 - Ritmo: a 1ª compra sai já na onda 1; depois ~1 compra a cada 10–15 s de partida.
-- **Validação pendente:** se a T-116 der muito mais ou muito menos que ~250 Partículas antes do chefe, ajustar só o multiplicador (5) da curva de custo, mantendo a razão 1,4.
+- **Validação pendente:** se a T-116 der muito mais ou muito menos que ~250 Partículas antes do chefe, ajustar só o multiplicador (hoje 4) da curva de custo, mantendo a razão 1,4.

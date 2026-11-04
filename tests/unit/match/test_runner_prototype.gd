@@ -8,7 +8,7 @@ func test_runner_data_matches_gameplay_doc() -> void:
 	assert_eq(RUNNER.id, &"enemy_runner")
 	assert_eq(RUNNER.hp, 20)
 	assert_eq(RUNNER.speed, 140.0)
-	assert_eq(RUNNER.contact_damage, 5)
+	assert_eq(RUNNER.contact_damage, 4)
 
 
 func test_step_towards_moves_by_speed_and_stops_at_target() -> void:

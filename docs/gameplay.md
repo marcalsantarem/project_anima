@@ -160,16 +160,50 @@ WaveEntry: enemy (EnemyData), count, interval (s), spawn_edge, start_delay (s)
 | 2 | 10 corredores (cima e baixo) | 10 | 10 | 15 | ~17 s |
 | 3 | 9 corredores + 1 enxame (**novo**) | ~15,5 | ~15,5 | ~30 | ~16 s |
 | 4 | 10 corredores + 2 enxames | ~23 | ~23 | ~53 | ~18 s |
-| 5 | 12 corredores + 2 enxames + 1 tanque (**novo**) | ~26 | ~29 | ~82 | ~23 s |
-| 6 | 12 corredores + 2 enxames + 2 tanques | ~27 | ~33 | ~115 | ~22 s |
-| 7 | 12 corredores + 2 enxames + 2 tanques + 3 atiradores (**novo**) | ~30 | ~39 | ~154 | ~24 s |
-| 8 | 14 corredores + 3 enxames + 2 tanques + 3 atiradores | ~38,5 | ~47,5 | ~201,5 | ~26 s |
-| 9 | 14 corredores + 3 enxames + 3 tanques + 4 atiradores | ~40,5 | ~53,5 | **~255,5** | ~27 s |
+| 5 | 10 corredores + 2 enxames + 1 tanque (**novo**) | ~24 | ~27 | ~80 | ~21 s |
+| 6 | 10 corredores + 2 enxames + 2 tanques | ~25 | ~31 | ~111 | ~20 s |
+| 7 | 10 corredores + 2 enxames + 2 tanques + 2 atiradores (**novo**) | ~27 | ~35 | ~146 | ~22 s |
+| 8 | 14 corredores + 3 enxames + 2 tanques + 2 atiradores | ~37,5 | ~45,5 | ~191,5 | ~26 s |
+| 9 | 14 corredores + 3 enxames + 3 tanques + 3 atiradores | ~39,5 | ~51,5 | **~243** | ~27 s |
 | 10 | **chefe** + 4 corredores + 1 atirador (+ enxames invocados) | 6+ | 6 + 50 do chefe | — | ~48 s |
 
-- **Partículas antes do chefe:** ~255 (faixa 233–278 conforme o tamanho dos enxames), alinhado aos ~250 de `docs/meta.md`. Nenhum `particle_drop` mudou.
-- **Duração estimada:** ~235 s de ondas + 27 s de respiros ≈ **4,5 min** jogando bem (alvo ~5 min; limite 3–10 min). Sem skill nem upgrades, a simulação do teste de integração perde na onda 4–5 (~80 s), como esperado.
+- **Partículas antes do chefe:** ~243 depois do BRF-051 (antes ~255; faixa ~222–264 conforme o tamanho dos enxames), alinhado aos ~250 de `docs/meta.md`. Nenhum `particle_drop` mudou.
+- **Duração estimada (antes do BRF-051):** ~235 s de ondas + 27 s de respiros ≈ **4,5 min** jogando bem (alvo ~5 min; limite 3–10 min). Sem skill nem upgrades, a simulação do teste de integração perde na onda 4–5 (~80 s), como esperado.
 - Teste: `tests/unit/match/test_stage_01_curve.gd` percorre as ondas pelos dados (chefe só na última, Partículas ~250 ± 15 %, ondas crescentes, todos os spawns emitidos).
+
+### Balanceamento da fase 1 (BRF-051) e simulação
+
+O dono achou a fase 1 difícil demais no iPhone. Mudanças **só em dados** (antes → depois):
+
+| Dado | Antes | Depois |
+|---|---|---|
+| HP do Núcleo (`anima_default`) | 100 | **160** |
+| Dano do tiro do atirador (`projectile_enemy_bolt`) / cadência do atirador | 6 / 0,667 tiro/s | **3 / 0,5 tiro/s** |
+| Tanque: HP / contato | 120 / 20 | **90 / 15** |
+| Contato: corredor / enxame | 5 / 2 | **4 / 1** |
+| Corredores nas ondas 5–7 | 12 | **10** |
+| Atiradores nas ondas 7 / 8 / 9 | 3 / 3 / 4 | **2 / 2 / 3** |
+| Respiro entre ondas (`wave_break`) | 3 s | **5 s** |
+| Custo dos upgrades (`docs/meta.md`) | 5, 7, 10 … 104 | **4, 6, 8 … 83** |
+| Chefe: HP / tiro (novo `projectile_boss_bolt`) | 1200 / 6 (tiro comum) | **2500 / 14** (tiro próprio, para o chefe seguir perigoso) |
+
+Meteoro e Partículas por inimigo não mudaram (o custo menor já faz os upgrades chegarem cedo: o 1º sai na onda 1).
+
+**Bot de simulação** (`tests/tools/sim_bot.gd` + `tests/tools/run_sim.gd`, ferramenta manual, fora do GUT): sem mira nem posicionamento (o jogo é automático); usa o meteoro sempre que pronto; compra upgrades em **round-robin** dano → cadência → vida → defesa → cooldown, esperando ter Partículas para o próximo da fila (pula o que está no máximo). A seed vai em `Arena.set_seed()` (T-123: mesma seed = mesmos spawns e sorteios do chefe).
+
+```bash
+godot --headless --path . --fixed-fps 60 -s tests/tools/run_sim.gd -- --seeds=20 --start=1
+```
+
+`--fixed-fps 60` faz cada quadro valer 1/60 s sem esperar o relógio (~1–2 s reais por partida). Teste rápido no GUT: `tests/unit/match/test_sim_seed.gd` (seed + 10 s do bot).
+
+| Bot médio | Chega ao chefe | Vence | HP do Núcleo ao chegar ao chefe | Chefe entra | Partida | Partículas |
+|---|---|---|---|---|---|---|
+| Antes (40 seeds) | **0 %** (cai nas ondas 7–8) | 0 % | — | — | ~2,4 min | ~135 |
+| Depois (seeds 1–40) | **100 %** | **58 %** | 53 % | ~214 s | ~4,6 min | ~275 |
+| Depois (seeds 1001–1100) | **100 %** | **62 %** | 55 % | ~214 s | ~4,6 min | ~279 |
+
+Limite: o bot reage na hora (compra e usa a skill no mesmo quadro); um jogador real tende a ser um pouco pior. Confirmar no playtest no iPhone.
 
 ## Contrato de partida
 

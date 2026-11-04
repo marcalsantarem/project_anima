@@ -118,6 +118,12 @@ func _physics_process(delta: float) -> void:
 		waves.tick(delta, active_enemies.size())
 
 
+## Fixa a seed do sorteio da partida (bordas RANDOM, grupos, chefe). Chamar antes de entrar
+## na árvore ou antes do primeiro spawn: mesma seed = mesmos spawns (T-123).
+func set_seed(value: int) -> void:
+	_rng.seed = value
+
+
 ## Aciona a skill do slot (1-based). Para os botões de toque da UI.
 func use_skill(slot: int) -> bool:
 	return skills.use_skill(slot)

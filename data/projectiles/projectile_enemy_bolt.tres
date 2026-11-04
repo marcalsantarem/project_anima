@@ -7,7 +7,7 @@
 script = ExtResource("1")
 id = &"projectile_enemy_bolt"
 speed = 300.0
-damage = 6
+damage = 3
 radius = 8.0
 pierce = 0
 color = Color(0.961, 0.271, 0.784, 1)

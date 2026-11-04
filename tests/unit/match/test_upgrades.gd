@@ -3,7 +3,7 @@ extends GutTest
 
 const ARENA_SCENE := preload("res://src/match/arena/arena.tscn")
 const RUNNER := preload("res://data/enemies/enemy_runner.tres")
-const COSTS := [5, 7, 10, 14, 20, 27, 38, 53, 74, 104]
+const COSTS := [4, 6, 8, 11, 16, 22, 31, 43, 60, 83] # BRF-051: ceil(4 × 1,4^(N−1)); total 284
 
 var _events: Array = []
 
@@ -34,35 +34,35 @@ func test_initial_signals_for_all_five_in_order() -> void:
 	_arena()
 	assert_eq(_events.size(), 5)
 	for i in 5:
-		assert_eq(_events[i], [Arena.UPGRADE_IDS[i], 0, 10, 5])
+		assert_eq(_events[i], [Arena.UPGRADE_IDS[i], 0, 10, 4])
 
 
 func test_buy_spends_and_cost_grows() -> void:
-	var arena := _arena(12)
+	var arena := _arena(10)
 	_events.clear()
 	assert_true(arena.buy_upgrade(&"upgrade_atk_power"))
-	assert_eq(arena.particles, 7)
-	assert_eq(_events.back(), [&"upgrade_atk_power", 1, 10, 7])
+	assert_eq(arena.particles, 6)
+	assert_eq(_events.back(), [&"upgrade_atk_power", 1, 10, 6])
 	assert_true(arena.buy_upgrade(&"upgrade_atk_power"))
 	assert_eq(arena.particles, 0)
-	assert_eq(_events.back(), [&"upgrade_atk_power", 2, 10, 10])
+	assert_eq(_events.back(), [&"upgrade_atk_power", 2, 10, 8])
 
 
 func test_buy_fails_without_particles_or_unknown_id() -> void:
-	var arena := _arena(4)
+	var arena := _arena(3)
 	_events.clear()
 	assert_false(arena.buy_upgrade(&"upgrade_atk_spd"))
 	assert_false(arena.buy_upgrade(&"upgrade_nope"))
-	assert_eq(arena.particles, 4)
+	assert_eq(arena.particles, 3)
 	assert_eq(arena.upgrades.level(&"upgrade_atk_spd"), 0)
 	assert_eq(_events.size(), 0)
 
 
 func test_cap_at_max_level() -> void:
-	var arena := _arena(352)
+	var arena := _arena(284)
 	for i in 10:
 		assert_true(arena.buy_upgrade(&"upgrade_defense"))
-	assert_eq(arena.particles, 0, "acumulado 352")
+	assert_eq(arena.particles, 0, "acumulado 284")
 	assert_eq(_events.back(), [&"upgrade_defense", 10, 10, -1])
 	arena.particles = 1000
 	assert_false(arena.buy_upgrade(&"upgrade_defense"))
@@ -93,7 +93,7 @@ func test_atk_spd_raises_fire_rate() -> void:
 
 
 func test_defense_reduces_core_damage_min_one() -> void:
-	var arena := _arena(352)
+	var arena := _arena(284)
 	for i in 10:
 		arena.buy_upgrade(&"upgrade_defense")
 	var core := arena.anima.core
@@ -108,9 +108,9 @@ func test_max_hp_raises_max_and_current() -> void:
 	arena.core_hp_changed.connect(func(c: int, m: int) -> void: hp.append([c, m]))
 	arena.anima.take_core_damage(30)
 	arena.buy_upgrade(&"upgrade_max_hp")
-	assert_eq(hp.back(), [80, 110])
+	assert_eq(hp.back(), [140, 170]) # base 160 (BRF-051)
 	arena.buy_upgrade(&"upgrade_max_hp")
-	assert_eq(hp.back(), [90, 120])
+	assert_eq(hp.back(), [150, 180])
 
 
 func test_cooldown_applies_from_next_use() -> void:

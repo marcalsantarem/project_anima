@@ -3,6 +3,7 @@ extends GutTest
 
 const ARENA_SCENE := preload("res://src/match/arena/arena.tscn")
 const WARDEN := preload("res://data/enemies/boss_warden.tres")
+const BOSS_HP := 2500 # BRF-051
 
 var _arena: Arena
 var _boss: Boss
@@ -55,21 +56,21 @@ func test_spawn_emits_boss_signals() -> void:
 	watch_signals(_arena)
 	_spawn_boss()
 	assert_signal_emitted_with_parameters(_arena, "boss_spawned", [&"boss_warden"])
-	assert_signal_emitted_with_parameters(_arena, "boss_hp_changed", [1200, 1200])
+	assert_signal_emitted_with_parameters(_arena, "boss_hp_changed", [BOSS_HP, BOSS_HP])
 
 
 func test_phase_changes_with_damage() -> void:
 	_spawn_boss()
 	watch_signals(_boss)
 	watch_signals(_arena)
-	_boss.take_damage(400) # 800/1200 = 67%
+	_boss.take_damage(roundi(BOSS_HP / 3.0)) # 67%
 	assert_eq(_boss.phase, 0)
-	_boss.take_damage(100) # 58%
+	_boss.take_damage(roundi(BOSS_HP / 12.0)) # ~58%
 	assert_eq(_boss.phase, 1)
-	_boss.take_damage(400) # 25%
+	_boss.take_damage(roundi(BOSS_HP / 3.0)) # ~25%
 	assert_eq(_boss.phase, 2)
 	assert_signal_emit_count(_boss, "phase_changed", 2)
-	assert_signal_emitted_with_parameters(_arena, "boss_hp_changed", [300, 1200])
+	assert_signal_emitted_with_parameters(_arena, "boss_hp_changed", [_boss.hp, BOSS_HP])
 
 
 func test_telegraph_comes_before_fan() -> void:

@@ -137,7 +137,7 @@ func test_skill_without_target_keeps_button_ready() -> void:
 
 
 func test_defeat_locks_hud_and_freezes_match() -> void:
-	_start(_stage([25], 0.5), false) # 25 × 5 de contato > 100 HP
+	_start(_stage([_runners_to_defeat()], 0.5), false) # contato total > HP do Núcleo
 	await wait_for_signal(arena.match_ended, 30.0)
 	var r := _result()
 	assert_eq(r.outcome, MatchResult.Outcome.DEFEAT)
@@ -228,3 +228,9 @@ func test_match_end_disables_upgrades() -> void:
 	await wait_physics_frames(2)
 	for ub in hud._upgrades:
 		assert_eq(ub.state, UpgradeButton.State.DISABLED)
+
+
+## Corredores cujo dano de contato somado passa do HP do Núcleo (+5 de folga).
+func _runners_to_defeat() -> int:
+	var anima: AnimaData = load("res://data/anima/anima_default.tres")
+	return ceili(float(anima.core_hp_max) / RUNNER.contact_damage) + 5
