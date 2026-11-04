@@ -38,7 +38,7 @@
 | T-122 | Ligar a arena real ao SceneFlow | M1 | AG07 | feita |
 | T-123 | Seed no `Arena._rng` para testes determinísticos | M1 | AG01 | pronta p/ briefing |
 | T-124 | Pasta `src/fx/` em `docs/estrutura.md` | M1 | AG07 | pronta p/ briefing |
-| T-125 | Proposta da skill de área: meteoro × onda de choque | M1 | AG01 + AG08 | pronta p/ briefing |
+| T-125 | Proposta da skill de área: meteoro × onda de choque | M1 | AG01 + AG08 | decidida (meteoro de fogo, decisão 37) |
 | T-126 | Guia de estilo `docs/arte.md` + mockup da arena | M1 | AG08 | pronta p/ briefing |
 | T-127 | Arte do Anima, inimigos, chefe, projéteis e fundo | M1 | AG08 | feita |
 | T-128 | Ícones e arte da UI | M1 | AG08 | feita |
@@ -52,7 +52,7 @@
 | T-136 | Slots 2 e 3 do HUD bloqueados (cadeado) | M1 | AG02 | feita |
 | T-137 | Trocar placeholders da partida pela arte final | M1 | AG01 | feita (sem chefe) |
 | T-138 | Aplicar a arte da UI no HUD e nas telas | M1 | AG02 | feita |
-| T-139 | Ajustar a skill de área à opção escolhida | M1 | AG01 | bloqueada |
+| T-139 | Meteoro de fogo como skill de área (decisão 37) | M1 | AG01 | a fazer |
 | T-140 | Moeda da partida vira Partículas: sinais, código e `gameplay.md` | M1 | AG01 | feita |
 | T-141 | Moeda da partida vira Partículas: HUD, telas e `ui.md` | M1 | AG02 | feita |
 | T-142 | Novo guia de estilo 2D cartoon 3/4 + mockups PNG | M1 | AG08 | pronta p/ briefing |
@@ -359,7 +359,7 @@
 - **Pronto quando:** a aparência do Anima (sprite e cor dos projéteis) vem de um Resource; trocar de skin não exige mudar código.
 
 ### T-125 — Proposta da skill de área: meteoro × onda de choque
-- **Marco:** M1 · **Dono:** AG01 + AG08 · **Status:** pronta p/ briefing
+- **Marco:** M1 · **Dono:** AG01 + AG08 · **Status:** decidida pelo dono: meteoro de fogo (decisão 37)
 - **Depende de:** — · **Desbloqueia:** T-139, T-128 (ícone), T-131
 - **Arquivos:** `docs/gameplay.md` (seção da skill, AG01); esboço visual em `assets/` (AG08)
 - **Pronto quando:** as 2 opções descritas (jogabilidade, leitura visual, custo de VFX no iPhone), com recomendação; **o usuário decide via AG00**.
@@ -444,11 +444,11 @@
 - **Arquivos:** `src/ui/`
 - **Pronto quando:** HUD, telas e tela de upgrade usam os ícones e a arte final; legibilidade conferida no iPhone.
 
-### T-139 — Ajustar a skill de área à opção escolhida
-- **Marco:** M1 · **Dono:** AG01 · **Status:** bloqueada
-- **Depende de:** T-125 (**decisão do usuário: meteoro ou onda de choque**) · **Desbloqueia:** T-116, T-131
+### T-139 — Meteoro de fogo como skill de área (decisão 37)
+- **Marco:** M1 · **Dono:** AG01 · **Status:** a fazer (desbloqueada pela decisão 37; depois da T-116, mesmos arquivos)
+- **Depende de:** decisão 37 (feita) · **Desbloqueia:** T-131, T-128 (troca do ícone)
 - **Arquivos:** `src/match/skills/`, `data/skills/`
-- **Pronto quando:** a skill do slot 1 tem o comportamento da opção escolhida (área, dano e cooldown em dados); sinais para VFX e UI.
+- **Pronto quando:** a skill do slot 1 é um meteoro de fogo: cai na posição alvo (inimigo mais denso ou mais próximo, regra a documentar), explode com **raio e dano em dados** (`radius`, `damage`, cooldown), pensados para receber upgrades depois; telegraph no chão antes de cair; sinais para VFX e UI; substitui `skill_pulse`; testes.
 
 ### T-140 — Moeda da partida vira Partículas: sinais, código e `gameplay.md`
 - **Marco:** M1 · **Dono:** AG01 · **Status:** feita
@@ -483,3 +483,5 @@
 - **[A definir] para o M2:** evolução das skills; atributos dos módulos; prêmios por nível de conta além dos slots.
 - **M3:** escolha do backend, conta guest, sincronização, economia no servidor, Remote Config.
 - **M4:** ads, loja, skins, áudio final, lojas nativas, mais fases, localização.
+
+- **Decisão 37 (meteoro de fogo):** T-139 (AG01) implementa o meteoro com raio de explosão e dano em dados, preparados para upgrades; o ícone (T-128, AG08) e o VFX (T-131, AG09) seguem o meteoro de fogo.
