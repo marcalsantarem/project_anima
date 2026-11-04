@@ -1,6 +1,6 @@
 # Arte — Project: Anima
 
-> Dono: AG08. Estado: **Aprovado** (decisões 31–36): a demo usa o mockup A "Jardim Arcano" (claro); o B "Noite Rúnica" (escuro) fica para a 2ª fase. A HUD ganha a fileira de 5 upgrades acima das skills (decisão 35), ausente nos mockups. As cores de UI são do [docs/ui.md](ui.md) (dono AG02); a retematização da UI é a T-145.
+> Dono: AG08. Estado: **Aprovado** (decisões 31–36): a demo usa o mockup A "Jardim Arcano" (claro); o B "Noite Rúnica" (escuro) fica para a 2ª fase. A HUD ganha a fileira de 5 upgrades acima das skills (decisão 35). As cores de UI são do [docs/ui.md](ui.md) (dono AG02); a retematização da UI é a T-145.
 > Mockups (PNG 720×1280, fonte SVG gerada por script): [`mockup_cartoon_a.png`](../assets/backgrounds/mockup_cartoon_a.png) e [`mockup_cartoon_b.png`](../assets/backgrounds/mockup_cartoon_b.png).
 
 ## 1. Direção: Cyber-Mystic em 2D cartoon casual
@@ -83,6 +83,7 @@ Pedestal cilíndrico neutro (`vessel`) com aro ciano + **cristal losango ciano f
 
 - **Botões encorpados:** forma arredondada, contorno escuro de 4 px, "sombra de base" sólida deslocada 4–6 px para baixo, faixa de brilho branca a ~18% no topo.
 - **Skill:** botão redondo Ø ≥ 100 px (defensiva ≥ 130 px). Pronta = anel ciano + halo; recarga = setor escuro a 55% + segundos; bloqueada = cinza com cadeado e o nível de desbloqueio. Badge da tecla (`1`, `2`, `3`, `ESPAÇO`) no canto superior.
+- **Fileira de upgrades (decisão 35):** faixa própria no topo da bandeja, logo acima das skills; 5 botões de 128×80 px (gap 12, margem 16), na ordem Atk power, Atk spd, Defesa, Vida máxima, Cooldown. Cada botão: ícone num círculo colorido (espada laranja, chevrons âmbar, placa hexagonal azul, coração rosa com "+", ampulheta verde-água), "Nv X" e pílula escura com a estrela de Partículas + custo. Estados: comprável = anel ciano interno e custo dourado (toque mostra "+1" ciano); sem Partículas = cinza, ícone a 55% e custo vermelho-claro; máximo = moldura dourada e pílula dourada "MAX". A arena encolhe (87%) para caber, com o núcleo ainda no centro. Mockup: [`mockup_cartoon_a_upgrades.png`](../assets/backgrounds/mockup_cartoon_a_upgrades.png).
 - **Texto:** fonte arredondada pesada (os mockups usam Outfit 800, OFL, já no projeto) com contorno escuro (paint-order stroke).
 - **Molduras por raridade** (cores do `ui.md`): moldura grossa da cor + contorno escuro + fundo do card num tom mais escuro da mesma cor; quanto mais rara, mais ornamento.
 

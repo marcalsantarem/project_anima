@@ -1,0 +1,6 @@
+# BRF-024 — AG08 — Mockup A com a fileira de upgrades em tempo real
+**Objetivo:** gerar uma versão do mockup A "Jardim Arcano" (`assets/backgrounds/mockup_cartoon_a.*`) com a fileira de upgrades da decisão 35 em [docs/decisoes.md](../decisoes.md).
+**Fileira:** 5 botões **acima da linha de skills**, nesta ordem: Atk power, Atk spd, Defesa, Vida máxima, Cooldown. Cada botão: ícone próprio e legível, nível ("Nv 2") e custo em Partículas (use o ícone/estilo de Partículas já usado no HUD). Alvo de toque de 44 px ou mais (720×1280). Mostre estados variados: um comprável, um sem Partículas suficientes (apagado), um no nível máximo ("MAX"). Os botões não podem cobrir inimigos nem as skills; reduza a arena ou reorganize a bandeja o necessário, mantendo o núcleo no centro da arena visível. Nada copiado de jogos existentes.
+**Entrega:** `assets/backgrounds/mockup_cartoon_a_upgrades.svg` e `.png` (720×1280, mesmo método de render do mockup A; reaproveite o script/SVG do A). Confira o PNG visualmente. Registre em `assets/LICENSES.md`. Se a fileira exigir mudança no guia, atualize só a seção de HUD de `docs/arte.md`.
+**Arquivos permitidos:** `assets/backgrounds/`, `assets/LICENSES.md`, `docs/arte.md` (só HUD).
+**Entrega ao AG00:** formato padrão, no máximo 10 linhas.
