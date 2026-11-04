@@ -18,7 +18,7 @@
 | Clima | dia, chão de pedra clara (creme) com runas lilás | crepúsculo, ilha de pedra índigo flutuando no vazio, runas douradas |
 | Contorno | **colorido** (tom escuro da própria cor), 3–4 px | **único escuro** `#1E1838`, 5 px |
 | Sombreamento | suave (sombra a ~45% de opacidade) | **cel duro** (sombra chapada 100%) + brilho forte |
-| HUD | bandeja inferior, 3 skills + defensiva grande à direita | painel superior com moldura dourada, defensiva grande no centro, barra do chefe |
+| HUD | bandeja inferior: fileira de 5 upgrades + 3 slots de skill (1 ativo, 2 e 3 bloqueados), Ø ≥ 144 px (demo) | painel superior com moldura dourada, defensiva grande no centro, barra do chefe |
 | Leitura | mais "casual/família", contraste de inimigos muito alto | mais "épico/mágico", o ciano do jogador brilha mais |
 
 ## 2. Paleta
@@ -82,7 +82,7 @@ Pedestal cilíndrico neutro (`vessel`) com aro ciano + **cristal losango ciano f
 ## 6. HUD e molduras por raridade (guia para a T-145)
 
 - **Botões encorpados:** forma arredondada, contorno escuro de 4 px, "sombra de base" sólida deslocada 4–6 px para baixo, faixa de brilho branca a ~18% no topo.
-- **Skill:** botão redondo Ø ≥ 100 px (defensiva ≥ 130 px). Pronta = anel ciano + halo; recarga = setor escuro a 55% + segundos; bloqueada = cinza com cadeado e o nível de desbloqueio. Badge da tecla (`1`, `2`, `3`, `ESPAÇO`) no canto superior.
+- **Skill (demo M1, decisão 28):** bandeja com **3 slots**, sem botão defensivo/`ESPAÇO`. Botão redondo **Ø ≥ 144 px**, centros em x = 150 / 360 / 570 (folga ~66 px), cy ≈ 1192 em 720×1280. Pronta = anel ciano + halo; recarga = setor escuro a 55% + segundos; bloqueada = cinza com cadeado e o nível de desbloqueio (slot 2 "NV 7", slot 3 "NV 12"). Badge da tecla (`1`, `2`, `3`) no canto superior direito.
 - **Fileira de upgrades (decisão 35):** faixa própria no topo da bandeja, logo acima das skills; 5 botões de 128×80 px (gap 12, margem 16), na ordem Atk power, Atk spd, Defesa, Vida máxima, Cooldown. Cada botão: ícone num círculo colorido (espada laranja, chevrons âmbar, placa hexagonal azul, coração rosa com "+", ampulheta verde-água), "Nv X" e pílula escura com a estrela de Partículas + custo. Estados: comprável = anel ciano interno e custo dourado (toque mostra "+1" ciano); sem Partículas = cinza, ícone a 55% e custo vermelho-claro; máximo = moldura dourada e pílula dourada "MAX". A arena encolhe (87%) para caber, com o núcleo ainda no centro. Mockup: [`mockup_cartoon_a_upgrades.png`](../assets/backgrounds/mockup_cartoon_a_upgrades.png).
 - **Texto:** fonte arredondada pesada (os mockups usam Outfit 800, OFL, já no projeto) com contorno escuro (paint-order stroke).
 - **Molduras por raridade** (cores do `ui.md`): moldura grossa da cor + contorno escuro + fundo do card num tom mais escuro da mesma cor; quanto mais rara, mais ornamento.
