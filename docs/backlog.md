@@ -77,6 +77,11 @@
 | T-162 | Arte do ícone de Moeda (moeda dourada) e do glossário na UI (para o M2) | M2 | AG08 | a fazer |
 | T-163 | Textos do jogo e docs com os nomes oficiais (Módulo, Fragmento, Núcleo, Moeda); decidir a colisão de "Núcleo" | M2 | AG00 + AG04 + AG02 | a fazer |
 | T-164 | Rótulo da vida do Anima: "NÚCLEO" vira "ENERGIA" no HUD, Resultado e docs de UI | M1 | AG02 | feita |
+| T-165 | Build e versão no cabeçalho do log (commit e data do deploy) | M1 | AG07 + AG02 | pronta p/ briefing |
+| T-166 | Chefe sem barra de defesa (mecânica arquivada, desligada por dados); meteoro lança e atordoa; rebalancear | M1 | AG01 | pronta p/ briefing |
+| T-167 | Animação de passos do chefe ogro (balanço, ritmo pelo movimento; quadros de caminhada) | M1 | AG01 + AG08 | pronta p/ briefing |
+| T-168 | Círculo rúnico do chão menor (~70%) | M1 | AG01 | pronta p/ briefing |
+| T-169 | Bandeja até a borda inferior, menos espaço sob os Módulos, Anima centralizado na área livre | M1 | AG02 + AG01 | pronta p/ briefing |
 | T-148 | Sinais da Arena para VFX (projectile_fired, projectile_hit, enemy_died, particles_gained, skill_cast, boss_telegraph_started, boss_phase_changed) | M1 | AG01 | feita |
 
 ## Próximas prontas p/ briefing
@@ -455,6 +460,26 @@
 - **Depende de:** decisão 41 · **Desbloqueia:** T-163
 - **Arquivos:** `src/ui/`, `docs/ui.md`, `tests/` (da UI)
 - **Pronto quando:** a barra de vida do Anima mostra "ENERGIA x / y" (e qualquer texto ao jogador que diga "Núcleo" para a vida do Anima); identificadores de código inalterados; testes e demos ajustados.
+
+### T-165 — Build no cabeçalho do log
+- **Marco:** M1 · **Dono:** AG07 + AG02 · **Status:** pronta p/ briefing
+- **Pronto quando:** o cabeçalho do log mostra a versão e o commit (SHA curto) do build, injetados no deploy (GitHub Actions) ou lidos de um arquivo gerado; localmente aparece "dev local". Hoje "versão" e "build" saem vazios.
+
+### T-166 — Chefe sem defesa
+- **Marco:** M1 · **Dono:** AG01 · **Status:** pronta p/ briefing
+- **Depende de:** decisão 42 · **Pronto quando:** `defense_max = 0` desliga a defesa (código e testes arquivados, documentados em `gameplay.md`); sem barra de defesa sobre o chefe; o meteoro o lança e o atordoa; vida do chefe e dano recalibrados com o bot e com o log real do iPhone.
+
+### T-167 — Passos do chefe
+- **Marco:** M1 · **Dono:** AG01 + AG08 · **Status:** pronta p/ briefing
+- **Pronto quando:** o ogro anda com balanço e passos no ritmo da velocidade (e quadros de caminhada do AG08), sombra acompanhando; não "desliza".
+
+### T-168 — Círculo rúnico menor
+- **Marco:** M1 · **Dono:** AG01 · **Status:** pronta p/ briefing
+- **Pronto quando:** o selo do chão (`floor_ring`) fica a ~70% do tamanho atual, mais perto do totem do Anima.
+
+### T-169 — Layout da bandeja e centralização
+- **Marco:** M1 · **Dono:** AG02 + AG01 · **Status:** pronta p/ briefing
+- **Pronto quando:** a bandeja vai até a borda inferior (sem a faixa de cor de fundo), com pouco espaço sob os Módulos e a safe area respeitada; o Anima fica centralizado entre o topo do HUD e a bandeja; sem alteração de tamanho dos botões.
 
 ### T-148 — Sinais da Arena para VFX
 - **Marco:** M1 · **Dono:** AG01 · **Status:** feita
