@@ -13,3 +13,6 @@ enum Shape { CIRCLE, DIAMOND }
 @export var color: Color = Color(0.3, 0.95, 1.0)
 ## Forma distinta para leitura: jogador = círculo, inimigo = losango.
 @export var shape: Shape = Shape.CIRCLE
+## Arte (PNG 2x, aponta para +X; âncora em px do PNG, no centro).
+@export var sprite: Texture2D
+@export var sprite_anchor: Vector2

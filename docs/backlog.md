@@ -50,7 +50,7 @@
 | T-134 | Lógica dos upgrades em tempo real (5 atributos) | M1 | AG01 | a fazer |
 | T-135 | Fileira de 5 botões de upgrade no HUD | M1 | AG02 | a fazer |
 | T-136 | Slots 2 e 3 do HUD bloqueados (cadeado) | M1 | AG02 | feita |
-| T-137 | Trocar placeholders da partida pela arte final | M1 | AG01 | a fazer |
+| T-137 | Trocar placeholders da partida pela arte final | M1 | AG01 | feita (sem chefe) |
 | T-138 | Aplicar a arte da UI no HUD e nas telas | M1 | AG02 | a fazer |
 | T-139 | Ajustar a skill de área à opção escolhida | M1 | AG01 | bloqueada |
 | T-140 | Moeda da partida vira Partículas: sinais, código e `gameplay.md` | M1 | AG01 | feita |

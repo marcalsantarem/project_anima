@@ -5,11 +5,6 @@ extends Area2D
 signal core_hp_changed(current: int, max_hp: int)
 signal core_depleted
 
-const BODY_COLOR := Color(0.55, 0.85, 1.0)
-const RING_WIDTH := 3.0
-## Altura do desenho do núcleo acima da âncora, em frações do raio (placeholder).
-const CORE_HEIGHT_FACTOR := 0.6
-
 @export var data: AnimaData
 ## Desligável para testes e debug.
 @export var auto_attack_enabled := true
@@ -21,6 +16,9 @@ var _enemies: Array[Enemy] = []
 var _pool: ProjectilePool
 var _scan_timer := 0.0
 var _fire_timer := 0.0
+var _crystal: Sprite2D
+var _orbits: Array[Sprite2D] = []
+var _art_time := 0.0
 
 @onready var _hurtbox: CollisionShape2D = $Hurtbox
 
@@ -35,7 +33,7 @@ func _ready() -> void:
 	core.changed.connect(func(c: int, m: int) -> void: core_hp_changed.emit(c, m))
 	core.depleted.connect(func() -> void: core_depleted.emit())
 	area_entered.connect(_on_area_entered)
-	queue_redraw()
+	_build_art()
 
 
 ## Liga o ataque à lista de inimigos vivos e ao pool (mesmo espaço de coordenadas do Anima).
@@ -77,8 +75,33 @@ func _on_area_entered(area: Area2D) -> void:
 			p.consume()
 
 
-## Âncora = centro do pedestal no chão: o anel é a hurtbox (elipse) e o núcleo flutua acima.
-func _draw() -> void:
-	draw_circle(Vector2(0.0, -data.hurtbox_radius * CORE_HEIGHT_FACTOR), data.hurtbox_radius * 0.4, BODY_COLOR)
-	draw_set_transform(Vector2.ZERO, 0.0, GroundPlane.SHAPE_SCALE)
-	draw_arc(Vector2.ZERO, data.hurtbox_radius, 0.0, TAU, 48, BODY_COLOR, RING_WIDTH, true)
+## Âncora = centro do pedestal no chão. Base e cristal são sprites; o cristal flutua e os nós orbitam.
+func _build_art() -> void:
+	add_child(SpriteArt.make(data.base_sprite, data.base_anchor))
+	_crystal = SpriteArt.make(data.crystal_sprite, data.crystal_anchor)
+	add_child(_crystal)
+	for i in data.orbit_count:
+		# Filho do cristal (escala 0,5): escala 1 e posição em px do PNG mantêm o 1x.
+		var orb := SpriteArt.make(data.orbit_sprite, data.orbit_anchor)
+		orb.scale = Vector2.ONE
+		_crystal.add_child(orb)
+		_orbits.append(orb)
+	_update_art()
+
+
+## Só visual (não mexe em regra): oscilação do cristal e órbita dos nós, sem alocar.
+func _process(delta: float) -> void:
+	_art_time += delta
+	_update_art()
+
+
+func _update_art() -> void:
+	var bob := sin(_art_time * TAU / data.crystal_bob_period) * data.crystal_bob_amplitude
+	_crystal.position = Vector2(0.0, -data.crystal_height + bob)
+	var to_png := Vector2.ONE / SpriteArt.SCALE
+	var n := _orbits.size()
+	for i in n:
+		var a := _art_time * TAU / data.orbit_period + TAU * i / n
+		var p := Vector2(cos(a), sin(a))
+		_orbits[i].position = p * data.orbit_radii * to_png
+		_orbits[i].show_behind_parent = p.y < 0.0 # metade de trás da elipse

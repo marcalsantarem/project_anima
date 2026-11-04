@@ -16,6 +16,7 @@ var _hits_left := 0
 var _hit_ids := PackedInt64Array()
 var _hit_count := 0
 var _shadow: GroundShadow
+var _sprite: Sprite2D
 
 @onready var _shape_node: CollisionShape2D = $Shape
 
@@ -36,7 +37,11 @@ func configure(p_data: ProjectileData) -> void:
 		add_child(_shadow)
 	_shadow.radius = data.radius
 	_hit_ids.resize(data.pierce + 1)
-	queue_redraw()
+	if _sprite == null:
+		_sprite = Sprite2D.new()
+		add_child(_sprite)
+	SpriteArt.apply(_sprite, data.sprite, data.sprite_anchor)
+	_sprite.position = Vector2(0.0, -data.height) # voa acima da sombra (âncora no chão)
 
 
 ## direction em tela; vira direção no chão. max_distance em px no chão.
@@ -49,6 +54,7 @@ func fire(origin: Vector2, direction: Vector2, max_distance: float, p_data: Proj
 	_distance_left = max_distance
 	_hits_left = data.pierce + 1
 	_hit_count = 0
+	_sprite.rotation = direction.angle() # sprite aponta para +X
 	active = true
 	visible = true
 	set_physics_process(true)
@@ -95,14 +101,3 @@ func _expire() -> void:
 	park()
 	expired.emit(self)
 
-
-func _draw() -> void:
-	if data == null:
-		return
-	# Voa a data.height acima da sombra (âncora no chão).
-	var c := Vector2(0.0, -data.height)
-	if data.shape == ProjectileData.Shape.DIAMOND:
-		var r := data.radius
-		draw_colored_polygon(PackedVector2Array([c + Vector2(0, -r), c + Vector2(r, 0), c + Vector2(0, r), c + Vector2(-r, 0)]), data.color)
-	else:
-		draw_circle(c, data.radius, data.color)

@@ -16,6 +16,7 @@ var hp: int
 var target_position: Vector2
 
 var _fire_timer := 0.0
+var _ring: Sprite2D
 
 @onready var _hitbox: CollisionShape2D = $Hitbox
 
@@ -36,7 +37,7 @@ func _ready() -> void:
 	add_child(GroundShadow.new(data.radius))
 	hp = data.hp
 	state = State.ADVANCE
-	queue_redraw()
+	_build_art()
 
 
 func _physics_process(delta: float) -> void:
@@ -90,6 +91,15 @@ func die(cause: DeathCause) -> void:
 	queue_free()
 
 
-## Âncora na base: o corpo fica em pé sobre o ponto de contato (placeholder).
-func _draw() -> void:
-	draw_circle(Vector2(0.0, -data.radius), data.radius, data.color)
+## Âncora na base: o sprite fica em pé sobre o ponto de contato. Anel opcional (chefe) atrás do corpo.
+func _build_art() -> void:
+	if data.ring_sprite != null:
+		_ring = SpriteArt.make(data.ring_sprite, data.ring_anchor)
+		_ring.position = Vector2(0.0, -data.ring_height)
+		add_child(_ring)
+	add_child(SpriteArt.make(data.sprite, data.sprite_anchor))
+	set_process(_ring != null and data.ring_spin_speed != 0.0)
+
+
+func _process(delta: float) -> void:
+	_ring.rotation += data.ring_spin_speed * delta

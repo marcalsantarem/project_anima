@@ -1,7 +1,10 @@
-[gd_resource type="Resource" script_class="AnimaData" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="AnimaData" load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://src/match/anima/anima_data.gd" id="1"]
 [ext_resource type="Resource" path="res://data/projectiles/projectile_anima_basic.tres" id="2"]
+[ext_resource type="Texture2D" path="res://assets/sprites/anima_default_base.png" id="tex_base"]
+[ext_resource type="Texture2D" path="res://assets/sprites/anima_default_crystal.png" id="tex_crystal"]
+[ext_resource type="Texture2D" path="res://assets/sprites/anima_default_node.png" id="tex_orbit"]
 
 [resource]
 script = ExtResource("1")
@@ -12,3 +15,9 @@ attack_range = 600.0
 target_scan_interval = 0.1
 projectile_pool_size = 64
 projectile = ExtResource("2")
+base_sprite = ExtResource("tex_base")
+base_anchor = Vector2(128, 200)
+crystal_sprite = ExtResource("tex_crystal")
+crystal_anchor = Vector2(128, 128)
+orbit_sprite = ExtResource("tex_orbit")
+orbit_anchor = Vector2(32, 32)

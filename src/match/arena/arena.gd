@@ -14,6 +14,7 @@ signal skill_used(slot: int)
 signal cooldown_changed(slot: int, remaining: float, total: float)
 signal skill_ready(slot: int)
 
+const FLOOR_Z_INDEX := -10 ## fundo atrás de tudo (sombras e decalques usam z -1)
 const ENEMY_SCENE := preload("res://src/match/enemies/enemy.tscn")
 
 @export var spawn_margin: float = 32.0 ## px além da borda da arena
@@ -26,6 +27,10 @@ const ENEMY_SCENE := preload("res://src/match/enemies/enemy.tscn")
 @export var waves_enabled := true
 @export var enemy_projectile_pool_size: int = 128
 @export var enemy_projectile: ProjectileData ## tipo padrão do pool inimigo
+## Fundo da fase (PNG 2x, já com os pilares). Âncora = centro do círculo rúnico, em px do PNG;
+## fica no centro da arena_rect, junto com o Anima.
+@export var floor_texture: Texture2D
+@export var floor_anchor: Vector2 = Vector2(720.0, 1151.0)
 
 var config: MatchConfig
 ## Se nulo no _ready, é carregada de data/waves/<config.stage_id>.tres.
@@ -39,6 +44,7 @@ var elapsed := 0.0
 var active_enemies: Array[Enemy] = []
 
 var _rng := RandomNumberGenerator.new()
+var _floor: Sprite2D
 
 @onready var anima: Anima = $Anima
 @onready var projectiles: ProjectilePool = $Projectiles
@@ -71,6 +77,10 @@ func _ready() -> void:
 	skills.skill_used.connect(func(slot: int) -> void: skill_used.emit(slot))
 	skills.cooldown_changed.connect(func(slot: int, r: float, t: float) -> void: cooldown_changed.emit(slot, r, t))
 	skills.skill_ready.connect(func(slot: int) -> void: skill_ready.emit(slot))
+	_floor = SpriteArt.make(floor_texture, floor_anchor)
+	_floor.z_index = FLOOR_Z_INDEX
+	add_child(_floor)
+	move_child(_floor, 0)
 	get_viewport().size_changed.connect(_center_anima)
 	_center_anima()
 
@@ -174,6 +184,7 @@ func _end(outcome: MatchResult.Outcome) -> void:
 
 func _center_anima() -> void:
 	anima.position = arena_rect().get_center()
+	_floor.position = anima.position
 
 func _emit_particles() -> void:
 	particles_changed.emit(particles)

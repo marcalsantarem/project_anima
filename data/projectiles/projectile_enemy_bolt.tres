@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="ProjectileData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="ProjectileData" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://src/match/projectiles/projectile_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/projectile_enemy.png" id="tex_sprite"]
 
 [resource]
 script = ExtResource("1")
@@ -11,3 +12,5 @@ radius = 8.0
 pierce = 0
 color = Color(0.961, 0.271, 0.784, 1)
 shape = 1
+sprite = ExtResource("tex_sprite")
+sprite_anchor = Vector2(32, 32)
