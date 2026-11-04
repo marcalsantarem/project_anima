@@ -25,6 +25,7 @@ var viewer: LogViewer
 func _ready() -> void:
 	set_anchors_and_offsets_preset(PRESET_FULL_RECT)
 	var root := ScreenKit.root(self)
+	ScreenKit.set_page_color(UiTokens.BG_VOID)
 	var col := ScreenKit.card(root, UiTokens.SPACE_L)
 	_title = ScreenKit.label("", &"LabelDisplay")
 	col.add_child(_title)

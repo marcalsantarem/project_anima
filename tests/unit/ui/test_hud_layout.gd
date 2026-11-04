@@ -86,3 +86,12 @@ func test_result_particles_row_does_not_wrap() -> void:
 	var label: Label = row.get_child(1)
 	assert_eq(label.get_line_count(), 1)
 	assert_gt(label.size.x, label.size.y)
+
+
+## T-172: a partida pinta a página do shell com a cor da bandeja (faixa abaixo do web view no Safari).
+func test_hud_sets_page_color() -> void:
+	ScreenKit.last_page_color = Color.BLACK
+	var hud: Hud = HUD_SCENE.instantiate()
+	add_child_autofree(hud)
+	await wait_process_frames(1)
+	assert_eq(ScreenKit.last_page_color, UiTokens.BG_PANEL_ALT)

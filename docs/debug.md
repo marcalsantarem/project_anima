@@ -15,7 +15,7 @@ Módulo `src/debug/` (sem autoload). O `SceneFlow` cria o gravador e o overlay n
 
 ## 1. O que é registrado
 
-- **Cabeçalho:** jogo, versão, Godot, data/hora local, plataforma, modelo, renderer, GPU, tela, janela, viewport, safe area, núcleos, efeitos reduzidos e seed da partida. Na web (`header.web`): user agent, `devicePixelRatio`, tela CSS, orientação, safe area do shell, `WEBGL_debug_renderer_info` (vendor/renderer), `deviceMemory`, `hardwareConcurrency`, `window.ANIMA_BUILD` (se existir) e a URL **sem query string**. `header.ui_insets`: insets que a UI usa (px do jogo; `bottom` já pela regra de docs/ui.md §9.1, `bottom_raw`, `covers_bottom`, `css_k`). `header.web.viewport` (T-172, `animaViewportInfo()` do shell, lido na hora): `inner` (innerWidth e innerHeight **nativo**), `app_h` (altura usada no canvas), `outer_h`, `vv` (visualViewport width, height, offsetTop, scale), `client_h`, `screen`, sondas `svh`/`dvh`/`lvh`, `canvas` (top, bottom, height do `getBoundingClientRect`), `standalone` e `safe` (o mesmo `animaGetSafeArea()` que a UI lê).
+- **Cabeçalho:** jogo, versão, Godot, data/hora local, plataforma, modelo, renderer, GPU, tela, janela, viewport, safe area, núcleos, efeitos reduzidos e seed da partida. Na web (`header.web`): user agent, `devicePixelRatio`, tela CSS, orientação, safe area do shell, `WEBGL_debug_renderer_info` (vendor/renderer), `deviceMemory`, `hardwareConcurrency`, `window.ANIMA_BUILD` (se existir) e a URL **sem query string**. `header.ui_insets`: insets que a UI usa (px do jogo; `bottom` já pela regra de docs/ui.md §9.1, `bottom_raw`, `covers_bottom`, `css_k`). `header.web.viewport` (T-172, `animaViewportInfo()` do shell, lido na hora): `inner` (innerWidth e innerHeight **nativo**), `app_h` (altura usada no canvas), `outer_h`, `vv` (visualViewport width, height, offsetTop, scale), `client_h`, `screen`, sondas `svh`/`dvh`/`lvh`, `canvas` (top, bottom, height do `getBoundingClientRect`), `canvas_h` (altura aplicada pelo Godot no estilo do canvas), `standalone` e `safe` (o mesmo `animaGetSafeArea()` que a UI lê).
 - **Amostras** a cada 1 s (0,25 s com o chefe vivo). Colunas em `samples_cols`:
   - tempo, FPS da janela, ms médio e máximo, quadros > 33 e > 50 ms;
   - tempo de processo e de física, draw calls, objetos, nós, órfãos;
@@ -56,7 +56,7 @@ Módulo `src/debug/` (sem autoload). O `SceneFlow` cria o gravador e o overlay n
 
 - Painel translúcido no canto superior esquerdo, abaixo do HUD. Ignora toques e fica abaixo da pausa.
 - Mostra: FPS, ms do quadro (atual e máximo da última janela), inimigos, projéteis, efeitos, draw calls, nós, memória, travadas > 50 ms e as 3 últimas linhas de erro. Na web, 4 linhas do viewport com os mesmos números de `header.web.viewport`: `in` (inner nativo), `app`, `out`, `cli`; `vv`, `scr`; `svh`/`dvh`/`lvh` e `standalone`/`aba`; `cv` (top..bottom, altura), `safe` topo/base (CSS) e `cobre` (sim/não).
-- **Simulação para capturas fora do iPhone** (shell, T-172): `?simih=768` limita o `innerHeight` nativo; `?simsafe=44,0,34,0` fixa a safe area (topo, direita, base, esquerda, px CSS).
+- **Simulação para capturas fora do iPhone** (shell, T-172): `?simih=768` limita o `innerHeight` nativo (o canvas fica com 768 e a sobra mostra a cor da etapa); `?simsafe=44,0,34,0` fixa a safe area (topo, direita, base, esquerda, px CSS).
 - Liga por: `?debug=1` na URL (`?debug=0` desliga), **F3** (action `debug_toggle`) ou o botão **"Debug"** do menu de pausa.
 - Vem desligado e o estado fica salvo. O gravador grava de qualquer jeito.
 

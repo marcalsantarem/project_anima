@@ -99,14 +99,26 @@ static func format_time(seconds: float) -> String:
 	return "%02d:%02d" % [s / 60, s % 60]
 
 
+## Cor da página do shell e do theme-color (T-172, docs/ui.md §9.1): o Safari pinta com ela a faixa
+## abaixo do web view. Cada etapa passa a cor da sua base (título, bandeja da partida, resultado).
+static var last_page_color := Color.BLACK
+
+
+static func set_page_color(c: Color) -> void:
+	last_page_color = c
+	if OS.has_feature("web"):
+		JavaScriptBridge.eval("window.animaSetPageColor && animaSetPageColor('#%s')" % c.to_html(false), true)
+
+
 ## Inset inferior usado pela UI quando o canvas cobre a borda (T-172, docs/ui.md §9.1): o indicador de
 ## início é uma linha fina, então basta max(SAFE_BOTTOM_MIN, SAFE_BOTTOM_FACTOR × inset).
 const SAFE_BOTTOM_MIN := 12.0
 const SAFE_BOTTOM_FACTOR := 0.5
 
 
-## Regra da inset inferior (px da resolução base): 0 sem inset; 0 se o canvas não cobre a borda inferior
-## (a faixa fora do canvas já é a zona do indicador); senão max(12, 0,5 × inset).
+## Regra da inset inferior (px da resolução base): 0 sem inset; 0 se o canvas termina acima da borda da tela
+## (caso normal do Safari em aba: o web view acaba antes do indicador de início); senão (tela cheia/standalone)
+## max(12, 0,5 × inset). A HUD mantém sempre a folga mínima de 8 px sob os slots.
 static func ui_bottom_inset(raw: float, covers_bottom: bool) -> float:
 	if raw <= 0.0 or not covers_bottom:
 		return 0.0

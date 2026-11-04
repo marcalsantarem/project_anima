@@ -51,6 +51,7 @@ var viewer: LogViewer
 func _ready() -> void:
 	set_anchors_and_offsets_preset(PRESET_FULL_RECT)
 	var root := ScreenKit.root(self, BG_MID)
+	ScreenKit.set_page_color(BG_BOTTOM)
 	var backdrop := Backdrop.new()
 	backdrop.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
 	root.add_child(backdrop)

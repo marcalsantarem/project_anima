@@ -71,6 +71,7 @@ var _wave_tween: Tween
 func _ready() -> void:
 	layer = 10
 	_build()
+	ScreenKit.set_page_color(UiTokens.BG_PANEL_ALT)
 	get_viewport().size_changed.connect(apply_safe_area)
 	apply_safe_area()
 
