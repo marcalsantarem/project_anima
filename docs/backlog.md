@@ -20,7 +20,7 @@
 | T-104 | Ataque automático com pool | M1 | AG01 | feita |
 | T-105 | Ondas por dados, HP do Núcleo, moedas, vitória/derrota | M1 | AG01 | feita |
 | T-106 | Tema base e componentes de UI | M1 | AG02 | feita |
-| T-107 | Overlay de debug Web (FPS, logs) | M1 | AG02 | pronta p/ briefing |
+| T-107 | Overlay de debug Web (FPS, logs) | M1 | AG02 | feita (com gravador de logs e botão Logs) |
 | T-108 | Base de skills + skill de área | M1 | AG01 | feita |
 | T-109 | Skill de controle | M2 | AG01 | a fazer |
 | T-110 | Skill de defesa | M2 | AG01 | a fazer |
@@ -221,7 +221,7 @@
 - **Decisão:** fonte Outfit.
 
 ### T-107 — Overlay de debug Web
-- **Marco:** M1 · **Dono:** AG02 · **Status:** pronta p/ briefing
+- **Marco:** M1 · **Dono:** AG02 · **Status:** feita (com gravador de logs e botão Logs, BRF-063)
 - **Depende de:** T-004 · **Desbloqueia:** T-118
 - **Arquivos:** `src/ui/debug/`
 - **Pronto quando:** FPS, contagem de nós e últimos logs visíveis na tela; liga/desliga por Input Action; fora dos builds release ou desligado por padrão.

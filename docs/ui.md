@@ -254,6 +254,14 @@ Boot/Loading (HTML shell) → Toque para começar → Partida ⇄ Pausa → Resu
 - Os insets são convertidos de px CSS para px da resolução base e aplicados como margem nos contêineres `HudTop` e `HudSkills` (e nas telas). A zona de combate não muda.
 - A confirmar no iPhone (T-005): se o Safari reporta os insets em tela cheia e em modo navegador.
 
+## 9b. Debug e logs (T-107, BRF-063)
+
+- **Resultado:** botão secundário **"Logs"** (200×64), abaixo de "Voltar ao título". Abre o `LogViewer`.
+- **Título:** link **"Último log"** (180×64) no canto superior direito, só se houver `user://logs/last_match.json`. O toque nele não começa a partida.
+- **Pausa:** botão **"Debug: ligado/desligado"** (240×64), que liga o overlay.
+- **HUD:** sinal `ui_pressed(button, ok)` para o gravador.
+- Detalhes, formato e como baixar no iPhone: [docs/debug.md](debug.md).
+
 ## 10. Pendências
 
 | Item | Com quem |

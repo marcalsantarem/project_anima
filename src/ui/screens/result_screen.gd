@@ -3,15 +3,23 @@ extends Control
 ## Resultado da partida (docs/ui.md §8).
 ## Contrato: show_result(result: MatchResult) (antes ou depois de entrar na árvore); sinais
 ## `play_again_requested` ("Jogar de novo") e `title_requested` ("Voltar ao título", T-155).
+## Botão secundário "Logs" (BRF-063): abre o LogViewer com `set_log(doc)` (ou o último log salvo).
 
 signal play_again_requested
 signal title_requested
+
+## Botão "Logs": secundário e menor que os dois principais (alvo ≥ 44 px, BRF-063).
+const LOGS_BUTTON_SIZE := Vector2(200, 64)
 
 var _result: MatchResult
 var _title: Label
 var _stats: Label
 var _particles_label: Label
 var _stats_tail: Label
+var _log: Dictionary = {}
+var _logs_button: Button
+## Visualizador aberto, ou null.
+var viewer: LogViewer
 
 
 func _ready() -> void:
@@ -44,7 +52,14 @@ func _ready() -> void:
 	col.add_child(back)
 	# Teclado: foco inicial no principal; setas/Tab levam ao secundário e a action de aceitar confirma.
 	play.focus_neighbor_bottom = play.get_path_to(back)
+	_logs_button = ScreenKit.button("Logs", false, open_logs)
+	_logs_button.name = "Logs"
+	_logs_button.custom_minimum_size = LOGS_BUTTON_SIZE
+	_logs_button.add_theme_font_size_override("font_size", UiTokens.FONT_CAPTION)
+	col.add_child(_logs_button)
 	back.focus_neighbor_top = back.get_path_to(play)
+	back.focus_neighbor_bottom = back.get_path_to(_logs_button)
+	_logs_button.focus_neighbor_top = _logs_button.get_path_to(back)
 	play.call_deferred(&"grab_focus")
 	ScreenKit.fade_in(root)
 	_refresh()
@@ -70,3 +85,20 @@ func _refresh() -> void:
 	_particles_label.text = "Partículas: %s" % UiTokens.format_int(_result.particles)
 	_stats_tail.text = "Inimigos: %d\nTempo: %s" % [
 		_result.enemies_killed, ScreenKit.format_time(_result.duration_s)]
+
+
+## Log da partida (MatchRecorder) para o botão "Logs".
+func set_log(doc: Dictionary) -> void:
+	_log = doc
+
+
+## Abre o visualizador por cima (não pausa nem mexe nos botões; ao fechar, o foco volta ao "Logs").
+func open_logs() -> void:
+	if viewer != null and is_instance_valid(viewer):
+		return
+	var doc := _log if not _log.is_empty() else MatchRecorder.load_last()
+	viewer = LogViewer.open(self, doc)
+	viewer.closed.connect(func() -> void:
+		viewer = null
+		if is_instance_valid(_logs_button):
+			_logs_button.grab_focus())

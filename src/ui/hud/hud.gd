@@ -7,6 +7,9 @@ extends CanvasLayer
 
 ## Pedido de pausa (botão). O botão também injeta a action `pause`; a tela de pausa (T-113) ouve um dos dois.
 signal pause_requested
+## Toque num botão do HUD, para o gravador de debug (docs/debug.md): `skill_N`, id do upgrade ou `pause`;
+## `ok` = a ação foi aceita (skill disparada, upgrade comprado). Sem posição do toque.
+signal ui_pressed(button: StringName, ok: bool)
 
 const THEME := preload("res://src/ui/theme/anima_theme.tres")
 const SKILL_COUNT := 3
@@ -488,23 +491,29 @@ func _on_match_ended(_result) -> void:
 func _on_skill_pressed(slot: int) -> void:
 	var sb := _skill(slot)
 	if sb and sb.is_locked():
+		ui_pressed.emit(StringName("skill_%d" % slot), false)
 		return
 	if _arena == null or not _arena.has_method(&"use_skill"):
 		return
-	if not _arena.use_skill(slot):
+	var ok: bool = _arena.use_skill(slot)
+	ui_pressed.emit(StringName("skill_%d" % slot), ok)
+	if not ok:
 		_skill(slot).reject()
 
 
 func _on_upgrade_buy(id: StringName) -> void:
 	if _arena == null or not _arena.has_method(&"buy_upgrade"):
 		return
-	if not _arena.buy_upgrade(id):
+	var ok: bool = _arena.buy_upgrade(id)
+	ui_pressed.emit(id, ok)
+	if not ok:
 		var ub := upgrade_button(id)
 		if ub:
 			ub.reject()
 
 
 func _on_pause_pressed() -> void:
+	ui_pressed.emit(&"pause", true)
 	pause_requested.emit()
 	var ev := InputEventAction.new()
 	ev.action = &"pause"

@@ -3,6 +3,7 @@ extends Control
 ## "Toque para começar" (docs/ui.md §8, §11.1). É o primeiro gesto do usuário: na web, destrava o áudio.
 ## Continuação da splash B do `web/shell.html`: mesmo fundo, núcleo e logotipo no mesmo lugar; o botão
 ## grande ocupa o lugar da barra. Contrato: emite `start_requested` uma vez, no primeiro toque, clique ou tecla.
+## Link pequeno "Último log" no canto (BRF-063), só se existir log salvo: abre o LogViewer sem começar a partida.
 
 signal start_requested
 
@@ -18,6 +19,7 @@ const BLOCK_H := 1000.0 # palco + barra + "Carregando…" (centralizado na verti
 const BUTTON_TOP := 856.0
 const BUTTON_SIZE := Vector2(440, 120)
 const BUTTON_FONT := 36.0
+const LINK_SIZE := Vector2(180, 64) ## "Último log": alvo ≥ 44 px (BRF-063)
 const W_VW := 0.86
 const W_MAX_CSS := 440.0
 const W_H_CSS := 0.55
@@ -36,6 +38,9 @@ var _started := false
 var _stage: Control
 var _button: Button
 var _credit: Label
+## Link "Último log" (null se não houver log salvo) e o visualizador aberto.
+var last_log_link: Button
+var viewer: LogViewer
 
 
 func _ready() -> void:
@@ -57,6 +62,17 @@ func _ready() -> void:
 
 	_credit = ScreenKit.label("Criado por Marçal Santarem", &"LabelCaption", UiTokens.TEXT_SECONDARY)
 	root.add_child(_credit)
+	if MatchRecorder.has_last_log():
+		last_log_link = Button.new()
+		last_log_link.name = "LastLog"
+		last_log_link.text = "Último log"
+		last_log_link.flat = true
+		last_log_link.focus_mode = FOCUS_NONE
+		last_log_link.custom_minimum_size = LINK_SIZE
+		last_log_link.add_theme_font_size_override("font_size", UiTokens.FONT_CAPTION)
+		last_log_link.add_theme_color_override("font_color", UiTokens.TEXT_SECONDARY)
+		last_log_link.pressed.connect(open_last_log)
+		root.add_child(last_log_link)
 
 	_layout()
 	get_viewport().size_changed.connect(_layout)
@@ -156,11 +172,17 @@ func _layout() -> void:
 	_credit.set_anchors_and_offsets_preset(PRESET_BOTTOM_WIDE, PRESET_MODE_MINSIZE)
 	_credit.offset_bottom = -(safe.bottom + UiTokens.SPACE_M)
 	_credit.offset_top = _credit.offset_bottom - _credit.get_combined_minimum_size().y
+	if last_log_link != null:
+		last_log_link.size = LINK_SIZE
+		last_log_link.position = Vector2(view.x - safe.right - LINK_SIZE.x - UiTokens.SPACE_XS, safe.top + UiTokens.SPACE_XS)
 
 
 # _input: o gesto precisa ser tratado no mesmo evento do navegador para destravar o áudio.
 func _input(event: InputEvent) -> void:
 	if _started or not is_visible_in_tree():
+		return
+	# O visualizador e o link "Último log" ficam com o toque (não começam a partida).
+	if viewer != null or _over_link(event):
 		return
 	var is_gesture: bool = (event is InputEventScreenTouch and event.pressed) \
 		or (event is InputEventMouseButton and event.pressed and event.device != InputEvent.DEVICE_ID_EMULATION) \
@@ -301,3 +323,17 @@ class StageArt extends Control:
 class ShadowBlob extends Control:
 	func _draw() -> void:
 		draw_colored_polygon(TitleScreen._ellipse(size / 2.0, size / 2.0, 32), Color(21 / 255.0, 103 / 255.0, 94 / 255.0, 0.28))
+
+
+func _over_link(event: InputEvent) -> bool:
+	if last_log_link == null or not (event is InputEventScreenTouch or event is InputEventMouseButton):
+		return false
+	return last_log_link.get_global_rect().has_point(event.position)
+
+
+## Abre o log salvo da última partida por cima do título.
+func open_last_log() -> void:
+	if viewer != null:
+		return
+	viewer = LogViewer.open(self, MatchRecorder.load_last())
+	viewer.closed.connect(func() -> void: viewer = null)

@@ -15,6 +15,7 @@ src/
   meta/          Lógica pura fora da partida: cards, fusão, atributos, talentos, economia.
   ui/            HUD, menus, hangar e componentes visuais reutilizáveis.
   fx/            Efeitos visuais: cenas `fx_*.tscn`, shaders `.gdshader` e o pool de efeitos.
+  debug/         Gravador da partida, logs, visualizador e overlay de debug (docs/debug.md).
 tests/
   unit/          Testes de lógica pura (principalmente src/meta).
   integration/   Testes que instanciam cenas.
@@ -30,5 +31,6 @@ build/           Saída das exportações (ignorada pelo git).
 - Somente `backend/` conversa com serviços externos.
 - `ui/` pode ler de todos, mas a lógica fica nos módulos de domínio.
 - `fx/` é só visual: não depende de `match/`, `meta/` nem `backend/` e não altera o estado do jogo. `match/` e `ui/` acionam os efeitos (por sinal ou pelo pool), passando posição, cor e escala.
+- `debug/` só **lê** `match/` (sinais e API pública) e usa o tema de `ui/`. `match/` não depende de `debug/`. Quem cria o gravador é o `SceneFlow`, e nada sai do aparelho.
 
 As pastas vazias têm um `.gitkeep`. Remova-o quando a pasta ganhar arquivos.

@@ -17,12 +17,16 @@ const MATCH_ROOT_NAME := &"Match"
 const ARENA_NODE_NAME := &"Arena"
 const FX_POOL_NODE_NAME := &"FxPool"
 const FX_DIRECTOR_NODE_NAME := &"FxDirector"
+const RECORDER_NODE_NAME := &"MatchRecorder"
 
 ## Último resultado recebido.
 var last_result: MatchResult
 ## Config da partida atual, reutilizada em "Recomeçar" e "Jogar de novo".
 var last_config: MatchConfig
+## Log da última partida (MatchRecorder, docs/debug.md), entregue ao Resultado.
+var last_log: Dictionary = {}
 var _changing := false
+var _recorder: MatchRecorder
 
 
 func go_to_title() -> void:
@@ -55,6 +59,7 @@ func start_match(config: MatchConfig = null) -> void:
 	arena.match_ended.connect(_on_match_ended, CONNECT_ONE_SHOT)
 	_link_bottom_inset(arena, hud)
 	_link_fx(arena, match_root)
+	_link_debug(arena, hud, pause, match_root)
 	match_root.add_child(arena)
 	_swap(match_root, config.match_scene_path)
 
@@ -73,6 +78,21 @@ func _link_fx(arena: Arena, match_root: Node) -> void:
 	director.reduced_effects = false
 	match_root.add_child(director)
 	arena.ready.connect(func() -> void: director.bind(arena), CONNECT_ONE_SHOT)
+
+
+## Debug (docs/debug.md): gravador sempre ligado e overlay (desligado por padrão), no nó da partida e
+## antes da Arena entrar na árvore. A seed sorteada aqui fica no log (reproduzir com Arena.set_seed).
+func _link_debug(arena: Node, hud: Hud, pause: PauseScreen, match_root: Node) -> void:
+	var match_seed := randi()
+	if arena.has_method(&"set_seed"):
+		arena.set_seed(match_seed)
+	_recorder = MatchRecorder.new()
+	_recorder.name = RECORDER_NODE_NAME
+	_recorder.attach(arena, hud, pause, match_seed)
+	match_root.add_child(_recorder)
+	var overlay := DebugOverlay.new()
+	overlay.setup(_recorder, hud)
+	match_root.add_child(overlay)
 
 
 ## Liga a base da Arena à altura da bandeja do HUD (com a safe area), também ao redimensionar.
@@ -100,6 +120,10 @@ func _on_match_ended(result: MatchResult) -> void:
 	last_result = result
 	var screen: ResultScreen = _instantiate(RESULT_SCENE)
 	screen.show_result(result)
+	if _recorder != null and is_instance_valid(_recorder):
+		_recorder.finish(result)
+		last_log = _recorder.log_data
+	screen.set_log(last_log)
 	screen.play_again_requested.connect(func() -> void: start_match(last_config), CONNECT_ONE_SHOT)
 	screen.title_requested.connect(go_to_title, CONNECT_ONE_SHOT)
 	_swap(screen, RESULT_SCENE)

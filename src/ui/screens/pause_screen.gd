@@ -8,9 +8,13 @@ extends CanvasLayer
 signal resumed
 signal restart_requested
 
+const DEBUG_BUTTON_SIZE := Vector2(240, 64)
+
 var enabled := true
 var _root: Control
 var _continue: Button
+## Interruptor "Debug" (overlay de debug, BRF-063; estado em DebugSettings).
+var debug_toggle: Button
 var _js_visibility_cb: JavaScriptObject
 
 
@@ -24,6 +28,12 @@ func _ready() -> void:
 	_continue = ScreenKit.button("Continuar", true, close)
 	col.add_child(_continue)
 	col.add_child(ScreenKit.button("Recomeçar", false, _on_restart))
+	debug_toggle = ScreenKit.button("", false, _on_debug_toggled)
+	debug_toggle.name = "DebugToggle"
+	debug_toggle.custom_minimum_size = DEBUG_BUTTON_SIZE
+	debug_toggle.add_theme_font_size_override("font_size", UiTokens.FONT_CAPTION)
+	col.add_child(debug_toggle)
+	_refresh_debug()
 	_root.visible = false
 	_listen_web_visibility()
 
@@ -47,6 +57,7 @@ func open() -> void:
 		return
 	get_tree().paused = true
 	_root.visible = true
+	_refresh_debug()
 	ScreenKit.fade_in(_root)
 
 
@@ -90,3 +101,12 @@ func _listen_web_visibility() -> void:
 func _on_web_visibility(_args: Array) -> void:
 	if JavaScriptBridge.eval("document.hidden", true):
 		open()
+
+
+func _on_debug_toggled() -> void:
+	DebugSettings.toggle_overlay()
+	_refresh_debug()
+
+
+func _refresh_debug() -> void:
+	debug_toggle.text = "Debug: %s" % ("ligado" if DebugSettings.overlay_enabled() else "desligado")
