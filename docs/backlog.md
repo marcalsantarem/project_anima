@@ -10,7 +10,7 @@
 | T-002 | Instalar GUT e teste smoke headless | M0 | AG03 | feita |
 | T-003 | `docs/ui.md` (tokens, layout, fluxo de telas) | M0 | AG02 | feita |
 | T-004 | Preset Web + HTML shell mínimo | M0 | AG02 | feita |
-| T-005 | Build vazio no Chrome PC e no iPhone | M0 | AG02 | feita (testado no iPhone) |
+| T-005 | Build vazio no Chrome PC e no iPhone | M0 | AG02 | feita |
 | T-006 | Cena de estresse para confirmar metas de desempenho | M0 | AG02 | pronta p/ briefing |
 | T-007 | ADR das metas de desempenho e da exportação single-threaded | M0 | AG07 | a fazer |
 | T-008 | Deploy automático Web (GitHub Actions → Netlify) | M0 | AG02 | feita |
@@ -50,7 +50,7 @@
 | T-134 | Lógica dos upgrades em tempo real (5 atributos) | M1 | AG01 | feita |
 | T-135 | Fileira de 5 botões de upgrade no HUD | M1 | AG02 | feita |
 | T-136 | Slots 2 e 3 do HUD bloqueados (cadeado) | M1 | AG02 | feita |
-| T-137 | Trocar placeholders da partida pela arte final | M1 | AG01 | feita (sem chefe) |
+| T-137 | Trocar placeholders da partida pela arte final | M1 | AG01 | feita |
 | T-138 | Aplicar a arte da UI no HUD e nas telas | M1 | AG02 | feita |
 | T-139 | Meteoro de fogo como skill de área (decisão 37) | M1 | AG01 | feita |
 | T-140 | Moeda da partida vira Partículas: sinais, código e `gameplay.md` | M1 | AG01 | feita |
@@ -148,7 +148,7 @@
 - **Briefing:** BRF-005
 
 ### T-005 — Build vazio no Chrome PC e no iPhone
-- **Marco:** M0 · **Dono:** AG02 · **Status:** em validação
+- **Marco:** M0 · **Dono:** AG02 · **Status:** feita (o dono testou o build no iPhone; o jogo já roda lá desde o protótipo)
 - **Depende de:** T-004, T-008 · **Desbloqueia:** T-007
 - **Situação:** build no ar em dev--projectanimagame.netlify.app e conferido no PC; falta o teste do usuário no iPhone.
 - **Arquivos:** `web/`, `docs/setup.md` (seção de deploy de teste, com autorização)
@@ -543,7 +543,7 @@
 - **Pronto quando:** slots 2 e 3 visíveis com cadeado e sem ação (toque e teclas `2`/`3` ignorados); ícone provisório até a T-128.
 
 ### T-137 — Trocar placeholders da partida pela arte final
-- **Marco:** M1 · **Dono:** AG01 · **Status:** a fazer
+- **Marco:** M1 · **Dono:** AG01 · **Status:** feita (o chefe ogro usa a arte final desde a T-150)
 - **Depende de:** T-127, T-144 · **Desbloqueia:** T-120
 - **Arquivos:** `src/match/` (cenas)
 - **Pronto quando:** Anima, inimigos, chefe, projéteis e fundo usam a arte final; colisões continuam corretas; nenhum placeholder geométrico.
