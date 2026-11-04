@@ -27,14 +27,40 @@ func _assert_sprite_rules(s: Sprite2D) -> void:
 	assert_eq(s.texture_filter, CanvasItem.TEXTURE_FILTER_LINEAR)
 
 
-func test_floor_is_behind_everything_and_centered() -> void:
+## BRF-041: fundo em tela cheia (tile, selo no Anima, degradê, 4 pilares com sombra e Y-sort).
+func test_floor_covers_screen_ring_on_anima_and_pillars_in_corners() -> void:
 	var arena := _arena()
 	await wait_physics_frames(1)
-	var floor_sprite := arena.get_child(0) as Sprite2D
-	assert_not_null(floor_sprite)
-	assert_lt(floor_sprite.z_index, -1) # sombras e decalques: z -1
-	assert_eq(floor_sprite.position, arena.anima.position)
-	assert_eq(floor_sprite.scale, SpriteArt.SCALE)
+	var floor_node := arena.get_node("Floor") as ArenaFloor
+	assert_true(floor_node.y_sort_enabled)
+	var sprites := _sprites(floor_node)
+	assert_eq(sprites.size(), 3 + 4, "tile, degradê, selo e 4 pilares")
+	for s in sprites:
+		_assert_sprite_rules(s)
+		assert_eq(s.texture.get_mipmap_count(), 0, "%s sem mipmaps" % s.texture.resource_path)
+	var tile := sprites[0]
+	assert_lt(tile.z_index, -1) # sombras e decalques: z -1
+	assert_eq(tile.texture_repeat, CanvasItem.TEXTURE_REPEAT_ENABLED)
+	assert_eq(tile.position, Vector2.ZERO)
+	assert_eq(tile.region_rect.size * SpriteArt.SCALE, arena.arena_size(), "tile cobre a tela inteira")
+	var ring := sprites[2]
+	assert_lt(ring.z_index, -1)
+	assert_eq(ring.position, arena.anima.position)
+	var rect := arena.arena_rect()
+	var pillars := floor_node.get_children().filter(func(c: Node) -> bool: return c.get_child_count() == 2)
+	assert_eq(pillars.size(), 4)
+	for p: Node2D in pillars:
+		assert_true(rect.has_point(p.position), "pilar dentro da arena")
+		assert_true(p.get_child(0) is GroundShadow)
+		assert_eq((p.get_child(1) as Sprite2D).z_index, 0, "pilar no Y-sort das entidades")
+
+
+func test_layout_follows_tray_inset() -> void:
+	var arena := _arena()
+	arena.set_bottom_inset(400.0)
+	assert_eq(arena.arena_rect().end.y, arena.arena_size().y - 400.0)
+	assert_eq(arena.anima.position, arena.arena_rect().get_center())
+	assert_eq((arena.get_node("Floor").get_child(2) as Sprite2D).position, arena.anima.position)
 
 
 func test_anima_has_base_crystal_and_orbit_nodes() -> void:

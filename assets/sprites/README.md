@@ -20,4 +20,13 @@ Fonte: `_src/gen_sprites.py` (SVG por código → Chrome headless). Para regener
 | `pickup_particle.png` | 64×64 | 32×32 | (32, 56) chão | Partícula dropada (moeda da partida) |
 | `shadow_ground.png` | 128×64 | 64×32 | (64, 32) centro | Sombra elíptica opcional (`#6B4E8C` a 22%). Escalar para a largura do §5 |
 
-Fundo: `assets/backgrounds/stage_01_floor.png` tem **1440×2560 (2x)**, ocupa a tela inteira (720×1280) e usa âncora no canto superior esquerdo. A arena vai de y = 164 a 987 (`arena_top_inset` / `arena_bottom_inset`), e o círculo rúnico fica centrado em (360, 575,5), o centro da `arena_rect`, onde o Anima nasce. O fundo não tem HUD; a faixa de baixo fica lisa para a bandeja.
+### Fundo em tela cheia (BRF-040)
+
+Peças em `assets/backgrounds/`, em 2x (`scale = 0.5`), sem moldura nem muro: o chão vai até as bordas e funciona em qualquer altura (720 × 1280 a ~1560). Prévias em `assets/backgrounds/_preview/` (com `.gdignore`).
+
+| Arquivo | PNG (2x) | Tela (1x) | Âncora (px do PNG) | Uso |
+|---|---|---|---|---|
+| `floor_tile.png` | 480×480 | 240×240 | (0, 0) canto | Chão creme quadriculado **sem emendas** (4×4 quadrados de 60 px 1x; 720 = 12 colunas exatas). Repetir em X e Y: `TextureRect` com `stretch_mode = TILE` ou `texture_repeat = ENABLED` + `region`. Cobre a tela inteira, `z_index` mais baixo |
+| `floor_ring.png` | 960×720 | 480×360 | (480, 360) centro | Selo rúnico (anéis e losangos), transparente. Centro = posição do Anima |
+| `floor_pillar.png` | 128×208 | 64×104 | (64, 192) chão | Pilar com cristal dourado, sem sombra (o jogo desenha a sombra, ~60×20 px 1x). Nos cantos da área jogável, com Y-sort |
+| `floor_top_shade.png` | 1440×440 | 720×220 | (0, 0) canto | **Opcional**: degradê roxo-escuro (30% → 0) para ler o HUD sobre o topo claro. Acima do chão, abaixo de tudo que é da partida |

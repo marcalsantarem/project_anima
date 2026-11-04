@@ -107,7 +107,7 @@ Pedestal cilíndrico neutro (`vessel`) com aro ciano + **cristal losango ciano f
 | Inimigos / chefe | `assets/sprites/` | `enemy_runner.png`, `boss_warden.png` |
 | Projéteis / moeda | `assets/sprites/` | `projectile_player.png`, `pickup_particle.png` |
 | Ícones / UI | `assets/ui/` | `ui_icon_skill_pulse.png`, `ui_frame_epic.png` |
-| Fundos | `assets/backgrounds/` | `stage_01_floor.png` |
+| Fundos | `assets/backgrounds/` | `floor_tile.png`, `floor_ring.png`, `floor_pillar.png` (tela cheia em peças, BRF-040; ver `assets/sprites/README.md`) |
 | Atlas | `assets/sprites/atlas/` | `atlas_enemies.png` |
 
 ## 8. Checklist de um asset

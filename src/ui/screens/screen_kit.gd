@@ -2,6 +2,7 @@ class_name ScreenKit
 ## Peças comuns das telas (docs/ui.md §8): raiz com tema, cartão com moldura, rótulos, botões e fade.
 
 const THEME := preload("res://src/ui/theme/anima_theme.tres")
+const CARD_WIDTH := 520.0
 
 
 ## Raiz em tela cheia com o tema aplicado (até o tema global, T-121).
@@ -42,9 +43,13 @@ static func card(parent: Control, separation: int = UiTokens.SPACE_M) -> VBoxCon
 	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	parent.add_child(center)
 	var panel := PanelContainer.new()
-	panel.custom_minimum_size.x = 520
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	center.add_child(panel)
+	# 520 px, mas nunca mais largo que a tela menos as margens (telas estreitas).
+	var fit := func() -> void:
+		panel.custom_minimum_size.x = clampf(center.size.x - 2 * UiTokens.MARGIN_SCREEN, 0.0, CARD_WIDTH)
+	center.resized.connect(fit)
+	fit.call()
 	var pad := MarginContainer.new()
 	pad.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	for side in ["left", "right", "top", "bottom"]:

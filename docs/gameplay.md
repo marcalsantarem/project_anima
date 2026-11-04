@@ -23,9 +23,9 @@
 | Parâmetro | Valor |
 |---|---|
 | Resolução base | 720×1280, retrato, stretch `canvas_items` / `expand` |
-| Arena | faixa da tela de y = 164 a 987 (base 720×1280, mockup A); o resto é HUD. Insets `arena_top_inset` / `arena_bottom_inset` na cena; com `expand` a arena cresce junto |
+| Arena (`arena_rect`) | **tela cheia acima da bandeja** (BRF-041): de y = 0 até `altura do viewport − arena_bottom_inset` (282 = `Hud.TRAY_HEIGHT`; quem monta a partida pode passar `Arena.set_bottom_inset(hud.tray_height())`, com safe area). O HUD de cima fica sobreposto ao fundo. Recalculada no `size_changed` do viewport (720 × 1280 a ~1560) |
 | Anima | centro da **arena** (não da tela), câmera fixa |
-| Bordas de spawn | `top`, `bottom`, `left`, `right` (fora da arena, 32 px além da borda) |
+| Bordas de spawn | `top`, `bottom`, `left`, `right`, **fora da tela inteira** (`screen_rect`): `spawn_margin` 32 px + o desenho do inimigo (`Arena.spawn_margin_for`: laterais = meia largura do sprite/anel, base = altura acima da âncora, topo = raio). Nenhum inimigo nasce visível |
 | Lógica | `_physics_process` a 60 Hz; o visual nunca decide a regra |
 
 ### Perspectiva 3/4 (T-144)
@@ -40,7 +40,7 @@
 
 - Sprites de `assets/sprites/` via `SpriteArt` (`src/match/arena/sprite_art.gd`): PNG 2x, `scale` 0,5, `centered = false`, `offset = -âncora`, filtro Linear. Textura e âncora ficam nos dados: `EnemyData.sprite/sprite_anchor`, `ProjectileData.sprite/sprite_anchor`, `AnimaData` (grupo "Arte": base, cristal a `crystal_height` 110 px com bob de 5 px, 3 nós em elipse 29×12 px). Só visual: colisão, `GroundShadow` e `ground_plane` não mudaram.
 - Projétil: sprite a `height` px acima da âncora, `rotation` = direção do tiro na tela. `ProjectileData.shape/color` seguem como identidade de leitura (testes), sem desenho.
-- Fundo: `Arena.floor_texture` (`stage_01_floor.png`), âncora = centro do círculo rúnico (720, 1151 px do PNG), posicionado no centro da `arena_rect` junto com o Anima, `z_index = -10`.
+- Fundo (BRF-041): nó `Floor` (`ArenaFloor`, `src/match/arena/arena_floor.gd`) com as peças de `assets/backgrounds/`: `floor_tile` repetido (Sprite2D com `region` + repeat) cobrindo a tela inteira, `floor_top_shade` no topo e `floor_ring` no Anima (todos `z_index = -10`); 4 `floor_pillar` nos cantos da `arena_rect` (insets `pillar_inset_*`), com `GroundShadow` e Y-sort junto das entidades. Sem moldura. `ArenaFloor.layout()` só reposiciona (sem alocar por frame).
 - Chefe: `EnemyData.ring_sprite/ring_anchor/ring_height/ring_spin_speed` já desenham o anel atrás do corpo; a T-115 só preenche os dados (`boss_warden.png`, âncora (256, 472); anel (256, 128) a 70 px).
 - Fora: `pickup_particle.png` (ainda não há drop no chão) e `shadow_ground.png` (a sombra segue desenhada pelo jogo).
 

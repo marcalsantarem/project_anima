@@ -103,11 +103,9 @@ func set_locked(locked: bool, level := 0) -> void:
 		_flash = 0.0
 		_touch_index = -1
 		mouse_default_cursor_shape = CURSOR_FORBIDDEN
-		tooltip_text = "Bloqueado: libera no nível %d" % level if level > 0 else "Bloqueado"
 	elif state == State.LOCKED:
 		state = State.READY
 		mouse_default_cursor_shape = CURSOR_ARROW
-		tooltip_text = ""
 	_update_accessibility()
 	queue_redraw()
 

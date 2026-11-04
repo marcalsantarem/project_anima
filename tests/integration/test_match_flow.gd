@@ -32,6 +32,8 @@ func test_full_flow_with_real_arena() -> void:
 	assert_eq(match_root.get_children().filter(func(n: Node) -> bool: return n is Hud).size(), 1, "HUD montado")
 	assert_eq(match_root.get_children().filter(func(n: Node) -> bool: return n is PauseScreen).size(), 1, "Pausa montada")
 	assert_eq(arena.config, SceneFlow.last_config, "setup(config) chamado")
+	var hud: Hud = match_root.get_children().filter(func(n: Node) -> bool: return n is Hud)[0]
+	assert_eq(arena.arena_bottom_inset, hud.tray_height(), "base da Arena = bandeja do HUD")
 
 	var waves_total := arena.stage.waves.size()
 	arena.anima.core.take_damage(arena.anima.core.max_hp)

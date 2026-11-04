@@ -165,7 +165,6 @@ func _update_accessibility() -> void:
 		State.POOR:
 			text += ", faltam Partículas (%s)" % UiTokens.format_int(next_cost)
 	accessibility_name = text
-	tooltip_text = text
 
 
 # --- Entrada ---

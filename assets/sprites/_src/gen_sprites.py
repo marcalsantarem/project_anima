@@ -148,19 +148,59 @@ def svg(w, h, inner):
             f'viewBox="0 0 {w} {h}">{inner}</svg>')
 
 
-def background():
-    """Arena do mockup A na escala 0,87 da HUD com upgrades (topo em y=164 = arena_top_inset)."""
-    lines = (BG / "mockup_cartoon_a.svg").read_text(encoding="utf-8").splitlines()
-    head = lines[0]
-    defs = head[head.index("<defs>"):head.index('<clipPath id="c2">')] + "</defs>"  # só o clip do piso
-    arena = []
-    for i, ln in enumerate(lines[1:128], start=2):  # piso, runas, pedrinhas, bordas e pilares
-        if 87 <= i <= 96:  # círculo rúnico centrado no Anima (centro da arena_rect, y = 575,5)
-            ln = f'<g transform="translate(0 -53)">{ln}</g>'
-        arena.append(ln)
-    inner = (defs + '<rect width="720" height="1280" fill="#7C6BC9"/>'
-             '<g transform="translate(360 164) scale(0.87) translate(-360 -164)">' + "\n".join(arena) + "</g>")
-    return svg(720, 1280, inner)
+# --- Fundo em tela cheia (BRF-040): peças separadas para o jogo montar ---
+SQ = 60  # lado do quadrado (1x); 720 / 60 = 12 colunas exatas
+TILE_N = 4  # repetição de 4×4 quadrados = 240×240 (1x)
+
+
+def floor_tile():
+    """Chão quadriculado creme sem emendas: número par de quadrados, sem nada cruzando a borda."""
+    t = SQ * TILE_N
+    out = [f'<rect width="{t}" height="{t}" fill="#F6E9CF"/>']
+    out += [f'<rect x="{c * SQ}" y="{r * SQ}" width="{SQ}" height="{SQ}" fill="#EEDDBD"/>'
+            for r in range(TILE_N) for c in range(TILE_N) if (r + c) % 2]
+    for x, y in ((38, 44), (172, 104), (96, 200)):  # pedrinhas longe da borda
+        out.append(f'<ellipse cx="{x}" cy="{y}" rx="10" ry="5" fill="#E0CCA6"/>')
+    return t, t, "".join(out)
+
+
+RING_W, RING_H = 480, 360  # 1x; centro (240, 180) = posição do Anima
+
+
+def floor_ring():
+    """Selo rúnico do mockup A (escala 0,87), centrado no canvas."""
+    k, cx, cy, c = 0.87, RING_W / 2, RING_H / 2, "#B9A5E8"
+    out = [f'<ellipse cx="{cx}" cy="{cy}" rx="{250 * k}" ry="{188 * k}" fill="none" stroke="{c}" '
+           f'stroke-width="{10 * k}" opacity="0.7"/>',
+           f'<ellipse cx="{cx}" cy="{cy}" rx="{226 * k}" ry="{170 * k}" fill="none" stroke="{c}" '
+           f'stroke-width="{3 * k}" opacity="0.7"/>']
+    for dx, dy in ((220, 69), (91, 165), (-91, 165), (-220, 69), (-220, -69), (-91, -165), (91, -165), (220, -69)):
+        out.append(f'<path d="M{cx + dx * k} {cy + dy * k - 10 * k} l{8 * k} {10 * k} l{-8 * k} {10 * k} '
+                   f'l{-8 * k} {-10 * k} Z" fill="{c}"/>')
+    return RING_W, RING_H, "".join(out)
+
+
+PILLAR = ('<path d="M58 260 L58 296 Q80 308 102 296 L102 260 Z" fill="#B7A8EA" stroke="#4E3F8F" stroke-width="3.5"/>'
+          '<ellipse cx="80" cy="260" rx="22" ry="8" fill="#DCD3FA" stroke="#4E3F8F" stroke-width="3.5"/>'
+          '<path d="M80 214 L92 244 L80 258 L68 244 Z" fill="#FFB84D" stroke="#8A4F12" stroke-width="3" '
+          'stroke-linejoin="round"/><path d="M80 214 L68 244 L77 244 Z" fill="#FFF3D1"/>')
+
+
+def floor_top_shade():
+    """Escurecimento opcional atrás do HUD: roxo-escuro a 30% no topo, some até a base."""
+    return 720, 220, ('<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1">'
+                      '<stop offset="0" stop-color="#3A2A55" stop-opacity="0.30"/>'
+                      '<stop offset="0.6" stop-color="#3A2A55" stop-opacity="0.10"/>'
+                      '<stop offset="1" stop-color="#3A2A55" stop-opacity="0"/></linearGradient></defs>'
+                      '<rect width="720" height="220" fill="url(#g)"/>')
+
+
+FLOOR_PARTS = {
+    "floor_tile": floor_tile(),
+    "floor_ring": floor_ring(),
+    "floor_pillar": (64, 104, place(PILLAR, 32, 96, 80, 302)),  # âncora no chão, sem sombra
+    "floor_top_shade": floor_top_shade(),
+}
 
 
 def render(svg_path, png_path, w, h):
@@ -171,7 +211,7 @@ def render(svg_path, png_path, w, h):
 
 if __name__ == "__main__":
     jobs = [(n, w, h, svg(w, h, c), SPR) for n, (w, h, c) in SPRITES.items()]
-    jobs.append(("stage_01_floor", 720, 1280, background(), BG))
+    jobs += [(n, w, h, svg(w, h, c), BG) for n, (w, h, c) in FLOOR_PARTS.items()]
     for name, w, h, text, outdir in jobs:
         sp = HERE / f"{name}.svg"
         sp.write_text(text, encoding="utf-8")

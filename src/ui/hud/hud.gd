@@ -14,6 +14,13 @@ const SKILL_ICONS := [SkillButton.Icon.CIRCLE, SkillButton.Icon.DIAMOND, SkillBu
 const PARTICLES_ICON_SIZE := 36
 const CORE_ICON_SIZE := Vector2(36, 44)
 const UPGRADE_BAND_PAD := 10
+## Altura da bandeja inferior (upgrades + skills) sem safe area, em px da resolução base (docs/ui.md §4.4).
+const TRAY_HEIGHT := 282
+## Altura do HUD de cima (pausa/ONDA/Partículas + barra do Núcleo) sem safe area e sem a barra do chefe.
+## O fundo da arena passa por trás do topo; o gameplay usa isto para não pôr alvos sob o HUD (docs/ui.md §4.4).
+const TOP_INSET := 164
+## Degradê escuro atrás do topo, só para leitura sobre o fundo da arena (alfa no alto da tela).
+const TOP_SCRIM_ALPHA := 0.35
 ## Padrão do M1 (decisão 25): slot 1 liberado; 2 e 3 bloqueados até os níveis 7 e 12.
 const M1_UNLOCK_LEVELS: Array[int] = [0, 7, 12]
 
@@ -24,6 +31,7 @@ const M1_UNLOCK_LEVELS: Array[int] = [0, 7, 12]
 var _arena: Node
 var _root: Control
 var _top: MarginContainer
+var _top_scrim: TextureRect
 var _tray: PanelContainer
 var _upgrade_margin: MarginContainer
 var _skills_margin: MarginContainer
@@ -79,8 +87,31 @@ func _build() -> void:
 	_root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_root)
+	_build_top_scrim()
 	_build_top()
 	_build_tray()
+
+
+## Topo sem faixa de fundo (BRF-039): só um degradê escuro suave, que some até a altura do HUD de cima.
+func _build_top_scrim() -> void:
+	var grad := Gradient.new()
+	grad.set_color(0, Color(UiTokens.INK, TOP_SCRIM_ALPHA))
+	grad.set_color(1, Color(UiTokens.INK, 0.0))
+	var tex := GradientTexture2D.new()
+	tex.gradient = grad
+	tex.fill_from = Vector2(0, 0)
+	tex.fill_to = Vector2(0, 1)
+	tex.width = 4
+	tex.height = 64
+	_top_scrim = TextureRect.new()
+	_top_scrim.name = "TopScrim"
+	_top_scrim.texture = tex
+	_top_scrim.stretch_mode = TextureRect.STRETCH_SCALE
+	_top_scrim.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_top_scrim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_top_scrim.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	_top_scrim.offset_bottom = TOP_INSET
+	_root.add_child(_top_scrim)
 
 
 func _build_top() -> void:
@@ -124,7 +155,7 @@ func _build_top() -> void:
 	row1.add_child(right)
 	var particles_pill := _panel(&"PanelPillLight")
 	particles_pill.name = "ParticlesPill"
-	particles_pill.tooltip_text = "Partículas"
+	particles_pill.accessibility_name = "Partículas"
 	particles_pill.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	right.add_child(particles_pill)
 	var particles_row := _hbox(UiTokens.SPACE_XS)
@@ -316,6 +347,17 @@ func apply_safe_area() -> void:
 	_upgrade_margin.add_theme_constant_override("margin_bottom", UPGRADE_BAND_PAD)
 	_skills_margin.add_theme_constant_override("margin_top", m)
 	_skills_margin.add_theme_constant_override("margin_bottom", UiTokens.SPACE_XS + int(s.bottom))
+	_top_scrim.offset_bottom = top_inset()
+
+
+## Altura ocupada pelo HUD de cima, com a safe area (px da resolução base). Sem a barra do chefe.
+func top_inset() -> float:
+	return TOP_INSET + safe_insets().top
+
+
+## Altura ocupada pela bandeja inferior, com a safe area (px da resolução base).
+func tray_height() -> float:
+	return TRAY_HEIGHT + safe_insets().bottom
 
 
 # --- Sinais da Arena ---

@@ -22,24 +22,20 @@ const UPGRADE_IDS: Array[StringName] = [
 	&"upgrade_atk_power", &"upgrade_atk_spd", &"upgrade_defense", &"upgrade_max_hp", &"upgrade_cooldown",
 ]
 
-const FLOOR_Z_INDEX := -10 ## fundo atrás de tudo (sombras e decalques usam z -1)
 const ENEMY_SCENE := preload("res://src/match/enemies/enemy.tscn")
 const BOSS_SCENE := preload("res://src/match/enemies/boss/boss.tscn")
 
-@export var spawn_margin: float = 32.0 ## px além da borda da arena
-## Faixa da tela ocupada pela arena (mockup A, base 720×1280: y de 164 a 987). O resto é HUD
-## (fileira de upgrades em cima, bandeja de skills embaixo). Com stretch expand, a arena
-## acompanha a largura e a altura extras da tela.
-@export var arena_top_inset: float = 164.0 ## px do topo da tela
-@export var arena_bottom_inset: float = 293.0 ## px da base da tela
+## Folga além da borda da TELA no spawn, somada ao tamanho do desenho do inimigo
+## (spawn_margin_for: nenhum inimigo nasce visível).
+@export var spawn_margin: float = 32.0
+## Arena = do topo da tela até o início da bandeja inferior do HUD (o HUD de cima fica
+## sobreposto ao fundo). Altura da bandeja, sem safe area = Hud.TRAY_HEIGHT (docs/ui.md §4.4);
+## o match não conhece a UI: quem monta a partida pode chamar set_bottom_inset(hud.tray_height()).
+@export var arena_bottom_inset: float = 282.0
 ## Desligável para testes e debug (spawn só manual).
 @export var waves_enabled := true
 @export var enemy_projectile_pool_size: int = 128
 @export var enemy_projectile: ProjectileData ## tipo padrão do pool inimigo
-## Fundo da fase (PNG 2x, já com os pilares). Âncora = centro do círculo rúnico, em px do PNG;
-## fica no centro da arena_rect, junto com o Anima.
-@export var floor_texture: Texture2D
-@export var floor_anchor: Vector2 = Vector2(720.0, 1151.0)
 
 var config: MatchConfig
 ## Se nulo no _ready, é carregada de data/waves/<config.stage_id>.tres.
@@ -55,13 +51,13 @@ var upgrades: MatchUpgrades
 var active_enemies: Array[Enemy] = []
 
 var _rng := RandomNumberGenerator.new()
-var _floor: Sprite2D
 
 @onready var anima: Anima = $Anima
 @onready var projectiles: ProjectilePool = $Projectiles
 @onready var enemy_projectiles: ProjectilePool = $EnemyProjectiles
 @onready var skills: SkillController = $Skills
 @onready var _enemies: Node2D = $Enemies
+@onready var _floor: ArenaFloor = $Floor
 
 
 ## Contrato do SceneFlow: chamado antes de entrar na árvore.
@@ -90,12 +86,8 @@ func _ready() -> void:
 	skills.skill_used.connect(func(slot: int) -> void: skill_used.emit(slot))
 	skills.cooldown_changed.connect(func(slot: int, r: float, t: float) -> void: cooldown_changed.emit(slot, r, t))
 	skills.skill_ready.connect(func(slot: int) -> void: skill_ready.emit(slot))
-	_floor = SpriteArt.make(floor_texture, floor_anchor)
-	_floor.z_index = FLOOR_Z_INDEX
-	add_child(_floor)
-	move_child(_floor, 0)
-	get_viewport().size_changed.connect(_center_anima)
-	_center_anima()
+	get_viewport().size_changed.connect(_layout)
+	_layout()
 
 	core_hp_changed.emit(anima.core.current, anima.core.max_hp)
 	_emit_particles()
@@ -137,7 +129,8 @@ func spawn(enemy_data: EnemyData, edge: WaveEntry.SpawnEdge) -> Enemy:
 	if edge == WaveEntry.SpawnEdge.RANDOM:
 		edge = _rng.randi_range(WaveEntry.SpawnEdge.TOP, WaveEntry.SpawnEdge.RIGHT) as WaveEntry.SpawnEdge
 	var enemy: Enemy = (BOSS_SCENE if enemy_data is BossData else ENEMY_SCENE).instantiate()
-	enemy.setup(enemy_data, edge_point(edge, arena_rect(), spawn_margin, _rng.randf()), anima.position)
+	var margin := spawn_margin_for(enemy_data, spawn_margin, edge)
+	enemy.setup(enemy_data, edge_point(edge, screen_rect(), margin, _rng.randf()), anima.position)
 	enemy.projectile_pool = enemy_projectiles
 	enemy.died.connect(_on_enemy_died)
 	_enemies.add_child(enemy)
@@ -176,13 +169,45 @@ func arena_size() -> Vector2:
 	return get_viewport_rect().size
 
 
-## Área jogável na tela (sem as faixas do HUD).
+## Tela inteira: o spawn é por fora das bordas dela.
+func screen_rect() -> Rect2:
+	return Rect2(Vector2.ZERO, arena_size())
+
+
+## Área jogável: do topo da tela até o início da bandeja inferior. O Anima fica no centro.
 func arena_rect() -> Rect2:
-	return rect_for(arena_size(), arena_top_inset, arena_bottom_inset)
+	return rect_for(arena_size(), arena_bottom_inset)
 
 
-static func rect_for(screen: Vector2, top_inset: float, bottom_inset: float) -> Rect2:
-	return Rect2(0.0, top_inset, screen.x, maxf(screen.y - top_inset - bottom_inset, 0.0))
+## Altura da bandeja inferior (px da resolução base, com safe area). Recalcula o layout.
+func set_bottom_inset(px: float) -> void:
+	arena_bottom_inset = px
+	if is_node_ready():
+		_layout()
+
+
+static func rect_for(screen: Vector2, bottom_inset: float) -> Rect2:
+	return Rect2(0.0, 0.0, screen.x, maxf(screen.y - bottom_inset, 0.0))
+
+
+## Folga do spawn além da borda da tela para o desenho inteiro do inimigo ficar fora dela:
+## laterais = meia largura do maior desenho (corpo ou anel); base = altura acima da âncora;
+## topo = raio (a sombra fica abaixo da âncora). px 1x.
+static func spawn_margin_for(enemy_data: EnemyData, base: float, edge: WaveEntry.SpawnEdge) -> float:
+	var half_w := 0.0
+	var up := 0.0
+	if enemy_data.sprite != null:
+		half_w = enemy_data.sprite.get_width() * SpriteArt.SCALE.x * 0.5
+		up = enemy_data.sprite_anchor.y * SpriteArt.SCALE.y
+	if enemy_data.ring_sprite != null:
+		half_w = maxf(half_w, enemy_data.ring_sprite.get_width() * SpriteArt.SCALE.x * 0.5)
+	match edge:
+		WaveEntry.SpawnEdge.LEFT, WaveEntry.SpawnEdge.RIGHT:
+			return base + half_w
+		WaveEntry.SpawnEdge.BOTTOM:
+			return base + up
+		_:
+			return base + enemy_data.radius
 
 
 ## Ponto fora da arena na borda indicada (não RANDOM). t (0..1) percorre a borda.
@@ -232,9 +257,10 @@ func _end(outcome: MatchResult.Outcome) -> void:
 	match_ended.emit(result)
 
 
-func _center_anima() -> void:
-	anima.position = arena_rect().get_center()
-	_floor.position = anima.position
+func _layout() -> void:
+	var rect := arena_rect()
+	anima.position = rect.get_center()
+	_floor.layout(arena_size(), rect, anima.position)
 
 func _emit_upgrade(id: StringName) -> void:
 	upgrade_changed.emit(id, upgrades.level(id), upgrades.max_level(id), upgrades.next_cost(id))

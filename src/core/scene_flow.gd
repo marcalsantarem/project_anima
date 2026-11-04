@@ -51,8 +51,22 @@ func start_match(config: MatchConfig = null) -> void:
 	pause.bind(arena)
 	pause.restart_requested.connect(func() -> void: start_match(config), CONNECT_ONE_SHOT)
 	arena.match_ended.connect(_on_match_ended, CONNECT_ONE_SHOT)
+	_link_bottom_inset(arena, hud)
 	match_root.add_child(arena)
 	_swap(match_root, config.match_scene_path)
+
+
+## Liga a base da Arena à altura da bandeja do HUD (com a safe area), também ao redimensionar.
+## O match não conhece a UI: a ligação fica aqui. O HUD entra na árvore antes da Arena.
+func _link_bottom_inset(arena: Arena, hud: Hud) -> void:
+	var sync := func() -> void: arena.set_bottom_inset(hud.tray_height())
+	hud.ready.connect(func() -> void:
+		sync.call()
+		hud.get_viewport().size_changed.connect(sync), CONNECT_ONE_SHOT)
+	hud.tree_exiting.connect(func() -> void:
+		var vp := hud.get_viewport()
+		if vp != null and vp.size_changed.is_connected(sync):
+			vp.size_changed.disconnect(sync), CONNECT_ONE_SHOT)
 
 
 ## Arena da partida em andamento, ou `null` fora da partida.

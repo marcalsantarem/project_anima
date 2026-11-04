@@ -116,6 +116,8 @@ y=1280 └───────────────────────�
 | HP do Núcleo | linha 2, largura total | altura 40 px, cristal `accent` à esquerda | texto "NÚCLEO atual / máx", cor por faixa, flash `danger` e barra fantasma |
 | Barra do chefe | linha 3, largura total | altura 28 px | aparece em `boss_spawned`; cor `boss_hp`, nome do chefe em cima |
 
+- **Sem faixa de fundo (BRF-039):** o fundo da arena passa por trás do topo; os elementos ficam sobrepostos a ele. Para leitura, um degradê `ink` (alfa 0,35 → 0) cobre só a altura do topo (`Hud/Root/TopScrim`). Pílulas e barra mantêm o contorno.
+
 ### 4.2 Zona de combate
 
 - Vai do fim do HUD do topo ao início da bandeja. **Nenhuma UI fixa entra aqui.**
@@ -130,6 +132,16 @@ y=1280 └───────────────────────�
 - Slots 2 e 3 bloqueados com cadeado e "NV 7"/"NV 12" (T-136). Os níveis vêm de `Hud.slot_unlock_levels` (padrão do M1 `[0, 7, 12]`, 0 = liberado); no M2 o meta-jogo passa a lista com `set_slot_unlock_levels()` conforme o nível da conta.
 - **Área de toque = o círculo inteiro.** Toques entre os botões não fazem nada.
 
+### 4.4 Alturas para o gameplay (BRF-039)
+
+| API | Valor (base 720 px de largura) | Uso |
+|---|---|---|
+| `Hud.TOP_INSET` | 164 px | altura do topo (margem 16 + linha 1 88 + gap 16 + barra 44), sem safe area e sem a barra do chefe |
+| `Hud.TRAY_HEIGHT` | 282 px | altura da bandeja (upgrades + skills), sem safe area. Medida; a arena usava ~293 |
+| `hud.top_inset()` / `hud.tray_height()` | constante + safe area | valores reais em tempo de execução, em px da resolução base |
+
+Teste: `tests/unit/ui/test_hud_layout.gd` confere as constantes contra o layout.
+
 ## 5. Componentes
 
 ### 5.1 `SkillButton`
@@ -142,7 +154,7 @@ y=1280 └───────────────────────�
 | `locked` | fundo `locked`, sem anel nem halo, cadeado branco com contorno `ink` e "NV x" (`font_hud`) abaixo; badge mantido. `set_locked(true, nivel)` |
 | `pressed` | escala 0,92 por 100 ms; volta em 100 ms |
 
-- **Bloqueado (T-136):** não responde a toque nem clique (o evento é consumido, não vaza para a arena) e engole a action `skill_<slot>` no `_input`, antes do `SkillController`. Ignora `skill_used`, `cooldown_changed`, `skill_ready` e `set_disabled`. Cursor "proibido", tooltip e `accessibility_name` com o nível. `set_locked(false)` volta a `ready`.
+- **Bloqueado (T-136):** não responde a toque nem clique (o evento é consumido, não vaza para a arena) e engole a action `skill_<slot>` no `_input`, antes do `SkillController`. Ignora `skill_used`, `cooldown_changed`, `skill_ready` e `set_disabled`. Cursor "proibido" e `accessibility_name` com o nível. `set_locked(false)` volta a `ready`.
 - **Uso confirmado** (`skill_used`): flash curto `accent` no anel, e o botão entra em `cooldown`.
 - **Toque em recarga:** sem `skill_used`, o botão só treme de leve (100 ms), para mostrar que a skill está indisponível.
 - **Cooldown com no máximo ~10 sinais/s:** o setor radial é interpolado localmente entre um sinal e outro, porque é só visual. O valor de verdade é sempre o último `remaining` recebido. Os segundos são arredondados para cima.
@@ -169,8 +181,10 @@ y=1280 └───────────────────────�
 - Estados: **comprável** (fundo azul, anel `accent`), **sem Partículas** (fundo `locked`-claro, ícone apagado, custo rosado), **MAX** (moldura dourada, pílula dourada "MAX"), **desabilitado** (antes do 1º `upgrade_changed` e após `match_ended`).
 - Toque/clique/`ui_accept` emitem `buy_requested(id)` **só se comprável**; nos outros estados o botão treme. Compra = afunda (≤ 150 ms) + "+1" dourado que sobe e some (2 × `ANIM_UI`) quando o nível sobe.
 - Teclado: `focus_mode = ALL` (Tab/setas) com anel `accent` por fora; `Enter` compra. **`Espaço` nunca compra** (é `skill_4`): o botão ignora eventos que casam com `skill_*`/`pause`. Clique/toque soltam o foco, para o anel só aparecer pelo teclado.
-- Nomes (tooltip e `accessibility_name`): Atk power, Atk spd, Defesa, Vida máxima, Cooldown. Ícones provisórios desenhados à mão (espada, dupla seta, hexágono, coração, ampulheta); a arte da T-128 entra por `icon_texture`.
+- Nomes (`accessibility_name`): Atk power, Atk spd, Defesa, Vida máxima, Cooldown. Ícones provisórios desenhados à mão (espada, dupla seta, hexágono, coração, ampulheta); a arte da T-128 entra por `icon_texture`.
 - Desenho só quando o estado muda (sem `_process`, StyleBoxes em cache).
+
+**Sem tooltips (BRF-039):** nenhum controle do HUD ou das telas usa `tooltip_text`; no toque o Godot exibia o tooltip sobre os botões. A descrição fica só em `accessibility_name`.
 
 ## 6. Ligação com o gameplay (contrato em [docs/gameplay.md](gameplay.md))
 

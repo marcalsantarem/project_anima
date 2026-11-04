@@ -28,6 +28,8 @@ func _ready() -> void:
 	particles_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	particles_row.add_child(StarIcon.new(32))
 	_particles_label = ScreenKit.label("", &"LabelHud")
+	# Dentro de HBox, autowrap dá largura mínima 0 e quebra letra por letra (BRF-039): sem quebra aqui.
+	_particles_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	particles_row.add_child(_particles_label)
 	col.add_child(particles_row)
 	_stats_tail = ScreenKit.label("", &"LabelHud")
