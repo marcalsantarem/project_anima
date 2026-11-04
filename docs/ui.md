@@ -127,7 +127,7 @@ y=1280 └───────────────────────�
 - Painel `bg_panel_alt` de largura total com contorno superior `ink`; vai até a borda inferior (a safe area entra como margem interna).
 - **Fileira de upgrades** (`Hud.upgrade_row`, decisão 35): faixa `tray_band` com 80 px úteis (padding 10), 5 botões de 128×80 com gap 12 e margem 16. **O contêiner fica vazio até a T-135.**
 - **3 slots de skill de Ø 144 px**, gap 66, centros em x = 150 / 360 / 570, cy ≈ 1194 sem safe area.
-- Slots 2 e 3 bloqueados com cadeado e "NV 7"/"NV 12": **T-136**.
+- Slots 2 e 3 bloqueados com cadeado e "NV 7"/"NV 12" (T-136). Os níveis vêm de `Hud.slot_unlock_levels` (padrão do M1 `[0, 7, 12]`, 0 = liberado); no M2 o meta-jogo passa a lista com `set_slot_unlock_levels()` conforme o nível da conta.
 - **Área de toque = o círculo inteiro.** Toques entre os botões não fazem nada.
 
 ## 5. Componentes
@@ -139,8 +139,10 @@ y=1280 └───────────────────────�
 | `ready` | círculo `skill_fill` com contorno e sombra de base `ink`, anel `accent` grosso, halo pulsando (1 vez a cada 1,5 s) |
 | `cooldown` | véu `cooldown_dim` com setor radial regressivo, segundos em `font_title` com contorno (inteiros; 1 decimal abaixo de 1 s), anel fino escuro |
 | `disabled` | fundo `locked`, ícone `text_secondary`, sem anel (ex.: fim da partida) |
+| `locked` | fundo `locked`, sem anel nem halo, cadeado branco com contorno `ink` e "NV x" (`font_hud`) abaixo; badge mantido. `set_locked(true, nivel)` |
 | `pressed` | escala 0,92 por 100 ms; volta em 100 ms |
 
+- **Bloqueado (T-136):** não responde a toque nem clique (o evento é consumido, não vaza para a arena) e engole a action `skill_<slot>` no `_input`, antes do `SkillController`. Ignora `skill_used`, `cooldown_changed`, `skill_ready` e `set_disabled`. Cursor "proibido", tooltip e `accessibility_name` com o nível. `set_locked(false)` volta a `ready`.
 - **Uso confirmado** (`skill_used`): flash curto `accent` no anel, e o botão entra em `cooldown`.
 - **Toque em recarga:** sem `skill_used`, o botão só treme de leve (100 ms), para mostrar que a skill está indisponível.
 - **Cooldown com no máximo ~10 sinais/s:** o setor radial é interpolado localmente entre um sinal e outro, porque é só visual. O valor de verdade é sempre o último `remaining` recebido. Os segundos são arredondados para cima.
@@ -234,7 +236,7 @@ Boot/Loading (HTML shell) → Toque para começar → Partida ⇄ Pausa → Resu
 - **Ligação:** `hud.bind(arena)` **antes** de a arena entrar na árvore, porque os valores iniciais saem no `_ready` dela. O HUD só escuta sinais; os `boss_*` são ligados se existirem.
 - **Skills:** o toque chama `Arena.use_skill(slot)` (com `SkillButton.inject_action = false`). Se a arena recusar, o botão treme. O teclado vai direto pelo Input Map ao `SkillController`.
 - **Pausa:** o botão emite `pause_requested` **e** injeta a action `pause`. A tela de pausa (T-113) deve ouvir **um** dos dois, não os dois.
-- **Fim da partida:** `match_ended` desativa as skills e o botão de pausa.
+- **Fim da partida:** `match_ended` desativa as skills liberadas (as bloqueadas mantêm o cadeado) e o botão de pausa.
 - **Safe area:** `apply_safe_area()` roda no `_ready` e a cada `size_changed`. Na web lê `animaGetSafeArea()`; no mobile nativo usa `DisplayServer.get_display_safe_area()`; no desktop, 0 + `margin_screen`.
 - **Teste:** `src/ui/demo/hud_demo.tscn` (Arena + HUD).
 

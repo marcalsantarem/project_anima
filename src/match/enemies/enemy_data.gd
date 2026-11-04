@@ -10,7 +10,7 @@ extends Resource
 @export var fire_rate: float = 0.0 ## tiros/s
 @export var projectile: ProjectileData ## só para quem atira
 @export var target_priority: int = 0
-@export var coin_drop: int = 0
+@export var particle_drop: int = 0 ## Partículas ao ser abatido
 @export var radius: float = 16.0 ## px
 @export var group_min: int = 1 ## inimigos por spawn (enxame)
 @export var group_max: int = 1

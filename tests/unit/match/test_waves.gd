@@ -79,7 +79,7 @@ func _run_arena(stage: StageData, attack: bool) -> Arena:
 	return arena
 
 
-func test_victory_after_last_wave_with_coins() -> void:
+func test_victory_after_last_wave_with_particles() -> void:
 	var arena := _run_arena(_stage([2, 2], 0.5), true)
 	await wait_for_signal(arena.match_ended, 30.0)
 	assert_signal_emit_count(arena, "match_ended", 1)
@@ -88,8 +88,8 @@ func test_victory_after_last_wave_with_coins() -> void:
 	assert_eq(result.wave_reached, 2)
 	assert_eq(result.waves_total, 2)
 	assert_eq(result.enemies_killed, 4)
-	assert_eq(result.coins, 4 * RUNNER.coin_drop)
-	assert_signal_emitted_with_parameters(arena, "coins_changed", [result.coins])
+	assert_eq(result.coins, 4 * RUNNER.particle_drop)
+	assert_signal_emitted_with_parameters(arena, "particles_changed", [result.coins])
 	assert_gt(result.duration_s, 0.0)
 
 

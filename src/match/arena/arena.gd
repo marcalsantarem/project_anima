@@ -6,6 +6,8 @@ extends Node2D
 
 signal core_hp_changed(current: int, max_hp: int)
 signal wave_changed(current: int, total: int)
+signal particles_changed(total: int)
+## [Temporário, até a T-141] Alias de particles_changed para o HUD atual (src/ui/hud/hud.gd).
 signal coins_changed(amount: int)
 signal match_ended(result: MatchResult)
 signal skill_used(slot: int)
@@ -30,7 +32,7 @@ var config: MatchConfig
 var stage: StageData
 var waves: WaveRunner
 var is_over := false
-var coins := 0
+var particles := 0 ## moeda da partida: começa em 0 e zera a cada partida
 var enemies_killed := 0
 var elapsed := 0.0
 ## Inimigos vivos; compartilhado com a mira do Anima.
@@ -73,7 +75,7 @@ func _ready() -> void:
 	_center_anima()
 
 	core_hp_changed.emit(anima.core.current, anima.core.max_hp)
-	coins_changed.emit(coins)
+	_emit_particles()
 	if waves_enabled:
 		waves.start()
 
@@ -147,8 +149,8 @@ func _on_enemy_died(enemy: Enemy, cause: Enemy.DeathCause) -> void:
 	active_enemies.erase(enemy)
 	if cause == Enemy.DeathCause.KILLED and not is_over:
 		enemies_killed += 1
-		coins += enemy.data.coin_drop
-		coins_changed.emit(coins)
+		particles += enemy.data.particle_drop
+		_emit_particles()
 
 
 func _end(outcome: MatchResult.Outcome) -> void:
@@ -164,7 +166,7 @@ func _end(outcome: MatchResult.Outcome) -> void:
 	result.outcome = outcome
 	result.wave_reached = waves.current_wave()
 	result.waves_total = waves.total_waves()
-	result.coins = coins
+	result.coins = particles # MatchResult.coins mantido (src/core, usado pela UI)
 	result.enemies_killed = enemies_killed
 	result.duration_s = elapsed
 	match_ended.emit(result)
@@ -172,3 +174,7 @@ func _end(outcome: MatchResult.Outcome) -> void:
 
 func _center_anima() -> void:
 	anima.position = arena_rect().get_center()
+
+func _emit_particles() -> void:
+	particles_changed.emit(particles)
+	coins_changed.emit(particles) # alias temporário (T-141)

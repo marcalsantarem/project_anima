@@ -14,6 +14,12 @@ const SKILL_ICONS := [SkillButton.Icon.CIRCLE, SkillButton.Icon.DIAMOND, SkillBu
 const COIN_SIZE := 36
 const CORE_ICON_SIZE := Vector2(36, 44)
 const UPGRADE_BAND_PAD := 10
+## Padrão do M1 (decisão 25): slot 1 liberado; 2 e 3 bloqueados até os níveis 7 e 12.
+const M1_UNLOCK_LEVELS: Array[int] = [0, 7, 12]
+
+## Nível de desbloqueio por slot (índice 0 = slot 1). 0 = liberado; > 0 = bloqueado com "NV x".
+## No M2 o meta-jogo passa a lista conforme o nível da conta (set_slot_unlock_levels).
+@export var slot_unlock_levels: Array[int] = M1_UNLOCK_LEVELS.duplicate()
 
 var _arena: Node
 var _root: Control
@@ -197,6 +203,19 @@ func _build_tray() -> void:
 		sb.activated.connect(_on_skill_pressed)
 		skills_row.add_child(sb)
 		_skills.append(sb)
+	_apply_slot_locks()
+
+
+## Troca os níveis de desbloqueio em tempo de execução (ver slot_unlock_levels).
+func set_slot_unlock_levels(levels: Array[int]) -> void:
+	slot_unlock_levels = levels.duplicate()
+	_apply_slot_locks()
+
+
+func _apply_slot_locks() -> void:
+	for i in _skills.size():
+		var level := slot_unlock_levels[i] if i < slot_unlock_levels.size() else 0
+		_skills[i].set_locked(level > 0, level)
 
 
 func _margin_box() -> MarginContainer:
@@ -366,6 +385,9 @@ func _on_match_ended(_result) -> void:
 # --- Entrada ---
 
 func _on_skill_pressed(slot: int) -> void:
+	var sb := _skill(slot)
+	if sb and sb.is_locked():
+		return
 	if _arena == null or not _arena.has_method(&"use_skill"):
 		return
 	if not _arena.use_skill(slot):

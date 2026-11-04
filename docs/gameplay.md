@@ -82,9 +82,9 @@ O comportamento fica em um script por `type` (`SkillBehavior` → `AreaSkill`, .
 
 ## Inimigos
 
-Arquivo de dados: `data/enemies/enemy_<id>.tres` (`EnemyData`). Campos: `id, hp, speed, contact_damage, attack_range, fire_rate, projectile (ProjectileData), target_priority, coin_drop, radius, group_min, group_max, group_spread, color`.
+Arquivo de dados: `data/enemies/enemy_<id>.tres` (`EnemyData`). Campos: `id, hp, speed, contact_damage, attack_range, fire_rate, projectile (ProjectileData), target_priority, particle_drop, radius, group_min, group_max, group_spread, color`.
 
-| Arquétipo | `id` | HP | Velocidade | Ataque | Moedas |
+| Arquétipo | `id` | HP | Velocidade | Ataque | Partículas |
 |---|---|---|---|---|---|
 | Corredor | `enemy_runner` | 20 | 140 px/s | contato, 5 de dano | 1 |
 | Tanque | `enemy_tank` | 120 | 50 px/s | contato, 20 de dano | 4 |
@@ -92,7 +92,7 @@ Arquivo de dados: `data/enemies/enemy_<id>.tres` (`EnemyData`). Campos: `id, hp,
 | Enxame | `enemy_swarm` | 8 | 120 px/s | contato, 2 de dano; nasce em grupos de 5–8, espalhados em 48 px | 1 cada |
 
 - **Estados:** `SPAWN → AVANÇA → ATACA → MORRE`, mais `CONGELADO` e `LENTO` (das skills de controle).
-- **Contato:** ao tocar a hurtbox do Anima, o inimigo causa `contact_damage` e morre (sem moedas).
+- **Contato:** ao tocar a hurtbox do Anima, o inimigo causa `contact_damage` e morre (sem Partículas).
 - **Justiça:** projéteis inimigos com cor e forma distintas das do jogador (ex.: losango quente × círculo frio) e mais lentos que os do jogador.
 - **Atirador:** um só script (`Enemy`); com `attack_range > 0` ele para no alcance (estado `ATTACK`) e atira com o pool `EnemyProjectiles` da arena (128, layer `enemy_projectiles`). Quem reage ao acerto é o Anima (mask), que consome o projétil.
 - **Grupo:** cada spawn de onda cria `group_min..group_max` inimigos (`Arena.spawn_group`). Só o enxame usa grupo > 1.
@@ -110,7 +110,7 @@ Arquivo de dados: `data/enemies/boss_<id>.tres` (`BossData`). Um chefe no M1: `b
 | Fases | 100–60%, 60–25%, 25–0% (cada fase muda o peso dos padrões e a cadência) |
 | Padrões | leque de projéteis, anel de projéteis, invocar enxame (com pesos por fase) |
 | Aviso | ≥ 0,8 s de telegraph antes de cada padrão forte |
-| Moedas | 50 |
+| Partículas | 50 |
 
 As ondas normais param enquanto o chefe está vivo. Ao derrotá-lo: vitória.
 
@@ -148,13 +148,13 @@ Alvo de duração: ~5–7 min.
 
 - **Raiz:** `Arena` (`src/match/arena/arena.tscn`). `setup(config)` antes de entrar na árvore; sem config, usa `MatchConfig.new()`.
 - **Entrada:** `MatchConfig` (`src/core/`, do AG07). Hoje só `stage_id` é lido; `anima_data` e `skills` entram depois (AG04).
-- **Saída:** `MatchResult` (`src/core/`; `outcome: VICTORY|DEFEAT`, `wave_reached`, `waves_total`, `coins`, `enemies_killed`, `duration_s`).
+- **Saída:** `MatchResult` (`src/core/`; `outcome: VICTORY|DEFEAT`, `wave_reached`, `waves_total`, `coins` (= Partículas; nome mantido em `src/core/` até decisão do AG00), `enemies_killed`, `duration_s`).
 - `src/match/` não conhece `meta/`, `backend/` nem nós de UI.
 - **Pausa:** a UI pausa via `get_tree().paused`; a partida respeita o process mode e não decide a pausa.
 
 ## Sinais expostos à UI
 
-Emitidos pelo nó raiz da partida (`Arena`). Na T-105 já existem `core_hp_changed`, `wave_changed`, `coins_changed` e `match_ended`. Base: AG01 §9.
+Emitidos pelo nó raiz da partida (`Arena`). Na T-105 já existem `core_hp_changed`, `wave_changed`, `particles_changed` e `match_ended`. Base: AG01 §9.
 
 | Sinal | Quando |
 |---|---|
@@ -162,14 +162,14 @@ Emitidos pelo nó raiz da partida (`Arena`). Na T-105 já existem `core_hp_chang
 | `wave_changed(current: int, total: int)` | início de cada onda (a onda do chefe conta no `total`) |
 | `cooldown_changed(slot: int, remaining: float, total: float)` | ao usar a skill e durante o cooldown, no máximo ~10×/s |
 | `skill_ready(slot: int)` | quando o cooldown chega a 0 |
-| `coins_changed(amount: int)` | `amount` = **total** de moedas na partida (não o incremento) |
+| `particles_changed(total: int)` | `total` = **total** de Partículas na partida (não o incremento). Partículas começam em 0 e zeram a cada partida (decisão 29). `coins_changed(amount)` é um alias temporário, emitido junto, até a T-141 migrar o HUD |
 | `boss_spawned(id: StringName)` | entrada do chefe |
 | `boss_hp_changed(current: int, max: int)` | a cada dano no chefe |
 | `match_ended(result: MatchResult)` | vitória ou derrota (uma vez) |
 
 **Mudanças em relação ao §9 do AG01 (precisam de aprovação):**
 1. **Novo:** `skill_used(slot: int)`, já citado no §7 do AG01 mas ausente do §9. Serve ao feedback de acionamento no HUD.
-2. **Esclarecido:** `coins_changed` envia o total, não o delta.
+2. **Esclarecido:** `particles_changed` (antigo `coins_changed`) envia o total, não o delta.
 3. **Esclarecido:** `cooldown_changed` usa 3 argumentos (o §7 do AG01 cita só 2).
 
 ## Camadas de colisão [Proposta → AG07]
@@ -202,7 +202,7 @@ O `project.godot` é do AG07. Layers sugeridas:
 |---|---|---|
 | Arena, Anima, 1 inimigo | protótipo | T-103 |
 | Ataque automático com pool | protótipo | T-104 |
-| Ondas, HP do Núcleo, moedas, vitória/derrota | protótipo | T-105 |
+| Ondas, HP do Núcleo, Partículas, vitória/derrota | protótipo | T-105 |
 | Skill de área | protótipo | T-108 |
 | Skill de controle | pendente | T-109 |
 | Skill de defesa | pendente | T-110 |

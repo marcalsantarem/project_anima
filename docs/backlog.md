@@ -40,7 +40,7 @@
 | T-124 | Pasta `src/fx/` em `docs/estrutura.md` | M1 | AG07 | pronta p/ briefing |
 | T-125 | Proposta da skill de área: meteoro × onda de choque | M1 | AG01 + AG08 | pronta p/ briefing |
 | T-126 | Guia de estilo `docs/arte.md` + mockup da arena | M1 | AG08 | pronta p/ briefing |
-| T-127 | Arte do Anima, inimigos, chefe, projéteis e fundo | M1 | AG08 | a fazer |
+| T-127 | Arte do Anima, inimigos, chefe, projéteis e fundo | M1 | AG08 | feita |
 | T-128 | Ícones e arte da UI | M1 | AG08 | a fazer |
 | T-129 | `docs/vfx.md` + pool de efeitos | M1 | AG09 | a fazer |
 | T-130 | VFX do ataque, acertos e mortes | M1 | AG09 | a fazer |
@@ -57,8 +57,8 @@
 | T-141 | Moeda da partida vira Partículas: HUD, telas e `ui.md` | M1 | AG02 | a fazer |
 | T-142 | Novo guia de estilo 2D cartoon 3/4 + mockups PNG | M1 | AG08 | pronta p/ briefing |
 | T-143 | Pipeline e fonte da arte final (opções e custos) | M1 | AG08 | pronta p/ briefing |
-| T-144 | Arena em 3/4: Y-sort, âncoras, sombras, spawn | M1 | AG01 | a fazer |
-| T-145 | Retema da UI no estilo cartoon (tokens, tema, fonte) | M1 | AG02 | a fazer |
+| T-144 | Arena em 3/4: Y-sort, âncoras, sombras, spawn | M1 | AG01 | feita |
+| T-145 | Retema da UI no estilo cartoon (tokens, tema, fonte) | M1 | AG02 | feita |
 | T-146 | Remover mockups rejeitados e excluir referências do export Web | M1 | AG07 | pronta p/ briefing |
 | T-147 | Anima com skin trocável (Resource de aparência) | M2 | AG01 | a fazer |
 
@@ -335,13 +335,13 @@
 - **Pronto quando:** comparadas as opções (gerada pelos agentes, pacotes CC0/pagos 2D cartoon, IA de imagem, artista) em qualidade, custo, prazo e licença; formato técnico definido (PNG, resolução, atlas, escala); recomendação para o usuário decidir.
 
 ### T-144 — Arena em 3/4
-- **Marco:** M1 · **Dono:** AG01 · **Status:** a fazer
+- **Marco:** M1 · **Dono:** AG01 · **Status:** feita
 - **Depende de:** T-142 · **Desbloqueia:** T-137
 - **Arquivos:** `src/match/`, `docs/gameplay.md`, testes em `tests/`
 - **Pronto quando:** ordenação por Y, sprites ancorados na base, sombra no chão, área de spawn e limites adaptados à perspectiva; colisões no plano do chão; testes passando.
 
 ### T-145 — Retema da UI no estilo cartoon
-- **Marco:** M1 · **Dono:** AG02 · **Status:** a fazer
+- **Marco:** M1 · **Dono:** AG02 · **Status:** feita
 - **Depende de:** T-142 · **Desbloqueia:** T-138
 - **Arquivos:** `docs/ui.md`, `src/ui/theme/`, `src/ui/components/`, `assets/fonts/`
 - **Pronto quando:** tokens e tema refeitos (botões grandes com contorno e sombra, painéis com moldura, cores por raridade); fonte arredondada OFL avaliada; HUD e telas atuais continuam funcionando.
@@ -371,7 +371,7 @@
 - **Pronto quando:** paleta, formas, silhuetas por arquétipo, tamanhos, nomes e checklist de asset documentados; mockup da arena em retrato com Anima, inimigos, projéteis e HUD; **aprovado pelo usuário**.
 
 ### T-127 — Arte do Anima, inimigos, chefe, projéteis e fundo
-- **Marco:** M1 · **Dono:** AG08 · **Status:** a fazer
+- **Marco:** M1 · **Dono:** AG08 · **Status:** feita
 - **Depende de:** T-142, T-143 (o chefe também depende da T-115) · **Desbloqueia:** T-137
 - **Arquivos:** `assets/sprites/`, `assets/backgrounds/`, `assets/LICENSES.md`
 - **Pronto quando:** Anima, 4 arquétipos, chefe, projéteis (inimigos sem ciano) e fundo seguem o `docs/arte.md`; silhuetas distintas; tamanhos para 720×1280; licenças registradas.

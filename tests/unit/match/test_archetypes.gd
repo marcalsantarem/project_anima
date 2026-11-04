@@ -18,8 +18,8 @@ func _arena() -> Arena:
 
 
 func test_data_matches_gameplay_doc() -> void:
-	assert_eq([TANK.hp, TANK.speed, TANK.contact_damage, TANK.coin_drop], [120, 50.0, 20, 4])
-	assert_eq([SHOOTER.hp, SHOOTER.attack_range, SHOOTER.coin_drop], [35, 380.0, 2])
+	assert_eq([TANK.hp, TANK.speed, TANK.contact_damage, TANK.particle_drop], [120, 50.0, 20, 4])
+	assert_eq([SHOOTER.hp, SHOOTER.attack_range, SHOOTER.particle_drop], [35, 380.0, 2])
 	assert_almost_eq(1.0 / SHOOTER.fire_rate, 1.5, 0.01)
 	assert_eq([BOLT.damage, BOLT.speed], [6, 300.0])
 	assert_eq([SWARM.hp, SWARM.contact_damage, SWARM.group_min, SWARM.group_max], [8, 2, 5, 8])

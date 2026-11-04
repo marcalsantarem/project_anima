@@ -86,7 +86,7 @@ func test_use_skill_kills_cluster_and_starts_cooldown() -> void:
 	await wait_seconds(PULSE.windup + 0.1)
 	for e in enemies:
 		assert_false(is_instance_valid(e), "morto pela área")
-	assert_eq(arena.coins, 3 * RUNNER.coin_drop)
+	assert_eq(arena.particles, 3 * RUNNER.particle_drop)
 
 
 func test_no_target_does_not_spend_cooldown() -> void:

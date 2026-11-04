@@ -66,15 +66,16 @@ Pedestal cilíndrico neutro (`vessel`) com aro ciano + **cristal losango ciano f
 | Entidade | Silhueta | Por quê | Colisão (raio) | Sombra no chão (largura) | Altura visual | Canvas 1x |
 |---|---|---|---|---|---|---|
 | **Anima** | pedestal + cristal losango flutuante | ponto focal, alto | 40 | ~130 | ~160 | 128×192 |
-| **Corredor** | bolinha laranja com duas orelhas pontudas e linhas de velocidade | rápido, "vem direto" | 16 | ~40 | ~62 | 64×64 |
+| **Corredor** | bolinha laranja com duas orelhas pontudas e linhas de velocidade | rápido, "vem direto" | 16 | ~38 | ~58 | 64×64 |
 | **Tanque** | cúpula grande carmim, chifres, placa frontal, pezinhos, barra de HP | pesado, blindado | 28 | ~72 | ~95 | 128×128 |
-| **Atirador** | gota magenta pontuda com garras laterais e **orbe** acima | angular; o orbe anuncia o tiro | 18 | ~48 | ~90 | 64×128 |
-| **Enxame** | bolinha violeta de um olho com asinhas, em bando | pequeno, numeroso | 10 | ~23 | ~32 | 32×32 |
+| **Atirador** | gota magenta pontuda com garras laterais e **orbe** acima | angular; o orbe anuncia o tiro | 18 | ~48 | ~90 | 128×128 |
+| **Enxame** | bolinha violeta de um olho com asinhas, em bando | pequeno, numeroso | 10 | ~23 | ~37 | 64×64 |
 | **Chefe** | massa violeta enorme, olho único, coroa dourada, braços, anel girando | domina a tela; anel = fases | [A definir] | ~145 | ~200 | 256×256 |
 | Projétil do jogador | cápsula ciano com núcleo branco e rastro | lado "amigo" | 6 | — | 26×14 | 32×16 |
 | Projétil inimigo | losango magenta com núcleo rosado e halo | lê como ameaça | [AG01] | — | 26×18 | 32×32 |
 | Partícula (moeda) | estrela de 4 pontas dourada com brilho | não confundir com projétil | — | ~16 | 22 | 32×32 |
 
+- **Arquivos finais (T-127):** tamanhos, âncoras e offsets de cada sprite em [`assets/sprites/README.md`](../assets/sprites/README.md). O atirador e o enxame ganharam canvas maior (garras e asas); o anel do chefe e os nós do Anima são sprites separados.
 - **Proporções:** inimigos têm cabeça = corpo (1 "cabeça" de altura), olhos ocupando ~30% da largura. Quanto mais perigoso, **maior e mais saturado**, nunca mais escuro.
 - **Visual × colisão:** a **sombra no chão** é o "tamanho real": deve ter entre 100% e 125% do diâmetro da colisão. O corpo pode subir acima disso (altura 3/4).
 - Contorno: A 3–4 px, B 5 px, na escala 1x. Brilho/halo só com forma de opacidade baixa, **sem blur**.

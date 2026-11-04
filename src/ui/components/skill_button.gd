@@ -4,10 +4,11 @@ extends Control
 ## Botão circular de skill. docs/ui.md §5.1.
 ## Não chama a skill: toque/clique emitem `activated(slot)` e, se `inject_action`, a Input Action `skill_<slot>`.
 ## O estado vem do gameplay: on_used() ← skill_used, set_cooldown() ← cooldown_changed, set_ready() ← skill_ready.
+## `locked` (T-136): slot ainda não liberado. Cadeado + "NV x", ignora toque, clique, a action `skill_<slot>` e os sinais de gameplay.
 
 signal activated(slot: int)
 
-enum State { READY, COOLDOWN, DISABLED }
+enum State { READY, COOLDOWN, DISABLED, LOCKED }
 enum Icon { CIRCLE, DIAMOND, HEX }
 
 const DIAMETER := float(UiTokens.SKILL_DIAMETER)
@@ -31,6 +32,8 @@ const BADGE_SIZE := 36.0
 @export var inject_action := true
 
 var action := &"skill_1"
+## Nível de conta que libera o slot (só exibição; quem decide é o meta-jogo).
+var unlock_level := 0
 var state := State.READY
 var _remaining := 0.0
 var _total := 0.0
@@ -49,12 +52,13 @@ func _init() -> void:
 
 func _ready() -> void:
 	_shortcut = _shortcut_label()
+	_update_accessibility()
 	resized.connect(_update_pivot)
 	_update_pivot()
 
 
 func set_cooldown(remaining: float, total: float) -> void:
-	if state == State.DISABLED:
+	if state == State.DISABLED or state == State.LOCKED:
 		return
 	_remaining = maxf(remaining, 0.0)
 	_total = maxf(total, 0.001)
@@ -63,6 +67,8 @@ func set_cooldown(remaining: float, total: float) -> void:
 
 
 func set_ready() -> void:
+	if state == State.LOCKED:
+		return
 	var was_cooldown := state == State.COOLDOWN
 	state = State.READY
 	_remaining = 0.0
@@ -72,16 +78,49 @@ func set_ready() -> void:
 
 
 func on_used() -> void:
+	if state == State.LOCKED:
+		return
 	_flash = 1.0
 	queue_redraw()
 
 
 func set_disabled(disabled: bool) -> void:
+	if state == State.LOCKED:
+		return
 	if disabled:
 		state = State.DISABLED
 	else:
 		state = State.COOLDOWN if _remaining > 0.0 else State.READY
 	queue_redraw()
+
+
+## Bloqueia (level > 0 aparece como "NV x") ou libera o slot. Liberado volta a `ready`.
+func set_locked(locked: bool, level := 0) -> void:
+	unlock_level = level if locked else 0
+	if locked:
+		state = State.LOCKED
+		_remaining = 0.0
+		_flash = 0.0
+		_touch_index = -1
+		mouse_default_cursor_shape = CURSOR_FORBIDDEN
+		tooltip_text = "Bloqueado: libera no nível %d" % level if level > 0 else "Bloqueado"
+	elif state == State.LOCKED:
+		state = State.READY
+		mouse_default_cursor_shape = CURSOR_ARROW
+		tooltip_text = ""
+	_update_accessibility()
+	queue_redraw()
+
+
+func is_locked() -> bool:
+	return state == State.LOCKED
+
+
+func _update_accessibility() -> void:
+	var text := "Skill %d" % slot
+	if state == State.LOCKED:
+		text += ", bloqueada" + (" até o nível %d" % unlock_level if unlock_level > 0 else "")
+	accessibility_name = text
 
 
 func _process(delta: float) -> void:
@@ -103,6 +142,11 @@ func _process(delta: float) -> void:
 
 
 func _gui_input(event: InputEvent) -> void:
+	if state == State.LOCKED:
+		# Consome o toque/clique sem acionar nada (não vaza para a arena).
+		if (event is InputEventScreenTouch or event is InputEventMouseButton) and _hit(event.position):
+			accept_event()
+		return
 	if event is InputEventScreenTouch:
 		if not _hit(event.position):
 			return
@@ -122,6 +166,12 @@ func _gui_input(event: InputEvent) -> void:
 		else:
 			_release()
 		accept_event()
+
+
+## Slot bloqueado: engole `skill_<slot>` (teclado ou injetada) antes do `_unhandled_input` do gameplay.
+func _input(event: InputEvent) -> void:
+	if state == State.LOCKED and event.is_action(action):
+		get_viewport().set_input_as_handled()
 
 
 ## Atalho de teclado: o Input Map já leva a ação ao gameplay; aqui é só o feedback visual.
@@ -212,7 +262,8 @@ func _draw() -> void:
 	var r := DIAMETER * 0.5
 	var inner := r - UiTokens.BORDER
 	var is_ready := state == State.READY
-	var disabled := state == State.DISABLED
+	var locked := state == State.LOCKED
+	var disabled := state == State.DISABLED or locked
 
 	# Halo de "pronta" (pulsa), sombra de base sólida e contorno
 	if is_ready and not Engine.is_editor_hint():
@@ -231,14 +282,17 @@ func _draw() -> void:
 	# Faixa de brilho no topo
 	draw_arc(c, inner - 3.0, PI * 1.2, PI * 1.8, 24, UiTokens.HIGHLIGHT, 5.0, true)
 
-	# Ícone (provisório até a T-128): branco com contorno escuro
-	_draw_icon(c, r * 0.4, UiTokens.TEXT_SECONDARY if disabled else UiTokens.TEXT_PRIMARY)
+	var font := get_theme_font("font_bold", "SkillButton")
+	if locked:
+		_draw_lock(c, r, font)
+	else:
+		# Ícone (provisório até a T-128): branco com contorno escuro
+		_draw_icon(c, r * 0.4, UiTokens.TEXT_SECONDARY if disabled else UiTokens.TEXT_PRIMARY)
 
 	# Véu e setor de recarga (sentido horário a partir do topo)
 	if state == State.COOLDOWN and _total > 0.0:
 		_draw_sector(c, inner, clampf(_remaining / _total, 0.0, 1.0), UiTokens.COOLDOWN_DIM)
 
-	var font := get_theme_font("font_bold", "SkillButton")
 	# Segundos restantes
 	if state == State.COOLDOWN and _remaining > 0.0:
 		var fs := get_theme_font_size("font_size", "SkillButton")
@@ -258,6 +312,38 @@ func _draw() -> void:
 	var label := _shortcut if _shortcut != "" else str(slot)
 	var by := bc.y + (font.get_ascent(cs) - font.get_descent(cs)) * 0.5
 	draw_string(font, Vector2(bc.x - half, by), label, HORIZONTAL_ALIGNMENT_CENTER, BADGE_SIZE, cs, UiTokens.INK)
+
+
+## Cadeado (acima do centro) + "NV x" (abaixo), como no mockup aprovado.
+func _draw_lock(c: Vector2, r: float, font: Font) -> void:
+	var has_level := unlock_level > 0
+	var lc := c + Vector2(0, -r * 0.2 if has_level else 0.0)
+	var bw := r * 0.62
+	var bh := r * 0.46
+	var body := Rect2(lc + Vector2(-bw * 0.5, -bh * 0.15), Vector2(bw, bh))
+	# Alça: arco grosso com contorno
+	var sh_c := Vector2(lc.x, body.position.y)
+	var sh_r := bw * 0.3
+	draw_arc(sh_c, sh_r, PI, TAU, 24, UiTokens.INK, 15.0, true)
+	draw_line(sh_c + Vector2(-sh_r, 0), sh_c + Vector2(-sh_r, 4), UiTokens.INK, 15.0)
+	draw_line(sh_c + Vector2(sh_r, 0), sh_c + Vector2(sh_r, 4), UiTokens.INK, 15.0)
+	draw_arc(sh_c, sh_r, PI, TAU, 24, UiTokens.TEXT_PRIMARY, 7.0, true)
+	draw_line(sh_c + Vector2(-sh_r, 0), sh_c + Vector2(-sh_r, 4), UiTokens.TEXT_PRIMARY, 7.0)
+	draw_line(sh_c + Vector2(sh_r, 0), sh_c + Vector2(sh_r, 4), UiTokens.TEXT_PRIMARY, 7.0)
+	# Corpo arredondado + fechadura
+	var box := UiTokens.cartoon_box(UiTokens.TEXT_PRIMARY, 6, 0)
+	box.set_border_width_all(4)
+	draw_style_box(box, body)
+	var kc := body.get_center() + Vector2(0, -bh * 0.08)
+	draw_circle(kc, bh * 0.14, UiTokens.INK)
+	draw_line(kc, kc + Vector2(0, bh * 0.24), UiTokens.INK, 4.0)
+	if not has_level:
+		return
+	var fs := UiTokens.FONT_HUD
+	var text := "NV %d" % unlock_level
+	var y := c.y + r * 0.62
+	draw_string_outline(font, Vector2(0, y), text, HORIZONTAL_ALIGNMENT_CENTER, size.x, fs, UiTokens.TEXT_OUTLINE, UiTokens.INK)
+	draw_string(font, Vector2(0, y), text, HORIZONTAL_ALIGNMENT_CENTER, size.x, fs, UiTokens.TEXT_PRIMARY)
 
 
 func _icon_points(c: Vector2, s: float) -> PackedVector2Array:

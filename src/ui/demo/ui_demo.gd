@@ -15,6 +15,7 @@ var _skills: Array[SkillButton] = []
 var _remaining: Array[float] = [0.0, 0.0, 0.0]
 var _signal_t := 0.0
 var _disabled := false
+var _locked := true
 
 
 func _ready() -> void:
@@ -66,6 +67,7 @@ func _build() -> void:
 	col.add_child(row2)
 	row2.add_child(_button("Jogar de novo", &"ButtonPrimary", _on_reset))
 	row2.add_child(_button("Desativar skills", &"", _on_toggle_disabled))
+	row2.add_child(_button("Cadeados", &"", _on_toggle_locked))
 
 	var hud := _label("ONDA 3/10    1.250", &"LabelHud")
 	col.add_child(hud)
@@ -98,6 +100,7 @@ func _build() -> void:
 		sb.icon = icons[i]
 		skills_row.add_child(sb)
 		_skills.append(sb)
+	_apply_locks()
 
 
 func _label(text: String, variation: StringName) -> Label:
@@ -177,3 +180,15 @@ func _on_toggle_disabled() -> void:
 	_disabled = not _disabled
 	for sb in _skills:
 		sb.set_disabled(_disabled)
+
+
+## T-136: slots 2 e 3 bloqueados ("NV 7" / "NV 12"), como no padrão do HUD no M1.
+func _on_toggle_locked() -> void:
+	_locked = not _locked
+	_apply_locks()
+
+
+func _apply_locks() -> void:
+	for i in 3:
+		var level: int = Hud.M1_UNLOCK_LEVELS[i] if _locked else 0
+		_skills[i].set_locked(level > 0, level)

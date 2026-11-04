@@ -56,4 +56,4 @@ API:
 
 **Tipos** (`src/core/`, `RefCounted`):
 - `MatchConfig`: `stage_id`, `match_scene_path` (padrão: `res://src/match/arena/arena.tscn`). O AG04 adiciona `anima_data` e `skills`.
-- `MatchResult`: `outcome` (`Outcome.VICTORY|DEFEAT`), `wave_reached`, `waves_total`, `coins`, `enemies_killed`, `duration_s`.
+- `MatchResult`: `outcome` (`Outcome.VICTORY|DEFEAT`), `wave_reached`, `waves_total`, `coins` (= Partículas da partida; renomear depende do AG00/T-141), `enemies_killed`, `duration_s`.

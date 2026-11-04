@@ -1,6 +1,6 @@
 extends GutTest
 ## Partida montada como no jogo: Arena + HUD (bind antes de a arena entrar na árvore).
-## Cobre ondas → dano → moedas → cooldown → match_ended refletidos no HUD.
+## Cobre ondas → dano → Partículas → cooldown → match_ended refletidos no HUD.
 
 const RUNNER := preload("res://data/enemies/enemy_runner.tres")
 const TANK := preload("res://data/enemies/enemy_tank.tres")
@@ -88,7 +88,7 @@ func test_victory_reaches_hud_and_result() -> void:
 	var r := _result()
 	assert_eq(r.outcome, MatchResult.Outcome.VICTORY)
 	assert_eq(r.enemies_killed, 5)
-	assert_eq(r.coins, 5 * RUNNER.coin_drop)
+	assert_eq(r.coins, 5 * RUNNER.particle_drop)
 	await wait_seconds(TWEEN_WAIT)
 	assert_eq(hud._wave_label.text, "ONDA 2/2")
 	assert_eq(hud._coin_label.text, UiTokens.format_int(r.coins))
@@ -144,7 +144,9 @@ func test_defeat_locks_hud_and_freezes_match() -> void:
 	assert_eq(r.wave_reached, 1)
 	assert_eq(hud._core_bar.current, 0)
 	for b in hud._skills:
-		assert_eq(b.state, SkillButton.State.DISABLED)
+		# Slots bloqueados (T-136) continuam com cadeado; os liberados ficam desativados.
+		var expected := SkillButton.State.LOCKED if b.slot > 1 else SkillButton.State.DISABLED
+		assert_eq(b.state, expected)
 	assert_true(hud._pause_button.disabled)
 	assert_false(arena.use_skill(1), "skills travadas após o fim")
 
@@ -152,14 +154,14 @@ func test_defeat_locks_hud_and_freezes_match() -> void:
 	var alive := arena.active_enemies.duplicate()
 	var positions := alive.map(func(e: Enemy) -> Vector2: return e.position)
 	var hp_emits: int = get_signal_emit_count(arena, "core_hp_changed")
-	var coin_emits: int = get_signal_emit_count(arena, "coins_changed")
+	var particle_emits: int = get_signal_emit_count(arena, "particles_changed")
 	await wait_seconds(1.0)
 	assert_eq(alive.map(func(e: Enemy) -> Vector2: return e.position), positions, "inimigos congelados")
 	assert_eq(get_signal_emit_count(arena, "core_hp_changed"), hp_emits)
 	if alive.size() > 0:
 		alive[0].take_damage(9999) # abate após o fim não pontua
-	assert_eq(get_signal_emit_count(arena, "coins_changed"), coin_emits)
-	assert_eq(arena.coins, r.coins)
+	assert_eq(get_signal_emit_count(arena, "particles_changed"), particle_emits)
+	assert_eq(arena.particles, r.coins)
 	assert_signal_emit_count(arena, "match_ended", 1)
 
 
@@ -173,7 +175,7 @@ func test_stage_01_full_match_is_consistent() -> void:
 	if get_signal_emit_count(arena, "match_ended") == 0:
 		return
 	var r := _result()
-	gut.p("stage_01 sem skills: %s, onda %d/%d, %d abates, %d moedas, %.1f s" % [
+	gut.p("stage_01 sem skills: %s, onda %d/%d, %d abates, %d Partículas, %.1f s" % [
 		MatchResult.Outcome.keys()[r.outcome], r.wave_reached, r.waves_total,
 		r.enemies_killed, r.coins, r.duration_s])
 	assert_eq(r.waves_total, 3)
