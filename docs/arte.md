@@ -1,5 +1,7 @@
 # Arte — Project: Anima
 
+> **OBSOLETO (2026-11-03):** as direções A e B foram rejeitadas. Nova direção nas decisões 31–34 (2D cartoon casual, câmera 3/4). Este guia será reescrito na T-142.
+
 > Dono: AG08. Estado: **[Proposta]** até o usuário aprovar o mockup (T-126). Cores de UI vêm do [docs/ui.md](ui.md) (dono AG02); aqui só se acrescentam as cores do mundo.
 > Mockups: [`assets/backgrounds/mockup_arena.svg`](../assets/backgrounds/mockup_arena.svg) (direção A) e [`mockup_arena_b.svg`](../assets/backgrounds/mockup_arena_b.svg) (direção B).
 

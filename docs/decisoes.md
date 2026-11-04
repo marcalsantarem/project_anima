@@ -40,3 +40,7 @@ Ao mudar uma decisão, atualize esta tabela e, se for o caso, o `CLAUDE.md`.
 | 28 | Skills da demo | Decidido | O M1 tem 1 skill (área, meteoro ou onda de choque) no slot 1; as skills de controle e defesa (T-109, T-110) vão para o M2 | Definido pelo dono do projeto em 2026-11-03 |
 | 29 | Moedas | Decidido | **Gold** é a moeda do jogo (meta), com ganho variável por partida. **Partículas** é a moeda da partida: começa em zero e é zerada a cada partida | Definido pelo dono do projeto em 2026-11-03 |
 | 30 | Árvore de talentos | Decidido | Continua no meta-jogo, comprada com Gold | Definido pelo dono do projeto em 2026-11-03 |
+| 31 | Direção de arte | Decidido | O tema continua Cyber-Mystic; o estilo passa a **2D cartoon casual**: colorido, formas arredondadas, contorno e sombra suave, UI "encorpada" (botões grandes, molduras por raridade). Referência de acabamento: jogos mobile casuais como o Archero, sem copiar nada. Mockups A "Facetado" e B "Glifo" rejeitados | Definido pelo dono do projeto em 2026-11-03 |
+| 32 | Técnica de arte | Decidido | Sprites 2D ilustrados (sem 3D), por desempenho no Safari do iPhone | Definido pelo dono do projeto em 2026-11-03 |
+| 33 | Câmera e protagonista | Decidido | Câmera 3/4. O "herói" do centro pode ser um objeto; na 1ª versão, um núcleo simples. Preparar para skins | Definido pelo dono do projeto em 2026-11-03 |
+| 34 | Produção da arte | A definir | Começa com arte gerada pelos agentes; a fonte final (pacotes, IA de imagem, artista) sai da T-143 | Definido pelo dono do projeto em 2026-11-03 |

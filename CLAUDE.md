@@ -59,8 +59,8 @@ O Claude principal é o **game dev líder** do projeto e o **único interlocutor
   - **Upgrades da partida:** comprados entre ondas com Partículas; valem só para ela.
   - **Árvore de talentos:** comprada com Gold.
 - **Monetização:** rewarded ads (multiplicar moedas ou reviver), skins cosméticas e moeda premium.
-- **Visual:** "Cyber-Mystic Minimal", top-down. Cenário escuro e suave contrastando com projéteis e partículas vibrantes. Interface em **modo retrato**.
-- O Archero serve só de **referência de gênero e de retenção**. Não copie arte, nomes, assets nem o visual de jogos existentes.
+- **Visual:** tema Cyber-Mystic em **2D cartoon casual**: colorido, formas arredondadas, contorno e sombra suave, **câmera 3/4**. O Anima é um núcleo (objeto) no centro, pronto para skins. UI com botões grandes e molduras por raridade. Interface em **modo retrato**. Guia em `docs/arte.md`.
+- O Archero é referência de **gênero, retenção e acabamento visual**. Inspiração de estilo, nunca cópia: não copie arte, nomes, assets, ícones nem layouts de jogos existentes.
 
 ## Stack
 

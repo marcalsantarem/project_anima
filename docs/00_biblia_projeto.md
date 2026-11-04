@@ -88,9 +88,9 @@
 ### FORA (até depois do M1)
 Nível de conta, skills de controle e defesa, módulos e fusão, talentos, save, backend, contas, ads, compras, skins, áudio final, mais de uma fase, localização, builds nativos.
 
-## Referências (gênero e estrutura, **nunca para copiar**)
+## Referências (gênero, estrutura e acabamento, **nunca para copiar**)
 
-- **Archero:** malha de retenção e progressão (equipamentos, farm, sessões curtas) e a clareza da vista de cima.
+- **Archero:** malha de retenção e progressão (equipamentos, farm, sessões curtas) e **referência de acabamento visual**: 2D cartoon casual colorido, câmera 3/4, UI com botões grandes e molduras por raridade (decisões 31–34). Tema próprio: Cyber-Mystic.
 - **Gêneros:** tower/base defense, bullet hell e survivor-likes, pela densidade de inimigos e projéteis.
 
 Proibido usar personagens, criaturas, nomes, ícones, sons, interface ou arte de qualquer jogo existente.

@@ -13,7 +13,7 @@
 - **Stack:**
   - Godot 4.7, GDScript, testes com GUT, renderer **Compatibility** (WebGL 2), exportação Web **single-threaded**.
   - Backend **[A definir]**; no protótipo, o save é local.
-- **Visual:** "Cyber-Mystic Minimal". Cenário escuro e suave, projéteis e partículas vibrantes, barras nítidas, alto contraste.
+- **Visual:** tema Cyber-Mystic em **2D cartoon casual**: colorido, formas arredondadas, contorno e sombra suave, câmera 3/4, UI com botões grandes e molduras. Guia em `docs/arte.md` (decisões 31–34).
 - **Marco atual:** ver a Bíblia ([docs/00_biblia_projeto.md](../00_biblia_projeto.md)).
 - **Originalidade:** referências de gênero e estrutura, **nunca cópia**. Nada de arte, nomes, ícones, sons ou interface do Archero ou de outros jogos.
 - **IDs:** em minúsculas (snake_case), iguais em dados, cenas e código. Prefixos: `anima_`, `skill_`, `enemy_`, `boss_`, `wave_`, `stage_`, `module_`, `upgrade_`, `stat_`, `talent_`, `fx_`, `sfx_`, `mus_`, `ui_`.

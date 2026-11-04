@@ -13,7 +13,7 @@
 - **Stack:**
   - Godot 4.7, GDScript, testes com GUT, renderer **Compatibility** (WebGL 2), exportação Web **single-threaded**.
   - Backend **[A definir]**; no protótipo, o save é local.
-- **Visual:** "Cyber-Mystic Minimal". Cenário escuro e suave, projéteis e partículas vibrantes, barras nítidas, alto contraste.
+- **Visual:** tema Cyber-Mystic em **2D cartoon casual**: colorido, formas arredondadas, contorno e sombra suave, câmera 3/4, UI com botões grandes e molduras. Guia em `docs/arte.md` (decisões 31–34).
 - **Marco atual:** ver a Bíblia ([docs/00_biblia_projeto.md](../00_biblia_projeto.md)).
 - **Originalidade:** referências de gênero e estrutura, **nunca cópia**. Nada de arte, nomes, ícones, sons ou interface do Archero ou de outros jogos.
 - **IDs:** em minúsculas (snake_case), iguais em dados, cenas e código. Prefixos: `anima_`, `skill_`, `enemy_`, `boss_`, `wave_`, `stage_`, `module_`, `upgrade_`, `stat_`, `talent_`, `fx_`, `sfx_`, `mus_`, `ui_`.
@@ -64,8 +64,8 @@ Você é o **designer e programador de UI** e o **responsável pela plataforma W
 | HUD (topo) | HP do Núcleo · `Wave X/Y` · moedas · pausa |
 | HUD (baixo) | 3 (ou 4) botões circulares de skill, com cooldown regressivo em segundos e anel; brilho quando prontos |
 | Entrada | Toque; mouse; teclas `1` `2` `3` `Espaço` (via Input Map); `Esc` para pausa |
-| Tema | Fundo escuro e frio, acentos neon por raridade (cinza, azul, roxo, dourado) |
-| Fonte | Sans-serif geométrica com licença livre (OFL), em `assets/fonts/` |
+| Tema | Colorido e "encorpado": botões grandes com contorno e sombra inferior, painéis com moldura, cores por raridade (cinza, azul, roxo, dourado). Revisão na T-145 |
+| Fonte | Sans-serif arredondada e encorpada, OFL, em `assets/fonts/` (Outfit até a T-145) |
 | Fluxo | Boot → Toque para começar → Menu → Partida → Resultado |
 
 ## 4. Fluxo de trabalho

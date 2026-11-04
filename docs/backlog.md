@@ -55,29 +55,37 @@
 | T-139 | Ajustar a skill de área à opção escolhida | M1 | AG01 | bloqueada |
 | T-140 | Moeda da partida vira Partículas: sinais, código e `gameplay.md` | M1 | AG01 | pronta p/ briefing |
 | T-141 | Moeda da partida vira Partículas: HUD, telas e `ui.md` | M1 | AG02 | a fazer |
+| T-142 | Novo guia de estilo 2D cartoon 3/4 + mockups PNG | M1 | AG08 | pronta p/ briefing |
+| T-143 | Pipeline e fonte da arte final (opções e custos) | M1 | AG08 | pronta p/ briefing |
+| T-144 | Arena em 3/4: Y-sort, âncoras, sombras, spawn | M1 | AG01 | a fazer |
+| T-145 | Retema da UI no estilo cartoon (tokens, tema, fonte) | M1 | AG02 | a fazer |
+| T-146 | Remover mockups rejeitados e excluir referências do export Web | M1 | AG07 | pronta p/ briefing |
+| T-147 | Anima com skin trocável (Resource de aparência) | M2 | AG01 | a fazer |
 
 ## Próximas prontas p/ briefing
 
 > **Decisão 21:** só o usuário libera briefings. A lista abaixo é sugestão; nada começa sem o OK dele.
 
-1. **T-126** (AG08, guia de estilo + mockup): caminho crítico de toda a arte e dos VFX; precisa da aprovação do usuário.
-2. **T-125** (AG01 + AG08, meteoro × onda de choque): gera a decisão do usuário que libera a T-139.
-3. **T-133** (AG04, upgrades da partida): libera a T-134 e a T-135.
-- Também prontas: **T-140** (AG01, Partículas; antes da T-134), **T-124** (AG07), **T-136** (AG02), **T-123** e **T-115** (AG01), **T-107** e **T-006** (AG02).
-- Paralelo possível: T-126 ‖ T-133 ‖ T-124 ‖ T-136 (arquivos diferentes). A T-125 usa o AG08 junto com a T-126: na mesma sessão do AG08, em sequência.
+1. **T-142** (AG08, novo guia + mockups PNG): caminho crítico da arte, dos VFX, da T-144 e da T-145; precisa da aprovação do usuário.
+2. **T-143** (AG08, fonte da arte final): gera a decisão 34. Pode ir junto da T-142 no mesmo disparo.
+3. **T-125** (AG01 + AG08, meteoro × onda de choque): libera a T-139.
+4. **T-133** (AG04, upgrades da partida): libera a T-134 e a T-135.
+- Também prontas: **T-146** (AG07), **T-140** (AG01), **T-136** (AG02), **T-123** e **T-115** (AG01), **T-107** e **T-006** (AG02).
 
 ## Paralelismo e conflitos
 
 - **Feito até aqui:** M0 e o núcleo do M1 (T-101 a T-108, T-111 a T-114, T-121, T-122).
 - **Trilhas paralelas do M1 (demo):**
-  - Arte: T-126 → {T-127, T-128} (AG08, em sequência na mesma sessão; T-125 entra antes ou depois da T-126).
+  - Arte: {T-142, T-143} → {T-127, T-128} (AG08, em sequência).
+  - Refatorações do novo estilo: T-142 → T-144 (AG01, `src/match/`) e T-142 → T-145 (AG02, `src/ui/`).
   - VFX: T-124 → T-129 → T-130 → T-131 → T-132 (AG09; a T-124 é do AG07).
   - Upgrades: T-133 (AG04) → T-134 (AG01) → T-135 (AG02).
   - Combate: T-123, T-115, T-139, T-116, T-137 (AG01, em sequência; `skills/` × `enemies/` só em paralelo com duas sessões).
   - UI: T-136 → T-135 → T-138 (AG02, `src/ui/`, em sequência); T-107 e T-006 em outra sessão.
 - **Não paralelizar:**
   - T-134 com T-139 ou T-116 (mesmo dono e `src/match/`);
-  - T-135, T-136 e T-138 (mesma pasta `src/ui/`);
+  - T-135, T-136, T-138, T-141 e T-145 (mesma pasta `src/ui/`);
+  - T-144 com outras tasks do AG01 em `src/match/`;
   - T-137 com outras tasks do AG01 que mexam nas cenas de `match/`;
   - T-117: as partes do AG01, AG09 e AG02 em briefings separados, cada uma nos seus arquivos.
 
@@ -308,10 +316,46 @@
 - **Origem:** sugestão do AG03.
 
 ### T-124 — Pasta `src/fx/` em `docs/estrutura.md`
-- **Marco:** M1 · **Dono:** AG07 · **Status:** pronta p/ briefing
+- **Marco:** M1 · **Dono:** AG07 · **Status:** feita
 - **Depende de:** — · **Desbloqueia:** T-129
 - **Arquivos:** `docs/estrutura.md`, `src/fx/.gitkeep`
 - **Pronto quando:** `src/fx/` (efeitos, shaders, pool), `assets/ui/` e `assets/backgrounds/` documentados; regra de dependência definida (`fx/` reage a sinais e não altera o estado de `match/`).
+
+### T-142 — Novo guia de estilo 2D cartoon 3/4 + mockups PNG
+- **Marco:** M1 · **Dono:** AG08 · **Status:** pronta p/ briefing
+- **Depende de:** decisões 31–33 · **Desbloqueia:** T-127, T-128, T-129, T-144, T-145
+- **Arquivos:** `docs/arte.md` (reescrever), `assets/backgrounds/` (mockups), `assets/LICENSES.md`
+- **Pronto quando:** guia com paleta (clara e saturada, mantendo a regra ciano = jogador), contorno, sombra, proporções, perspectiva 3/4, núcleo-Anima, silhuetas por arquétipo e molduras por raridade; 2 mockups renderizados em **PNG** 720×1280 (arena com HUD); nada copiado de jogos existentes; **aprovado pelo usuário**.
+
+### T-143 — Pipeline e fonte da arte final
+- **Marco:** M1 · **Dono:** AG08 · **Status:** pronta p/ briefing
+- **Depende de:** — · **Desbloqueia:** decisão 34, T-127, T-128
+- **Arquivos:** seção em `docs/arte.md`
+- **Pronto quando:** comparadas as opções (gerada pelos agentes, pacotes CC0/pagos 2D cartoon, IA de imagem, artista) em qualidade, custo, prazo e licença; formato técnico definido (PNG, resolução, atlas, escala); recomendação para o usuário decidir.
+
+### T-144 — Arena em 3/4
+- **Marco:** M1 · **Dono:** AG01 · **Status:** a fazer
+- **Depende de:** T-142 · **Desbloqueia:** T-137
+- **Arquivos:** `src/match/`, `docs/gameplay.md`, testes em `tests/`
+- **Pronto quando:** ordenação por Y, sprites ancorados na base, sombra no chão, área de spawn e limites adaptados à perspectiva; colisões no plano do chão; testes passando.
+
+### T-145 — Retema da UI no estilo cartoon
+- **Marco:** M1 · **Dono:** AG02 · **Status:** a fazer
+- **Depende de:** T-142 · **Desbloqueia:** T-138
+- **Arquivos:** `docs/ui.md`, `src/ui/theme/`, `src/ui/components/`, `assets/fonts/`
+- **Pronto quando:** tokens e tema refeitos (botões grandes com contorno e sombra, painéis com moldura, cores por raridade); fonte arredondada OFL avaliada; HUD e telas atuais continuam funcionando.
+
+### T-146 — Remover mockups rejeitados e excluir referências do export Web
+- **Marco:** M1 · **Dono:** AG07 · **Status:** pronta p/ briefing
+- **Depende de:** — · **Desbloqueia:** —
+- **Arquivos:** `assets/backgrounds/mockup_arena*.svg`, `assets/LICENSES.md`, `export_presets.cfg`
+- **Pronto quando:** mockups A/B removidos; filtro do preset Web exclui mockups e referências; export e testes OK.
+
+### T-147 — Anima com skin trocável
+- **Marco:** M2 · **Dono:** AG01 · **Status:** a fazer
+- **Depende de:** T-137 · **Desbloqueia:** skins (M4)
+- **Arquivos:** `src/match/anima/`, `data/`
+- **Pronto quando:** a aparência do Anima (sprite e cor dos projéteis) vem de um Resource; trocar de skin não exige mudar código.
 
 ### T-125 — Proposta da skill de área: meteoro × onda de choque
 - **Marco:** M1 · **Dono:** AG01 + AG08 · **Status:** pronta p/ briefing
@@ -320,26 +364,27 @@
 - **Pronto quando:** as 2 opções descritas (jogabilidade, leitura visual, custo de VFX no iPhone), com recomendação; **o usuário decide via AG00**.
 
 ### T-126 — Guia de estilo `docs/arte.md` + mockup da arena
-- **Marco:** M1 · **Dono:** AG08 · **Status:** pronta p/ briefing
+- **Marco:** M1 · **Dono:** AG08 · **Status:** feita, **rejeitada** (substituída pela T-142)
 - **Depende de:** — (alinhar com os tokens do `docs/ui.md`) · **Desbloqueia:** T-127, T-128, T-129
 - **Arquivos:** `docs/arte.md`, mockup em `assets/backgrounds/`, `assets/LICENSES.md`
 - **Pronto quando:** paleta, formas, silhuetas por arquétipo, tamanhos, nomes e checklist de asset documentados; mockup da arena em retrato com Anima, inimigos, projéteis e HUD; **aprovado pelo usuário**.
 
 ### T-127 — Arte do Anima, inimigos, chefe, projéteis e fundo
 - **Marco:** M1 · **Dono:** AG08 · **Status:** a fazer
-- **Depende de:** T-126 (o chefe também depende da T-115) · **Desbloqueia:** T-137
+- **Depende de:** T-142, T-143 (o chefe também depende da T-115) · **Desbloqueia:** T-137
 - **Arquivos:** `assets/sprites/`, `assets/backgrounds/`, `assets/LICENSES.md`
 - **Pronto quando:** Anima, 4 arquétipos, chefe, projéteis (inimigos sem ciano) e fundo seguem o `docs/arte.md`; silhuetas distintas; tamanhos para 720×1280; licenças registradas.
 
 ### T-128 — Ícones e arte da UI
 - **Marco:** M1 · **Dono:** AG08 · **Status:** a fazer
-- **Depende de:** T-126, T-125 (ícone da skill), T-133 (ícones dos upgrades) · **Desbloqueia:** T-138
+- **Depende de:** T-142, T-143, T-125 (ícone da skill), T-133 (ícones dos upgrades) · **Desbloqueia:** T-138
 - **Arquivos:** `assets/ui/`
 - **Pronto quando:** ícone da skill, cadeado dos slots, ícones dos upgrades, botões, barras e painéis no estilo do guia; legíveis no toque no iPhone.
 
 ### T-129 — `docs/vfx.md` + pool de efeitos
 - **Marco:** M1 · **Dono:** AG09 · **Status:** a fazer
-- **Depende de:** T-124, T-126 · **Desbloqueia:** T-130, T-131, T-132
+- **Depende de:** T-124, T-142 · **Desbloqueia:** T-130, T-131, T-132
+- **Nota:** VFX no estilo cartoon (formas sólidas, contorno, cores vivas, poucas partículas).
 - **Arquivos:** `docs/vfx.md`, `src/fx/`
 - **Pronto quando:** catálogo de efeitos com os sinais de que cada um depende; pool de efeitos reutilizável (sem instanciar por evento), com teste ou cena de demonstração.
 
@@ -388,13 +433,13 @@
 
 ### T-137 — Trocar placeholders da partida pela arte final
 - **Marco:** M1 · **Dono:** AG01 · **Status:** a fazer
-- **Depende de:** T-127 · **Desbloqueia:** T-120
+- **Depende de:** T-127, T-144 · **Desbloqueia:** T-120
 - **Arquivos:** `src/match/` (cenas)
 - **Pronto quando:** Anima, inimigos, chefe, projéteis e fundo usam a arte final; colisões continuam corretas; nenhum placeholder geométrico.
 
 ### T-138 — Aplicar a arte da UI no HUD e nas telas
 - **Marco:** M1 · **Dono:** AG02 · **Status:** a fazer
-- **Depende de:** T-128, T-135, T-136 · **Desbloqueia:** T-120
+- **Depende de:** T-128, T-135, T-136, T-145 · **Desbloqueia:** T-120
 - **Arquivos:** `src/ui/`
 - **Pronto quando:** HUD, telas e tela de upgrade usam os ícones e a arte final; legibilidade conferida no iPhone.
 
