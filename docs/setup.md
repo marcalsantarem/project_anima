@@ -34,3 +34,5 @@ A inspeção remota do Safari exige um Mac. No Windows, os testes são feitos po
 - Produção (`main`): https://projectanimagame.netlify.app
 - Desenvolvimento (`dev`): https://dev--projectanimagame.netlify.app
 - O build roda no GitHub Actions, e o Netlify não está ligado ao Git. Os secrets de repositório são `NETLIFY_SITE_ID` e `NETLIFY_AUTH_TOKEN`.
+- Export local completo (T-175): `godot --headless --path . --export-release "Web" build/web/index.html && bash web/copy_pwa.sh build/web` (copia `web/pwa/`: manifesto e ícones). Ícones novos do AG08 em `assets/app/`: `bash web/copy_pwa.sh --sync-icons`.
+- App na tela de início do iPhone: depois de mudar ícone ou manifesto, remova o atalho antigo e adicione de novo pelo Safari (Compartilhar › Adicionar à Tela de Início); detalhes em `docs/ui.md` §12.

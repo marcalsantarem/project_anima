@@ -86,8 +86,8 @@
 | T-171 | Logo horizontal do estúdio na base da tela de título; remover o crédito "Criado por Marçal Santarem" | M1 | AG02 | feita |
 | T-172 | Canvas até a borda inferior no Safari do iPhone, sem faixa e sem somar a safe area duas vezes; diagnóstico no log | M1 | AG02 | feita (falta confirmar no iPhone) |
 | T-173 | Meteoro: reavaliar o alvo perto do impacto (2 dos 6 lançamentos contra a horda acertaram 0 inimigos, 1 acertou 1) | M1 | AG01 | feita |
-| T-174 | Ícones do app (tela de início do iPhone, favicon, maskable) | M1 | AG08 | pronta p/ briefing |
-| T-175 | Manifesto web (modo app, tela cheia, retrato) + meta tags do iOS + cópia no deploy | M1 | AG02 | pronta p/ briefing |
+| T-174 | Ícones do app (tela de início do iPhone, favicon, maskable) | M1 | AG08 | feita |
+| T-175 | Manifesto web (modo app, tela cheia, retrato) + meta tags do iOS + cópia no deploy | M1 | AG02 | feita |
 | T-148 | Sinais da Arena para VFX (projectile_fired, projectile_hit, enemy_died, particles_gained, skill_cast, boss_telegraph_started, boss_phase_changed) | M1 | AG01 | feita |
 
 ## Próximas prontas p/ briefing

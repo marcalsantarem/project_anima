@@ -80,6 +80,9 @@ jobs:
           test -s build/web/index.html
           test -s build/web/index.wasm
           test -s build/web/index.pck
+          # Manifesto e ícones do app (T-175): o export não copia extras de web/.
+          bash web/copy_pwa.sh build/web
+          test -s build/web/manifest.webmanifest
           du -ah build/web | sort -h
 
       - uses: actions/upload-artifact@v7.0.2

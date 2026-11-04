@@ -6,8 +6,11 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 		<meta name="mobile-web-app-capable" content="yes">
 		<meta name="apple-mobile-web-app-capable" content="yes">
+		<!-- Modo app na tela de início (T-175, docs/ui.md §12): standalone; a status bar translúcida põe o
+		     conteúdo sob o relógio, e o HUD respeita safe-area-inset-top. -->
 		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-		<!-- Preto durante o logo do estúdio; vira #8E72EC quando a splash B aparece. -->
+		<meta name="apple-mobile-web-app-title" content="Anima">
+		<!-- Segue a etapa (animaSetPageColor, T-172): preto no logo, depois a cor da tela. -->
 		<meta name="theme-color" content="#000000">
 		<meta name="format-detection" content="telephone=no">
 		<title>$GODOT_PROJECT_NAME</title>
@@ -403,6 +406,12 @@ html, body {
 }
 		</style>
 		$GODOT_HEAD_INCLUDE
+		<!-- Depois do head include do Godot. Arquivos de web/pwa/, copiados para o build por web/copy_pwa.sh. -->
+		<link rel="manifest" href="manifest.webmanifest">
+		<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-180.png">
+		<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+		<link rel="icon" type="image/png" sizes="48x48" href="favicon-48.png">
+		<link rel="icon" href="favicon.ico" sizes="any">
 	</head>
 	<body>
 		<canvas id="canvas">

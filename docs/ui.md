@@ -342,3 +342,12 @@ Cenas independentes em `src/ui/screens/`, com o tema na raiz (via `ScreenKit`). 
 - sem fade de entrada (o fade da splash, 250 ms, faz a transição); logo horizontal do estúdio Anima Games (`ui_studio_logo_h.png`, branco, 88% de opacidade) centralizado na base, com ~30% da largura da tela (máx. 240 px) e 32 px acima da safe area inferior, sem receber toque (BRF-068);
 - contrato mantido: qualquer toque, clique ou tecla (inclui a action de aceitar) emite `start_requested` uma vez e libera o áudio.
 - Se a splash mudar no `web/shell.html`, ajuste as constantes do topo do script.
+
+## 12. App na tela de início (T-175)
+
+- **Arquivos:** `web/pwa/manifest.webmanifest` e ícones (cópia de `assets/app/`, AG08; atualizar com `bash web/copy_pwa.sh --sync-icons`). O export do Godot não copia extras: `bash web/copy_pwa.sh build/web` roda depois do `--export-release` (local e no workflow `deploy-web.yml`) e também sobrescreve `index.apple-touch-icon.png`/`index.icon.png`, que o preset (`html/export_icon`) injeta com o ícone do projeto. `web/pwa/.gdignore` mantém os PNGs fora do `.pck`.
+- **Manifesto:** "Project: Anima"/"Anima", `start_url`/`scope` `./`, `display` standalone (`display_override` fullscreen → standalone), retrato, `background_color` `#5A4A9A`, `theme_color` `#8E72EC`, ícones 192/512 `any`, 512 `maskable` e 180.
+- **Sem service worker** (o PWA nativo do Godot gera um com cache offline; fica desligado): cada deploy aparece na próxima abertura.
+- **Shell:** `<link rel="manifest">`, `apple-touch-icon` 180, favicons 32/48/ico, `apple-mobile-web-app-capable`, `mobile-web-app-capable`, `apple-mobile-web-app-title` "Anima", status bar `black-translucent`, `viewport-fit=cover`.
+- **Standalone no iPhone:** sem barra do Safari; o web view vai da borda de cima (sob relógio/bateria) até a de baixo. O HUD já soma `safe-area-inset-top`. Altura do canvas pela regra do §9.1 (área visível real); se o canvas chega à borda, `covers_bottom = true` e a UI usa `max(12, 0,5 × inset)` embaixo. Conferir no log (`header.web.viewport`: `standalone`, `inner`, `vv`, `canvas`, `safe`).
+- **Reinstalar no iPhone:** o iOS só relê manifesto, nome e ícone ao criar o atalho. Remova o atalho antigo (toque e segure › Remover App › Excluir da Tela de Início), abra o link no Safari e use Compartilhar › Adicionar à Tela de Início.

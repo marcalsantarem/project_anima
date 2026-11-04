@@ -155,6 +155,9 @@ Pedestal cilíndrico neutro (`vessel`) com aro ciano + **cristal losango ciano f
 ### 9.3 Splash de carregamento (BRF-052, proposta)
 Em `assets/splash/` (com `.gdignore`; fica fora do `.pck`): `splash_a.png` (chão creme + selo + pilares, logotipo no topo) e `splash_b.png` (roxo da UI + selo suave, núcleo sobre disco de xadrez, logotipo abaixo). Para o shell: fundo em SVG/CSS (`splash_bg_a.svg` 1,7 KB, `splash_bg_b.svg` 3,2 KB; esticam de 1280 a 1560 px) e só o `splash_logo_core.webp` (22 KB, alfa) como imagem; brilho do cristal e sombra em CSS. Barra: pílula `#5B4A7A` com contorno `#3A2A55` e preenchimento dourado (sem ciano). Gerar: `python assets/splash/_src/gen_splash.py`.
 
+### 9.4 Ícones do app (BRF-071)
+Em `assets/app/` (com `.gdignore`): núcleo-Anima sobre o degradê roxo da splash B, selo rúnico discreto, sem texto nem transparência; mestre 1024, apple-touch 180, PWA 192/512 + maskable (zona segura 80%) e favicons 32/48/ICO (variante sem selo, núcleo maior). Ver `assets/app/README.md`.
+
 ## 10. Pendências
 
 | Item | Com quem |
