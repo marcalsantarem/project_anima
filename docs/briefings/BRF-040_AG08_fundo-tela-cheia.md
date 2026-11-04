@@ -1,0 +1,11 @@
+# BRF-040 — AG08 — Fundo da arena em tela cheia
+**Contexto:** pedido do dono: a arena deve ocupar visualmente **toda a tela acima da bandeja de botões**, sem moldura nem faixa roxa; o HUD de cima fica sobreposto ao fundo. Hoje o fundo `assets/backgrounds/stage_01_floor.png` (1440×2560) é uma arena emoldurada de y=164 a 987 em 720×1280, com paredes/bordas roxas e pilares desenhados nele. Na prática o canvas tem largura 720 e altura **variável** (1280 a ~1560, conforme o aparelho), e a bandeja inferior (~293 px) cobre a base. O fundo precisa funcionar em qualquer altura.
+**Fazer:** refaça a arte do chão para tela cheia, no mesmo estilo claro "Jardim Arcano" (mockup `assets/backgrounds/mockup_cartoon_a_upgrades.png` e `docs/arte.md`), em **peças separadas** para o jogo montar:
+- `floor_tile.png`: chão quadriculado creme **sem emendas** (repetível na vertical e na horizontal), 2x, tamanho da repetição múltiplo do quadrado (ex.: 4×4 quadrados);
+- `floor_ring.png`: o selo rúnico elíptico (anéis e losangos) com fundo transparente, para ficar centralizado no Anima;
+- `floor_pillar.png`: pilar com cristal dourado (âncora na base, para o jogo posicionar nos cantos com Y-sort);
+- uma faixa de borda/parede opcional **só se** ajudar a sensação de cenário nas laterais (se criar, deve ser fina, translúcida ou decorativa, e não pode reduzir a área jogável nem cobrir o HUD).
+Sem moldura roxa e sem muro em volta: o chão vai até as bordas da tela. Teste a emenda (tile 3×3 lado a lado) e a leitura por trás da barra do HUD (topo claro: sugira um leve escurecimento do topo só como camada separada `floor_top_shade.png`, opcional). Atualize `assets/sprites/README.md` (ou `assets/backgrounds/README.md`) com arquivo, tamanho, âncora e uso, e `assets/LICENSES.md` com **edição pontual**. Mantenha o gerador (`assets/sprites/_src/`) atualizado; o `stage_01_floor.png` antigo pode ser removido se nada mais o usar (avise o AG00: o AG01 troca o uso depois).
+**Arquivos permitidos:** `assets/backgrounds/`, `assets/sprites/` e `_src`, `assets/LICENSES.md`, `docs/arte.md` (nota curta).
+**Validação:** monte uma imagem de teste 720×1560 e 720×1280 com as peças (e a bandeja desenhada embaixo) e confira visualmente; confira a emenda do tile.
+**Entrega:** no máximo 10 linhas, com tamanhos e âncoras.

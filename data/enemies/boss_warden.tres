@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="BossData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://src/match/enemies/boss/boss_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/boss_ogre.png" id="tex_sprite"]
+[ext_resource type="Texture2D" path="res://assets/sprites/boss_ogre_attack.png" id="tex_attack"]
+[ext_resource type="Texture2D" path="res://assets/sprites/boss_ogre_stunned.png" id="tex_stunned"]
+
+[resource]
+script = ExtResource("1")
+id = &"boss_warden"
+hp = 600
+speed = 110.0
+contact_damage = 30
+attack_range = 100.0
+fire_rate = 0.0
+target_priority = 0
+particle_drop = 50
+radius = 48.0
+group_min = 1
+group_max = 1
+group_spread = 0.0
+color = Color(0.85, 0.3, 0.95, 1)
+show_health_bar = false
+sprite = ExtResource("tex_sprite")
+sprite_anchor = Vector2(256, 472)
+attack_interval = 1.5
+attack_windup = 0.5
+attack_damage = 21
+attack_id = &"boss_slam"
+telegraph_radius = 110.0
+windup_scale = 0.12
+defense_max = 500
+launch_distance = 600.0
+launch_time = 0.6
+stun_time = 2.0
+sprite_attack = ExtResource("tex_attack")
+sprite_stunned = ExtResource("tex_stunned")

@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/fx/fx_effect.gd" id="1"]
+
+[node name="fx_pickup" type="Node2D"]
+script = ExtResource("1")
+style = 2
+duration = 0.5
+radius = 18.0
+dot_count = 4
+height = 48.0
+default_color = Color(0.4863, 0.9412, 0.3529, 1)
+outline_color = Color(0.0706, 0.3098, 0.1412, 1)
+highlight_color = Color(0.8235, 1, 0.6902, 1)

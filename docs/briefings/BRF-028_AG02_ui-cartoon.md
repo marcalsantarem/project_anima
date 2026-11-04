@@ -1,0 +1,7 @@
+# BRF-028 — AG02 — T-145 Retema da UI no estilo cartoon
+**Objetivo e pronto quando:** ver T-145 em [docs/backlog.md](../backlog.md).
+**Contexto:** decisões 31, 35 e 36. Guia em [docs/arte.md](../arte.md) (§ HUD e UI) e mockup `assets/backgrounds/mockup_cartoon_a_upgrades.png` (720×1280). Referência exata do layout e do visual: botões grandes com contorno e sombra inferior, painéis com moldura, topo com pausa + pílula "ONDA x/y" + moedas, barra do Núcleo, **fileira de 5 botões de upgrade** (128×80 px) acima de **3 slots de skill** (Ø 144 px, centros x=150/360/570), slots 2 e 3 bloqueados com cadeado e "NV 7" / "NV 12".
+**Fazer:** refaça os tokens (`UiTokens`) e o tema (`anima_theme.tres`, `build_theme.gd`) no estilo cartoon claro; atualize `SkillButton` e `UiBar`, o HUD e as telas (título, pausa, resultado) para o novo visual e as novas medidas; reserve no HUD o espaço da fileira de upgrades (o componente funcional vem na T-135, pode deixar um contêiner vazio ou botões desabilitados de demonstração só na cena de demo); slots bloqueados (cadeado) fazem parte da T-136, mas ajuste as medidas dos 3 slots. Avalie a fonte (Outfit pode ficar se servir). Sem cópia de jogos existentes. Atualize `docs/ui.md`. Respeite os alvos de toque (≥ 44 px) e o modo retrato.
+**Arquivos permitidos:** `src/ui/`, `docs/ui.md`, `assets/fonts/`, `tests/` (só da UI). Não toque em `src/match/` nem em `project.godot`.
+**Validação:** GUT passando e as cenas de demo (`src/ui/demo/`) abrem sem erro.
+**Entrega:** no máximo 10 linhas.

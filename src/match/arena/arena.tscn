@@ -1,0 +1,46 @@
+[gd_scene load_steps=14 format=3]
+
+[ext_resource type="Script" path="res://src/match/arena/arena.gd" id="1"]
+[ext_resource type="PackedScene" path="res://src/match/anima/anima.tscn" id="2"]
+[ext_resource type="Script" path="res://src/match/projectiles/projectile_pool.gd" id="4"]
+[ext_resource type="Script" path="res://src/match/skills/skill_controller.gd" id="5"]
+[ext_resource type="Resource" path="res://data/skills/skill_meteor.tres" id="6"]
+[ext_resource type="Script" path="res://src/match/skills/skill_data.gd" id="7"]
+[ext_resource type="PackedScene" path="res://src/match/projectiles/enemy_projectile.tscn" id="8"]
+[ext_resource type="Resource" path="res://data/projectiles/projectile_enemy_bolt.tres" id="9"]
+[ext_resource type="Script" path="res://src/match/arena/arena_floor.gd" id="11"]
+[ext_resource type="Texture2D" path="res://assets/backgrounds/floor_tile.png" id="12"]
+[ext_resource type="Texture2D" path="res://assets/backgrounds/floor_ring.png" id="13"]
+[ext_resource type="Texture2D" path="res://assets/backgrounds/floor_pillar.png" id="14"]
+[ext_resource type="Texture2D" path="res://assets/backgrounds/floor_top_shade.png" id="15"]
+
+[node name="Arena" type="Node2D"]
+y_sort_enabled = true
+script = ExtResource("1")
+enemy_projectile = ExtResource("9")
+
+[node name="Floor" type="Node2D" parent="."]
+y_sort_enabled = true
+script = ExtResource("11")
+tile_texture = ExtResource("12")
+ring_texture = ExtResource("13")
+pillar_texture = ExtResource("14")
+top_shade_texture = ExtResource("15")
+
+[node name="Enemies" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="Projectiles" type="Node2D" parent="."]
+y_sort_enabled = true
+script = ExtResource("4")
+
+[node name="EnemyProjectiles" type="Node2D" parent="."]
+y_sort_enabled = true
+script = ExtResource("4")
+projectile_scene = ExtResource("8")
+
+[node name="Anima" parent="." instance=ExtResource("2")]
+
+[node name="Skills" type="Node2D" parent="."]
+script = ExtResource("5")
+skills = Array[ExtResource("7")]([ExtResource("6")])

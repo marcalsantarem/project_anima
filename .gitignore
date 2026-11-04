@@ -1,0 +1,18 @@
+# Godot
+.godot/
+*.import.tmp
+export_credentials.cfg
+
+# Builds
+build/
+
+# Firebase / Node (se adotados)
+node_modules/
+.firebase/
+*-debug.log
+
+# SO / editores
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json

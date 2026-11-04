@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/match/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemy_swarm.png" id="tex_sprite"]
+
+[resource]
+script = ExtResource("1")
+id = &"enemy_swarm"
+hp = 8
+speed = 120.0
+contact_damage = 1
+attack_range = 0.0
+fire_rate = 0.0
+target_priority = 0
+particle_drop = 1
+radius = 10.0
+group_min = 5
+group_max = 8
+group_spread = 48.0
+color = Color(1, 0.6, 0.3, 1)
+sprite = ExtResource("tex_sprite")
+sprite_anchor = Vector2(64, 104)

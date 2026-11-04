@@ -1,0 +1,331 @@
+[gd_resource type="Resource" script_class="StageData" load_steps=52 format=3]
+
+[ext_resource type="Script" path="res://src/match/waves/stage_data.gd" id="1"]
+[ext_resource type="Script" path="res://src/match/waves/wave_data.gd" id="2"]
+[ext_resource type="Script" path="res://src/match/waves/wave_entry.gd" id="3"]
+[ext_resource type="Resource" path="res://data/enemies/enemy_runner.tres" id="4"]
+[ext_resource type="Resource" path="res://data/enemies/enemy_tank.tres" id="5"]
+[ext_resource type="Resource" path="res://data/enemies/enemy_shooter.tres" id="6"]
+[ext_resource type="Resource" path="res://data/enemies/enemy_swarm.tres" id="7"]
+[ext_resource type="Resource" path="res://data/enemies/boss_warden.tres" id="8"]
+
+[sub_resource type="Resource" id="w01_e1"]
+script = ExtResource("3")
+enemy = ExtResource("4")
+count = 5
+interval = 1.6
+spawn_edge = 0
+start_delay = 0.5
+
+[sub_resource type="Resource" id="w01"]
+script = ExtResource("2")
+id = &"wave_01"
+entries = Array[ExtResource("3")]([SubResource("w01_e1")])
+
+[sub_resource type="Resource" id="w02_e1"]
+script = ExtResource("3")
+enemy = ExtResource("4")
+count = 5
+interval = 1.8
+spawn_edge = 0
+start_delay = 0.5
+
+[sub_resource type="Resource" id="w02_e2"]
+script = ExtResource("3")
+enemy = ExtResource("4")
+count = 5
+interval = 1.8
+spawn_edge = 1
+start_delay = 1.4
+
+[sub_resource type="Resource" id="w02"]
+script = ExtResource("2")
+id = &"wave_02"
+entries = Array[ExtResource("3")]([SubResource("w02_e1"), SubResource("w02_e2")])
+
+[sub_resource type="Resource" id="w03_e1"]
+script = ExtResource("3")
+enemy = ExtResource("4")
+count = 5
+interval = 1.8
+spawn_edge = 2
+start_delay = 0.5
+
+[sub_resource type="Resource" id="w03_e2"]
+script = ExtResource("3")
+enemy = ExtResource("4")
+count = 4
+interval = 1.8
+spawn_edge = 3
+start_delay = 1.4
+
+[sub_resource type="Resource" id="w03_e3"]
+script = ExtResource("3")
+enemy = ExtResource("7")
+count = 1
+interval = 1.0
+spawn_edge = 0
+start_delay = 6.0
+
+[sub_resource type="Resource" id="w03"]
+script = ExtResource("2")
+id = &"wave_03"
+entries = Array[ExtResource("3")]([SubResource("w03_e1"), SubResource("w03_e2"), SubResource("w03_e3")])
+
+[sub_resource type="Resource" id="w04_e1"]
+script = ExtResource("3")
+enemy = ExtResource("4")
+count = 5
+interval = 1.8
+spawn_edge = 0
+start_delay = 0.5
+
+[sub_resource type="Resource" id="w04_e2"]
+script = ExtResource("3")
+enemy = ExtResource("4")
+count = 5
+interval = 1.8
+spawn_edge = 1
+start_delay = 1.4
+
+[sub_resource type="Resource" id="w04_e3"]
+script = ExtResource("3")
+enemy = ExtResource("7")
+count = 2
+interval = 7.0
+spawn_edge = 4
+start_delay = 3.0
+
+[sub_resource type="Resource" id="w04"]
+script = ExtResource("2")
+id = &"wave_04"
+entries = Array[ExtResource("3")]([SubResource("w04_e1"), SubResource("w04_e2"), SubResource("w04_e3")])
+
+[sub_resource type="Resource" id="w05_e1"]
+script = ExtResource("3")
+enemy = ExtResource("4")
+count = 5
+interval = 1.7
+spawn_edge = 2
+start_delay = 0.5
+
+[sub_resource type="Resource" id="w05_e2"]
+script = ExtResource("3")
+enemy = ExtResource("4")
+count = 5
+interval = 1.7
+spawn_edge = 3
+start_delay = 1.4
+
+[sub_resource type="Resource" id="w05_e3"]
+script = ExtResource("3")
+enemy = ExtResource("7")
+count = 2
+interval = 7.0
+spawn_edge = 4
+start_delay = 4.0
+
+[sub_resource type="Resource" id="w05_e4"]
+script = ExtResource("3")
+enemy = ExtResource("5")
+count = 1
+interval = 1.0
+spawn_edge = 0
+start_delay = 2.0
+
+[sub_resource type="Resource" id="w05"]
+script = ExtResource("2")
+id = &"wave_05"
+entries = Array[ExtResource("3")]([SubResource("w05_e1"), SubResource("w05_e2"), SubResource("w05_e3"), SubResource("w05_e4")])
+
+[sub_resource type="Resource" id="w06_e1"]
+script = ExtResource("3")
+enemy = ExtResource("4")
+count = 5
+interval = 1.7
+spawn_edge = 0
+start_delay = 0.5
+
+[sub_resource type="Resource" id="w06_e2"]
+script = ExtResource("3")
+enemy = ExtResource("4")
+count = 5
+interval = 1.7
+spawn_edge = 1
+start_delay = 1.4
+
+[sub_resource type="Resource" id="w06_e3"]
+script = ExtResource("3")
+enemy = ExtResource("7")
+count = 2
+interval = 7.0
+spawn_edge = 4
+start_delay = 3.0
+
+[sub_resource type="Resource" id="w06_e4"]
+script = ExtResource("3")
+enemy = ExtResource("5")
+count = 2
+interval = 7.0
+spawn_edge = 4
+start_delay = 2.0
+
+[sub_resource type="Resource" id="w06"]
+script = ExtResource("2")
+id = &"wave_06"
+entries = Array[ExtResource("3")]([SubResource("w06_e1"), SubResource("w06_e2"), SubResource("w06_e3"), SubResource("w06_e4")])
+
+[sub_resource type="Resource" id="w07_e1"]
+script = ExtResource("3")
+enemy = ExtResource("4")
+count = 5
+interval = 1.8
+spawn_edge = 2
+start_delay = 0.5
+
+[sub_resource type="Resource" id="w07_e2"]
+script = ExtResource("3")
+enemy = ExtResource("4")
+count = 5
+interval = 1.8
+spawn_edge = 3
+start_delay = 1.4
+
+[sub_resource type="Resource" id="w07_e3"]
+script = ExtResource("3")
+enemy = ExtResource("7")
+count = 2
+interval = 7.0
+spawn_edge = 4
+start_delay = 4.0
+
+[sub_resource type="Resource" id="w07_e4"]
+script = ExtResource("3")
+enemy = ExtResource("5")
+count = 2
+interval = 7.0
+spawn_edge = 0
+start_delay = 2.0
+
+[sub_resource type="Resource" id="w07_e5"]
+script = ExtResource("3")
+enemy = ExtResource("6")
+count = 2
+interval = 4.5
+spawn_edge = 4
+start_delay = 3.0
+
+[sub_resource type="Resource" id="w07"]
+script = ExtResource("2")
+id = &"wave_07"
+entries = Array[ExtResource("3")]([SubResource("w07_e1"), SubResource("w07_e2"), SubResource("w07_e3"), SubResource("w07_e4"), SubResource("w07_e5")])
+
+[sub_resource type="Resource" id="w08_e1"]
+script = ExtResource("3")
+enemy = ExtResource("4")
+count = 7
+interval = 1.7
+spawn_edge = 0
+start_delay = 0.5
+
+[sub_resource type="Resource" id="w08_e2"]
+script = ExtResource("3")
+enemy = ExtResource("4")
+count = 7
+interval = 1.7
+spawn_edge = 1
+start_delay = 1.4
+
+[sub_resource type="Resource" id="w08_e3"]
+script = ExtResource("3")
+enemy = ExtResource("7")
+count = 3
+interval = 5.5
+spawn_edge = 4
+start_delay = 3.0
+
+[sub_resource type="Resource" id="w08_e4"]
+script = ExtResource("3")
+enemy = ExtResource("5")
+count = 2
+interval = 7.0
+spawn_edge = 4
+start_delay = 2.0
+
+[sub_resource type="Resource" id="w08_e5"]
+script = ExtResource("3")
+enemy = ExtResource("6")
+count = 2
+interval = 4.5
+spawn_edge = 4
+start_delay = 4.0
+
+[sub_resource type="Resource" id="w08"]
+script = ExtResource("2")
+id = &"wave_08"
+entries = Array[ExtResource("3")]([SubResource("w08_e1"), SubResource("w08_e2"), SubResource("w08_e3"), SubResource("w08_e4"), SubResource("w08_e5")])
+
+[sub_resource type="Resource" id="w09_e1"]
+script = ExtResource("3")
+enemy = ExtResource("4")
+count = 7
+interval = 1.8
+spawn_edge = 2
+start_delay = 0.5
+
+[sub_resource type="Resource" id="w09_e2"]
+script = ExtResource("3")
+enemy = ExtResource("4")
+count = 7
+interval = 1.8
+spawn_edge = 3
+start_delay = 1.4
+
+[sub_resource type="Resource" id="w09_e3"]
+script = ExtResource("3")
+enemy = ExtResource("7")
+count = 3
+interval = 5.5
+spawn_edge = 4
+start_delay = 2.0
+
+[sub_resource type="Resource" id="w09_e4"]
+script = ExtResource("3")
+enemy = ExtResource("5")
+count = 3
+interval = 6.0
+spawn_edge = 4
+start_delay = 2.0
+
+[sub_resource type="Resource" id="w09_e5"]
+script = ExtResource("3")
+enemy = ExtResource("6")
+count = 3
+interval = 4.0
+spawn_edge = 4
+start_delay = 3.0
+
+[sub_resource type="Resource" id="w09"]
+script = ExtResource("2")
+id = &"wave_09"
+entries = Array[ExtResource("3")]([SubResource("w09_e1"), SubResource("w09_e2"), SubResource("w09_e3"), SubResource("w09_e4"), SubResource("w09_e5")])
+
+[sub_resource type="Resource" id="w10_e1"]
+script = ExtResource("3")
+enemy = ExtResource("8")
+count = 1
+interval = 1.0
+spawn_edge = 0
+start_delay = 1.0
+
+[sub_resource type="Resource" id="w10"]
+script = ExtResource("2")
+id = &"wave_10"
+entries = Array[ExtResource("3")]([SubResource("w10_e1")])
+
+[resource]
+script = ExtResource("1")
+id = &"stage_01"
+waves = Array[ExtResource("2")]([SubResource("w01"), SubResource("w02"), SubResource("w03"), SubResource("w04"), SubResource("w05"), SubResource("w06"), SubResource("w07"), SubResource("w08"), SubResource("w09"), SubResource("w10")])
+wave_break = 5.0
+boss_id = &"boss_warden"
