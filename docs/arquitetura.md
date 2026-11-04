@@ -25,6 +25,14 @@ Regras:
 
 `project.godot` → `[gui] theme/custom="res://src/ui/theme/anima_theme.tres"` (tema do AG02, com a fonte Outfit). Vale para toda a UI.
 
+## Boot e splash (BRF-055)
+
+Na web, a primeira tela é a splash do `web/shell.html` (degradê de `#8E72EC` a `#4E3F8F`) e a segunda é a cena "Toque para começar". Para não aparecer logotipo do Godot nem um quadro de outra cor entre as duas, o `project.godot` usa:
+- `application/boot_splash/show_image=false`
+- `application/boot_splash/bg_color` e `rendering/environment/defaults/default_clear_color` = `#8E72EC` (o topo do degradê da splash)
+
+Efeito colateral: toda cena que não pinta o próprio fundo aparece em roxo, e não mais quase preto.
+
 ## Fluxo de cenas (T-102, T-122)
 
 Cena principal: `src/core/main.tscn` (**Boot**), que chama `SceneFlow.go_to_title()`. Auth e config entram aqui no futuro.

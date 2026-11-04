@@ -233,7 +233,7 @@ Boot/Loading (HTML shell) → Toque para começar → Partida ⇄ Pausa → Resu
 | Tela | Conteúdo | Saídas |
 |---|---|---|
 | **Loading** (HTML, em `web/`) | logo/nome em texto, barra de progresso `accent` sobre `bg_void` | automática → Toque para começar |
-| **Toque para começar** | nome do jogo (`font_title`), "Toque para começar" pulsando (`font_body`) | qualquer toque, clique ou tecla → **libera o áudio** → Partida |
+| **Toque para começar** | continuação da splash B (§11.1): fundo, núcleo e logotipo iguais; botão grande "Toque para começar" pulsando no lugar da barra | qualquer toque, clique ou tecla → **libera o áudio** → Partida |
 | **Partida** | HUD (§4) | ⏸ / `Esc` → Pausa; `match_ended` → Resultado |
 | **Pausa** (overlay) | véu `bg_panel` sobre o jogo, título "Pausado", botões **Continuar** e **Recomeçar** | Continuar / `Esc` → Partida; Recomeçar → nova Partida |
 | **Resultado** | "Vitória" (`particles`) ou "Derrota" (`danger`) em `font_display`, num cartão com moldura; "Onda wave_reached/waves_total", estrela + "Partículas: N", inimigos derrotados, tempo (mm:ss); botão **Jogar de novo** | Jogar de novo → nova Partida |
@@ -295,3 +295,14 @@ Cenas independentes em `src/ui/screens/`, com o tema na raiz (via `ScreenKit`). 
   - `theme-color` `#8E72EC` (topo do gradiente);
   - `window.animaGetSafeArea()` devolve um JSON com os insets em px CSS.
 - **Teste local:** sirva `build/web/` por HTTP (ex.: `python -m http.server -d build/web 8000`); `file://` não funciona.
+
+### 11.1 Tela "Toque para começar" (BRF-054)
+
+`src/ui/screens/title_screen.gd` repete a splash B para a passagem parecer um único quadro:
+- mesma conta de tamanho do shell: `W = min(86vw, 440px, (altura − 64px) × 0,55)`, convertida para px da resolução base por `ScreenKit.safe_area().css_k`; bloco de 1000 u (palco 830 u + barra + texto) centralizado entre as safe areas;
+- fundo desenhado por código (degradê `#8E72EC` → `#7B5CE0` 55% → `#4E3F8F`, brilhos dourados, anéis rúnicos e disco de xadrez), sem textura extra; logotipo `assets/ui/ui_title_logo_core.png` (cópia do `splash_logo_core.png`) fatiado em cristal, pedestal e título;
+- cristal flutua (−12 u, 2,4 s), sombra e brilho acompanham, com tweens em loop (sem alocação por quadro);
+- no lugar da barra, botão `ButtonPrimary` (arte `ui_button_big_*`) de 440×120 u (mín. 88 px), com pulso de escala (0,8 s); no gesto mostra a arte pressionada;
+- sem fade de entrada (o fade da splash, 250 ms, faz a transição); crédito em `LabelCaption` acima da safe area inferior;
+- contrato mantido: qualquer toque, clique ou tecla (inclui a action de aceitar) emite `start_requested` uma vez e libera o áudio.
+- Se a splash mudar no `web/shell.html`, ajuste as constantes do topo do script.

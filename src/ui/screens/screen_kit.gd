@@ -93,3 +93,30 @@ static func fade_in(node: CanvasItem) -> void:
 static func format_time(seconds: float) -> String:
 	var s := int(seconds)
 	return "%02d:%02d" % [s / 60, s % 60]
+
+
+## Safe area (docs/ui.md §9). Insets em px da resolução base: {top, bottom, left, right}, mais
+## `css_k` (px da resolução base por px CSS; fora da web, por px da janela) para medir como o shell.
+static func safe_area(vp: Viewport) -> Dictionary:
+	var out := {"top": 0.0, "bottom": 0.0, "left": 0.0, "right": 0.0, "css_k": 1.0}
+	var visible_size := vp.get_visible_rect().size
+	var win := Vector2(DisplayServer.window_get_size())
+	if win.y > 0.0:
+		out.css_k = visible_size.y / win.y
+	if OS.has_feature("web"):
+		var raw = JavaScriptBridge.eval("window.animaGetSafeArea ? animaGetSafeArea() : ''", true)
+		var data = JSON.parse_string(str(raw)) if raw else null
+		if data is Dictionary and float(data.get("height", 0)) > 0.0:
+			var k := visible_size.y / float(data["height"])
+			out.css_k = k
+			for side in ["top", "bottom", "left", "right"]:
+				out[side] = float(data.get(side, 0.0)) * k
+	elif OS.has_feature("mobile"):
+		var screen := Rect2(Vector2.ZERO, DisplayServer.screen_get_size())
+		var safe := Rect2(DisplayServer.get_display_safe_area())
+		var k := visible_size.y / screen.size.y
+		out.top = safe.position.y * k
+		out.bottom = (screen.end.y - safe.end.y) * k
+		out.left = safe.position.x * k
+		out.right = (screen.end.x - safe.end.x) * k
+	return out
