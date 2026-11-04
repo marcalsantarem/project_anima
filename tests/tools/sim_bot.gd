@@ -11,12 +11,15 @@ const BUY_ORDER: Array[StringName] = [
 ]
 
 var arena: Arena
+## true = só observa (partida sem intervenção do jogador: nem skill nem upgrade).
+var passive := false
 var reached_boss := false
 var boss_core_pct := 0.0 ## HP do Núcleo (0..1) quando o chefe entra
 var boss_at := 0.0 ## s de partida quando o chefe entra
 var particles_earned := 0
 var upgrades_bought := 0
 var result: MatchResult
+var match_ended_count := 0
 ## Dano bruto no Núcleo por origem (id do arquétipo por contato; &"bolt_hits" = nº de tiros que acertaram).
 var damage_by_source := {}
 
@@ -29,12 +32,14 @@ func attach(p_arena: Arena) -> void:
 	arena.particles_gained.connect(func(_at: Vector2, amount: int) -> void: particles_earned += amount)
 	arena.enemy_died.connect(_on_enemy_died)
 	arena.projectile_hit.connect(_on_projectile_hit)
-	arena.match_ended.connect(func(r: MatchResult) -> void: result = r)
+	arena.match_ended.connect(func(r: MatchResult) -> void:
+		result = r
+		match_ended_count += 1)
 	arena.add_child(self)
 
 
 func _physics_process(_delta: float) -> void:
-	if arena.is_over:
+	if arena.is_over or passive:
 		return
 	var slot := arena.skills.get_slot(1)
 	if slot != null and slot.is_ready():

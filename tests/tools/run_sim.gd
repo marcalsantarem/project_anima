@@ -2,8 +2,10 @@ extends SceneTree
 ## Simulação headless de balanceamento (BRF-051, ferramenta manual; não é teste do GUT).
 ## Uso (rápido: --fixed-fps faz cada quadro valer 1/60 s sem esperar o relógio):
 ##   godot --headless --path . --fixed-fps 60 -s tests/tools/run_sim.gd -- --seeds=20 --start=1
-## Opções: --seeds=N (padrão 20), --start=S (primeira seed, padrão 1), --max-time=s (corte, padrão 900).
-## Imprime uma linha CSV por seed e o resumo.
+## Opções: --seeds=N (padrão 20), --start=S (primeira seed, padrão 1), --max-time=s (corte, padrão 900),
+## --bot=0 (partida sem intervenção do jogador; padrão 1).
+## Imprime uma linha CSV por seed, uma linha "CHECK,..." por seed (lida por
+## tests/integration/test_stage_01_sim.gd) e o resumo.
 
 const ARENA_SCENE := preload("res://src/match/arena/arena.tscn")
 
@@ -13,7 +15,7 @@ func _initialize() -> void:
 
 
 func _run() -> void:
-	var opts := {"seeds": 20, "start": 1, "max-time": 900.0}
+	var opts := {"seeds": 20, "start": 1, "max-time": 900.0, "bot": 1.0}
 	for arg in OS.get_cmdline_user_args():
 		var kv := arg.trim_prefix("--").split("=")
 		if kv.size() == 2 and opts.has(kv[0]):
@@ -22,16 +24,17 @@ func _run() -> void:
 	var rows: Array[Dictionary] = []
 	for i in int(opts["seeds"]):
 		var seed := int(opts["start"]) + i
-		rows.append(await _play(seed, opts["max-time"]))
+		rows.append(await _play(seed, opts["max-time"], opts["bot"] == 0.0))
 	_summary(rows)
 	quit()
 
 
-func _play(seed: int, max_time: float) -> Dictionary:
+func _play(seed: int, max_time: float, passive := false) -> Dictionary:
 	var arena: Arena = ARENA_SCENE.instantiate()
 	arena.set_seed(seed)
 	root.add_child(arena)
 	var bot := SimBot.new()
+	bot.passive = passive
 	bot.attach(arena)
 	while bot.result == null and arena.elapsed < max_time:
 		await physics_frame
@@ -42,6 +45,11 @@ func _play(seed: int, max_time: float) -> Dictionary:
 		"dmg": bot.damage_by_source,
 	}
 	print("%d,%s,%s,%d,%.0f,%.0f,%.0f,%d,%d" % [seed, r.boss, r.won, r.wave, r.core, r.boss_at, r.time, r.particles, r.upgrades])
+	# ended, outcome, wave_reached, waves_total, core_end, result_particles, arena_particles, match_ended_count
+	var res := bot.result
+	print("CHECK,%d,%s,%d,%d,%d,%d,%d,%d,%d" % [seed, res != null, res.outcome if res else -1,
+		res.wave_reached if res else -1, res.waves_total if res else -1, arena.anima.core.current,
+		res.particles if res else -1, arena.particles, bot.match_ended_count])
 	arena.queue_free()
 	await process_frame
 	return r

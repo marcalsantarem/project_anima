@@ -165,32 +165,7 @@ func test_defeat_locks_hud_and_freezes_match() -> void:
 	assert_signal_emit_count(arena, "match_ended", 1)
 
 
-func test_stage_01_full_match_is_consistent() -> void:
-	# Fase real, sem intervenção do jogador, acelerada 4×.
-	_start(load(StageData.path_for(&"stage_01")))
-	Engine.time_scale = 4.0
-	await wait_for_signal(arena.match_ended, 120.0) # fase de ~5 min (T-116)
-	Engine.time_scale = 1.0
-	gut.p("stage_01: onda %d, %.1f s" % [arena.waves.current_wave(), arena.elapsed])
-	assert_signal_emit_count(arena, "match_ended", 1, "partida termina")
-	if get_signal_emit_count(arena, "match_ended") == 0:
-		return
-	var r := _result()
-	gut.p("stage_01 sem skills: %s, onda %d/%d, %d abates, %d Partículas, %.1f s" % [
-		MatchResult.Outcome.keys()[r.outcome], r.wave_reached, r.waves_total,
-		r.enemies_killed, r.particles, r.duration_s])
-	var total := arena.stage.waves.size()
-	assert_eq(r.waves_total, total)
-	assert_between(r.wave_reached, 1, total)
-	if r.outcome == MatchResult.Outcome.VICTORY:
-		assert_eq(r.wave_reached, total)
-		assert_gt(arena.anima.core.current, 0)
-	else:
-		assert_eq(arena.anima.core.current, 0)
-	await wait_seconds(TWEEN_WAIT)
-	assert_eq(hud._wave_label.text, "ONDA %d/%d" % [r.wave_reached, total])
-	assert_eq(hud._particles_label.text, UiTokens.format_int(r.particles))
-	assert_eq(hud._core_bar.current, arena.anima.core.current)
+# A fase real inteira (stage_01) é verificada em test_stage_01_sim.gd, em passos fixos (sem tempo real).
 
 
 # --- Upgrades (T-135) ---

@@ -152,6 +152,9 @@ Pedestal cilíndrico neutro (`vessel`) com aro ciano + **cristal losango ciano f
 - **Animação:** por transformação (squash/stretch, bob, rotação) e shader (AG09); no máximo 2–4 quadros onde for indispensável.
 - **Orçamento:** arte 2D do M1 ≤ ~2 MB no `.pck`.
 
+### 9.3 Splash de carregamento (BRF-052, proposta)
+Em `assets/splash/` (com `.gdignore`; fica fora do `.pck`): `splash_a.png` (chão creme + selo + pilares, logotipo no topo) e `splash_b.png` (roxo da UI + selo suave, núcleo sobre disco de xadrez, logotipo abaixo). Para o shell: fundo em SVG/CSS (`splash_bg_a.svg` 1,7 KB, `splash_bg_b.svg` 3,2 KB; esticam de 1280 a 1560 px) e só o `splash_logo_core.webp` (22 KB, alfa) como imagem; brilho do cristal e sombra em CSS. Barra: pílula `#5B4A7A` com contorno `#3A2A55` e preenchimento dourado (sem ciano). Gerar: `python assets/splash/_src/gen_splash.py`.
+
 ## 10. Pendências
 
 | Item | Com quem |
