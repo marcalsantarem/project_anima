@@ -51,7 +51,7 @@ Nomes oficiais que o jogador vê. Os **identificadores de código continuam em i
 | **Fragmento** | módulo (equipamento) | equipamento do Anima, com raridade e fusão 3→1; o Anima tem **6 espaços** para equipá-los | futuro (M2+) |
 | **Núcleo** (talento) | talento, árvore de talentos | cada nó da árvore, comprado com Moeda | futuro; **atenção:** colide com o "Núcleo" que já nomeia a vida do Anima no HUD (ver nota) |
 
-> **Colisão de nome (pendente):** "Núcleo" já é o nome da base do Anima (barra "NÚCLEO 1.170 / 1.500", `core_hp`). Como os talentos também serão "Núcleos", é preciso decidir se a barra do HUD muda de rótulo ou se os talentos ganham outro nome antes de criar a árvore.
+> **Colisão de nome (resolvida, decisão 41):** a barra de vida do Anima no HUD passa a se chamar **"ENERGIA"**; "Núcleo" fica para os talentos.
 
 ## Progressão (decidida pelo usuário em 2026-11-03; detalhe no AG04)
 
