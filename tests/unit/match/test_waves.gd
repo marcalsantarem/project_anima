@@ -24,9 +24,9 @@ func _stage(wave_counts: Array, wave_break := 1.0) -> StageData:
 	return s
 
 
-func test_stage_01_has_three_waves() -> void:
+func test_stage_01_has_ten_waves() -> void:
 	var s: StageData = load(StageData.path_for(&"stage_01"))
-	assert_eq(s.waves.size(), 3)
+	assert_eq(s.waves.size(), 10)
 
 
 func test_spawns_follow_delay_and_interval() -> void:

@@ -139,22 +139,29 @@ WaveEntry: enemy (EnemyData), count, interval (s), spawn_edge, start_delay (s)
 - `spawn_edge`: `TOP | BOTTOM | LEFT | RIGHT | RANDOM` (enum `WaveEntry.SpawnEdge`).
 - `WaveEntry.enemy` aponta direto para o `.tres` do inimigo (sem tabela de `enemy_id`).
 - O i-ésimo inimigo de um grupo nasce em `start_delay + i × interval`.
-- A fase vem de `data/waves/<config.stage_id>.tres`. Hoje `stage_01` tem **3 ondas de teste** (corredores; a 3ª inclui 1 tanque, 1 atirador e 1 grupo de enxame); a curva abaixo entra na T-116.
+- A fase vem de `data/waves/<config.stage_id>.tres`.
 - Uma onda termina quando todos os inimigos dela nasceram **e** morreram. Depois vem o respiro `wave_break` (3 s).
-- A última onda é a do chefe.
+- **Chefe na onda 10, com acompanhantes** (T-116), e não numa onda 11 só dele: o "Onda 10/10" bate com o fim da fase e os acompanhantes mantêm pressão enquanto o jogador foca o chefe. `StageData.boss_id = boss_warden` (informativo).
+- **Vitória ao derrotar o chefe** (`Arena._on_enemy_died`), mesmo com acompanhantes vivos. Derrota: HP do Núcleo = 0.
 
-**Curva de dificuldade (fase 1, ~10 ondas):**
+**Curva da fase 1 (`stage_01`, T-116).** Balanceada para **1 skill (slot 1, `skill_pulse`) + upgrades da partida**, independente do tipo da skill de área (T-139). Um arquétipo novo a cada 2–3 ondas. Partículas pela média do enxame (5–8 por grupo, média 6,5); "tempo" = último spawn + tempo de limpeza estimado (sem simulação de combate).
 
-| Ondas | Composição | Objetivo |
-|---|---|---|
-| 1–2 | corredores | aprender o ataque automático |
-| 3–4 | corredores + enxame | usar a skill de área |
-| 5–6 | + tanques | usar o controle |
-| 7–8 | + atiradores | usar a defesa |
-| 9 | tudo junto, densidade máxima | teste final |
-| 10 | chefe | |
+| Onda | Composição | Inimigos | Partículas | Acumulado | Tempo est. |
+|---|---|---|---|---|---|
+| 1 | 5 corredores | 5 | 5 | 5 | ~15 s |
+| 2 | 10 corredores (cima e baixo) | 10 | 10 | 15 | ~17 s |
+| 3 | 9 corredores + 1 enxame (**novo**) | ~15,5 | ~15,5 | ~30 | ~16 s |
+| 4 | 10 corredores + 2 enxames | ~23 | ~23 | ~53 | ~18 s |
+| 5 | 12 corredores + 2 enxames + 1 tanque (**novo**) | ~26 | ~29 | ~82 | ~23 s |
+| 6 | 12 corredores + 2 enxames + 2 tanques | ~27 | ~33 | ~115 | ~22 s |
+| 7 | 12 corredores + 2 enxames + 2 tanques + 3 atiradores (**novo**) | ~30 | ~39 | ~154 | ~24 s |
+| 8 | 14 corredores + 3 enxames + 2 tanques + 3 atiradores | ~38,5 | ~47,5 | ~201,5 | ~26 s |
+| 9 | 14 corredores + 3 enxames + 3 tanques + 4 atiradores | ~40,5 | ~53,5 | **~255,5** | ~27 s |
+| 10 | **chefe** + 4 corredores + 1 atirador (+ enxames invocados) | 6+ | 6 + 50 do chefe | — | ~48 s |
 
-Alvo de duração: ~5–7 min.
+- **Partículas antes do chefe:** ~255 (faixa 233–278 conforme o tamanho dos enxames), alinhado aos ~250 de `docs/meta.md`. Nenhum `particle_drop` mudou.
+- **Duração estimada:** ~235 s de ondas + 27 s de respiros ≈ **4,5 min** jogando bem (alvo ~5 min; limite 3–10 min). Sem skill nem upgrades, a simulação do teste de integração perde na onda 4–5 (~80 s), como esperado.
+- Teste: `tests/unit/match/test_stage_01_curve.gd` percorre as ondas pelos dados (chefe só na última, Partículas ~250 ± 15 %, ondas crescentes, todos os spawns emitidos).
 
 ## Contrato de partida
 

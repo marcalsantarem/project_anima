@@ -86,7 +86,8 @@ func test_stage_01_data_is_valid() -> void:
 		for e in w.entries:
 			assert_not_null(e.enemy, "onda %d: grupo sem inimigo" % (wi + 1))
 			if e.enemy:
-				assert_true(String(e.enemy.id).begins_with("enemy_"), "id %s" % e.enemy.id)
+				var prefix := "boss_" if e.enemy is BossData else "enemy_"
+				assert_true(String(e.enemy.id).begins_with(prefix), "id %s" % e.enemy.id)
 			assert_gt(e.count, 0)
 			assert_gte(e.interval, 0.0)
 			assert_gte(e.start_delay, 0.0)

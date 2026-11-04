@@ -29,7 +29,7 @@
 | T-113 | Telas: toque para começar, pausa, resultado | M1 | AG02 | feita |
 | T-114 | Testes GUT de ondas, dano e cooldowns | M1 | AG03 | feita |
 | T-115 | Chefe da fase 1 | M1 | AG01 | feita |
-| T-116 | Fase 1 completa (~10 ondas + chefe) | M1 | AG01 | a fazer |
+| T-116 | Fase 1 completa (~10 ondas + chefe) | M1 | AG01 | feita |
 | T-117 | Game feel | M1 | AG01 + AG09 | a fazer |
 | T-118 | Desempenho no iPhone (150 inimigos / 300 projéteis) | M1 | AG01 | a fazer |
 | T-119 | Otimização do build Web | M1 | AG02 | a fazer |
@@ -42,7 +42,7 @@
 | T-126 | Guia de estilo `docs/arte.md` + mockup da arena | M1 | AG08 | pronta p/ briefing |
 | T-127 | Arte do Anima, inimigos, chefe, projéteis e fundo | M1 | AG08 | feita |
 | T-128 | Ícones e arte da UI | M1 | AG08 | feita |
-| T-129 | `docs/vfx.md` + pool de efeitos | M1 | AG09 | a fazer |
+| T-129 | `docs/vfx.md` + pool de efeitos | M1 | AG09 | feita |
 | T-130 | VFX do ataque, acertos e mortes | M1 | AG09 | a fazer |
 | T-131 | VFX da skill e do chefe | M1 | AG09 | a fazer |
 | T-132 | Modo de efeitos reduzidos | M1 | AG09 | a fazer |
@@ -61,6 +61,7 @@
 | T-145 | Retema da UI no estilo cartoon (tokens, tema, fonte) | M1 | AG02 | feita |
 | T-146 | Remover mockups rejeitados e excluir referências do export Web | M1 | AG07 | feita |
 | T-147 | Anima com skin trocável (Resource de aparência) | M2 | AG01 | a fazer |
+| T-148 | Sinais da Arena para VFX (projectile_fired, projectile_hit, enemy_died, particles_gained, skill_cast, boss_telegraph_started, boss_phase_changed) | M1 | AG01 | pronta p/ briefing |
 
 ## Próximas prontas p/ briefing
 
@@ -261,7 +262,7 @@
 - **Pronto quando:** chefe com fases por vida, ao menos 2 padrões de ataque e aviso visual (telegraph) antes de cada padrão; vencível com 1 skill + upgrades da partida.
 
 ### T-116 — Fase 1 completa
-- **Marco:** M1 · **Dono:** AG01 · **Status:** a fazer
+- **Marco:** M1 · **Dono:** AG01 · **Status:** feita
 - **Depende de:** T-111, T-115, T-134, T-139 · **Desbloqueia:** T-117, T-118, T-120
 - **Arquivos:** `data/waves/stage_01*`
 - **Pronto quando:** ~10 ondas + chefe; partida de 3–10 min; curva de dificuldade descrita em `docs/gameplay.md`.
@@ -352,6 +353,12 @@
 - **Arquivos:** `assets/backgrounds/mockup_arena*.svg`, `assets/LICENSES.md`, `export_presets.cfg`
 - **Pronto quando:** mockups A/B removidos; filtro do preset Web exclui mockups e referências; export e testes OK.
 
+### T-148 — Sinais da Arena para VFX
+- **Marco:** M1 · **Dono:** AG01 · **Status:** pronta p/ briefing
+- **Depende de:** T-129 (lista em `docs/vfx.md`), T-139 (o `skill_cast` do meteoro) · **Desbloqueia:** T-130, T-131
+- **Arquivos:** `src/match/`, `docs/gameplay.md`, `tests/` (da arena)
+- **Pronto quando:** a Arena emite `projectile_fired(from, dir)`, `projectile_hit(at, target_kind)`, `enemy_died(at, archetype_id, cause)`, `particles_gained(at, amount)`, `skill_cast(slot, at, radius)`, `boss_telegraph_started(pattern_id, duration, at, radius)` e `boss_phase_changed(phase)`, sem custo por quadro; documentados e testados.
+
 ### T-147 — Anima com skin trocável
 - **Marco:** M2 · **Dono:** AG01 · **Status:** a fazer
 - **Depende de:** T-137 · **Desbloqueia:** skins (M4)
@@ -383,7 +390,7 @@
 - **Pronto quando:** ícone da skill, cadeado dos slots, ícones dos upgrades, botões, barras e painéis no estilo do guia; legíveis no toque no iPhone.
 
 ### T-129 — `docs/vfx.md` + pool de efeitos
-- **Marco:** M1 · **Dono:** AG09 · **Status:** a fazer
+- **Marco:** M1 · **Dono:** AG09 · **Status:** feita
 - **Depende de:** T-124, T-142 · **Desbloqueia:** T-130, T-131, T-132
 - **Nota:** VFX no estilo cartoon (formas sólidas, contorno, cores vivas, poucas partículas).
 - **Arquivos:** `docs/vfx.md`, `src/fx/`
