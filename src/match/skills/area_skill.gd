@@ -1,6 +1,7 @@
 class_name AreaSkill
 extends SkillBehavior
-## Dano instantâneo em raio, no ponto de maior densidade de inimigos ao alcance.
+## Dano instantâneo em raio (no chão), no ponto de maior densidade de inimigos ao alcance.
+## Fica abaixo dos corpos (z -1): é um decalque no chão, desenhado como elipse 0,75.
 
 const TELEGRAPH_COLOR := Color(0.3, 0.95, 1.0, 0.35)
 const IMPACT_COLOR := Color(0.6, 1.0, 1.0, 0.8)
@@ -13,6 +14,7 @@ var _fx_left := 0.0
 
 
 func _ready() -> void:
+	z_index = -1
 	visible = false
 	set_physics_process(false)
 
@@ -59,7 +61,7 @@ static func apply_damage(center: Vector2, enemies: Array[Enemy], radius: float, 
 		if not is_instance_valid(e) or e.state == Enemy.State.DEAD:
 			continue
 		var reach := radius + e.data.radius
-		if center.distance_squared_to(e.position) <= reach * reach:
+		if GroundPlane.distance_squared(center, e.position) <= reach * reach:
 			e.take_damage(damage)
 			hits += 1
 	return hits
@@ -75,13 +77,13 @@ static func densest_point(origin: Vector2, enemies: Array[Enemy], target_range: 
 	for candidate in enemies:
 		if not is_instance_valid(candidate) or candidate.state == Enemy.State.DEAD:
 			continue
-		var dist_sq := origin.distance_squared_to(candidate.position)
+		var dist_sq := GroundPlane.distance_squared(origin, candidate.position)
 		if dist_sq > range_sq:
 			continue
 		var count := 0
 		for other in enemies:
 			if is_instance_valid(other) and other.state != Enemy.State.DEAD \
-					and candidate.position.distance_squared_to(other.position) <= radius_sq:
+					and GroundPlane.distance_squared(candidate.position, other.position) <= radius_sq:
 				count += 1
 		if count > best_count or (count == best_count and dist_sq < best_dist_sq):
 			best = candidate.position
@@ -91,6 +93,7 @@ static func densest_point(origin: Vector2, enemies: Array[Enemy], target_range: 
 
 
 func _draw() -> void:
+	draw_set_transform(Vector2.ZERO, 0.0, GroundPlane.SHAPE_SCALE)
 	if _windup_left > 0.0:
 		draw_arc(Vector2.ZERO, data.radius, 0.0, TAU, 64, TELEGRAPH_COLOR, RING_WIDTH, true)
 	else:

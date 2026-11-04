@@ -50,7 +50,7 @@ func test_anima_kills_runner_before_contact_using_pool() -> void:
 	await wait_physics_frames(1)
 	var pool_size := arena.projectiles.get_child_count()
 	var enemy := arena.spawn(RUNNER, WaveEntry.SpawnEdge.TOP)
-	var dist := enemy.position.distance_to(arena.anima.position)
+	var dist := GroundPlane.distance(enemy.position, arena.anima.position)
 	await wait_seconds(dist / RUNNER.speed + 0.5)
 	assert_false(is_instance_valid(enemy), "corredor morto")
 	assert_eq(arena.anima.core.current, arena.anima.core.max_hp, "Núcleo intacto")

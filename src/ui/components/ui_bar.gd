@@ -17,6 +17,11 @@ const GHOST_TIME := 0.3
 	set(v):
 		fill_color = v
 		queue_redraw()
+## Texto antes dos números (ex.: "NÚCLEO ").
+@export var label_prefix := "":
+	set(v):
+		label_prefix = v
+		queue_redraw()
 @export var show_numbers := true:
 	set(v):
 		show_numbers = v
@@ -32,7 +37,7 @@ var _flash_tween: Tween
 
 
 func _init() -> void:
-	custom_minimum_size = Vector2(0, 32)
+	custom_minimum_size = Vector2(0, UiTokens.CORE_BAR_HEIGHT)
 	mouse_filter = MOUSE_FILTER_IGNORE
 
 
@@ -79,31 +84,36 @@ func _current_color() -> Color:
 
 
 func _draw() -> void:
+	# Trilho escuro com contorno; o preenchimento fica por dentro do contorno.
 	var r := Rect2(Vector2.ZERO, size)
-	var radius := minf(size.y * 0.5, UiTokens.RADIUS_S)
-	draw_style_box(_rounded(UiTokens.BG_PANEL_ALT, radius), r)
+	var radius := size.y * 0.5
+	draw_style_box(_rounded(UiTokens.BAR_TRACK, radius, UiTokens.BORDER), r)
+	var b := float(UiTokens.BORDER)
+	var inner := r.grow(-b)
+	var inner_radius := maxf(radius - b, 0.0)
 	if _ghost > _fill:
-		draw_style_box(_rounded(Color(UiTokens.TEXT_PRIMARY, 0.35), radius), Rect2(Vector2.ZERO, Vector2(size.x * _ghost, size.y)))
+		draw_style_box(_rounded(Color(UiTokens.TEXT_PRIMARY, 0.45), inner_radius), Rect2(inner.position, Vector2(inner.size.x * _ghost, inner.size.y)))
 	if _fill > 0.0:
-		draw_style_box(_rounded(_current_color(), radius), Rect2(Vector2.ZERO, Vector2(size.x * _fill, size.y)))
-	var border := StyleBoxFlat.new()
-	border.draw_center = false
-	border.border_color = UiTokens.LINE
-	border.set_border_width_all(UiTokens.BORDER)
-	border.set_corner_radius_all(int(radius))
-	draw_style_box(border, r)
+		var fill_rect := Rect2(inner.position, Vector2(maxf(inner.size.x * _fill, inner.size.y), inner.size.y))
+		draw_style_box(_rounded(_current_color(), inner_radius), fill_rect)
+		# Faixa de brilho no topo do preenchimento
+		var hl := Rect2(fill_rect.position + Vector2(inner_radius * 0.5, inner.size.y * 0.14), Vector2(maxf(fill_rect.size.x - inner_radius, 0.0), inner.size.y * 0.22))
+		draw_style_box(_rounded(UiTokens.HIGHLIGHT, hl.size.y * 0.5), hl)
 	if show_numbers:
 		var font := get_theme_font("font", "UiBar")
 		var fs := get_theme_font_size("font_size", "UiBar")
-		var text := "%d/%d" % [current, maximum]
+		var text := "%s%s / %s" % [label_prefix, UiTokens.format_int(current), UiTokens.format_int(maximum)]
 		var baseline := (size.y + font.get_ascent(fs) - font.get_descent(fs)) * 0.5
-		draw_string_outline(font, Vector2(0, baseline), text, HORIZONTAL_ALIGNMENT_CENTER, size.x, fs, 4, UiTokens.BG_VOID)
+		draw_string_outline(font, Vector2(0, baseline), text, HORIZONTAL_ALIGNMENT_CENTER, size.x, fs, UiTokens.TEXT_OUTLINE - 2, UiTokens.INK)
 		draw_string(font, Vector2(0, baseline), text, HORIZONTAL_ALIGNMENT_CENTER, size.x, fs, UiTokens.TEXT_PRIMARY)
 
 
-static func _rounded(color: Color, radius: float) -> StyleBoxFlat:
+static func _rounded(color: Color, radius: float, border := 0) -> StyleBoxFlat:
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = color
 	sb.set_corner_radius_all(int(radius))
+	if border > 0:
+		sb.border_color = UiTokens.INK
+		sb.set_border_width_all(border)
 	sb.anti_aliasing = true
 	return sb

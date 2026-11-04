@@ -54,11 +54,11 @@ func test_shooter_stops_at_range_and_damages_core() -> void:
 	var arena := _arena()
 	await wait_physics_frames(1)
 	var shooter := arena.spawn(SHOOTER, WaveEntry.SpawnEdge.TOP)
-	shooter.position = arena.anima.position + Vector2(0, -420)
+	shooter.position = arena.anima.position + GroundPlane.to_screen(Vector2(0, -420)) # 420 px no chão
 	# 40 px até o alcance + 1º tiro em 1,5 s + 340 px de voo a 300 px/s.
 	await wait_seconds(40.0 / SHOOTER.speed + 1.5 + 340.0 / BOLT.speed + 0.3)
 	assert_eq(shooter.state, Enemy.State.ATTACK)
-	assert_almost_eq(shooter.position.distance_to(arena.anima.position), SHOOTER.attack_range, 3.0)
+	assert_almost_eq(GroundPlane.distance(shooter.position, arena.anima.position), SHOOTER.attack_range, 3.0)
 	assert_eq(arena.anima.core.current, arena.anima.core.max_hp - BOLT.damage)
 	assert_eq(arena.enemy_projectiles.get_child_count(), arena.enemy_projectile_pool_size, "pool não cresce")
 

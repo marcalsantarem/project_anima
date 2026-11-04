@@ -63,7 +63,7 @@ func test_hud_gets_initial_values() -> void:
 	var max_hp := arena.anima.data.core_hp_max
 	assert_eq(hud._core_bar.current, max_hp)
 	assert_eq(hud._core_bar.maximum, max_hp)
-	assert_eq(hud._wave_label.text, "Wave 1/3")
+	assert_eq(hud._wave_label.text, "ONDA 1/3")
 	assert_eq(hud._coin_label.text, "0")
 
 
@@ -90,8 +90,8 @@ func test_victory_reaches_hud_and_result() -> void:
 	assert_eq(r.enemies_killed, 5)
 	assert_eq(r.coins, 5 * RUNNER.coin_drop)
 	await wait_seconds(TWEEN_WAIT)
-	assert_eq(hud._wave_label.text, "Wave 2/2")
-	assert_eq(hud._coin_label.text, str(r.coins))
+	assert_eq(hud._wave_label.text, "ONDA 2/2")
+	assert_eq(hud._coin_label.text, UiTokens.format_int(r.coins))
 	assert_eq(hud._core_bar.current, arena.anima.core.current)
 
 
@@ -184,6 +184,6 @@ func test_stage_01_full_match_is_consistent() -> void:
 	else:
 		assert_eq(arena.anima.core.current, 0)
 	await wait_seconds(TWEEN_WAIT)
-	assert_eq(hud._wave_label.text, "Wave %d/3" % r.wave_reached)
-	assert_eq(hud._coin_label.text, str(r.coins))
+	assert_eq(hud._wave_label.text, "ONDA %d/3" % r.wave_reached)
+	assert_eq(hud._coin_label.text, UiTokens.format_int(r.coins))
 	assert_eq(hud._core_bar.current, arena.anima.core.current)

@@ -7,6 +7,8 @@ signal core_depleted
 
 const BODY_COLOR := Color(0.55, 0.85, 1.0)
 const RING_WIDTH := 3.0
+## Altura do desenho do núcleo acima da âncora, em frações do raio (placeholder).
+const CORE_HEIGHT_FACTOR := 0.6
 
 @export var data: AnimaData
 ## Desligável para testes e debug.
@@ -27,6 +29,8 @@ func _ready() -> void:
 	var shape := CircleShape2D.new()
 	shape.radius = data.hurtbox_radius
 	_hurtbox.shape = shape
+	_hurtbox.scale = GroundPlane.SHAPE_SCALE # círculo no chão
+	add_child(GroundShadow.new(data.hurtbox_radius))
 	core = CoreHealth.new(data.core_hp_max)
 	core.changed.connect(func(c: int, m: int) -> void: core_hp_changed.emit(c, m))
 	core.depleted.connect(func() -> void: core_depleted.emit())
@@ -73,6 +77,8 @@ func _on_area_entered(area: Area2D) -> void:
 			p.consume()
 
 
+## Âncora = centro do pedestal no chão: o anel é a hurtbox (elipse) e o núcleo flutua acima.
 func _draw() -> void:
+	draw_circle(Vector2(0.0, -data.hurtbox_radius * CORE_HEIGHT_FACTOR), data.hurtbox_radius * 0.4, BODY_COLOR)
+	draw_set_transform(Vector2.ZERO, 0.0, GroundPlane.SHAPE_SCALE)
 	draw_arc(Vector2.ZERO, data.hurtbox_radius, 0.0, TAU, 48, BODY_COLOR, RING_WIDTH, true)
-	draw_circle(Vector2.ZERO, data.hurtbox_radius * 0.4, BODY_COLOR)

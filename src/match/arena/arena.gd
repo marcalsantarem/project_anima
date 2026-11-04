@@ -1,6 +1,8 @@
 class_name Arena
 extends Node2D
 ## Raiz da partida. Recebe setup(config), roda as ondas da fase e emite match_ended uma vez.
+## Perspectiva 3/4: Anima, inimigos e projéteis são ordenados por Y (âncora no chão); a regra
+## de distância e colisão vale no plano do chão (ver GroundPlane).
 
 signal core_hp_changed(current: int, max_hp: int)
 signal wave_changed(current: int, total: int)
@@ -12,7 +14,12 @@ signal skill_ready(slot: int)
 
 const ENEMY_SCENE := preload("res://src/match/enemies/enemy.tscn")
 
-@export var spawn_margin: float = 64.0 ## px além da borda da tela
+@export var spawn_margin: float = 32.0 ## px além da borda da arena
+## Faixa da tela ocupada pela arena (mockup A, base 720×1280: y de 164 a 987). O resto é HUD
+## (fileira de upgrades em cima, bandeja de skills embaixo). Com stretch expand, a arena
+## acompanha a largura e a altura extras da tela.
+@export var arena_top_inset: float = 164.0 ## px do topo da tela
+@export var arena_bottom_inset: float = 293.0 ## px da base da tela
 ## Desligável para testes e debug (spawn só manual).
 @export var waves_enabled := true
 @export var enemy_projectile_pool_size: int = 128
@@ -88,7 +95,7 @@ func spawn(enemy_data: EnemyData, edge: WaveEntry.SpawnEdge) -> Enemy:
 	if edge == WaveEntry.SpawnEdge.RANDOM:
 		edge = _rng.randi_range(WaveEntry.SpawnEdge.TOP, WaveEntry.SpawnEdge.RIGHT) as WaveEntry.SpawnEdge
 	var enemy: Enemy = ENEMY_SCENE.instantiate()
-	enemy.setup(enemy_data, edge_point(edge, arena_size(), spawn_margin, _rng.randf()), anima.position)
+	enemy.setup(enemy_data, edge_point(edge, arena_rect(), spawn_margin, _rng.randf()), anima.position)
 	enemy.projectile_pool = enemy_projectiles
 	enemy.died.connect(_on_enemy_died)
 	_enemies.add_child(enemy)
@@ -102,7 +109,7 @@ func spawn_group(enemy_data: EnemyData, edge: WaveEntry.SpawnEdge) -> int:
 	var leader := spawn(enemy_data, edge)
 	for i in n - 1:
 		var e := spawn(enemy_data, edge)
-		e.position = leader.position + Vector2.from_angle(_rng.randf() * TAU) * _rng.randf() * enemy_data.group_spread
+		e.position = leader.position + GroundPlane.to_screen(Vector2.from_angle(_rng.randf() * TAU) * _rng.randf() * enemy_data.group_spread)
 	return n
 
 
@@ -110,17 +117,26 @@ func arena_size() -> Vector2:
 	return get_viewport_rect().size
 
 
-## Ponto fora da tela na borda indicada (não RANDOM). t (0..1) percorre a borda.
-static func edge_point(edge: WaveEntry.SpawnEdge, size: Vector2, margin: float, t: float) -> Vector2:
+## Área jogável na tela (sem as faixas do HUD).
+func arena_rect() -> Rect2:
+	return rect_for(arena_size(), arena_top_inset, arena_bottom_inset)
+
+
+static func rect_for(screen: Vector2, top_inset: float, bottom_inset: float) -> Rect2:
+	return Rect2(0.0, top_inset, screen.x, maxf(screen.y - top_inset - bottom_inset, 0.0))
+
+
+## Ponto fora da arena na borda indicada (não RANDOM). t (0..1) percorre a borda.
+static func edge_point(edge: WaveEntry.SpawnEdge, rect: Rect2, margin: float, t: float) -> Vector2:
 	match edge:
 		WaveEntry.SpawnEdge.TOP:
-			return Vector2(size.x * t, -margin)
+			return Vector2(rect.position.x + rect.size.x * t, rect.position.y - margin)
 		WaveEntry.SpawnEdge.BOTTOM:
-			return Vector2(size.x * t, size.y + margin)
+			return Vector2(rect.position.x + rect.size.x * t, rect.end.y + margin)
 		WaveEntry.SpawnEdge.LEFT:
-			return Vector2(-margin, size.y * t)
+			return Vector2(rect.position.x - margin, rect.position.y + rect.size.y * t)
 		_:
-			return Vector2(size.x + margin, size.y * t)
+			return Vector2(rect.end.x + margin, rect.position.y + rect.size.y * t)
 
 
 func _on_spawn_requested(enemy_data: EnemyData, edge: WaveEntry.SpawnEdge) -> void:
@@ -155,4 +171,4 @@ func _end(outcome: MatchResult.Outcome) -> void:
 
 
 func _center_anima() -> void:
-	anima.position = arena_size() / 2.0
+	anima.position = arena_rect().get_center()

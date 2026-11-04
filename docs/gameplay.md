@@ -23,9 +23,18 @@
 | Parâmetro | Valor |
 |---|---|
 | Resolução base | 720×1280, retrato, stretch `canvas_items` / `expand` |
-| Anima | centro da arena, câmera fixa |
-| Bordas de spawn | `top`, `bottom`, `left`, `right` (fora da tela, ~64 px além da borda) |
+| Arena | faixa da tela de y = 164 a 987 (base 720×1280, mockup A); o resto é HUD. Insets `arena_top_inset` / `arena_bottom_inset` na cena; com `expand` a arena cresce junto |
+| Anima | centro da **arena** (não da tela), câmera fixa |
+| Bordas de spawn | `top`, `bottom`, `left`, `right` (fora da arena, 32 px além da borda) |
 | Lógica | `_physics_process` a 60 Hz; o visual nunca decide a regra |
+
+### Perspectiva 3/4 (T-144)
+
+- **`position` = âncora = ponto de contato com o chão**, em coordenadas de tela. O corpo é desenhado acima dela.
+- **Regra no plano do chão:** o Y da tela é o Y do chão encolhido por **0,75** (`GroundPlane.Y_SCALE`). Alcance, raios, distâncias e velocidades (px e px/s) valem **no chão**: 100 px no chão = 100 px na horizontal ou 75 px na vertical da tela. Use sempre `GroundPlane` (`distance`, `move_toward`, `to_ground`, `to_screen`), nunca `distance_to` direto.
+- **Colisão:** `CircleShape2D` com o `CollisionShape2D` em escala `(1, 0,75)`, ou seja, círculo no chão = elipse na tela (testado no Godot 4.7.2, inclusive elipse × elipse).
+- **Desenho:** decalques no chão (sombra, anel de skill, telegraph) são elipses 0,75 com `z_index = -1`, abaixo de todos os corpos. Cada entidade tem uma `GroundShadow` (115% do raio de colisão).
+- **Y-sort:** `Arena`, `Enemies`, `Projectiles` e `EnemyProjectiles` com `y_sort_enabled`; Anima, inimigos e projéteis são ordenados juntos pela âncora. Projéteis voam `ProjectileData.height` px acima da sombra (só desenho).
 
 ## Anima e ataque automático
 

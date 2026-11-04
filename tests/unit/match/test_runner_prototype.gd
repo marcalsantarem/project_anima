@@ -18,12 +18,14 @@ func test_step_towards_moves_by_speed_and_stops_at_target() -> void:
 	assert_eq(p, Vector2(100, 0))
 
 
-func test_edge_points_are_off_screen() -> void:
+func test_edge_points_are_outside_arena() -> void:
 	var size := Vector2(720, 1280)
-	assert_eq(Arena.edge_point(WaveEntry.SpawnEdge.TOP, size, 64.0, 0.5), Vector2(360, -64))
-	assert_eq(Arena.edge_point(WaveEntry.SpawnEdge.BOTTOM, size, 64.0, 0.0), Vector2(0, 1344))
-	assert_eq(Arena.edge_point(WaveEntry.SpawnEdge.LEFT, size, 64.0, 1.0), Vector2(-64, 1280))
-	assert_eq(Arena.edge_point(WaveEntry.SpawnEdge.RIGHT, size, 64.0, 0.5), Vector2(784, 640))
+	var rect := Arena.rect_for(size, 164.0, 293.0) # arena do mockup: y 164..987
+	assert_eq(rect, Rect2(0, 164, 720, 823))
+	assert_eq(Arena.edge_point(WaveEntry.SpawnEdge.TOP, rect, 64.0, 0.5), Vector2(360, 100))
+	assert_eq(Arena.edge_point(WaveEntry.SpawnEdge.BOTTOM, rect, 64.0, 0.0), Vector2(0, 1051))
+	assert_eq(Arena.edge_point(WaveEntry.SpawnEdge.LEFT, rect, 64.0, 1.0), Vector2(-64, 987))
+	assert_eq(Arena.edge_point(WaveEntry.SpawnEdge.RIGHT, rect, 64.0, 0.5), Vector2(784, 575.5))
 
 
 func test_runner_reaches_core_and_deals_contact_damage() -> void:
@@ -34,7 +36,7 @@ func test_runner_reaches_core_and_deals_contact_damage() -> void:
 	await wait_physics_frames(1)
 	var enemy := arena.spawn(RUNNER, WaveEntry.SpawnEdge.TOP)
 	# Distância até o centro + margem, dividida pela velocidade, com folga.
-	var dist := enemy.position.distance_to(arena.anima.position)
+	var dist := GroundPlane.distance(enemy.position, arena.anima.position)
 	await wait_seconds(dist / RUNNER.speed + 0.5)
 	assert_eq(arena.anima.core.current, arena.anima.core.max_hp - RUNNER.contact_damage)
 	assert_false(is_instance_valid(enemy))

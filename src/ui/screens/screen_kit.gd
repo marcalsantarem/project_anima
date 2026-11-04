@@ -1,5 +1,5 @@
 class_name ScreenKit
-## Peças comuns das telas (docs/ui.md §8): raiz com tema, rótulos, botões e fade.
+## Peças comuns das telas (docs/ui.md §8): raiz com tema, cartão com moldura, rótulos, botões e fade.
 
 const THEME := preload("res://src/ui/theme/anima_theme.tres")
 
@@ -35,6 +35,29 @@ static func column(parent: Control, separation: int = UiTokens.SPACE_M) -> VBoxC
 	return col
 
 
+## Cartão com moldura (painel cartoon) centralizado na tela, com uma coluna dentro.
+static func card(parent: Control, separation: int = UiTokens.SPACE_M) -> VBoxContainer:
+	var center := CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	parent.add_child(center)
+	var panel := PanelContainer.new()
+	panel.custom_minimum_size.x = 520
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	center.add_child(panel)
+	var pad := MarginContainer.new()
+	pad.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	for side in ["left", "right", "top", "bottom"]:
+		pad.add_theme_constant_override("margin_" + side, UiTokens.SPACE_M)
+	panel.add_child(pad)
+	var col := VBoxContainer.new()
+	col.alignment = BoxContainer.ALIGNMENT_CENTER
+	col.add_theme_constant_override("separation", separation)
+	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	pad.add_child(col)
+	return col
+
+
 static func label(text: String, variation: StringName, color: Color = UiTokens.TEXT_PRIMARY) -> Label:
 	var l := Label.new()
 	l.text = text
@@ -51,7 +74,7 @@ static func button(text: String, primary: bool, cb: Callable) -> Button:
 	var b := Button.new()
 	b.text = text
 	b.theme_type_variation = &"ButtonPrimary" if primary else &""
-	b.custom_minimum_size = Vector2(320, UiTokens.TOUCH_MIN)
+	b.custom_minimum_size = Vector2(360, UiTokens.TOUCH_MIN)
 	b.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	b.pressed.connect(cb)
 	return b

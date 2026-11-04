@@ -2,20 +2,27 @@ class_name Hud
 extends CanvasLayer
 ## HUD da partida (docs/ui.md §4–6). Só escuta os sinais da Arena; toques chamam Arena.use_skill(slot).
 ## Chame bind(arena) ANTES de a arena entrar na árvore: os valores iniciais saem no _ready dela.
+## Layout cartoon (T-145): topo = pausa · pílula "ONDA x/y" · pílula de moedas, barra do Núcleo;
+## bandeja inferior = fileira de upgrades (reservada, T-135) + 3 slots de skill (Ø 144, centros 150/360/570).
 
 ## Pedido de pausa (botão). O botão também injeta a action `pause`; a tela de pausa (T-113) ouve um dos dois.
 signal pause_requested
 
 const THEME := preload("res://src/ui/theme/anima_theme.tres")
 const SKILL_COUNT := 3
-const SKILL_GAP := 52
 const SKILL_ICONS := [SkillButton.Icon.CIRCLE, SkillButton.Icon.DIAMOND, SkillButton.Icon.HEX]
-const COIN_SIZE := 24
+const COIN_SIZE := 36
+const CORE_ICON_SIZE := Vector2(36, 44)
+const UPGRADE_BAND_PAD := 10
 
 var _arena: Node
 var _root: Control
 var _top: MarginContainer
-var _bottom: MarginContainer
+var _tray: PanelContainer
+var _upgrade_margin: MarginContainer
+var _skills_margin: MarginContainer
+## Contêiner da fileira de 5 upgrades (vazio até a T-135).
+var upgrade_row: HBoxContainer
 var _core_bar: UiBar
 var _boss_bar: UiBar
 var _boss_row: Control
@@ -64,42 +71,74 @@ func _build() -> void:
 	_root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_root)
+	_build_top()
+	_build_tray()
 
-	# Topo
-	_top = _margin(Control.PRESET_TOP_WIDE)
+
+func _build_top() -> void:
+	_top = MarginContainer.new()
+	_top.name = "Top"
+	_top.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_top.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	_top.grow_vertical = Control.GROW_DIRECTION_END
+	_root.add_child(_top)
 	var top_col := VBoxContainer.new()
-	top_col.add_theme_constant_override("separation", UiTokens.SPACE_XS)
+	top_col.add_theme_constant_override("separation", UiTokens.SPACE_S)
 	top_col.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_top.add_child(top_col)
 
-	var row1 := _hbox(UiTokens.SPACE_S)
-	row1.alignment = BoxContainer.ALIGNMENT_CENTER
+	# Linha 1: pausa · ONDA x/y (centralizada) · moedas. Os lados têm a mesma largura.
+	var row1 := _hbox(UiTokens.SPACE_XS)
 	top_col.add_child(row1)
-	_core_bar = UiBar.new()
-	_core_bar.color_mode = UiBar.ColorMode.CORE_HP
-	_core_bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_core_bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	row1.add_child(_core_bar)
+	var left := _hbox(0)
+	left.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row1.add_child(left)
 	_pause_button = Button.new()
+	_pause_button.name = "Pause"
 	_pause_button.text = "II"
 	_pause_button.custom_minimum_size = Vector2(UiTokens.TOUCH_MIN, UiTokens.TOUCH_MIN)
 	_pause_button.focus_mode = Control.FOCUS_NONE
+	_pause_button.add_theme_font_size_override("font_size", UiTokens.FONT_HUD)
 	_pause_button.pressed.connect(_on_pause_pressed)
-	row1.add_child(_pause_button)
+	left.add_child(_pause_button)
 
-	var row2 := _hbox(UiTokens.SPACE_XS)
-	top_col.add_child(row2)
+	var wave_pill := _panel(&"PanelPill")
+	wave_pill.custom_minimum_size.x = 220
+	wave_pill.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row1.add_child(wave_pill)
 	_wave_label = _label(&"LabelHud")
-	row2.add_child(_wave_label)
-	var spacer := Control.new()
-	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	row2.add_child(spacer)
-	row2.add_child(_coin_icon())
+	_wave_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	wave_pill.add_child(_wave_label)
+
+	var right := _hbox(0)
+	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	right.alignment = BoxContainer.ALIGNMENT_END
+	row1.add_child(right)
+	var coin_pill := _panel(&"PanelPillLight")
+	coin_pill.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	right.add_child(coin_pill)
+	var coin_row := _hbox(UiTokens.SPACE_XS)
+	coin_pill.add_child(coin_row)
+	coin_row.add_child(_icon(Vector2(COIN_SIZE, COIN_SIZE), _draw_star))
 	_coin_label = _label(&"LabelHud")
 	_coin_label.text = "0"
-	row2.add_child(_coin_label)
+	_coin_label.add_theme_color_override("font_color", UiTokens.COIN)
+	_coin_label.custom_minimum_size.x = 72
+	_coin_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	coin_row.add_child(_coin_label)
 
+	# Linha 2: cristal + barra do Núcleo
+	var row2 := _hbox(UiTokens.SPACE_XS)
+	top_col.add_child(row2)
+	row2.add_child(_icon(CORE_ICON_SIZE, _draw_crystal))
+	_core_bar = UiBar.new()
+	_core_bar.color_mode = UiBar.ColorMode.CORE_HP
+	_core_bar.label_prefix = "NÚCLEO "
+	_core_bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_core_bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row2.add_child(_core_bar)
+
+	# Chefe (aparece com boss_spawned)
 	var boss_col := VBoxContainer.new()
 	boss_col.add_theme_constant_override("separation", UiTokens.SPACE_XS)
 	boss_col.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -107,19 +146,49 @@ func _build() -> void:
 	top_col.add_child(boss_col)
 	_boss_row = boss_col
 	_boss_label = _label(&"LabelCaption")
+	_boss_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	boss_col.add_child(_boss_label)
 	_boss_bar = UiBar.new()
 	_boss_bar.color_mode = UiBar.ColorMode.FIXED
 	_boss_bar.fill_color = UiTokens.BOSS_HP
 	_boss_bar.show_numbers = false
-	_boss_bar.custom_minimum_size.y = 24
+	_boss_bar.custom_minimum_size.y = 28
 	boss_col.add_child(_boss_bar)
 
-	# Base: botões de skill
-	_bottom = _margin(Control.PRESET_BOTTOM_WIDE)
-	var skills_row := _hbox(SKILL_GAP)
+
+func _build_tray() -> void:
+	_tray = _panel(&"PanelTray")
+	_tray.name = "Tray"
+	_tray.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	_tray.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	_root.add_child(_tray)
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override("separation", 0)
+	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_tray.add_child(col)
+
+	# Faixa da fileira de upgrades (decisão 35). Os botões vêm na T-135.
+	var band := _panel(&"")
+	var band_sb := StyleBoxFlat.new()
+	band_sb.bg_color = UiTokens.TRAY_BAND
+	band_sb.border_color = UiTokens.INK
+	band_sb.border_width_bottom = UiTokens.BORDER
+	band.add_theme_stylebox_override("panel", band_sb)
+	col.add_child(band)
+	_upgrade_margin = _margin_box()
+	band.add_child(_upgrade_margin)
+	upgrade_row = _hbox(UiTokens.UPGRADE_GAP)
+	upgrade_row.name = "UpgradeRow"
+	upgrade_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	upgrade_row.custom_minimum_size.y = UiTokens.UPGRADE_SIZE.y
+	_upgrade_margin.add_child(upgrade_row)
+
+	# Slots de skill
+	_skills_margin = _margin_box()
+	col.add_child(_skills_margin)
+	var skills_row := _hbox(UiTokens.SKILL_GAP)
 	skills_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	_bottom.add_child(skills_row)
+	_skills_margin.add_child(skills_row)
 	for i in SKILL_COUNT:
 		var sb := SkillButton.new()
 		sb.slot = i + 1
@@ -130,13 +199,17 @@ func _build() -> void:
 		_skills.append(sb)
 
 
-func _margin(preset: Control.LayoutPreset) -> MarginContainer:
+func _margin_box() -> MarginContainer:
 	var m := MarginContainer.new()
 	m.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	m.set_anchors_and_offsets_preset(preset)
-	m.grow_vertical = Control.GROW_DIRECTION_END if preset == Control.PRESET_TOP_WIDE else Control.GROW_DIRECTION_BEGIN
-	_root.add_child(m)
 	return m
+
+
+func _panel(variation: StringName) -> PanelContainer:
+	var p := PanelContainer.new()
+	p.theme_type_variation = variation
+	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return p
 
 
 func _hbox(separation: int) -> HBoxContainer:
@@ -153,17 +226,40 @@ func _label(variation: StringName) -> Label:
 	return l
 
 
-func _coin_icon() -> Control:
-	var p := Panel.new()
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = UiTokens.COIN
-	sb.set_corner_radius_all(COIN_SIZE / 2)
-	sb.anti_aliasing = true
-	p.add_theme_stylebox_override("panel", sb)
-	p.custom_minimum_size = Vector2(COIN_SIZE, COIN_SIZE)
-	p.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	return p
+func _icon(min_size: Vector2, painter: Callable) -> Control:
+	var c := Control.new()
+	c.custom_minimum_size = min_size
+	c.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	c.draw.connect(painter.bind(c))
+	return c
+
+
+## Estrela de 4 pontas (moedas/Partículas), dourada com contorno.
+func _draw_star(c: Control) -> void:
+	var ctr := c.size * 0.5
+	var s := minf(c.size.x, c.size.y) * 0.5
+	var pts := PackedVector2Array()
+	for i in 8:
+		var a := TAU * i / 8.0 - PI * 0.5
+		pts.append(ctr + Vector2(cos(a), sin(a)) * (s if i % 2 == 0 else s * 0.38))
+	_outlined(c, pts, UiTokens.COIN)
+
+
+## Cristal do Núcleo, ciano com contorno.
+func _draw_crystal(c: Control) -> void:
+	var w := c.size.x * 0.5
+	var h := c.size.y * 0.5
+	var ctr := c.size * 0.5
+	var pts := PackedVector2Array([ctr + Vector2(0, -h), ctr + Vector2(w, 0), ctr + Vector2(0, h), ctr + Vector2(-w, 0)])
+	_outlined(c, pts, UiTokens.ACCENT)
+
+
+func _outlined(c: Control, pts: PackedVector2Array, fill: Color) -> void:
+	var closed := pts.duplicate()
+	closed.append(pts[0])
+	c.draw_polyline(closed, UiTokens.INK, 6.0, true)
+	c.draw_colored_polygon(pts, fill)
 
 
 # --- Safe area (docs/ui.md §9) ---
@@ -192,11 +288,15 @@ func safe_insets() -> Dictionary:
 
 func apply_safe_area() -> void:
 	var s := safe_insets()
-	for m in [_top, _bottom]:
-		m.add_theme_constant_override("margin_left", UiTokens.MARGIN_SCREEN + int(s.left))
-		m.add_theme_constant_override("margin_right", UiTokens.MARGIN_SCREEN + int(s.right))
-	_top.add_theme_constant_override("margin_top", UiTokens.MARGIN_SCREEN + int(s.top))
-	_bottom.add_theme_constant_override("margin_bottom", UiTokens.MARGIN_SCREEN + int(s.bottom))
+	var m := UiTokens.MARGIN_SCREEN
+	for box in [_top, _upgrade_margin, _skills_margin]:
+		box.add_theme_constant_override("margin_left", m + int(s.left))
+		box.add_theme_constant_override("margin_right", m + int(s.right))
+	_top.add_theme_constant_override("margin_top", m + int(s.top))
+	_upgrade_margin.add_theme_constant_override("margin_top", UPGRADE_BAND_PAD)
+	_upgrade_margin.add_theme_constant_override("margin_bottom", UPGRADE_BAND_PAD)
+	_skills_margin.add_theme_constant_override("margin_top", m)
+	_skills_margin.add_theme_constant_override("margin_bottom", UiTokens.SPACE_XS + int(s.bottom))
 
 
 # --- Sinais da Arena ---
@@ -206,7 +306,7 @@ func _on_core_hp_changed(current: int, max_hp: int) -> void:
 
 
 func _on_wave_changed(current: int, total: int) -> void:
-	_wave_label.text = "Wave %d/%d" % [current, total]
+	_wave_label.text = "ONDA %d/%d" % [current, total]
 	_wave_label.pivot_offset = _wave_label.size * 0.5
 	if _wave_tween:
 		_wave_tween.kill()
@@ -225,7 +325,7 @@ func _on_coins_changed(amount: int) -> void:
 
 func _set_coins_shown(v: int) -> void:
 	_coins_shown = v
-	_coin_label.text = str(v)
+	_coin_label.text = UiTokens.format_int(v)
 
 
 func _on_skill_used(slot: int) -> void:

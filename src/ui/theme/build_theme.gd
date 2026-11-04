@@ -1,8 +1,9 @@
 extends SceneTree
-## Gera anima_theme.tres a partir de UiTokens.
+## Gera anima_theme.tres a partir de UiTokens (estilo cartoon, T-145).
 ## Uso: godot --headless --path . -s res://src/ui/theme/build_theme.gd
 
 const OUTPUT := "res://src/ui/theme/anima_theme.tres"
+const PILL_RADIUS := 40
 
 
 func _init() -> void:
@@ -16,31 +17,44 @@ func _init() -> void:
 
 static func build() -> Theme:
 	var theme := Theme.new()
-	var regular := _font_weight(400)
-	var bold := _font_weight(700)
+	var regular := _font_weight(UiTokens.FONT_WEIGHT_REGULAR)
+	var bold := _font_weight(UiTokens.FONT_WEIGHT_BOLD)
 	theme.default_font = regular
 	theme.default_font_size = UiTokens.FONT_BODY
 
-	# Label
+	# Label: texto claro com contorno escuro (legível sobre a arena clara e os painéis).
 	theme.set_color("font_color", "Label", UiTokens.TEXT_PRIMARY)
-	_label_variation(theme, "LabelDisplay", bold, UiTokens.FONT_DISPLAY, UiTokens.TEXT_PRIMARY)
-	_label_variation(theme, "LabelTitle", bold, UiTokens.FONT_TITLE, UiTokens.TEXT_PRIMARY)
-	_label_variation(theme, "LabelHud", bold, UiTokens.FONT_HUD, UiTokens.TEXT_PRIMARY)
-	_label_variation(theme, "LabelCaption", regular, UiTokens.FONT_CAPTION, UiTokens.TEXT_SECONDARY)
+	theme.set_color("font_outline_color", "Label", UiTokens.INK)
+	theme.set_constant("outline_size", "Label", UiTokens.TEXT_OUTLINE)
+	_label_variation(theme, "LabelDisplay", bold, UiTokens.FONT_DISPLAY, UiTokens.TEXT_PRIMARY, UiTokens.TEXT_OUTLINE + 6)
+	_label_variation(theme, "LabelTitle", bold, UiTokens.FONT_TITLE, UiTokens.TEXT_PRIMARY, UiTokens.TEXT_OUTLINE + 2)
+	_label_variation(theme, "LabelHud", bold, UiTokens.FONT_HUD, UiTokens.TEXT_PRIMARY, UiTokens.TEXT_OUTLINE)
+	_label_variation(theme, "LabelCaption", bold, UiTokens.FONT_CAPTION, UiTokens.TEXT_SECONDARY, UiTokens.TEXT_OUTLINE - 2)
+	# Texto escuro sem contorno, para fundos claros.
+	_label_variation(theme, "LabelOnLight", bold, UiTokens.FONT_BODY, UiTokens.TEXT_ON_LIGHT, 0)
 
-	# Button (secundário = padrão)
-	_button(theme, "Button", UiTokens.BG_PANEL_ALT, UiTokens.TEXT_PRIMARY, UiTokens.LINE)
+	# Button (secundário = padrão): claro, texto escuro.
+	_button(theme, "Button", UiTokens.SURFACE, UiTokens.TEXT_ON_LIGHT)
 	theme.set_font("font", "Button", bold)
-	# ButtonPrimary
 	theme.set_type_variation("ButtonPrimary", "Button")
-	_button(theme, "ButtonPrimary", UiTokens.ACCENT, UiTokens.BG_VOID, UiTokens.ACCENT)
+	_button(theme, "ButtonPrimary", UiTokens.ACCENT, UiTokens.TEXT_ON_LIGHT)
 
-	# Painel
-	theme.set_stylebox("panel", "PanelContainer", _box(UiTokens.BG_PANEL, UiTokens.LINE, UiTokens.RADIUS_M, UiTokens.BORDER))
+	# Painéis com moldura
+	theme.set_stylebox("panel", "PanelContainer", UiTokens.cartoon_box(UiTokens.BG_PANEL, UiTokens.RADIUS_L))
+	theme.set_type_variation("PanelPill", "PanelContainer")
+	theme.set_stylebox("panel", "PanelPill", _pill(UiTokens.BG_PANEL))
+	theme.set_type_variation("PanelPillLight", "PanelContainer")
+	theme.set_stylebox("panel", "PanelPillLight", _pill(UiTokens.SURFACE))
+	theme.set_type_variation("PanelTray", "PanelContainer")
+	var tray := StyleBoxFlat.new()
+	tray.bg_color = UiTokens.BG_PANEL_ALT
+	tray.border_color = UiTokens.INK
+	tray.border_width_top = UiTokens.BORDER
+	theme.set_stylebox("panel", "PanelTray", tray)
 
 	# Fontes extras para componentes desenhados à mão (SkillButton, UiBar)
 	theme.set_font("font_bold", "SkillButton", bold)
-	theme.set_font_size("font_size", "SkillButton", UiTokens.FONT_HUD)
+	theme.set_font_size("font_size", "SkillButton", UiTokens.FONT_TITLE)
 	theme.set_font_size("caption_size", "SkillButton", UiTokens.FONT_CAPTION)
 	theme.set_font("font", "UiBar", bold)
 	theme.set_font_size("font_size", "UiBar", UiTokens.FONT_CAPTION)
@@ -57,33 +71,38 @@ static func _font_weight(weight: int) -> FontVariation:
 	return fv
 
 
-static func _label_variation(theme: Theme, type_name: StringName, font: Font, size: int, color: Color) -> void:
+static func _label_variation(theme: Theme, type_name: StringName, font: Font, size: int, color: Color, outline: int) -> void:
 	theme.set_type_variation(type_name, "Label")
 	theme.set_font("font", type_name, font)
 	theme.set_font_size("font_size", type_name, size)
 	theme.set_color("font_color", type_name, color)
+	theme.set_constant("outline_size", type_name, outline)
 
 
-static func _button(theme: Theme, type_name: StringName, bg: Color, fg: Color, border: Color) -> void:
-	theme.set_stylebox("normal", type_name, _box(bg, border, UiTokens.RADIUS_M, UiTokens.BORDER))
-	theme.set_stylebox("hover", type_name, _box(bg.lightened(0.08), border, UiTokens.RADIUS_M, UiTokens.BORDER))
-	theme.set_stylebox("pressed", type_name, _box(bg.darkened(0.15), border, UiTokens.RADIUS_M, UiTokens.BORDER))
-	theme.set_stylebox("focus", type_name, _box(Color.TRANSPARENT, UiTokens.ACCENT, UiTokens.RADIUS_M, UiTokens.BORDER_FOCUS))
-	theme.set_stylebox("disabled", type_name, _box(UiTokens.BG_PANEL_ALT.darkened(0.3), UiTokens.LINE, UiTokens.RADIUS_M, UiTokens.BORDER))
+static func _button(theme: Theme, type_name: StringName, bg: Color, fg: Color) -> void:
+	theme.set_stylebox("normal", type_name, UiTokens.cartoon_box(bg))
+	theme.set_stylebox("hover", type_name, UiTokens.cartoon_box(bg.lightened(0.12)))
+	# Pressionado: afunda (sem sombra de base, conteúdo desce o mesmo tanto).
+	var pressed := UiTokens.cartoon_box(bg.darkened(0.12), UiTokens.RADIUS_M, 0)
+	pressed.expand_margin_top = -UiTokens.SHADOW_BASE
+	pressed.content_margin_top += UiTokens.SHADOW_BASE
+	theme.set_stylebox("pressed", type_name, pressed)
+	var focus := StyleBoxFlat.new()
+	focus.draw_center = false
+	focus.border_color = UiTokens.ACCENT
+	focus.set_border_width_all(UiTokens.BORDER_FOCUS)
+	focus.set_corner_radius_all(UiTokens.RADIUS_M + 4)
+	focus.set_expand_margin_all(UiTokens.BORDER_FOCUS + 2)
+	theme.set_stylebox("focus", type_name, focus)
+	theme.set_stylebox("disabled", type_name, UiTokens.cartoon_box(UiTokens.LOCKED))
 	for state in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color", "font_hover_pressed_color"]:
 		theme.set_color(state, type_name, fg)
-	theme.set_color("font_disabled_color", type_name, UiTokens.TEXT_SECONDARY)
+	theme.set_color("font_disabled_color", type_name, UiTokens.INK.lightened(0.35))
+	theme.set_constant("outline_size", type_name, 0)
 
 
-static func _box(bg: Color, border: Color, radius: int, border_width: int) -> StyleBoxFlat:
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = bg
-	sb.border_color = border
-	sb.set_border_width_all(border_width)
-	sb.set_corner_radius_all(radius)
-	sb.content_margin_left = UiTokens.SPACE_M
-	sb.content_margin_right = UiTokens.SPACE_M
-	sb.content_margin_top = UiTokens.SPACE_S
-	sb.content_margin_bottom = UiTokens.SPACE_S
-	sb.anti_aliasing = true
+static func _pill(bg: Color) -> StyleBoxFlat:
+	var sb := UiTokens.cartoon_box(bg, PILL_RADIUS)
+	sb.content_margin_top = UiTokens.SPACE_XS
+	sb.content_margin_bottom = UiTokens.SPACE_XS
 	return sb

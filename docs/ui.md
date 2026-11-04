@@ -25,42 +25,51 @@ Com aspect `expand`, telas mais altas ganham altura extra. Essa altura vai para 
 
 ## 3. Tokens
 
-### 3.1 Cores (Cyber-Mystic Minimal)
+### 3.1 Cores (cartoon claro "Jardim Arcano", T-145)
+
+Fonte única: `src/ui/theme/ui_tokens.gd`. Estilo das decisões 31–36 e do [docs/arte.md](arte.md) §6.
 
 | Token | Hex | Uso |
 |---|---|---|
-| `bg_void` | `#07090F` | fundo da arena, pillarbox |
-| `bg_panel` | `#111726` (opacidade 85%) | painéis, barra do topo, overlays |
-| `bg_panel_alt` | `#1A2236` | botões em repouso, trilhas de barra |
-| `line` | `#2A3550` | bordas e divisores (1–2 px) |
-| `text_primary` | `#E8EEF8` | texto principal |
-| `text_secondary` | `#8A96B0` | rótulos, atalhos de teclado |
-| `accent` | `#3DF5E0` (ciano) | foco, skill pronta, destaque |
-| `core_hp` | `#3DF58A` → `#F5C53D` → `#F5455C` | HP do Núcleo: > 50% / 25–50% / < 25% |
-| `boss_hp` | `#C040F5` | barra do chefe |
-| `danger` | `#F5455C` | dano, derrota, alertas |
-| `coin` | `#F5C53D` | moedas |
-| `cooldown_dim` | preto com opacidade 55% | véu sobre a skill em recarga |
+| `ink` / `line` | `#3A2A55` | contorno de tudo (4 px), sombra de base, texto sobre fundo claro |
+| `bg_void` | `#7C6BC9` | fundo das telas (lavanda) |
+| `bg_panel` | `#8E7CD8` | painéis, pílula "ONDA", cartões |
+| `bg_panel_alt` | `#5A4A9A` | bandeja inferior (skills) |
+| `tray_band` | `#64549F` | faixa da fileira de upgrades |
+| `bg_dim` | `ink` a 70% | véu atrás da pausa |
+| `surface` | `#FFFFFF` | botão secundário, pílula de moedas, botão de pausa |
+| `text_primary` | `#FFFFFF` + contorno `ink` | texto sobre painéis e arena |
+| `text_secondary` | `#E2DAFF` | rótulos, legendas |
+| `text_on_light` | `#3A2A55` | texto de botão claro/ciano |
+| `accent` | `#2FE6D2` (ciano) | foco, skill pronta, botão principal, cristal do Núcleo |
+| `skill_fill` / `badge` / `locked` | `#957CE6` / `#CDF1FF` / `#9D98AE` | slot de skill, badge da tecla, bloqueado/desabilitado |
+| `bar_track` | `#5B4A7A` | trilho das barras |
+| `core_hp` | `#6CF0A4` → `#FFC93D` → `#FF5A6E` | HP do Núcleo: > 50% / 25–50% / < 25% |
+| `boss_hp` | `#C056F0` | barra do chefe |
+| `danger` | `#FF5A6E` | dano, derrota |
+| `coin` | `#FFC93D` | estrela de moedas/Partículas, "Vitória" |
+| `cooldown_dim` | `#1A0F2E` a 55% | véu da skill em recarga |
+| `highlight` | branco a 18% | faixa de brilho no topo de botões e barras |
 
-**Raridade** (reservado para depois do M1): comum `#9AA4B8` · raro `#3D8BF5` · épico `#A04DF5` · lendário `#F5B83D`.
+**Raridade:** comum `#9AA4B8` · raro `#3D8BF5` · épico `#A04DF5` · lendário `#F5B83D` (`RARITY_*`; molduras no arte.md §6).
 
 **Regras:**
-- Contraste do texto sobre `bg_panel` ≥ 4.5:1.
-- **Projéteis inimigos não usam `accent`** (ciano). Isso evita confundir ameaça com UI. A paleta dos projéteis é com o AG01; peço `danger` e magenta.
+- Texto claro sempre com contorno `ink` (`outline_size` 8 no tema); texto escuro só sobre `surface`/`accent`.
+- **Projéteis inimigos não usam `accent`** (ciano), para não confundir ameaça com UI.
 
 ### 3.2 Tipografia
 
-- **Fonte (aprovada):** *Outfit* (sans-serif geométrica, OFL), em `assets/fonts/`, com o `OFL.txt` ao lado.
-- **Pesos:** só 2 (Regular e Bold), para reduzir o tamanho do build.
-- **Números do HUD:** algarismos tabulares (largura fixa), para não "tremerem" na contagem.
+- **Fonte:** *Outfit* variável (OFL), em `assets/fonts/`, com o `OFL.txt` ao lado. Avaliada na T-145: arredondada o bastante no peso 800 e já usada nos mockups; **fica**.
+- **Pesos:** 600 (corpo) e 800 (títulos, HUD, botões), do mesmo arquivo variável (sem custo de build).
+- **Números do HUD:** algarismos tabulares; milhar com ponto (`1.250`, `UiTokens.format_int`).
 
 | Token | Tamanho (px base) | Peso | Uso |
 |---|---|---|---|
-| `font_display` | 72 | Bold | "Vitória" / "Derrota" |
-| `font_title` | 48 | Bold | títulos de tela |
-| `font_hud` | 32 | Bold | `Wave X/Y`, moedas, segundos do cooldown |
-| `font_body` | 28 | Regular | textos de tela, botões |
-| `font_caption` | 22 | Regular | atalhos de teclado, rótulos |
+| `font_display` | 72 | 800 | "Vitória" / "Derrota" |
+| `font_title` | 48 | 800 | títulos de tela, segundos do cooldown |
+| `font_hud` | 32 | 800 | "ONDA X/Y", moedas |
+| `font_body` | 28 | 600/800 | textos de tela, botões |
+| `font_caption` | 22 | 800 | número na barra, badge da tecla, rótulos |
 
 Mínimo absoluto: **22 px** na base (~11 pt no iPhone).
 
@@ -69,57 +78,57 @@ Mínimo absoluto: **22 px** na base (~11 pt no iPhone).
 | Token | Valor |
 |---|---|
 | `space_xs / s / m / l / xl` | 8 / 16 / 24 / 32 / 48 px |
-| `margin_screen` | 24 px (além da safe area) |
-| `radius_s / m` | 8 / 16 px; botões de skill são círculos |
+| `margin_screen` | 16 px (além da safe area) |
+| `radius_s / m / l` | 12 / 20 / 28 px; pílulas 40 px; skills são círculos |
 | `touch_min` | 88 px |
-| `border` | 2 px (`line`); 3 px no foco (`accent`) |
+| `border` | 4 px `ink` em botões, painéis, barras e skills; foco = borda `accent` 4 px por fora |
+| `shadow_base` | 6 px: sombra sólida `ink` sob botões e painéis (borda inferior mais grossa); ao pressionar, o botão "afunda" |
 | `anim_fast / anim_ui` | 100 / 200 ms, ease-out |
 
 ## 4. Layout da partida (retrato)
 
+Referência: [`mockup_cartoon_a_upgrades.png`](../assets/backgrounds/mockup_cartoon_a_upgrades.png).
+
 ```
 y=0    ┌──────────────────────────────┐
        │  safe area topo (notch)      │
-       ├──────────────────────────────┤ ← topo do HUD = safe_top + 24
-       │ [HP Núcleo ███████░░] [⏸]    │  linha 1: 64 px
-       │ Wave 3/10          ● 125     │  linha 2: 48 px
-       │ [barra do chefe — só c/ boss]│  linha 3: 32 px (oculta sem chefe)
-       ├──────────────────────────────┤ ← ~y 200 + safe_top
-       │                              │
-       │       ZONA DE COMBATE        │
-       │             ◆ Anima          │  centro da tela (360, 640)
-       │      (nenhuma UI fixa)       │
-       │                              │
-       ├──────────────────────────────┤ ← ~y 1060 − safe_bottom
-       │   (1)      (2)      (3)      │  botões de skill Ø 128 px
-       ├──────────────────────────────┤ ← base do HUD = 1280 − safe_bottom − 24
+       ├──────────────────────────────┤ ← topo do HUD = safe_top + 16
+       │ [II]   (ONDA 3/10)  (★ 1.250)│  linha 1: 88 px
+       │ ◆ [NÚCLEO 1.170 / 1.500 ███] │  linha 2: 44 px
+       │ [barra do chefe — só c/ boss]│  linha 3 (oculta sem chefe)
+       ├──────────────────────────────┤ ← ~y 180 + safe_top
+       │       ZONA DE COMBATE        │  Anima no centro; a arena encolhe (AG01)
+       ├──────────────────────────────┤ ← bandeja, ~y 1000 − safe_bottom
+       │ [up][up][up][up][up]         │  fileira de upgrades 5 × 128×80 (T-135)
+       ├──────────────────────────────┤
+       │   (1)      (2)      (3)      │  skills Ø 144, cy ≈ 1194
        │  safe area base (home bar)   │
 y=1280 └──────────────────────────────┘
 ```
 
-### 4.1 Topo (`HudTop`)
+### 4.1 Topo (`Hud/Top`)
 
 | Elemento | Posição | Tamanho | Notas |
 |---|---|---|---|
-| HP do Núcleo | linha 1, esquerda → até o botão de pausa | altura 32 px | barra com interpolação suave (~150 ms), número `atual/máx` dentro dela, cor por faixa (`core_hp`), flash `danger` ao levar dano |
-| Pausa | linha 1, à direita | **88×88** | ícone ⏸; também `Esc` |
-| `Wave X/Y` | linha 2, à esquerda | `font_hud` | pulso de escala (200 ms) ao trocar de onda |
-| Moedas | linha 2, à direita | `font_hud`, ícone `coin` | só a contagem da partida |
-| Barra do chefe | linha 3, largura total | altura 24 px | aparece em `boss_spawned`, some com o chefe; cor `boss_hp`, nome do chefe à esquerda **[Proposta]** |
+| Pausa | linha 1, à esquerda | **88×88**, botão claro | "II"; também `Esc` |
+| "ONDA X/Y" | linha 1, centro | pílula `bg_panel`, `font_hud` | pulso de escala (200 ms) ao trocar de onda |
+| Moedas | linha 1, à direita | pílula `surface`, estrela `coin` + número `coin` | contagem da partida, com milhar |
+| HP do Núcleo | linha 2, largura total | altura 40 px, cristal `accent` à esquerda | texto "NÚCLEO atual / máx", cor por faixa, flash `danger` e barra fantasma |
+| Barra do chefe | linha 3, largura total | altura 28 px | aparece em `boss_spawned`; cor `boss_hp`, nome do chefe em cima |
 
 ### 4.2 Zona de combate
 
-- Vai do fim do HUD do topo ao início da barra de skills. **Nenhuma UI fixa entra aqui.**
+- Vai do fim do HUD do topo ao início da bandeja. **Nenhuma UI fixa entra aqui.**
 - Textos flutuantes (dano, "Onda 3!") são permitidos, curtos (≤ 1 s) e **fora** do círculo central de raio ~160 px em volta do Anima **[Proposta]**.
-- O Anima fica sempre no centro geométrico da tela (360, 640 na base). Em telas altas, o espaço extra é distribuído acima e abaixo dele.
+- O Anima fica no centro da tela; o encolhimento da arena para caber a bandeja (87%) é do AG01 (T-144).
 
-### 4.3 Barra de skills (`HudSkills`)
+### 4.3 Bandeja inferior (`Hud/Tray`)
 
-- **3 botões circulares de Ø 128 px** (acima do mínimo de 88), com centros em x = 180 / 360 / 540 e espaço de 52 px entre eles.
-- Centro vertical: `1280 − safe_bottom − 24 − 64` (≈ y 1192 sem safe area).
-- **Ordem:** 1 = área, 2 = controle, 3 = defesa. A defesa fica à direita, mais perto do polegar direito **[Proposta]**.
-- **4º slot (`Espaço`): fica para Depois** (fora do M1). Quando entrar, os 4 botões ficam em x = 108 / 276 / 444 / 612 com Ø 120 px, ou o 4º vai acima do centro em Ø 104 px. Decisão do AG00.
-- **Área de toque = o círculo inteiro.** Toques entre os botões não fazem nada (sem "dedo gordo" acionando o vizinho).
+- Painel `bg_panel_alt` de largura total com contorno superior `ink`; vai até a borda inferior (a safe area entra como margem interna).
+- **Fileira de upgrades** (`Hud.upgrade_row`, decisão 35): faixa `tray_band` com 80 px úteis (padding 10), 5 botões de 128×80 com gap 12 e margem 16. **O contêiner fica vazio até a T-135.**
+- **3 slots de skill de Ø 144 px**, gap 66, centros em x = 150 / 360 / 570, cy ≈ 1194 sem safe area.
+- Slots 2 e 3 bloqueados com cadeado e "NV 7"/"NV 12": **T-136**.
+- **Área de toque = o círculo inteiro.** Toques entre os botões não fazem nada.
 
 ## 5. Componentes
 
@@ -127,29 +136,30 @@ y=1280 └───────────────────────�
 
 | Estado | Visual |
 |---|---|
-| `ready` | ícone cheio, anel `accent`, brilho pulsando de leve (1 vez a cada 1,5 s) |
-| `cooldown` | véu `cooldown_dim` com setor radial regressivo, segundos em `font_hud` (inteiros; com 1 decimal abaixo de 1 s), anel `line` |
-| `disabled` | ícone em `text_secondary`, sem anel (ex.: pausa, fim da partida) |
+| `ready` | círculo `skill_fill` com contorno e sombra de base `ink`, anel `accent` grosso, halo pulsando (1 vez a cada 1,5 s) |
+| `cooldown` | véu `cooldown_dim` com setor radial regressivo, segundos em `font_title` com contorno (inteiros; 1 decimal abaixo de 1 s), anel fino escuro |
+| `disabled` | fundo `locked`, ícone `text_secondary`, sem anel (ex.: fim da partida) |
 | `pressed` | escala 0,92 por 100 ms; volta em 100 ms |
 
 - **Uso confirmado** (`skill_used`): flash curto `accent` no anel, e o botão entra em `cooldown`.
 - **Toque em recarga:** sem `skill_used`, o botão só treme de leve (100 ms), para mostrar que a skill está indisponível.
 - **Cooldown com no máximo ~10 sinais/s:** o setor radial é interpolado localmente entre um sinal e outro, porque é só visual. O valor de verdade é sempre o último `remaining` recebido. Os segundos são arredondados para cima.
 - Na transição `cooldown → ready` (`skill_ready`): flash `accent` + escala 1,08 → 1,0 em 200 ms.
-- **Atalho:** no desktop, mostra a tecla (`1`, `2`, `3`) em `font_caption` abaixo do botão. No toque, fica oculto.
+- **Badge da tecla:** quadradinho `badge` no canto superior direito com a tecla do Input Map (ou o número do slot), sempre visível (mockup aprovado).
 - **Toque e clique** disparam a mesma Input Action (§7). O botão não chama a skill diretamente.
-- Ícones: placeholders geométricos (círculo, losango, escudo hexagonal), sem copiar ícones de jogos existentes.
+- Ícones: placeholders geométricos brancos com contorno (explosão de 8 pontas, losango, hexágono) até a T-128.
 
 ### 5.2 `Bar` (HP do Núcleo / chefe)
 
-- Trilha `bg_panel_alt`, preenchimento na cor do token, borda `line`.
+- Pílula: trilho `bar_track` com contorno `ink` 4 px, preenchimento na cor do token com faixa `highlight`, texto `label_prefix` + "atual / máx" com contorno.
 - **Interpolação:** o preenchimento principal vai direto ao novo valor, e uma "barra fantasma" clara vai atrás em ~300 ms, mostrando quanto foi perdido.
 
 ### 5.3 `Button` (telas)
 
-- Altura mínima de 88 px, largura ≥ 320 px nos botões principais, `radius_m`.
-- Principal: fundo `accent`, texto `bg_void`. Secundário: fundo `bg_panel_alt`, borda `line`.
-- Foco por teclado visível (borda `accent` 3 px); `Enter`/`Espaço` ativam.
+- Altura mínima de 88 px, largura ≥ 360 px nos botões principais, `radius_m`, contorno `ink` 4 px e sombra de base de 6 px (pressionado = afunda).
+- Principal: fundo `accent`, texto `text_on_light`. Secundário: fundo `surface`, texto `text_on_light`. Desabilitado: `locked`.
+- Painéis (`PanelContainer`): `bg_panel` com moldura; variações `PanelPill`, `PanelPillLight` e `PanelTray`. Pausa e resultado usam um cartão central (`ScreenKit.card`).
+- Foco por teclado visível (borda `accent` 4 px por fora); `Enter`/`Espaço` ativam.
 
 ## 6. Ligação com o gameplay (contrato em [docs/gameplay.md](gameplay.md))
 
@@ -158,7 +168,7 @@ Os sinais são emitidos pelo nó raiz `Match`.
 | Sinal | Consumidor | Efeito |
 |---|---|---|
 | `core_hp_changed(current, max)` | Bar HP do Núcleo | valor, cor por faixa, flash de dano |
-| `wave_changed(current, total)` | rótulo `Wave X/Y` | texto + pulso |
+| `wave_changed(current, total)` | rótulo "ONDA X/Y" | texto + pulso |
 | `skill_used(slot)` | SkillButton[slot] | flash de acionamento (§5.1) |
 | `cooldown_changed(slot, remaining, total)` | SkillButton[slot] | estado `cooldown`, setor e segundos (≤ ~10×/s, interpolado) |
 | `skill_ready(slot)` | SkillButton[slot] | estado `ready` + flash |
@@ -196,7 +206,7 @@ Boot/Loading (HTML shell) → Toque para começar → Partida ⇄ Pausa → Resu
 | **Toque para começar** | nome do jogo (`font_title`), "Toque para começar" pulsando (`font_body`) | qualquer toque, clique ou tecla → **libera o áudio** → Partida |
 | **Partida** | HUD (§4) | ⏸ / `Esc` → Pausa; `match_ended` → Resultado |
 | **Pausa** (overlay) | véu `bg_panel` sobre o jogo, título "Pausado", botões **Continuar** e **Recomeçar** | Continuar / `Esc` → Partida; Recomeçar → nova Partida |
-| **Resultado** | "Vitória" (`accent`) ou "Derrota" (`danger`) em `font_display`; `Wave wave_reached/waves_total`, moedas, inimigos derrotados, tempo (mm:ss); botão **Jogar de novo** | Jogar de novo → nova Partida |
+| **Resultado** | "Vitória" (`coin`) ou "Derrota" (`danger`) em `font_display`, num cartão com moldura; "Onda wave_reached/waves_total", moedas, inimigos derrotados, tempo (mm:ss); botão **Jogar de novo** | Jogar de novo → nova Partida |
 
 - **Perda de foco** (troca de aba ou app, `NOTIFICATION_APPLICATION_FOCUS_OUT` / `visibilitychange`): abre a Pausa automaticamente. A volta **não** retoma sozinha; o jogador toca em Continuar.
 - **Sem menu/hangar no M1** (meta-jogo fora do escopo). "Jogar de novo" volta direto à partida.
@@ -214,6 +224,8 @@ Boot/Loading (HTML shell) → Toque para começar → Partida ⇄ Pausa → Resu
 | Item | Com quem |
 |---|---|
 | Paleta de projéteis inimigos sem ciano | AG01 |
+| Arena encolhida (87%) para caber a bandeja de ~280 px sem cobrir inimigos | AG01 (T-144) |
+| Botões de upgrade no `Hud.upgrade_row` / slots bloqueados | AG02 (T-135 / T-136) |
 | Leitura da safe area no Safari (`animaGetSafeArea()` já está no shell) | AG02 (T-005) |
 
 ## 10b. HUD (implementação, T-112)

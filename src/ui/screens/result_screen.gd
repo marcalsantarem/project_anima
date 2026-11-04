@@ -13,7 +13,7 @@ var _stats: Label
 func _ready() -> void:
 	set_anchors_and_offsets_preset(PRESET_FULL_RECT)
 	var root := ScreenKit.root(self)
-	var col := ScreenKit.column(root, UiTokens.SPACE_L)
+	var col := ScreenKit.card(root, UiTokens.SPACE_L)
 	_title = ScreenKit.label("", &"LabelDisplay")
 	col.add_child(_title)
 	_stats = ScreenKit.label("", &"LabelHud")
@@ -36,7 +36,7 @@ func _refresh() -> void:
 		return
 	var won := _result.outcome == MatchResult.Outcome.VICTORY
 	_title.text = "Vitória" if won else "Derrota"
-	_title.add_theme_color_override("font_color", UiTokens.ACCENT if won else UiTokens.DANGER)
-	_stats.text = "Wave %d/%d\nMoedas: %d\nInimigos: %d\nTempo: %s" % [
-		_result.wave_reached, _result.waves_total, _result.coins,
+	_title.add_theme_color_override("font_color", UiTokens.COIN if won else UiTokens.DANGER)
+	_stats.text = "Onda %d/%d\nMoedas: %s\nInimigos: %d\nTempo: %s" % [
+		_result.wave_reached, _result.waves_total, UiTokens.format_int(_result.coins),
 		_result.enemies_killed, ScreenKit.format_time(_result.duration_s)]

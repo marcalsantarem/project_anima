@@ -67,7 +67,7 @@ func _build() -> void:
 	row2.add_child(_button("Jogar de novo", &"ButtonPrimary", _on_reset))
 	row2.add_child(_button("Desativar skills", &"", _on_toggle_disabled))
 
-	var hud := _label("Wave 3/10    ● 125", &"LabelHud")
+	var hud := _label("ONDA 3/10    1.250", &"LabelHud")
 	col.add_child(hud)
 
 	var spacer := Control.new()
@@ -75,9 +75,21 @@ func _build() -> void:
 	spacer.mouse_filter = MOUSE_FILTER_IGNORE
 	col.add_child(spacer)
 
+	# Fileira de upgrades: só demonstração de medidas (128×80); o componente real é da T-135.
+	var up_row := HBoxContainer.new()
+	up_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	up_row.add_theme_constant_override("separation", UiTokens.UPGRADE_GAP)
+	col.add_child(up_row)
+	for t in ["Atk", "Vel", "Def", "Vida", "Cd"]:
+		var ub := Button.new()
+		ub.text = t
+		ub.disabled = true
+		ub.custom_minimum_size = UiTokens.UPGRADE_SIZE
+		up_row.add_child(ub)
+
 	var skills_row := HBoxContainer.new()
 	skills_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	skills_row.add_theme_constant_override("separation", 52)
+	skills_row.add_theme_constant_override("separation", UiTokens.SKILL_GAP)
 	col.add_child(skills_row)
 	var icons := [SkillButton.Icon.CIRCLE, SkillButton.Icon.DIAMOND, SkillButton.Icon.HEX]
 	for i in 3:

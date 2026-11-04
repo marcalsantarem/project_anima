@@ -17,9 +17,9 @@ var _js_visibility_cb: JavaScriptObject
 func _ready() -> void:
 	layer = 20
 	process_mode = PROCESS_MODE_ALWAYS
-	_root = ScreenKit.root(self, UiTokens.BG_PANEL)
+	_root = ScreenKit.root(self, UiTokens.BG_DIM)
 	_root.mouse_filter = Control.MOUSE_FILTER_STOP
-	var col := ScreenKit.column(_root)
+	var col := ScreenKit.card(_root)
 	col.add_child(ScreenKit.label("Pausado", &"LabelTitle"))
 	_continue = ScreenKit.button("Continuar", true, close)
 	col.add_child(_continue)

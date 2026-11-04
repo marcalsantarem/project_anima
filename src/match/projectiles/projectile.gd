@@ -10,11 +10,12 @@ const PARKED_POSITION := Vector2(-100000.0, -100000.0)
 var active := false
 var data: ProjectileData
 
-var _direction := Vector2.ZERO
+var _direction := Vector2.ZERO ## no chão
 var _distance_left := 0.0
 var _hits_left := 0
 var _hit_ids := PackedInt64Array()
 var _hit_count := 0
+var _shadow: GroundShadow
 
 @onready var _shape_node: CollisionShape2D = $Shape
 
@@ -29,16 +30,22 @@ func _ready() -> void:
 func configure(p_data: ProjectileData) -> void:
 	data = p_data
 	(_shape_node.shape as CircleShape2D).radius = data.radius
+	_shape_node.scale = GroundPlane.SHAPE_SCALE # círculo no chão
+	if _shadow == null:
+		_shadow = GroundShadow.new()
+		add_child(_shadow)
+	_shadow.radius = data.radius
 	_hit_ids.resize(data.pierce + 1)
 	queue_redraw()
 
 
+## direction em tela; vira direção no chão. max_distance em px no chão.
 ## p_data troca o tipo do projétil (pool compartilhado entre atiradores).
 func fire(origin: Vector2, direction: Vector2, max_distance: float, p_data: ProjectileData = null) -> void:
 	if p_data != null and p_data != data:
 		configure(p_data)
 	position = origin
-	_direction = direction.normalized()
+	_direction = GroundPlane.to_ground(direction).normalized()
 	_distance_left = max_distance
 	_hits_left = data.pierce + 1
 	_hit_count = 0
@@ -56,7 +63,7 @@ func park() -> void:
 
 func _physics_process(delta: float) -> void:
 	var step := data.speed * delta
-	position += _direction * step
+	position += GroundPlane.to_screen(_direction * step)
 	_distance_left -= step
 	if _distance_left <= 0.0:
 		_expire()
@@ -92,8 +99,10 @@ func _expire() -> void:
 func _draw() -> void:
 	if data == null:
 		return
+	# Voa a data.height acima da sombra (âncora no chão).
+	var c := Vector2(0.0, -data.height)
 	if data.shape == ProjectileData.Shape.DIAMOND:
 		var r := data.radius
-		draw_colored_polygon(PackedVector2Array([Vector2(0, -r), Vector2(r, 0), Vector2(0, r), Vector2(-r, 0)]), data.color)
+		draw_colored_polygon(PackedVector2Array([c + Vector2(0, -r), c + Vector2(r, 0), c + Vector2(0, r), c + Vector2(-r, 0)]), data.color)
 	else:
-		draw_circle(Vector2.ZERO, data.radius, data.color)
+		draw_circle(c, data.radius, data.color)

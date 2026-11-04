@@ -32,6 +32,8 @@ func _ready() -> void:
 	var shape := CircleShape2D.new()
 	shape.radius = data.radius
 	_hitbox.shape = shape
+	_hitbox.scale = GroundPlane.SHAPE_SCALE # círculo no chão
+	add_child(GroundShadow.new(data.radius))
 	hp = data.hp
 	state = State.ADVANCE
 	queue_redraw()
@@ -41,7 +43,7 @@ func _physics_process(delta: float) -> void:
 	match state:
 		State.ADVANCE:
 			position = step_towards(position, target_position, data.speed, delta)
-			if is_shooter() and position.distance_to(target_position) <= data.attack_range:
+			if is_shooter() and GroundPlane.distance(position, target_position) <= data.attack_range:
 				state = State.ATTACK
 				_fire_timer = 1.0 / data.fire_rate
 		State.ATTACK:
@@ -66,9 +68,9 @@ func shoot() -> bool:
 	return true
 
 
-## Passo de movimento em linha reta, sem passar do alvo.
+## Passo em linha reta no chão (speed em px/s no chão), sem passar do alvo.
 static func step_towards(from: Vector2, to: Vector2, speed: float, delta: float) -> Vector2:
-	return from.move_toward(to, speed * delta)
+	return GroundPlane.move_toward(from, to, speed * delta)
 
 
 func take_damage(amount: int) -> void:
@@ -88,5 +90,6 @@ func die(cause: DeathCause) -> void:
 	queue_free()
 
 
+## Âncora na base: o corpo fica em pé sobre o ponto de contato (placeholder).
 func _draw() -> void:
-	draw_circle(Vector2.ZERO, data.radius, data.color)
+	draw_circle(Vector2(0.0, -data.radius), data.radius, data.color)

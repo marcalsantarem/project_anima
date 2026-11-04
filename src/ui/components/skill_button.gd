@@ -10,11 +10,12 @@ signal activated(slot: int)
 enum State { READY, COOLDOWN, DISABLED }
 enum Icon { CIRCLE, DIAMOND, HEX }
 
-const DIAMETER := 128.0
+const DIAMETER := float(UiTokens.SKILL_DIAMETER)
 const PRESS_SCALE := 0.92
 const READY_POP := 1.08
 const SHAKE_PX := 6.0
 const GLOW_PERIOD := 1.5
+const BADGE_SIZE := 36.0
 
 ## 1-based (1 a 3), casa com `skill_1`..`skill_3`.
 @export_range(1, 4) var slot := 1:
@@ -36,19 +37,17 @@ var _total := 0.0
 var _flash := 0.0
 var _glow_t := 0.0
 var _shortcut := ""
-var _show_shortcut := true
 var _touch_index := -1
 var _anim: Tween
 
 
 func _init() -> void:
-	custom_minimum_size = Vector2(DIAMETER, DIAMETER + UiTokens.FONT_CAPTION + UiTokens.SPACE_XS)
+	custom_minimum_size = Vector2(DIAMETER, DIAMETER + UiTokens.SHADOW_BASE)
 	mouse_filter = MOUSE_FILTER_STOP
 	focus_mode = FOCUS_NONE
 
 
 func _ready() -> void:
-	_show_shortcut = not DisplayServer.is_touchscreen_available() or Engine.is_editor_hint()
 	_shortcut = _shortcut_label()
 	resized.connect(_update_pivot)
 	_update_pivot()
@@ -211,32 +210,33 @@ func _shortcut_label() -> String:
 func _draw() -> void:
 	var c := _center()
 	var r := DIAMETER * 0.5
+	var inner := r - UiTokens.BORDER
 	var is_ready := state == State.READY
 	var disabled := state == State.DISABLED
 
-	# Fundo e brilho
+	# Halo de "pronta" (pulsa), sombra de base sólida e contorno
 	if is_ready and not Engine.is_editor_hint():
 		var pulse := 0.5 - 0.5 * cos(TAU * _glow_t / GLOW_PERIOD)
-		draw_circle(c, r + 6.0, Color(UiTokens.ACCENT, 0.12 + 0.18 * pulse))
-	draw_circle(c, r, UiTokens.BG_PANEL_ALT)
+		draw_circle(c, r + 8.0, Color(UiTokens.ACCENT, 0.15 + 0.25 * pulse))
+	draw_circle(c + Vector2(0, UiTokens.SHADOW_BASE), r, UiTokens.INK)
+	draw_circle(c, r, UiTokens.INK)
+	draw_circle(c, inner, UiTokens.LOCKED if disabled else UiTokens.SKILL_FILL)
 
-	# Ícone
-	var icon_color := UiTokens.TEXT_SECONDARY if disabled else UiTokens.TEXT_PRIMARY
-	_draw_icon(c, r * 0.42, icon_color)
-
-	# Véu e setor de recarga (sentido horário a partir do topo)
-	if state == State.COOLDOWN and _total > 0.0:
-		var frac := clampf(_remaining / _total, 0.0, 1.0)
-		_draw_sector(c, r, frac, UiTokens.COOLDOWN_DIM)
-
-	# Anel
-	var ring := UiTokens.LINE
-	if is_ready:
-		ring = UiTokens.ACCENT
+	# Anel ciano (pronta) ou anel escuro discreto
+	var ring := UiTokens.ACCENT if is_ready else UiTokens.INK.lightened(0.15)
 	if _flash > 0.0:
 		ring = ring.lerp(Color.WHITE, _flash)
 	if not disabled:
-		draw_arc(c, r - 2.0, 0.0, TAU, 64, ring, 4.0 if is_ready or _flash > 0.0 else 2.0, true)
+		draw_arc(c, inner - 9.0, 0.0, TAU, 64, ring, 12.0 if is_ready or _flash > 0.0 else 4.0, true)
+	# Faixa de brilho no topo
+	draw_arc(c, inner - 3.0, PI * 1.2, PI * 1.8, 24, UiTokens.HIGHLIGHT, 5.0, true)
+
+	# Ícone (provisório até a T-128): branco com contorno escuro
+	_draw_icon(c, r * 0.4, UiTokens.TEXT_SECONDARY if disabled else UiTokens.TEXT_PRIMARY)
+
+	# Véu e setor de recarga (sentido horário a partir do topo)
+	if state == State.COOLDOWN and _total > 0.0:
+		_draw_sector(c, inner, clampf(_remaining / _total, 0.0, 1.0), UiTokens.COOLDOWN_DIM)
 
 	var font := get_theme_font("font_bold", "SkillButton")
 	# Segundos restantes
@@ -244,28 +244,46 @@ func _draw() -> void:
 		var fs := get_theme_font_size("font_size", "SkillButton")
 		var text := "%.1f" % _remaining if _remaining < 1.0 else str(ceili(_remaining))
 		var y := c.y + (font.get_ascent(fs) - font.get_descent(fs)) * 0.5
-		draw_string_outline(font, Vector2(0, y), text, HORIZONTAL_ALIGNMENT_CENTER, size.x, fs, 6, UiTokens.BG_VOID)
+		draw_string_outline(font, Vector2(0, y), text, HORIZONTAL_ALIGNMENT_CENTER, size.x, fs, UiTokens.TEXT_OUTLINE + 2, UiTokens.INK)
 		draw_string(font, Vector2(0, y), text, HORIZONTAL_ALIGNMENT_CENTER, size.x, fs, UiTokens.TEXT_PRIMARY)
 
-	# Atalho de teclado (só desktop)
-	if _show_shortcut and _shortcut != "":
-		var cs := get_theme_font_size("caption_size", "SkillButton")
-		draw_string(font, Vector2(0, DIAMETER + UiTokens.SPACE_XS + font.get_ascent(cs)), _shortcut, HORIZONTAL_ALIGNMENT_CENTER, size.x, cs, UiTokens.TEXT_SECONDARY)
+	# Badge da tecla / slot (canto superior direito)
+	var bc := c + Vector2(r, -r) * 0.72
+	var half := BADGE_SIZE * 0.5
+	var badge := UiTokens.cartoon_box(UiTokens.BADGE, 10, 3)
+	badge.set_border_width_all(3)
+	badge.border_width_bottom = 6
+	draw_style_box(badge, Rect2(bc - Vector2(half, half), Vector2(BADGE_SIZE, BADGE_SIZE + 3)))
+	var cs := get_theme_font_size("caption_size", "SkillButton")
+	var label := _shortcut if _shortcut != "" else str(slot)
+	var by := bc.y + (font.get_ascent(cs) - font.get_descent(cs)) * 0.5
+	draw_string(font, Vector2(bc.x - half, by), label, HORIZONTAL_ALIGNMENT_CENTER, BADGE_SIZE, cs, UiTokens.INK)
+
+
+func _icon_points(c: Vector2, s: float) -> PackedVector2Array:
+	var pts := PackedVector2Array()
+	match icon:
+		Icon.CIRCLE: # explosão de 8 pontas
+			for i in 16:
+				var a := TAU * i / 16.0 - PI * 0.5
+				pts.append(c + Vector2(cos(a), sin(a)) * (s if i % 2 == 0 else s * 0.5))
+		Icon.DIAMOND:
+			pts = PackedVector2Array([c + Vector2(0, -s), c + Vector2(s * 0.8, 0), c + Vector2(0, s), c + Vector2(-s * 0.8, 0)])
+		Icon.HEX:
+			for i in 6:
+				var a := TAU * i / 6.0 - PI * 0.5
+				pts.append(c + Vector2(cos(a), sin(a)) * s)
+	return pts
 
 
 func _draw_icon(c: Vector2, s: float, color: Color) -> void:
-	match icon:
-		Icon.CIRCLE:
-			draw_arc(c, s, 0.0, TAU, 48, color, 5.0, true)
-			draw_circle(c, s * 0.35, color)
-		Icon.DIAMOND:
-			draw_colored_polygon(PackedVector2Array([c + Vector2(0, -s), c + Vector2(s, 0), c + Vector2(0, s), c + Vector2(-s, 0)]), color)
-		Icon.HEX:
-			var pts := PackedVector2Array()
-			for i in 7:
-				var a := TAU * i / 6.0 - PI * 0.5
-				pts.append(c + Vector2(cos(a), sin(a)) * s)
-			draw_polyline(pts, color, 5.0, true)
+	var pts := _icon_points(c, s)
+	var closed := pts.duplicate()
+	closed.append(pts[0])
+	draw_polyline(closed, UiTokens.INK, 10.0, true)
+	draw_colored_polygon(pts, color)
+	if icon == Icon.CIRCLE:
+		draw_circle(c, s * 0.28, UiTokens.ACCENT)
 
 
 func _draw_sector(c: Vector2, r: float, frac: float, color: Color) -> void:
