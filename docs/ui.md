@@ -289,6 +289,9 @@ Cenas independentes em `src/ui/screens/`, com o tema na raiz (via `ScreenKit`). 
   - viewport sem zoom com `viewport-fit=cover`;
   - página `position: fixed`, `overscroll-behavior: none`, `touch-action: none`;
   - bloqueio de pinça, duplo toque, rolagem e menu de contexto;
-  - tela de carregamento com os tokens do tema;
+  - **splash B** (BRF-053; arte em `assets/splash/`, `docs/arte.md` §9.3), **toda inline** no HTML, porque o export Web do Godot não copia arquivos extras de `web/`: fundo em gradiente CSS + estrelas em SVG (`slice`), anéis em SVG presos ao núcleo, disco de xadrez, brilho e sombra em CSS, e o `splash_logo_core.webp` em base64 (uma cópia, num `<img>` oculto) fatiado em cristal (flutua; parado com `prefers-reduced-motion`), pedestal e título. Sem WebP, o título vira texto. Peso do `index.html`: ~46 KB (~28 KB gzip), sem requisições externas. Para trocar a arte, substitua o base64 pelo novo `.webp` (mesmo tamanho 560×760);
+  - barra em pílula (`#5B4A7A`, contorno `#3A2A55`, preenchimento dourado) com progresso real do `onProgress` e modo indeterminado; texto "Carregando… N%" na fonte do sistema;
+  - erro de carregamento e "sem WebGL 2" usam o mesmo fundo e logotipo, com o aviso num painel no estilo do jogo; ao iniciar o jogo, a splash sai com fade de 250 ms;
+  - `theme-color` `#8E72EC` (topo do gradiente);
   - `window.animaGetSafeArea()` devolve um JSON com os insets em px CSS.
 - **Teste local:** sirva `build/web/` por HTTP (ex.: `python -m http.server -d build/web 8000`); `file://` não funciona.
