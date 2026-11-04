@@ -10,7 +10,7 @@
 | T-002 | Instalar GUT e teste smoke headless | M0 | AG03 | feita |
 | T-003 | `docs/ui.md` (tokens, layout, fluxo de telas) | M0 | AG02 | feita |
 | T-004 | Preset Web + HTML shell mínimo | M0 | AG02 | feita |
-| T-005 | Build vazio no Chrome PC e no iPhone | M0 | AG02 | em validação |
+| T-005 | Build vazio no Chrome PC e no iPhone | M0 | AG02 | feita (testado no iPhone) |
 | T-006 | Cena de estresse para confirmar metas de desempenho | M0 | AG02 | pronta p/ briefing |
 | T-007 | ADR das metas de desempenho e da exportação single-threaded | M0 | AG07 | a fazer |
 | T-008 | Deploy automático Web (GitHub Actions → Netlify) | M0 | AG02 | feita |
@@ -37,9 +37,9 @@
 | T-121 | Tema global no `project.godot` | M1 | AG07 | feita |
 | T-122 | Ligar a arena real ao SceneFlow | M1 | AG07 | feita |
 | T-123 | Seed no `Arena._rng` para testes determinísticos | M1 | AG01 | feita |
-| T-124 | Pasta `src/fx/` em `docs/estrutura.md` | M1 | AG07 | pronta p/ briefing |
-| T-125 | Proposta da skill de área: meteoro × onda de choque | M1 | AG01 + AG08 | decidida (meteoro de fogo, decisão 37) |
-| T-126 | Guia de estilo `docs/arte.md` + mockup da arena | M1 | AG08 | pronta p/ briefing |
+| T-124 | Pasta `src/fx/` em `docs/estrutura.md` | M1 | AG07 | feita |
+| T-125 | Proposta da skill de área: meteoro × onda de choque | M1 | AG01 + AG08 | feita (meteoro de fogo, decisão 37) |
+| T-126 | Guia de estilo `docs/arte.md` + mockup da arena | M1 | AG08 | feita |
 | T-127 | Arte do Anima, inimigos, chefe, projéteis e fundo | M1 | AG08 | feita |
 | T-128 | Ícones e arte da UI | M1 | AG08 | feita |
 | T-129 | `docs/vfx.md` + pool de efeitos | M1 | AG09 | feita |
@@ -55,8 +55,8 @@
 | T-139 | Meteoro de fogo como skill de área (decisão 37) | M1 | AG01 | feita |
 | T-140 | Moeda da partida vira Partículas: sinais, código e `gameplay.md` | M1 | AG01 | feita |
 | T-141 | Moeda da partida vira Partículas: HUD, telas e `ui.md` | M1 | AG02 | feita |
-| T-142 | Novo guia de estilo 2D cartoon 3/4 + mockups PNG | M1 | AG08 | pronta p/ briefing |
-| T-143 | Pipeline e fonte da arte final (opções e custos) | M1 | AG08 | pronta p/ briefing |
+| T-142 | Novo guia de estilo 2D cartoon 3/4 + mockups PNG | M1 | AG08 | feita |
+| T-143 | Pipeline e fonte da arte final (opções e custos) | M1 | AG08 | feita |
 | T-144 | Arena em 3/4: Y-sort, âncoras, sombras, spawn | M1 | AG01 | feita |
 | T-145 | Retema da UI no estilo cartoon (tokens, tema, fonte) | M1 | AG02 | feita |
 | T-146 | Remover mockups rejeitados e excluir referências do export Web | M1 | AG07 | feita |
@@ -328,13 +328,13 @@
 - **Pronto quando:** `src/fx/` (efeitos, shaders, pool), `assets/ui/` e `assets/backgrounds/` documentados; regra de dependência definida (`fx/` reage a sinais e não altera o estado de `match/`).
 
 ### T-142 — Novo guia de estilo 2D cartoon 3/4 + mockups PNG
-- **Marco:** M1 · **Dono:** AG08 · **Status:** pronta p/ briefing
+- **Marco:** M1 · **Dono:** AG08 · **Status:** feita
 - **Depende de:** decisões 31–33 · **Desbloqueia:** T-127, T-128, T-129, T-144, T-145
 - **Arquivos:** `docs/arte.md` (reescrever), `assets/backgrounds/` (mockups), `assets/LICENSES.md`
 - **Pronto quando:** guia com paleta (clara e saturada, mantendo a regra ciano = jogador), contorno, sombra, proporções, perspectiva 3/4, núcleo-Anima, silhuetas por arquétipo e molduras por raridade; 2 mockups renderizados em **PNG** 720×1280 (arena com HUD); nada copiado de jogos existentes; **aprovado pelo usuário**.
 
 ### T-143 — Pipeline e fonte da arte final
-- **Marco:** M1 · **Dono:** AG08 · **Status:** pronta p/ briefing
+- **Marco:** M1 · **Dono:** AG08 · **Status:** feita
 - **Depende de:** — · **Desbloqueia:** decisão 34, T-127, T-128
 - **Arquivos:** seção em `docs/arte.md`
 - **Pronto quando:** comparadas as opções (gerada pelos agentes, pacotes CC0/pagos 2D cartoon, IA de imagem, artista) em qualidade, custo, prazo e licença; formato técnico definido (PNG, resolução, atlas, escala); recomendação para o usuário decidir.
