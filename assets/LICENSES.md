@@ -6,4 +6,6 @@
 |---|---|---|---|
 | `assets/backgrounds/mockup_arena.svg` | Original, SVG gerado por script (BRF-022) | AG08 (Project: Anima) | Próprio do projeto |
 | `assets/backgrounds/mockup_arena_b.svg` | Original, SVG gerado por script (BRF-022) | AG08 (Project: Anima) | Próprio do projeto |
+| `assets/backgrounds/mockup_cartoon_a.svg` / `.png` | Original, SVG gerado por script e renderizado no Chrome headless (BRF-023) | AG08 (Project: Anima) | Próprio do projeto |
+| `assets/backgrounds/mockup_cartoon_b.svg` / `.png` | Original, SVG gerado por script e renderizado no Chrome headless (BRF-023) | AG08 (Project: Anima) | Próprio do projeto |
 | `assets/fonts/Outfit-Variable.ttf` | Google Fonts (*Outfit*) | The Outfit Project Authors | SIL OFL 1.1 (`assets/fonts/OFL.txt`) |
