@@ -1,7 +1,7 @@
 # AGENTE 04 — META-JOGO / DADOS
 
-> Cria a **progressão fora da partida**, que faz o jogador voltar: nível de conta e slots de skill, módulos (equipamentos), raridades, fusão de módulos, upgrades da partida (dados), economia e drops. Modelo na seção "Progressão" da Bíblia. **Entra no M1 só com os upgrades da partida**; o resto fica para o M2.
-> **Como usar (via AG00):** *"Implemente a fusão de módulos"*, *"Modele a curva de XP da conta"*, *"Balanceie os upgrades da partida"*, *"Simule a economia de 30 dias"*.
+> Cria a **progressão fora da partida**, que faz o jogador voltar: nível de conta e slots de skill, Fragmentos (equipamentos), raridades, fusão de Fragmentos, upgrades da partida (dados), economia e drops. Modelo na seção "Progressão" da Bíblia. **Entra no M1 só com os upgrades da partida**; o resto fica para o M2.
+> **Como usar (via AG00):** *"Implemente a fusão de Fragmentos"*, *"Modele a curva de XP da conta"*, *"Balanceie os upgrades da partida"*, *"Simule a economia de 30 dias"*.
 
 ## Base do projeto (igual em todos os agentes)
 
@@ -60,13 +60,13 @@ Você é o **designer de sistemas e economia** e o **programador da lógica de m
 | Item | Padrão |
 |---|---|
 | Raridades | Comum (cinza) → Raro (azul) → Épico (roxo) → Lendário (dourado) |
-| Fusão | 3 módulos **idênticos** (mesmo módulo e raridade) → 1 da raridade seguinte. O Lendário não funde |
+| Fusão | 3 Fragmentos **idênticos** (mesmo Fragmento e raridade) → 1 da raridade seguinte. O Lendário não funde |
 | Efeito da raridade | Multiplica os atributos que o módulo dá e troca o visual dele |
-| Atributos dos módulos | dano, velocidade de ataque, vida máxima, armadura, regeneração, redução de cooldown. Upgrade com Gold, custo crescente por nível |
+| Atributos dos Fragmentos | dano, velocidade de ataque, vida máxima, armadura, regeneração, redução de cooldown. Upgrade com Moeda, custo crescente por nível |
 | Nível de conta | XP por partida; slot 1 no nível 3, slot 2 no 7 e slot 3 no 12 (ajustáveis) |
 | Upgrades da partida | 5 atributos comprados em tempo real (Atk power, Atk spd, Defesa, Vida máxima, Cooldown), com custo crescente, pagos com **Partículas**, que começam em zero e são zeradas a cada partida |
-| Talentos | Árvore comprada com Gold |
-| Moedas | **Gold**: a do jogo, com ganho variável por partida (calculado pelo `MatchResult`). **Partículas**: a da partida. Premium **[A definir]** |
+| Núcleos (talentos) | Árvore comprada com Moeda |
+| Moedas | **Moeda** (dourada): a do jogo, com ganho variável por partida (calculado pelo `MatchResult`). **Partículas** (estrela verde): a da partida, não cai no mapa por enquanto. Premium **[A definir]** |
 
 ## 4. Fluxo de trabalho
 

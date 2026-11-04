@@ -12,7 +12,7 @@
 
 **Pilares:**
 1. **Timing é tudo:** sem movimento, a habilidade do jogador está em **quando** usar cada skill. Poucas decisões, todas importantes.
-2. **Progressão que se sente:** cada nível, módulo e upgrade muda números **e** o visual.
+2. **Progressão que se sente:** cada nível, Módulo, Fragmento e upgrade muda números **e** o visual.
 3. **Clareza no caos:** centenas de projéteis, e mesmo assim tudo legível numa tela de celular.
 4. **Zero atrito:** abriu o link, está jogando, no PC ou no iPhone.
 
@@ -39,23 +39,37 @@
 - Ondas (`Wave X/Y`) até o **chefe**. Se o HP do Núcleo chegar a zero, é derrota.
 - **Upgrades da partida:** em **tempo real**, por uma **fileira de 5 botões acima das skills** (Atk power, Atk spd, Defesa, Vida máxima, Cooldown), pagos com as **Partículas** da partida. Cada toque compra 1 nível, com custo crescente; valem só para aquela partida.
 
+## Glossário do jogo (decidido pelo usuário em 2026-11-04; decisão 40)
+
+Nomes oficiais que o jogador vê. Os **identificadores de código continuam em inglês** e **não serão renomeados agora** (ex.: `skill_meteor`, `particles`); a troca dos textos nos docs e na UI é gradual.
+
+| Nome oficial | Era chamado de | O que é | Estado |
+|---|---|---|---|
+| **Módulo** | skill, poder ativo | poder ativo com cooldown (ex.: o meteoro); a conta abre os slots de Módulo nos níveis 3, 7 e 12 | M1: 1 Módulo (meteoro) |
+| **Partículas** | moeda da partida | moeda dropada pelos inimigos mortos; compra os upgrades da partida e **some no fim dela**. **Não cai no mapa por enquanto** (só aumenta o contador; pode mudar depois). Ícone: **estrela verde, como um "chipzinho"** | M1 (o ícone ainda é dourado: T-160 e T-161) |
+| **Moeda** | Gold | moeda do jogo (meta): sobe nível de Módulos, Fragmentos, Núcleos etc. Ícone: **moeda dourada** | futuro (M2+) |
+| **Fragmento** | módulo (equipamento) | equipamento do Anima, com raridade e fusão 3→1; o Anima tem **6 espaços** para equipá-los | futuro (M2+) |
+| **Núcleo** (talento) | talento, árvore de talentos | cada nó da árvore, comprado com Moeda | futuro; **atenção:** colide com o "Núcleo" que já nomeia a vida do Anima no HUD (ver nota) |
+
+> **Colisão de nome (pendente):** "Núcleo" já é o nome da base do Anima (barra "NÚCLEO 1.170 / 1.500", `core_hp`). Como os talentos também serão "Núcleos", é preciso decidir se a barra do HUD muda de rótulo ou se os talentos ganham outro nome antes de criar a árvore.
+
 ## Progressão (decidida pelo usuário em 2026-11-03; detalhe no AG04)
 
-- **Nível da conta (do jogador):** sobe com XP das partidas. Ele desbloqueia os **slots de skill**:
+- **Nível da conta (do jogador):** sobe com XP das partidas. Ele desbloqueia os **slots de Módulo** (as skills):
   - a conta começa com **0 skills**;
   - o **slot 1** abre no nível **3**, o **slot 2** no nível **7** e o **slot 3** no nível **12**;
   - os valores são ajustáveis no balanceamento.
   - **[A DEFINIR]:** se a conta ganha outros prêmios por nível.
-- **Skills:** são "poderes especiais" ativos, com cooldown. São desbloqueadas pela progressão e não são cards.
+- **Módulos (as skills):** são "poderes especiais" ativos, com cooldown. São desbloqueadas pela progressão e não são cards.
   - **[A DEFINIR]:** como cada skill evolui.
-- **Módulos:** são os equipamentos do Anima, equipados em slots e melhorados com **Gold**. Têm raridade Comum → Raro → Épico → Lendário.
-  - **Fusão:** 3 módulos idênticos da mesma raridade viram 1 da raridade seguinte.
+- **Fragmentos:** são os equipamentos do Anima (**6 espaços**), melhorados com **Moeda**. Têm raridade Comum → Raro → Épico → Lendário.
+  - **Fusão:** 3 Fragmentos idênticos da mesma raridade viram 1 da raridade seguinte.
 - **Upgrades da partida:** comprados durante a partida com **Partículas** e perdidos ao fim.
 - **Moedas:**
-  - **Gold:** a moeda do jogo (meta). A quantidade ganha varia a cada partida jogada.
-  - **Partículas:** a moeda da partida. Começa em zero e é zerada a cada partida.
-- **Árvore de talentos:** continua, comprada com Gold. O detalhe fica no AG04.
-- **[A DEFINIR]:** quais atributos os módulos dão (dano, velocidade de ataque, vida, armadura, regeneração, redução de cooldown).
+  - **Moeda:** a moeda do jogo (meta), dourada. A quantidade ganha varia a cada partida jogada.
+  - **Partículas:** a moeda da partida, estrela verde (chip). Começa em zero, é zerada a cada partida e não cai no mapa por enquanto.
+- **Núcleos (a árvore de talentos):** continua, comprada com Moeda. O detalhe fica no AG04.
+- **[A DEFINIR]:** quais atributos os Fragmentos dão (dano, velocidade de ataque, vida, armadura, regeneração, redução de cooldown).
 
 ## Roadmap
 
@@ -63,7 +77,7 @@
 |---|---|---|
 | **M0 — Fundação** | Docs, ambiente, projeto Godot, exportação Web vazia rodando no PC e no iPhone | AG07, AG02, AG03 |
 | **M1 — Demo do combate** *(1º marco jogável)* | 1 fase completa, divertida e **visualmente polida, pronta para divulgar como demo** | AG01, AG02, AG03, AG08, AG09 |
-| **M2 — Meta-jogo local** | Nível de conta, slots e skills (controle e defesa), módulos, fusão de módulos, save local | AG04, AG01, AG02, AG05 (local), AG08 |
+| **M2 — Meta-jogo local** | Nível de conta, slots e Módulos (controle e defesa), Fragmentos, fusão de Fragmentos, save local | AG04, AG01, AG02, AG05 (local), AG08 |
 | **M3 — Online** | Backend escolhido: conta guest, sincronização, economia no servidor, config remota | AG05, AG04 |
 | **M4 — Monetização e lançamento** | Ads, loja, skins, áudio final, lojas nativas | **[A DEFINIR]** |
 
@@ -86,7 +100,7 @@
 | Idioma | Português do Brasil |
 
 ### FORA (até depois do M1)
-Nível de conta, skills de controle e defesa, módulos e fusão, talentos, save, backend, contas, ads, compras, skins, áudio final, mais de uma fase, localização, builds nativos.
+Nível de conta, Módulos de controle e defesa, Fragmentos e fusão, Núcleos (talentos), save, backend, contas, ads, compras, skins, áudio final, mais de uma fase, localização, builds nativos.
 
 ## Referências (gênero, estrutura e acabamento, **nunca para copiar**)
 
@@ -112,7 +126,7 @@ Proibido usar personagens, criaturas, nomes, ícones, sons, interface ou arte de
 | AG01 | Gameplay / Combate | Arena, Anima, ataque automático, skills, inimigos, ondas, chefe | M1 |
 | AG02 | UI / Plataforma Web | HUD, telas, entrada, tema, exportação Web (`export_presets.cfg`, `web/`), desempenho no Safari | M0/M1 |
 | AG03 | QA / Revisor | Testes, revisão, medições, veredito passa ou não passa | M1 |
-| AG04 | Meta-jogo / Dados | Nível de conta, módulos, fusão, upgrades da partida (dados e balanceamento), economia | M1/M2 |
+| AG04 | Meta-jogo / Dados | Nível de conta, Fragmentos, fusão, upgrades da partida (dados e balanceamento), economia | M1/M2 |
 | AG05 | Backend | Interface `Backend`, save, provedor online, segurança | M2/M3 |
 | AG06 | Backlog | Quebra dos marcos em tasks, quadro de status, andamento dos marcos e riscos | Sempre |
 | AG07 | Arquiteto Técnico | `project.godot` (Input Map, layers, autoloads), `src/core/`, arquitetura, contratos entre módulos, ADRs, metas de desempenho | Sempre |

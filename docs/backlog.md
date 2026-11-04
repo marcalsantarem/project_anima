@@ -72,6 +72,10 @@
 | T-157 | Ajustar o escurecimento do topo (degradê do chão + do HUD) | M1 | AG02 + AG01 | depende do teste no iPhone |
 | T-158 | Teste no iPhone: splash, título, partida e chefe (ajustes saem daqui) | M1 | usuário + AG00 | a fazer (o dono fará o teste) |
 | T-159 | Remover o ícone provisório do `skill_pulse` e deixar o do meteoro como padrão | M1 | AG02 | pronta p/ briefing |
+| T-160 | Arte do ícone de Partículas: estrela verde, estilo "chip" (e nova cor dos efeitos de coleta) | M1 | AG08 | pronta p/ briefing |
+| T-161 | Aplicar o ícone verde de Partículas no HUD, Resultado, botões de upgrade e efeitos (hoje dourado) | M1 | AG02 + AG09 | pronta p/ briefing |
+| T-162 | Arte do ícone de Moeda (moeda dourada) e do glossário na UI (para o M2) | M2 | AG08 | a fazer |
+| T-163 | Textos do jogo e docs com os nomes oficiais (Módulo, Fragmento, Núcleo, Moeda); decidir a colisão de "Núcleo" | M2 | AG00 + AG04 + AG02 | a fazer |
 | T-148 | Sinais da Arena para VFX (projectile_fired, projectile_hit, enemy_died, particles_gained, skill_cast, boss_telegraph_started, boss_phase_changed) | M1 | AG01 | feita |
 
 ## Próximas prontas p/ briefing
@@ -423,6 +427,27 @@
 - **Depende de:** — · **Desbloqueia:** —
 - **Arquivos:** `src/ui/`
 - **Pronto quando:** o ícone do meteoro vem de uma fonte única (hoje por caminho no HUD, ver `Hud.slot_icon_paths`); o `ui_icon_skill_pulse.png` e o `skill_pulse` provisório deixam de aparecer no jogo e nas demos; o número de recarga continua legível sobre o ícone (que ocupa pouco do quadro de 88 px).
+
+### T-160 — Ícone de Partículas verde
+- **Marco:** M1 · **Dono:** AG08 · **Status:** pronta p/ briefing
+- **Depende de:** decisão 40 · **Desbloqueia:** T-161
+- **Arquivos:** `assets/ui/`, `assets/LICENSES.md`
+- **Pronto quando:** estrela de 4 pontas **verde** em estilo "chipzinho" (contorno escuro, brilho), legível a 24–32 px, **diferente do verde da barra de vida dos inimigos** e sem ciano; paleta de coleta definida para o AG09.
+
+### T-161 — Partículas em verde na UI e nos efeitos
+- **Marco:** M1 · **Dono:** AG02 + AG09 · **Status:** pronta p/ briefing
+- **Depende de:** T-160 · **Desbloqueia:** —
+- **Arquivos:** `src/ui/` (AG02), `src/fx/` (AG09)
+- **Pronto quando:** o HUD, o Resultado, o custo dos botões de upgrade e o efeito de coleta usam a estrela verde (`UiTokens.PARTICLES` deixa de ser dourado); nenhuma Partícula cai no mapa.
+
+### T-162 — Ícone de Moeda dourada
+- **Marco:** M2 · **Dono:** AG08 · **Status:** a fazer
+- **Depende de:** decisão 40 · **Desbloqueia:** hangar e economia (M2)
+
+### T-163 — Nomes oficiais nos textos e nos docs
+- **Marco:** M2 · **Dono:** AG00 + AG04 + AG02 · **Status:** a fazer
+- **Depende de:** decisão do dono sobre a colisão de "Núcleo" (barra da vida do Anima × talentos) · **Desbloqueia:** hangar e telas de meta
+- **Pronto quando:** textos e docs usam Módulo, Fragmento, Núcleo (talento) e Moeda onde hoje dizem skill, módulo, talento e Gold; identificadores de código inalterados.
 
 ### T-148 — Sinais da Arena para VFX
 - **Marco:** M1 · **Dono:** AG01 · **Status:** feita

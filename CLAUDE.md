@@ -54,10 +54,11 @@ O Claude principal é o **game dev líder** do projeto e o **único interlocutor
 - A partida avança por ondas (`Wave X/Y`) até o chefe e termina se o HP do Núcleo chegar a zero. Cada sessão dura de 3 a 10 minutos.
 - **Progressão** (detalhe na seção "Progressão" da Bíblia; substitui os cards do GDD):
   - **Nível da conta:** desbloqueia os slots de skill (slot 1 no nível 3, slot 2 no 7 e slot 3 no 12). A conta começa sem skills.
-  - **Moedas:** **Gold** é a do jogo (meta), com ganho variável por partida. **Partículas** é a da partida: começa em zero e é zerada a cada partida.
-  - **Módulos:** são os equipamentos do Anima, melhorados com Gold, com raridade e **fusão** (3 iguais viram 1 da raridade seguinte).
+  - **Moedas:** **Moeda** (dourada) é a do jogo (meta), com ganho variável por partida; futuro. **Partículas** (estrela verde, "chip") é a da partida: começa em zero, é zerada a cada partida e não cai no mapa por enquanto.
+  - **Fragmentos:** são os equipamentos do Anima (6 espaços), melhorados com Moeda, com raridade e **fusão** (3 iguais viram 1 da raridade seguinte); futuro.
+  - **Módulos** são as skills (poderes ativos, ex.: o meteoro). **Núcleos** são os talentos. Glossário completo na Bíblia; identificadores de código seguem em inglês.
   - **Upgrades da partida:** 5 botões em tempo real acima das skills (Atk power, Atk spd, Defesa, Vida máxima, Cooldown), pagos com Partículas; valem só para a partida.
-  - **Árvore de talentos:** comprada com Gold.
+  - **Núcleos (árvore de talentos):** comprados com Moeda; futuro.
 - **Monetização:** rewarded ads (multiplicar moedas ou reviver), skins cosméticas e moeda premium.
 - **Visual:** tema Cyber-Mystic em **2D cartoon casual**: colorido, formas arredondadas, contorno e sombra suave, **câmera 3/4**. O Anima é um núcleo (objeto) no centro, pronto para skins. UI com botões grandes e molduras por raridade. Interface em **modo retrato**. Guia em `docs/arte.md`.
 - O Archero é referência de **gênero, retenção e acabamento visual**. Inspiração de estilo, nunca cópia: não copie arte, nomes, assets, ícones nem layouts de jogos existentes.

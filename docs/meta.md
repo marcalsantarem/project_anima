@@ -1,6 +1,6 @@
 # Meta-jogo e economia (AG04)
 
-> Documento do AG04. Modelo geral em "Progressão" da [Bíblia](00_biblia_projeto.md). Por enquanto só tem os upgrades da partida (M1); módulos, nível de conta, talentos e economia de Gold entram no M2.
+> Documento do AG04. Modelo geral em "Progressão" da [Bíblia](00_biblia_projeto.md). Por enquanto só tem os upgrades da partida (M1); Fragmentos, nível de conta, Núcleos (talentos) e economia de Moeda entram no M2.
 
 ## Upgrades da partida
 
@@ -19,7 +19,7 @@ Base: decisão 35 (5 botões em tempo real, pagos com **Partículas**, valem só
 | `upgrade_cooldown` | cooldown de todas as skills | −4% | redução percentual | −40% | `cd = base × (1 − 0,04·L)`; vale a partir do próximo uso (não mexe no cooldown em curso) |
 
 - Os percentuais somam sobre o **valor base** (sem juros compostos entre níveis), o que deixa a curva previsível e fácil de exibir.
-- **M2 (Proposta):** quando houver módulos, o "base" passa a ser o valor já com módulos e talentos (vindo do `MatchConfig`); os upgrades multiplicam por cima.
+- **M2 (Proposta):** quando houver Fragmentos, o "base" passa a ser o valor já com Fragmentos e Núcleos (vindo do `MatchConfig`); os upgrades multiplicam por cima.
 - Tetos de segurança: cadência ≤ 3,6 tiros/s cabe no pool de 64 projéteis (vida do tiro ≈ 0,67 s → ~3 em voo); redução de dano e de cooldown nunca passam de 40%; dano mínimo recebido = 1.
 
 ### Custo
