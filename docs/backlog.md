@@ -67,10 +67,10 @@
 | T-152 | Barra de vida grande e vermelha "Boss" no topo do HUD | M1 | AG02 | feita |
 | T-153 | Arte das pílulas do topo (ONDA e Partículas) e do botão secundário | M1 | AG08 | pronta p/ briefing |
 | T-154 | Texto "MAX" na pílula de custo dos upgrades (hoje desenhado por código) | M1 | AG08 + AG02 | pronta p/ briefing |
-| T-155 | "Voltar ao título" a partir da tela de Resultado | M1 | AG02 + AG07 | aguarda decisão do dono |
+| T-155 | "Voltar ao título" a partir da tela de Resultado | M1 | AG02 + AG07 | pronta p/ briefing (aprovada pelo dono) |
 | T-156 | Chão: quebrar a repetição das pedrinhas do tile | M1 | AG08 + AG01 | depende do teste no iPhone |
 | T-157 | Ajustar o escurecimento do topo (degradê do chão + do HUD) | M1 | AG02 + AG01 | depende do teste no iPhone |
-| T-158 | Teste no iPhone: splash, título, partida e chefe (ajustes saem daqui) | M1 | usuário + AG00 | a fazer |
+| T-158 | Teste no iPhone: splash, título, partida e chefe (ajustes saem daqui) | M1 | usuário + AG00 | a fazer (o dono fará o teste) |
 | T-159 | Remover o ícone provisório do `skill_pulse` e deixar o do meteoro como padrão | M1 | AG02 | pronta p/ briefing |
 | T-148 | Sinais da Arena para VFX (projectile_fired, projectile_hit, enemy_died, particles_gained, skill_cast, boss_telegraph_started, boss_phase_changed) | M1 | AG01 | feita |
 
@@ -396,8 +396,8 @@
 - **Pronto quando:** o README e o PNG de `ui_upgrade_cost_pill_max` ficam de acordo (ou a pílula sem texto, ou com "MAX"); a UI não desenha o texto duas vezes.
 
 ### T-155 — Voltar ao título a partir do Resultado
-- **Marco:** M1 · **Dono:** AG02 + AG07 · **Status:** aguarda decisão do dono
-- **Depende de:** decisão (hoje o Resultado só tem "Jogar de novo") · **Desbloqueia:** —
+- **Marco:** M1 · **Dono:** AG02 + AG07 · **Status:** pronta p/ briefing (aprovada pelo dono)
+- **Depende de:** — (o Resultado hoje só tem "Jogar de novo") · **Desbloqueia:** —
 - **Arquivos:** `src/ui/screens/` (AG02), `src/core/scene_flow.gd` (AG07)
 - **Pronto quando:** o Resultado oferece também "Voltar ao título" (botão secundário), o fluxo muda para a cena de título sem reiniciar o jogo e sem vazar a partida; testes de fluxo.
 
