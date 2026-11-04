@@ -17,12 +17,14 @@ const SKILL_ICONS := [SkillButton.Icon.CIRCLE, SkillButton.Icon.DIAMOND, SkillBu
 const PARTICLES_ICON_SIZE := 36
 const PAUSE_ICON_SIZE := 64
 const CORE_ICON_SIZE := Vector2(36, 44)
-const UPGRADE_BAND_PAD := 10
+const UPGRADE_BAND_PAD := 6
 ## Altura da bandeja inferior (upgrades + skills) sem safe area, em px da resolução base (docs/ui.md §4.4).
-const TRAY_HEIGHT := 282
+const TRAY_HEIGHT := 266
 ## Altura do HUD de cima (pausa/ONDA/Partículas + barra de Energia) sem safe area e sem a barra do chefe.
 ## O fundo da arena passa por trás do topo; o gameplay usa isto para não pôr alvos sob o HUD (docs/ui.md §4.4).
 const TOP_INSET := 164
+## Respiro entre a faixa de upgrades e os slots; embaixo dos slots ficam SPACE_XS + safe area (BRF-066).
+const SKILLS_TOP_PAD := UiTokens.SPACE_XS
 ## Altura extra do topo com a barra "Boss" visível (gap 16 + barra 36). top_inset() já soma quando ela aparece.
 const BOSS_BAR_INSET := 52
 ## Trilho da barra "Boss": ~89% do trilho da Energia (36), decisão 39.
@@ -368,7 +370,7 @@ func apply_safe_area() -> void:
 	_top.add_theme_constant_override("margin_top", m + int(s.top))
 	_upgrade_margin.add_theme_constant_override("margin_top", UPGRADE_BAND_PAD)
 	_upgrade_margin.add_theme_constant_override("margin_bottom", UPGRADE_BAND_PAD)
-	_skills_margin.add_theme_constant_override("margin_top", m)
+	_skills_margin.add_theme_constant_override("margin_top", SKILLS_TOP_PAD)
 	_skills_margin.add_theme_constant_override("margin_bottom", UiTokens.SPACE_XS + int(s.bottom))
 	_top_scrim.offset_bottom = top_inset()
 

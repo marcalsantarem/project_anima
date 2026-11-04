@@ -31,6 +31,28 @@ func test_exposed_heights_match_layout() -> void:
 	assert_eq(hud.tray_height(), float(Hud.TRAY_HEIGHT))
 
 
+## BRF-066: bandeja até a borda inferior cobrindo a safe area; slots acima dela, com folga curta.
+func test_tray_reaches_bottom_with_safe_area() -> void:
+	ScreenKit.simulated_safe_area = {"bottom": 65.0}
+	var hud: Hud = HUD_SCENE.instantiate()
+	add_child_autofree(hud)
+	await wait_process_frames(2)
+	var tray: Control = hud.get_node("Root/Tray")
+	var screen_h := hud.get_viewport().get_visible_rect().size.y
+	assert_eq(tray.get_global_rect().end.y, screen_h, "bandeja termina na borda da tela")
+	assert_eq(hud.tray_height(), float(Hud.TRAY_HEIGHT) + 65.0)
+	assert_eq(tray.size.y, hud.tray_height())
+	var skill: Control = hud._skills[0]
+	var gap := screen_h - 65.0 - skill.get_global_rect().end.y
+	assert_between(gap, 0.0, 32.0, "folga entre slots e a safe area")
+	var row: Control = hud.upgrade_row
+	assert_eq(row.size, Vector2(row.size.x, 80.0))
+
+
+func after_each() -> void:
+	ScreenKit.simulated_safe_area = {}
+
+
 func test_result_particles_row_does_not_wrap() -> void:
 	var screen: ResultScreen = RESULT_SCENE.instantiate()
 	var r := MatchResult.new()

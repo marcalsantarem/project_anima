@@ -4,6 +4,10 @@ class_name ScreenKit
 const THEME := preload("res://src/ui/theme/anima_theme.tres")
 const CARD_WIDTH := 520.0
 
+## Safe area simulada (px da resolução base, ex.: {"bottom": 65.0}) para renders e testes fora do iPhone.
+## Vazio = safe area real do navegador/dispositivo.
+static var simulated_safe_area: Dictionary = {}
+
 
 ## Raiz em tela cheia com o tema aplicado (até o tema global, T-121).
 static func root(parent: Node, bg: Color = UiTokens.BG_VOID) -> Control:
@@ -98,6 +102,10 @@ static func format_time(seconds: float) -> String:
 ## Safe area (docs/ui.md §9). Insets em px da resolução base: {top, bottom, left, right}, mais
 ## `css_k` (px da resolução base por px CSS; fora da web, por px da janela) para medir como o shell.
 static func safe_area(vp: Viewport) -> Dictionary:
+	if not simulated_safe_area.is_empty():
+		var sim := {"top": 0.0, "bottom": 0.0, "left": 0.0, "right": 0.0, "css_k": 1.0}
+		sim.merge(simulated_safe_area, true)
+		return sim
 	var out := {"top": 0.0, "bottom": 0.0, "left": 0.0, "right": 0.0, "css_k": 1.0}
 	var visible_size := vp.get_visible_rect().size
 	var win := Vector2(DisplayServer.window_get_size())

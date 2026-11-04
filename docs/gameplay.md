@@ -24,7 +24,8 @@
 |---|---|
 | Resolução base | 720×1280, retrato, stretch `canvas_items` / `expand` |
 | Arena (`arena_rect`) | **tela cheia acima da bandeja** (BRF-041): de y = 0 até `altura do viewport − arena_bottom_inset` (282 = `Hud.TRAY_HEIGHT`; quem monta a partida pode passar `Arena.set_bottom_inset(hud.tray_height())`, com safe area). O HUD de cima fica sobreposto ao fundo. Recalculada no `size_changed` do viewport (720 × 1280 a ~1560) |
-| Anima | centro da **arena** (não da tela), câmera fixa |
+| Área livre (`free_rect`) | entre o topo do HUD e a bandeja (T-169, decisão 43): de `arena_top_inset` (164 = `Hud.TOP_INSET`, **fixo**: a barra "Boss" não desloca o Anima) até o topo da bandeja (`altura − arena_bottom_inset`). Recalculada no `size_changed` e no `set_bottom_inset` |
+| Anima | **centro da área livre**: `x = largura / 2`, `y = (top_inset + tray_top) / 2` (720×1280 com bandeja 282: y = 581; 720×1474: y = 678). Selo, pilares, alvo dos inimigos (inclusive os já em campo) e o alvo do meteoro seguem esse centro. Câmera fixa |
 | Bordas de spawn | `top`, `bottom`, `left`, `right`, **fora da tela inteira** (`screen_rect`): `spawn_margin` 32 px + o desenho do inimigo (`Arena.spawn_margin_for`: laterais = meia largura do sprite/anel, base = altura acima da âncora, topo = raio). Nenhum inimigo nasce visível |
 | Lógica | `_physics_process` a 60 Hz; o visual nunca decide a regra |
 
@@ -40,7 +41,7 @@
 
 - Sprites de `assets/sprites/` via `SpriteArt` (`src/match/arena/sprite_art.gd`): PNG 2x, `scale` 0,5, `centered = false`, `offset = -âncora`, filtro Linear. Textura e âncora ficam nos dados: `EnemyData.sprite/sprite_anchor`, `ProjectileData.sprite/sprite_anchor`, `AnimaData` (grupo "Arte": base, cristal a `crystal_height` 110 px com bob de 5 px, 3 nós em elipse 29×12 px). Só visual: colisão, `GroundShadow` e `ground_plane` não mudaram.
 - Projétil: sprite a `height` px acima da âncora, `rotation` = direção do tiro na tela. `ProjectileData.shape/color` seguem como identidade de leitura (testes), sem desenho.
-- Fundo (BRF-041): nó `Floor` (`ArenaFloor`, `src/match/arena/arena_floor.gd`) com as peças de `assets/backgrounds/`: `floor_tile` repetido (Sprite2D com `region` + repeat) cobrindo a tela inteira, `floor_top_shade` no topo e `floor_ring` no Anima (todos `z_index = -10`); 4 `floor_pillar` nos cantos da `arena_rect` (insets `pillar_inset_*`), com `GroundShadow` e Y-sort junto das entidades. Sem moldura. `ArenaFloor.layout()` só reposiciona (sem alocar por frame).
+- Fundo (BRF-041): nó `Floor` (`ArenaFloor`, `src/match/arena/arena_floor.gd`) com as peças de `assets/backgrounds/`: `floor_tile` repetido (Sprite2D com `region` + repeat) cobrindo a tela inteira, `floor_top_shade` no topo e `floor_ring` no Anima (escala `ArenaFloor.RING_SCALE` 0,35 = ~70% do tamanho anterior, decisão 43; todos `z_index = -10`); 4 `floor_pillar` nos cantos da área livre (`free_rect`; insets `pillar_inset_*`, topo 96 abaixo do HUD), com `GroundShadow` e Y-sort junto das entidades. Sem moldura. `ArenaFloor.layout()` só reposiciona (sem alocar por frame).
 - Chefe: ogro (`boss_ogre.png`, âncora (256, 472), sem anel; `BossData.sprite_attack`/`sprite_stunned` para o wind-up e o atordoamento). Os campos `ring_*` do `EnemyData` continuam disponíveis.
 - Fora: `pickup_particle.png` (ainda não há drop no chão) e `shadow_ground.png` (a sombra segue desenhada pelo jogo).
 
@@ -118,21 +119,30 @@ Arquivo de dados: `data/enemies/enemy_<id>.tres` (`EnemyData`). Campos: `id, hp,
 
 ## Chefe
 
-**Ogro (T-150, decisão 39).** Dados em `data/enemies/boss_warden.tres` (`BossData`; o id `boss_warden` foi mantido para não quebrar HUD/FX/fase; a arte é do ogro). Código em `src/match/enemies/boss/` (`Boss` herda `Enemy`). Entra sozinho na onda 10. **Uma fase**, **um golpe corpo a corpo**, **sem minions nem tiros** (os padrões leque/anel/invocação, as fases por vida, `BossPattern` e `BossTelegraph` foram removidos).
+**Ogro (T-150, decisões 39 e 42).** Dados em `data/enemies/boss_warden.tres` (`BossData`; o id `boss_warden` foi mantido para não quebrar HUD/FX/fase; a arte é do ogro). Código em `src/match/enemies/boss/` (`Boss` herda `Enemy`). Entra sozinho na onda 10. **Uma fase**, **um golpe corpo a corpo**, **sem minions nem tiros**, **sem defesa** (T-166: a barra de defesa saiu; só a barra "Boss" do HUD, de vida).
 
 | Parâmetro | Valor |
 |---|---|
-| HP / defesa | 600 / 500 (`hp`, `defense_max`) |
-| Movimento | 110 px/s até `attack_range` 100 px (no chão) do centro do Núcleo: encosta sem tocar a hurtbox (40 + raio 48) |
-| Golpe | a cada `attack_interval` 1,5 s; `attack_windup` 0,5 s de aviso (sprite `boss_ogre_attack.png`, cresce até +12% e puxa para vermelho) e `attack_damage` 21 no Núcleo (passa pela defesa do upgrade) |
+| HP | 1200 (`hp`); defesa `defense_max = 0` (arquivada, ver abaixo) |
+| Movimento | 160 px/s até `attack_range` 100 px (no chão) do centro do Núcleo: encosta sem tocar a hurtbox (40 + raio 48) |
+| Golpe | a cada `attack_interval` 1,5 s; `attack_windup` 0,5 s de aviso (sprite `boss_ogre_attack.png`, cresce até +12% e puxa para vermelho) e `attack_damage` 30 no Núcleo (passa pela defesa do upgrade) |
+| Meteoro | **sempre** causa o dano (40) na vida **e** lança o chefe (`Boss.take_skill_damage`; vale qualquer meteoro cujo raio o toque). Se o meteoro o mata, não há lançamento |
 | Lançamento | `launch_distance` 600 px no chão para longe do Núcleo, preso na área visível acima da bandeja (`Arena.boss_launch_bounds`: arena menos o raio nas laterais e na base e a altura do sprite no topo); voo `launch_time` 0,6 s (tween de física, ease-out) |
-| Atordoado | `stun_time` 2 s (sprite `boss_ogre_stunned.png`), não bate; no fim a defesa volta cheia e ele anda de volta |
+| Atordoado | `stun_time` 2 s (sprite `boss_ogre_stunned.png`), não bate; no fim anda de volta |
+| Imunidade | `relaunch_immunity` 1 s depois de acordar: o meteoro fere, mas não relança. Em voo ou atordoado também não relança. Evita prender o chefe longe com dois meteoros seguidos (o cooldown do meteoro com upgrade fica perto do ciclo voo + atordoamento + volta) |
+| Passos (T-167) | `WalkAnimator` (`src/match/enemies/walk_animator.gd`), só visual: `walk_bob` 7 px, inclinação ±`walk_tilt_deg` 5°, squash `walk_squash` 6% no apoio do pé e sombra encolhendo até 12% no alto do passo; ritmo = distância andada / `walk_step_length` 70 px (a 160 px/s ≈ 2,3 passos/s). Parado, atacando, em voo ou atordoado: pose neutra. `walk_frames` (opcional, um quadro por quarto de ciclo) alterna os quadros `boss_ogre_walk_1..4` (AG08; mesma âncora do `boss_ogre`). `walk_full = true` liga a pose completa; com `false` (inimigos comuns) só o balanço. **Inimigos comuns: desligado** (`walk_bob = 0`): medido com 150 inimigos andando, só o balanço de 3 px custa +0,7 ms/quadro de física no PC (0,6 → 1,3 ms; a pose completa, +1,6 ms) |
 | Partículas | 50 ao morrer; vitória imediata |
 
-- **Defesa = escudo:** todo dano tira primeiro da defesa e, enquanto ela é > 0, a vida não muda (o excedente do golpe que zera a defesa não passa para a vida). Ao zerar, o chefe é lançado. Durante o voo e o atordoamento (defesa 0), o dano vai para a vida.
-- **Meteoro:** com defesa > 0, zera a defesa e lança na hora, sem dano na vida (vale qualquer meteoro cujo raio toque o chefe). Com defesa 0, causa o dano normal (40) na vida. Vem de `Enemy.take_skill_damage` (o `AreaSkill` chama esse método).
-- **Barra de defesa:** `HealthBar` com cor fixa aço `#7F93AD`, 96 px, sobre o chefe. A barra grande "Boss" (vida) é do HUD (AG02, T-152).
 - **Modos:** `ADVANCE → ATTACK (espera → wind-up → golpe) → LAUNCHED → STUNNED → ADVANCE`. Durante `LAUNCHED`/`STUNNED`, `Enemy.state = ATTACK` (parado para a mira e o meteoro).
+
+### Defesa do chefe (arquivada)
+
+Código e testes mantidos e funcionais (`Boss.has_defense()`), desligados no `boss_warden` (decisão 42). **Como ligar** em outro chefe: `defense_max > 0` no `.tres`. Com ela:
+- **Escudo:** todo dano tira primeiro da defesa e, enquanto ela é > 0, a vida não muda (o excedente do golpe que zera a defesa não passa para a vida). Ao zerar, o chefe é lançado; ao acordar, a defesa volta cheia.
+- **Meteoro com defesa > 0:** zera a defesa e lança na hora, sem dano na vida.
+- **Barra:** `HealthBar` aço `#7F93AD`, 96 px, sobre o chefe; o sinal `boss_defense_changed` só existe nesse caso.
+- Testes: `test_archived_*` em `tests/unit/match/test_boss.gd` e `test_boss_telegraph_defense_and_launch` (cópia do `boss_warden` com `defense_max = 500`).
+
 
 ## Ondas
 
@@ -205,6 +215,19 @@ godot --headless --path . --fixed-fps 60 -s tests/tools/run_sim.gd -- --seeds=20
 
 **T-150 (chefe ogro), seeds 1–100 e 1001–1100:** chega ao chefe **100%**, vence **63% / 56%**, HP do Núcleo ao chegar **56% / 55%**, chefe entra aos ~204 s, partida ~4,2 min (luta ~50 s). Calibrado só nos dados do chefe: HP 600, defesa 500, 110 px/s, golpe 21 a cada 1,5 s. O meteoro (cooldown ~8–10 s) lança o chefe quase a cada uso; a velocidade decide se ele volta a tempo de bater (70–80 px/s: nunca bate; 130: o bot perde sempre), por isso o ajuste fino é no dano do golpe. O `run_sim.gd` agora fixa a janela em retrato (405×720 → base 720×1280); antes a janela headless saía quadrada e a arena tinha 1280 px de largura (os números do BRF-051 acima foram medidos assim; refeitos em retrato, a chegada ao chefe e o HP continuam iguais).
 
+**T-166 (chefe sem defesa; meteoro sempre lança), seeds 1–100** (`run_sim.gd` agora imprime a luta e a Energia restante de quem vence; `--boss-hp/--boss-dmg/--boss-interval/--boss-speed` sobrescrevem o chefe só na execução):
+
+| Chefe | Chega | Vence | Luta (vitórias) | Energia restante de quem vence | Energia ao chegar |
+|---|---|---|---|---|---|
+| Antes: HP 600 + defesa 500, 110 px/s, golpe 21 / 1,5 s | 100% | 63% | 49 s (53 s) | 13% | 56% |
+| Sem defesa, HP 1000, resto igual | 100% | 100% | 25 s | 48% | 58% |
+| HP 1200, 150 px/s, golpe 28 | 100% | 94% | 28 s | 27% | 58% |
+| HP 1200, 165 px/s, golpe 28 | 100% | 70% | 27 s (28 s) | 21% | — |
+| HP 1200, 180 px/s, golpe 30 | 100% | 54% | 26 s (28 s) | 19% | — |
+| **Escolhido: HP 1200, 160 px/s, golpe 30 / 1,5 s** | **100%** | **73%** | **27 s (28 s)** | **22%** | 57% |
+
+As linhas intermediárias usaram 50 seeds. Sem a defesa, o meteoro (cooldown 8–10 s) lança o chefe a cada uso e ele passa ~7 s fora (voo, 2 s atordoado e a volta), por isso a **velocidade** decide quanto ele bate. As metas "vitória ~60%" e "Energia de quem vence ≥ 25%" puxam em sentidos opostos (o dano do chefe é quase o mesmo em toda seed; quem vence é quem chega com mais Energia): 94% de vitória dá 27% de Energia, 54% dá 19%. Ficou no meio (73% / 22%), com a luta no limite de baixo da faixa de 25–45 s. Referência do log real no iPhone: o jogador tinha ~38 de DPS no chefe; com 1200 de vida, ~32 s de luta.
+
 Limite: o bot reage na hora (compra e usa a skill no mesmo quadro); um jogador real tende a ser um pouco pior. Confirmar no playtest no iPhone.
 
 ## Contrato de partida
@@ -227,8 +250,8 @@ Emitidos pelo nó raiz da partida (`Arena`). Na T-105 já existem `core_hp_chang
 | `skill_ready(slot: int)` | quando o cooldown chega a 0 |
 | `particles_changed(total: int)` | `total` = **total** de Partículas na partida (não o incremento). Partículas começam em 0 e zeram a cada partida (decisão 29). `coins_changed(amount)` é um alias temporário, emitido junto, até a T-141 migrar o HUD |
 | `boss_spawned(id: StringName)` | entrada do chefe (logo depois vem `boss_hp_changed` com a vida cheia) |
-| `boss_hp_changed(current: int, max: int)` | entrada e a cada dano **na vida** do chefe (a defesa absorve antes; `current` nunca negativo; 0 na morte, antes de `match_ended`) |
-| `boss_defense_changed(current: int, max: int)` | entrada (cheia) e a cada mudança da defesa (dano, meteoro, volta cheia no fim do atordoamento) |
+| `boss_hp_changed(current: int, max: int)` | entrada e a cada dano **na vida** do chefe (com a defesa arquivada ligada, ela absorve antes; `current` nunca negativo; 0 na morte, antes de `match_ended`) |
+| `boss_defense_changed(current: int, max: int)` | **arquivado:** só para chefes com `defense_max > 0` (o `boss_warden` não emite). Entrada (cheia) e a cada mudança da defesa |
 | `boss_defeated` | chefe abatido (antes do `match_ended` de vitória) |
 | `upgrade_changed(id: StringName, level: int, max_level: int, next_cost: int)` | ver "Upgrades da partida (T-134)" abaixo |
 | `match_ended(result: MatchResult)` | vitória ou derrota (uma vez) |
@@ -245,7 +268,7 @@ Também na `Arena`, só em eventos (nenhum por quadro; as ligações são feitas
 | `particles_gained(at: Vector2, amount: int)` | abate com `particle_drop > 0` (depois de `particles_changed`) |
 | `skill_cast(slot: int, at: Vector2, radius: float)` | impacto da skill de área (meteoro), não no acionamento |
 | `boss_telegraph_started(pattern_id: StringName, duration: float, at: Vector2, radius: float)` | início do wind-up do golpe: `pattern_id` = `attack_id` (`&"boss_slam"`), `duration` = `attack_windup`, `at` = posição do chefe, `radius` = `telegraph_radius` |
-| `boss_launched(from: Vector2, to: Vector2)` | chefe lançado (defesa esgotada ou meteoro); `to` = fim do voo |
+| `boss_launched(from: Vector2, to: Vector2)` | chefe lançado (meteoro; ou defesa arquivada esgotada); `to` = fim do voo |
 
 `boss_phase_changed` **deixou de existir** (uma fase; T-150).
 
@@ -301,6 +324,6 @@ O `project.godot` é do AG07. Layers sugeridas:
 | Skill de controle | pendente | T-109 |
 | Skill de defesa | pendente | T-110 |
 | Arquétipos (tanque, atirador, enxame) | protótipo | T-111 |
-| Chefe (ogro) | protótipo | T-115, T-150 |
+| Chefe (ogro) | protótipo | T-115, T-150, T-166, T-167 |
 | Barra de vida dos inimigos | protótipo | T-149 |
 | Upgrades da partida | protótipo | T-134 |

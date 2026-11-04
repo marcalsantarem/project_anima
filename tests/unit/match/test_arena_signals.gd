@@ -82,7 +82,9 @@ func test_skill_cast_on_meteor_impact() -> void:
 
 func test_boss_telegraph_defense_and_launch() -> void:
 	await wait_physics_frames(1)
-	var boss := _parked(BOSS, GroundPlane.to_screen(Vector2(0, -BOSS.attack_range + 1.0))) as Boss
+	var shielded: BossData = BOSS.duplicate() # defesa arquivada ligada por dados (decisão 42)
+	shielded.defense_max = 500
+	var boss := _parked(shielded, GroundPlane.to_screen(Vector2(0, -BOSS.attack_range + 1.0))) as Boss
 	await wait_seconds(BOSS.attack_interval - BOSS.attack_windup + 0.1)
 	assert_signal_emitted(arena, "boss_telegraph_started")
 	var p: Array = get_signal_parameters(arena, "boss_telegraph_started")
@@ -91,7 +93,7 @@ func test_boss_telegraph_defense_and_launch() -> void:
 	assert_eq(p[2], boss.position)
 	assert_eq(p[3], BOSS.telegraph_radius)
 	boss.take_damage(100)
-	assert_signal_emitted_with_parameters(arena, "boss_defense_changed", [BOSS.defense_max - 100, BOSS.defense_max])
+	assert_signal_emitted_with_parameters(arena, "boss_defense_changed", [shielded.defense_max - 100, shielded.defense_max])
 	var from := boss.position
 	boss.take_skill_damage(40)
 	assert_signal_emitted(arena, "boss_launched")

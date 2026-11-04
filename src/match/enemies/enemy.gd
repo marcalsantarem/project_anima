@@ -19,6 +19,9 @@ var _fire_timer := 0.0
 var _ring: Sprite2D
 var health_bar: HealthBar
 var _body: Sprite2D
+var _shadow: GroundShadow
+## Passos procedurais; nulo quando data.walk_bob = 0.
+var walk: WalkAnimator
 
 @onready var _hitbox: CollisionShape2D = $Hitbox
 
@@ -36,19 +39,28 @@ func _ready() -> void:
 	shape.radius = data.radius
 	_hitbox.shape = shape
 	_hitbox.scale = GroundPlane.SHAPE_SCALE # círculo no chão
-	add_child(GroundShadow.new(data.radius))
+	_shadow = GroundShadow.new(data.radius)
+	add_child(_shadow)
 	hp = data.hp
 	state = State.ADVANCE
 	_build_art()
+	var w := WalkAnimator.new(_body, _shadow, data)
+	if w.enabled():
+		walk = w
 
 
 func _physics_process(delta: float) -> void:
 	match state:
 		State.ADVANCE:
+			var before := position
 			position = step_towards(position, target_position, data.speed, delta)
+			if walk:
+				walk.step(GroundPlane.distance(before, position))
 			if is_shooter() and GroundPlane.distance(position, target_position) <= data.attack_range:
 				state = State.ATTACK
 				_fire_timer = 1.0 / data.fire_rate
+				if walk:
+					walk.rest()
 		State.ATTACK:
 			_fire_timer -= delta
 			if _fire_timer <= 0.0:

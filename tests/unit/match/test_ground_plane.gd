@@ -28,7 +28,7 @@ func test_arena_is_y_sorted_and_anima_at_arena_center() -> void:
 	assert_true(arena.get_node("Enemies").y_sort_enabled)
 	assert_true(arena.projectiles.y_sort_enabled)
 	assert_true(arena.enemy_projectiles.y_sort_enabled)
-	assert_eq(arena.anima.position, arena.arena_rect().get_center())
+	assert_eq(arena.anima.position, arena.free_rect().get_center())
 
 
 func test_entities_have_ground_shadow_and_ellipse_collision() -> void:

@@ -26,3 +26,13 @@ extends Resource
 @export var ring_anchor: Vector2
 @export var ring_height: float = 0.0
 @export var ring_spin_speed: float = 0.0 ## rad/s
+## Passos procedurais (T-167, WalkAnimator). walk_bob = 0 desliga (padrão).
+@export_group("Caminhada")
+@export var walk_bob: float = 0.0 ## px (1x) de balanço vertical no alto do passo; 0 = sem animação
+@export var walk_step_length: float = 40.0 ## px no chão por passo (ritmo = distância / passo)
+## Pose completa (inclinação, squash, sombra e quadros). Desligado = só o balanço vertical (barato).
+@export var walk_full := false
+@export var walk_tilt_deg: float = 0.0 ## inclinação lateral alternada (±graus)
+@export var walk_squash: float = 0.0 ## achatamento no apoio do pé (0,05 = 5%)
+## Quadros opcionais de caminhada (mesmo canvas e âncora do sprite), um por quarto de ciclo.
+@export var walk_frames: Array[Texture2D] = []

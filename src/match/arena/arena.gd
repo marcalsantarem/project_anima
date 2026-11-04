@@ -24,9 +24,10 @@ signal enemy_died(at: Vector2, archetype_id: StringName, cause: int) ## cause = 
 signal particles_gained(at: Vector2, amount: int)
 signal skill_cast(slot: int, at: Vector2, radius: float)
 signal boss_telegraph_started(pattern_id: StringName, duration: float, at: Vector2, radius: float)
-## Defesa do chefe (escudo na frente da vida). Início e a cada mudança.
+## Defesa do chefe (escudo na frente da vida; ARQUIVADA, decisão 42). Só é emitido por chefes com
+## defense_max > 0 (o boss_warden não emite). Início e a cada mudança.
 signal boss_defense_changed(current: int, max_defense: int)
-## Chefe lançado (defesa esgotada ou meteoro): de `from` até `to` (âncora no chão, tela).
+## Chefe lançado (meteoro; ou defesa arquivada esgotada): de `from` até `to` (âncora no chão, tela).
 signal boss_launched(from: Vector2, to: Vector2)
 
 ## Upgrades da partida, na ordem da fileira do HUD.
@@ -44,6 +45,9 @@ const BOSS_SCENE := preload("res://src/match/enemies/boss/boss.tscn")
 ## sobreposto ao fundo). Altura da bandeja, sem safe area = Hud.TRAY_HEIGHT (docs/ui.md §4.4);
 ## o match não conhece a UI: quem monta a partida pode chamar set_bottom_inset(hud.tray_height()).
 @export var arena_bottom_inset: float = 282.0
+## Topo da área livre (abaixo do HUD de cima) = Hud.TOP_INSET, FIXO (decisão 43): a barra "Boss"
+## não desloca o Anima. O Anima fica no centro da área livre (free_rect).
+@export var arena_top_inset: float = 164.0
 ## Desligável para testes e debug (spawn só manual).
 @export var waves_enabled := true
 @export var enemy_projectile_pool_size: int = 128
@@ -172,7 +176,8 @@ func _bind_boss(boss: Boss) -> void:
 		boss_telegraph_started.emit(pattern_id, duration, boss.position, boss.boss_data.telegraph_radius))
 	boss_spawned.emit(boss.data.id)
 	boss_hp_changed.emit(boss.hp, boss.data.hp)
-	boss_defense_changed.emit(boss.defense, boss.boss_data.defense_max)
+	if boss.has_defense(): # defesa arquivada (decisão 42): sem ela, o sinal não é emitido
+		boss_defense_changed.emit(boss.defense, boss.boss_data.defense_max)
 
 
 ## Área visível onde o chefe pode cair ao ser lançado: a arena acima da bandeja, com folga para o
@@ -206,9 +211,20 @@ func screen_rect() -> Rect2:
 	return Rect2(Vector2.ZERO, arena_size())
 
 
-## Área jogável: do topo da tela até o início da bandeja inferior. O Anima fica no centro.
+## Área jogável: do topo da tela até o início da bandeja inferior (limite do lançamento do chefe).
 func arena_rect() -> Rect2:
 	return rect_for(arena_size(), arena_bottom_inset)
+
+
+## Área livre entre o HUD de cima e a bandeja. O Anima fica no centro dela (decisão 43).
+func free_rect() -> Rect2:
+	return free_rect_for(arena_size(), arena_top_inset, arena_bottom_inset)
+
+
+static func free_rect_for(screen: Vector2, top_inset: float, bottom_inset: float) -> Rect2:
+	var tray_top := maxf(screen.y - bottom_inset, 0.0)
+	var top := minf(top_inset, tray_top)
+	return Rect2(0.0, top, screen.x, tray_top - top)
 
 
 ## Altura da bandeja inferior (px da resolução base, com safe area). Recalcula o layout.
@@ -293,9 +309,11 @@ func _end(outcome: MatchResult.Outcome) -> void:
 
 
 func _layout() -> void:
-	var rect := arena_rect()
-	anima.position = rect.get_center()
-	_floor.layout(arena_size(), rect, anima.position)
+	var free := free_rect()
+	anima.position = free.get_center()
+	_floor.layout(arena_size(), free, anima.position)
+	for e in active_enemies: # inimigos já em campo seguem o novo centro
+		e.target_position = anima.position
 
 func _emit_upgrade(id: StringName) -> void:
 	upgrade_changed.emit(id, upgrades.level(id), upgrades.max_level(id), upgrades.next_cost(id))

@@ -1,15 +1,19 @@
-[gd_resource type="Resource" script_class="BossData" load_steps=5 format=3]
+[gd_resource type="Resource" script_class="BossData" load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://src/match/enemies/boss/boss_data.gd" id="1"]
 [ext_resource type="Texture2D" path="res://assets/sprites/boss_ogre.png" id="tex_sprite"]
 [ext_resource type="Texture2D" path="res://assets/sprites/boss_ogre_attack.png" id="tex_attack"]
 [ext_resource type="Texture2D" path="res://assets/sprites/boss_ogre_stunned.png" id="tex_stunned"]
+[ext_resource type="Texture2D" path="res://assets/sprites/boss_ogre_walk_1.png" id="tex_walk_1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/boss_ogre_walk_2.png" id="tex_walk_2"]
+[ext_resource type="Texture2D" path="res://assets/sprites/boss_ogre_walk_3.png" id="tex_walk_3"]
+[ext_resource type="Texture2D" path="res://assets/sprites/boss_ogre_walk_4.png" id="tex_walk_4"]
 
 [resource]
 script = ExtResource("1")
 id = &"boss_warden"
-hp = 600
-speed = 110.0
+hp = 1200
+speed = 160.0
 contact_damage = 30
 attack_range = 100.0
 fire_rate = 0.0
@@ -25,13 +29,20 @@ sprite = ExtResource("tex_sprite")
 sprite_anchor = Vector2(256, 472)
 attack_interval = 1.5
 attack_windup = 0.5
-attack_damage = 21
+attack_damage = 30
 attack_id = &"boss_slam"
 telegraph_radius = 110.0
 windup_scale = 0.12
-defense_max = 500
+defense_max = 0
+relaunch_immunity = 1.0
 launch_distance = 600.0
 launch_time = 0.6
 stun_time = 2.0
 sprite_attack = ExtResource("tex_attack")
 sprite_stunned = ExtResource("tex_stunned")
+walk_bob = 7.0
+walk_full = true
+walk_step_length = 70.0
+walk_tilt_deg = 5.0
+walk_squash = 0.06
+walk_frames = Array[Texture2D]([ExtResource("tex_walk_1"), ExtResource("tex_walk_2"), ExtResource("tex_walk_3"), ExtResource("tex_walk_4")])

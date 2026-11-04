@@ -99,11 +99,11 @@ y=0    ┌───────────────────────�
        │   [Boss ████████ 2.140/2.500]│  linha 3: 36 px (só com chefe, +52)
        ├──────────────────────────────┤ ← y 164 (216 c/ chefe) + safe_top
        │       ZONA DE COMBATE        │  Anima no centro; a arena encolhe (AG01)
-       ├──────────────────────────────┤ ← bandeja, ~y 1000 − safe_bottom
-       │ [up][up][up][up][up]         │  fileira de upgrades 5 × 128×80 (T-135)
+       ├──────────────────────────────┤ ← bandeja, y 1014 − safe_bottom (266 px)
+       │ [up][up][up][up][up]         │  fileira de upgrades 5 × 128×80 (T-135), padding 6
        ├──────────────────────────────┤
-       │   (1)      (2)      (3)      │  skills Ø 144, cy ≈ 1194
-       │  safe area base (home bar)   │
+       │   (1)      (2)      (3)      │  skills Ø 144 (+6 sombra), gap 8 acima, cy ≈ 1194
+       │  8 px + safe area (home bar) │  fundo da bandeja até a borda
 y=1280 └──────────────────────────────┘
 ```
 
@@ -127,8 +127,8 @@ y=1280 └───────────────────────�
 
 ### 4.3 Bandeja inferior (`Hud/Tray`)
 
-- Painel `bg_panel_alt` de largura total com contorno superior `ink`; vai até a borda inferior (a safe area entra como margem interna).
-- **Fileira de upgrades** (`Hud.upgrade_row`, decisão 35): faixa `tray_band` com 80 px úteis (padding 10), 5 botões `UpgradeButton` de 128×80 com gap 12 e margem 16 (5×128 + 4×12 = 688 = 720 − 2×16), na ordem `UpgradeButton.IDS` (§5.4). A faixa fica abaixo da arena: não cobre inimigos nem os slots.
+- Painel `bg_panel_alt` de largura total com contorno superior `ink`; vai até a borda inferior, cobrindo a safe area (a safe area entra como margem interna; os botões ficam acima dela). Pilha (BRF-066): contorno 4 + faixa 96 (6 + 80 + 6 + contorno 4) + respiro 8 (`Hud.SKILLS_TOP_PAD`) + slot 150 (Ø 144 + sombra 6) + 8 + safe area.
+- **Fileira de upgrades** (`Hud.upgrade_row`, decisão 35): faixa `tray_band` com 80 px úteis (padding 6, `Hud.UPGRADE_BAND_PAD`), 5 botões `UpgradeButton` de 128×80 com gap 12 e margem 16 (5×128 + 4×12 = 688 = 720 − 2×16), na ordem `UpgradeButton.IDS` (§5.4). A faixa fica abaixo da arena: não cobre inimigos nem os slots.
 - **3 slots de skill de Ø 144 px**, gap 66, centros em x = 150 / 360 / 570, cy ≈ 1194 sem safe area.
 - Slots 2 e 3 bloqueados com cadeado e "NV 7"/"NV 12" (T-136). Os níveis vêm de `Hud.slot_unlock_levels` (padrão do M1 `[0, 7, 12]`, 0 = liberado); no M2 o meta-jogo passa a lista com `set_slot_unlock_levels()` conforme o nível da conta.
 - **Área de toque = o círculo inteiro.** Toques entre os botões não fazem nada.
@@ -139,10 +139,10 @@ y=1280 └───────────────────────�
 |---|---|---|
 | `Hud.TOP_INSET` | 164 px | altura do topo (margem 16 + linha 1 88 + gap 16 + barra 44), sem safe area e sem a barra do chefe |
 | `Hud.BOSS_BAR_INSET` | 52 px | altura extra do topo com a barra "Boss" (gap 16 + barra 36); `top_inset()` já soma enquanto ela está visível |
-| `Hud.TRAY_HEIGHT` | 282 px | altura da bandeja (upgrades + skills), sem safe area. Medida; a arena usava ~293 |
+| `Hud.TRAY_HEIGHT` | 266 px | altura da bandeja (upgrades + skills), sem safe area (era 282 até a BRF-066). Medida |
 | `hud.top_inset()` / `hud.tray_height()` | constante + safe area | valores reais em tempo de execução, em px da resolução base |
 
-Teste: `tests/unit/ui/test_hud_layout.gd` confere as constantes contra o layout.
+Teste: `tests/unit/ui/test_hud_layout.gd` confere as constantes contra o layout e, com safe area simulada (`ScreenKit.simulated_safe_area`), que a bandeja termina na borda da tela.
 
 ## 5. Componentes
 
@@ -267,7 +267,7 @@ Boot/Loading (HTML shell) → Toque para começar → Partida ⇄ Pausa → Resu
 | Item | Com quem |
 |---|---|
 | Paleta de projéteis inimigos sem ciano | AG01 |
-| Arena encolhida (87%) para caber a bandeja de ~280 px sem cobrir inimigos | AG01 (T-144) |
+| Arena encolhida (87%) para caber a bandeja de ~266 px sem cobrir inimigos | AG01 (T-144) |
 | Leitura da safe area no Safari (`animaGetSafeArea()` já está no shell) | AG02 (T-005) |
 
 ## 10b. HUD (implementação, T-112)
@@ -300,12 +300,14 @@ Cenas independentes em `src/ui/screens/`, com o tema na raiz (via `ScreenKit`). 
 - **Preset `Web`** (`export_presets.cfg`): sem threads, sem extensões, VRAM compression só desktop (o 2D usa textura sem compressão VRAM), resize policy *adaptive*, saída em `build/web/index.html`. Exclui `tests/`, `addons/gut/`, `docs/` e `build/`.
 - **Shell** `web/shell.html`:
   - viewport sem zoom com `viewport-fit=cover`;
-  - página `position: fixed`, `overscroll-behavior: none`, `touch-action: none`;
+  - página `position: fixed`, `overscroll-behavior: none`, `touch-action: none`; fundo da página `#5A4A9A` (`UiTokens.BG_PANEL_ALT`, a bandeja do HUD), para que uma sobra no rodapé não mostre o lilás da splash; o degradê fica só em `#status`;
+  - canvas `position: fixed` no canto (tamanho inline do Godot, policy *adaptive* + stretch `expand` = janela inteira). Se `window.innerHeight` vier menor que a área visível (`#viewport-probe`, `100dvh`, inclui a safe area com `viewport-fit=cover`; caso visto no Safari do iPhone), o shell faz `innerHeight` devolver a altura da sonda (limitada a `screen.height`), e o canvas cobre o rodapé (T-170);
+  - **ordem das etapas: logo do estúdio → splash B → título** (T-170, decisão 44). `#brand`: preto puro (`#000`, `100dvh`, safe areas) por cima da splash, logo `assets/branding/anima_games_logo.webp` em base64 (largura `min(60vw, 420px, 60vh)`); fade-in 200 ms, 1 s parado, fade-out 250 ms (≈1,5 s; corte seco com `prefers-reduced-motion`). O engine carrega em paralelo desde o início; se o jogo ficar pronto antes, o título só aparece quando o logo sai (`animaBrand.whenDone`); erro ou falta de WebGL 2 cortam o logo na hora (`animaBrand.stop`). `theme-color` `#000000` no logo e `#8E72EC` a partir da splash;
   - bloqueio de pinça, duplo toque, rolagem e menu de contexto;
-  - **splash B** (BRF-053; arte em `assets/splash/`, `docs/arte.md` §9.3), **toda inline** no HTML, porque o export Web do Godot não copia arquivos extras de `web/`: fundo em gradiente CSS + estrelas em SVG (`slice`), anéis em SVG presos ao núcleo, disco de xadrez, brilho e sombra em CSS, e o `splash_logo_core.webp` em base64 (uma cópia, num `<img>` oculto) fatiado em cristal (flutua; parado com `prefers-reduced-motion`), pedestal e título. Sem WebP, o título vira texto. Peso do `index.html`: ~46 KB (~28 KB gzip), sem requisições externas. Para trocar a arte, substitua o base64 pelo novo `.webp` (mesmo tamanho 560×760);
+  - **splash B** (BRF-053; arte em `assets/splash/`, `docs/arte.md` §9.3), **toda inline** no HTML, porque o export Web do Godot não copia arquivos extras de `web/`: fundo em gradiente CSS + estrelas em SVG (`slice`), anéis em SVG presos ao núcleo, disco de xadrez, brilho e sombra em CSS, e o `splash_logo_core.webp` em base64 (uma cópia, num `<img>` oculto) fatiado em cristal (flutua; parado com `prefers-reduced-motion`), pedestal e título. Sem WebP, o título vira texto. Peso do `index.html`: ~73 KB com o logo do estúdio (era ~46 KB), sem requisições externas. Para trocar a arte, substitua o base64 pelo novo `.webp` (mesmo tamanho 560×760);
   - barra em pílula (`#5B4A7A`, contorno `#3A2A55`, preenchimento dourado) com progresso real do `onProgress` e modo indeterminado; texto "Carregando… N%" na fonte do sistema;
   - erro de carregamento e "sem WebGL 2" usam o mesmo fundo e logotipo, com o aviso num painel no estilo do jogo; ao iniciar o jogo, a splash sai com fade de 250 ms;
-  - `theme-color` `#8E72EC` (topo do gradiente);
+  - `theme-color` `#8E72EC` (topo do gradiente) depois do logo;
   - `window.animaGetSafeArea()` devolve um JSON com os insets em px CSS.
 - **Teste local:** sirva `build/web/` por HTTP (ex.: `python -m http.server -d build/web 8000`); `file://` não funciona.
 
@@ -316,6 +318,6 @@ Cenas independentes em `src/ui/screens/`, com o tema na raiz (via `ScreenKit`). 
 - fundo desenhado por código (degradê `#8E72EC` → `#7B5CE0` 55% → `#4E3F8F`, brilhos dourados, anéis rúnicos e disco de xadrez), sem textura extra; logotipo `assets/ui/ui_title_logo_core.png` (cópia do `splash_logo_core.png`) fatiado em cristal, pedestal e título;
 - cristal flutua (−12 u, 2,4 s), sombra e brilho acompanham, com tweens em loop (sem alocação por quadro);
 - no lugar da barra, botão `ButtonPrimary` (arte `ui_button_big_*`) de 440×120 u (mín. 88 px), com pulso de escala (0,8 s); no gesto mostra a arte pressionada;
-- sem fade de entrada (o fade da splash, 250 ms, faz a transição); crédito em `LabelCaption` acima da safe area inferior;
+- sem fade de entrada (o fade da splash, 250 ms, faz a transição); logo horizontal do estúdio Anima Games (`ui_studio_logo_h.png`, branco, 88% de opacidade) centralizado na base, com ~30% da largura da tela (máx. 240 px) e 32 px acima da safe area inferior, sem receber toque (BRF-068);
 - contrato mantido: qualquer toque, clique ou tecla (inclui a action de aceitar) emite `start_requested` uma vez e libera o áudio.
 - Se a splash mudar no `web/shell.html`, ajuste as constantes do topo do script.

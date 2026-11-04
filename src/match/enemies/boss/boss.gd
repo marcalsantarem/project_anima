@@ -1,9 +1,14 @@
 class_name Boss
 extends Enemy
-## Chefe ogro (decisão 39). Uma fase: anda até encostar no Núcleo (attack_range) e bate a cada
-## attack_interval, com wind-up (aviso) de attack_windup. A defesa é um escudo na frente da vida:
-## todo dano tira dela primeiro; ao zerar (ou ao levar meteoro), é lançado para longe do Núcleo,
-## fica atordoado (o dano vai para a vida) e, no fim, a defesa volta cheia e ele anda de volta.
+## Chefe ogro (decisões 39 e 42). Uma fase: anda até encostar no Núcleo (attack_range) e bate a cada
+## attack_interval, com wind-up (aviso) de attack_windup. O meteoro sempre o lança para longe do
+## Núcleo e o atordoa (stun_time); depois ele anda de volta. relaunch_immunity evita lançamento em
+## cadeia logo depois de acordar.
+##
+## DEFESA (ARQUIVADA, decisão 42): escudo na frente da vida, ligado só com defense_max > 0 nos dados.
+## Com ela, todo dano tira da defesa primeiro; ao zerar, ele é lançado e, ao acordar, a defesa volta
+## cheia. O boss_warden usa defense_max = 0: sem barra, sem escudo e sem sinal defense_changed.
+## Como ligar para outro chefe: docs/gameplay.md, "Defesa do chefe (arquivada)".
 
 signal hp_changed(current: int, max_hp: int)
 signal defense_changed(current: int, max_defense: int)
@@ -27,12 +32,15 @@ var defense_bar: HealthBar
 var _attack_left := 0.0 ## s até o golpe (no fim do intervalo)
 var _winding := false
 var _stun_left := 0.0
+var _immune_left := 0.0 ## s de imunidade a novo lançamento depois de acordar
 var _tween: Tween
 
 
 func _ready() -> void:
 	super()
 	boss_data = data as BossData
+	if not has_defense():
+		return
 	defense = boss_data.defense_max
 	defense_bar = HealthBar.new()
 	defense_bar.fixed_color = DEFENSE_COLOR
@@ -40,12 +48,21 @@ func _ready() -> void:
 	add_child(defense_bar)
 
 
+## Defesa arquivada ligada nos dados (defense_max > 0).
+func has_defense() -> bool:
+	return boss_data.defense_max > 0
+
+
 func _physics_process(delta: float) -> void:
 	if state == State.DEAD:
 		return
+	_immune_left = maxf(_immune_left - delta, 0.0)
 	match mode:
 		Mode.ADVANCE:
+			var before := position
 			position = step_towards(position, target_position, data.speed, delta)
+			if walk:
+				walk.step(GroundPlane.distance(before, position))
 			if in_reach():
 				_start_attack_cycle()
 		Mode.ATTACK:
@@ -79,7 +96,7 @@ func tick_attack(delta: float) -> void:
 func take_damage(amount: int) -> void:
 	if state == State.DEAD or amount <= 0:
 		return
-	if defense > 0:
+	if defense > 0: # só com a defesa arquivada ligada
 		_set_defense(defense - amount) # o excedente não passa para a vida
 		if defense == 0:
 			launch()
@@ -90,7 +107,8 @@ func take_damage(amount: int) -> void:
 		die(DeathCause.KILLED)
 
 
-## Meteoro: com defesa, zera e lança na hora (sem dano na vida); sem defesa, dano normal.
+## Meteoro: dano na vida e lançamento (se can_launch). Com a defesa arquivada ainda de pé, ela
+## zera e o lançamento acontece sem dano na vida.
 func take_skill_damage(amount: int) -> void:
 	if state == State.DEAD:
 		return
@@ -99,12 +117,21 @@ func take_skill_damage(amount: int) -> void:
 		launch()
 		return
 	take_damage(amount)
+	if can_launch():
+		launch()
+
+
+## Pode ser lançado agora: não está voando, atordoado nem na imunidade pós-atordoamento.
+func can_launch() -> bool:
+	return state != State.DEAD and mode != Mode.LAUNCHED and mode != Mode.STUNNED and _immune_left <= 0.0
 
 
 ## Voa para longe do Núcleo, rumo à borda (launch_bounds), e fica atordoado no fim.
 func launch() -> void:
 	if state == State.DEAD or mode == Mode.LAUNCHED:
 		return
+	if walk:
+		walk.rest()
 	mode = Mode.LAUNCHED
 	state = State.ATTACK # parado para a mira/meteoro (não avança)
 	_end_windup()
@@ -140,13 +167,17 @@ func _stun() -> void:
 
 
 func _recover() -> void:
-	_set_defense(boss_data.defense_max)
+	if has_defense():
+		_set_defense(boss_data.defense_max)
+	_immune_left = boss_data.relaunch_immunity
 	_set_texture(data.sprite)
 	mode = Mode.ADVANCE
 	state = State.ADVANCE
 
 
 func _start_attack_cycle() -> void:
+	if walk:
+		walk.rest()
 	mode = Mode.ATTACK
 	state = State.ATTACK
 	_attack_left = boss_data.attack_interval

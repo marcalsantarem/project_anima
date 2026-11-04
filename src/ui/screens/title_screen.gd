@@ -8,6 +8,7 @@ extends Control
 signal start_requested
 
 const LOGO := preload("res://assets/ui/ui_title_logo_core.png")
+const STUDIO_LOGO := preload("res://assets/ui/ui_studio_logo_h.png") ## Anima Games, 2x (BRF-068)
 const PULSE_TIME := 0.8
 const FLOAT_TIME := 2.4
 const BUTTON_TEXT := "Toque para começar"
@@ -24,6 +25,10 @@ const W_VW := 0.86
 const W_MAX_CSS := 440.0
 const W_H_CSS := 0.55
 const W_H_PAD_CSS := 64.0
+const STUDIO_W := 0.30 ## largura do logo do estúdio / largura da tela
+const STUDIO_W_MAX := 240.0
+const STUDIO_BOTTOM := 32.0 ## folga acima da safe area inferior
+const STUDIO_ALPHA := 0.88
 
 const BG_TOP := Color("#8E72EC")
 const BG_MID := Color("#7B5CE0")
@@ -37,7 +42,7 @@ const RUNE := Color("#DCD3FA")
 var _started := false
 var _stage: Control
 var _button: Button
-var _credit: Label
+var _studio_logo: TextureRect
 ## Link "Último log" (null se não houver log salvo) e o visualizador aberto.
 var last_log_link: Button
 var viewer: LogViewer
@@ -60,8 +65,14 @@ func _ready() -> void:
 	_button.mouse_filter = MOUSE_FILTER_IGNORE # o gesto vale na tela toda (_input)
 	root.add_child(_button)
 
-	_credit = ScreenKit.label("Criado por Marçal Santarem", &"LabelCaption", UiTokens.TEXT_SECONDARY)
-	root.add_child(_credit)
+	_studio_logo = TextureRect.new()
+	_studio_logo.name = "StudioLogo"
+	_studio_logo.texture = STUDIO_LOGO
+	_studio_logo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_studio_logo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_studio_logo.modulate.a = STUDIO_ALPHA
+	_studio_logo.mouse_filter = MOUSE_FILTER_IGNORE
+	root.add_child(_studio_logo)
 	if MatchRecorder.has_last_log():
 		last_log_link = Button.new()
 		last_log_link.name = "LastLog"
@@ -169,9 +180,11 @@ func _layout() -> void:
 	_button.pivot_offset = bsize / 2.0
 	_button.add_theme_font_size_override("font_size", maxi(UiTokens.FONT_BODY, roundi(BUTTON_FONT * u)))
 
-	_credit.set_anchors_and_offsets_preset(PRESET_BOTTOM_WIDE, PRESET_MODE_MINSIZE)
-	_credit.offset_bottom = -(safe.bottom + UiTokens.SPACE_M)
-	_credit.offset_top = _credit.offset_bottom - _credit.get_combined_minimum_size().y
+	var tex := STUDIO_LOGO.get_size()
+	var lw := minf(view.x * STUDIO_W, STUDIO_W_MAX)
+	var lsize := Vector2(lw, lw * tex.y / tex.x)
+	_studio_logo.size = lsize
+	_studio_logo.position = Vector2((view.x - lsize.x) / 2.0, view.y - safe.bottom - STUDIO_BOTTOM - lsize.y)
 	if last_log_link != null:
 		last_log_link.size = LINK_SIZE
 		last_log_link.position = Vector2(view.x - safe.right - LINK_SIZE.x - UiTokens.SPACE_XS, safe.top + UiTokens.SPACE_XS)
