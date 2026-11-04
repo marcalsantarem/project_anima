@@ -41,7 +41,7 @@
 - Sprites de `assets/sprites/` via `SpriteArt` (`src/match/arena/sprite_art.gd`): PNG 2x, `scale` 0,5, `centered = false`, `offset = -âncora`, filtro Linear. Textura e âncora ficam nos dados: `EnemyData.sprite/sprite_anchor`, `ProjectileData.sprite/sprite_anchor`, `AnimaData` (grupo "Arte": base, cristal a `crystal_height` 110 px com bob de 5 px, 3 nós em elipse 29×12 px). Só visual: colisão, `GroundShadow` e `ground_plane` não mudaram.
 - Projétil: sprite a `height` px acima da âncora, `rotation` = direção do tiro na tela. `ProjectileData.shape/color` seguem como identidade de leitura (testes), sem desenho.
 - Fundo (BRF-041): nó `Floor` (`ArenaFloor`, `src/match/arena/arena_floor.gd`) com as peças de `assets/backgrounds/`: `floor_tile` repetido (Sprite2D com `region` + repeat) cobrindo a tela inteira, `floor_top_shade` no topo e `floor_ring` no Anima (todos `z_index = -10`); 4 `floor_pillar` nos cantos da `arena_rect` (insets `pillar_inset_*`), com `GroundShadow` e Y-sort junto das entidades. Sem moldura. `ArenaFloor.layout()` só reposiciona (sem alocar por frame).
-- Chefe: `EnemyData.ring_sprite/ring_anchor/ring_height/ring_spin_speed` já desenham o anel atrás do corpo; a T-115 só preenche os dados (`boss_warden.png`, âncora (256, 472); anel (256, 128) a 70 px).
+- Chefe: ogro (`boss_ogre.png`, âncora (256, 472), sem anel; `BossData.sprite_attack`/`sprite_stunned` para o wind-up e o atordoamento). Os campos `ring_*` do `EnemyData` continuam disponíveis.
 - Fora: `pickup_particle.png` (ainda não há drop no chão) e `shadow_ground.png` (a sombra segue desenhada pelo jogo).
 
 ## Anima e ataque automático
@@ -102,10 +102,10 @@ Arquivo de dados: `data/enemies/enemy_<id>.tres` (`EnemyData`). Campos: `id, hp,
 
 | Arquétipo | `id` | HP | Velocidade | Ataque | Partículas |
 |---|---|---|---|---|---|
-| Corredor | `enemy_runner` | 20 | 140 px/s | contato, 5 de dano | 1 |
-| Tanque | `enemy_tank` | 120 | 50 px/s | contato, 20 de dano | 4 |
-| Atirador | `enemy_shooter` | 35 | 80 px/s | para a 380 px do centro; 1 tiro a cada 1,5 s (`projectile_enemy_bolt`: 6 de dano, 300 px/s, losango magenta) | 2 |
-| Enxame | `enemy_swarm` | 8 | 120 px/s | contato, 2 de dano; nasce em grupos de 5–8, espalhados em 48 px | 1 cada |
+| Corredor | `enemy_runner` | 20 | 140 px/s | contato, 4 de dano | 1 |
+| Tanque | `enemy_tank` | 90 | 50 px/s | contato, 15 de dano | 4 |
+| Atirador | `enemy_shooter` | 35 | 80 px/s | para a 380 px do centro; 1 tiro a cada 2 s (`projectile_enemy_bolt`: 3 de dano, 300 px/s, losango magenta) | 2 |
+| Enxame | `enemy_swarm` | 8 | 120 px/s | contato, 1 de dano; nasce em grupos de 5–8, espalhados em 48 px | 1 cada |
 
 - **Estados:** `SPAWN → AVANÇA → ATACA → MORRE`, mais `CONGELADO` e `LENTO` (das skills de controle).
 - **Contato:** ao tocar a hurtbox do Anima, o inimigo causa `contact_damage` e morre (sem Partículas).
@@ -113,26 +113,26 @@ Arquivo de dados: `data/enemies/enemy_<id>.tres` (`EnemyData`). Campos: `id, hp,
 - **Atirador:** um só script (`Enemy`); com `attack_range > 0` ele para no alcance (estado `ATTACK`) e atira com o pool `EnemyProjectiles` da arena (128, layer `enemy_projectiles`). Quem reage ao acerto é o Anima (mask), que consome o projétil.
 - **Grupo:** cada spawn de onda cria `group_min..group_max` inimigos (`Arena.spawn_group`). Só o enxame usa grupo > 1.
 - Inimigos em pool por arquétipo (T-118); fora da tela não fazem cálculos caros.
-- **Balanceamento:** só com o ataque automático, 2 tanques + 2 atiradores juntos já derrotam o Núcleo. A curva da T-116 deve contar com as skills.
+- **Balanceamento:** valores do BRF-051 (ver "Balanceamento da fase 1").
+- **Barra de vida (T-149, decisão 38):** `HealthBar` (`src/match/enemies/health_bar.gd`), filha do inimigo, 6 px de altura, largura `28 + raio` limitada a 40–56 px, 6 px acima do topo do sprite, z +1 (acima dos corpos), contorno `ink` `#3A2A55` 1,5 px e trilho `bar_track` `#5B4A7A`. Cor pela fração: **verde** `#3FD27F` com ≥ 60% (mais escuro que o `core_hp` para ler sobre o chão creme), **amarela** `#FFC93D` abaixo de 60%, **vermelha** `#FF5A6E` com ≤ 30%. Cheia ao nascer; só redesenha em `take_damage` (sem `_process`). `EnemyData.show_health_bar` (padrão true; o chefe usa false). Teste: `tests/unit/match/test_health_bar.gd` (faixas e 150 inimigos sem redesenho por quadro).
 
 ## Chefe
 
-Arquivo de dados: `data/enemies/boss_<id>.tres` (`BossData`, herda `EnemyData`; padrões como `BossPattern` embutidos). Código em `src/match/enemies/boss/` (`Boss` herda `Enemy`; cena `boss.tscn`). Um chefe no M1: `boss_warden` (nome provisório). Entra numa onda como qualquer inimigo (`WaveEntry.enemy = boss_warden.tres`, `count` 1): a `Arena.spawn` usa a cena do chefe quando os dados são `BossData`.
+**Ogro (T-150, decisão 39).** Dados em `data/enemies/boss_warden.tres` (`BossData`; o id `boss_warden` foi mantido para não quebrar HUD/FX/fase; a arte é do ogro). Código em `src/match/enemies/boss/` (`Boss` herda `Enemy`). Entra sozinho na onda 10. **Uma fase**, **um golpe corpo a corpo**, **sem minions nem tiros** (os padrões leque/anel/invocação, as fases por vida, `BossPattern` e `BossTelegraph` foram removidos).
 
 | Parâmetro | Valor |
 |---|---|
-| HP | 1200 |
-| Posição | entra pela borda, a 60 px/s, e para a 420 px do centro (`attack_range`) |
-| Fases | `phase_thresholds` [0,6, 0,3]: 100–60%, 60–30%, abaixo de 30% |
-| Espera entre padrões | `pattern_interval` 3,0 / 2,4 / 1,8 s por fase |
-| Padrões (peso por fase) | `pattern_fan` leque de 5 `projectile_enemy_bolt` em 40°, mirado no Núcleo (3/2/2); `pattern_ring` anel de 12 com ângulo inicial aleatório (0/2/3); `pattern_summon` 4 `enemy_swarm` a 70 px do chefe (1/1/2) |
-| Aviso | antes de cada padrão, 1,0–1,2 s (≥ 0,8 s). `BossTelegraph` desenhado por código: cone (leque) ou círculo (anel, invocação) que se preenche até o efeito. VFX final: AG09 |
-| Projéteis | pool inimigo da arena (128), alcance `projectile_range` 700 px |
-| Partículas | 50 ao morrer |
+| HP / defesa | 600 / 500 (`hp`, `defense_max`) |
+| Movimento | 110 px/s até `attack_range` 100 px (no chão) do centro do Núcleo: encosta sem tocar a hurtbox (40 + raio 48) |
+| Golpe | a cada `attack_interval` 1,5 s; `attack_windup` 0,5 s de aviso (sprite `boss_ogre_attack.png`, cresce até +12% e puxa para vermelho) e `attack_damage` 21 no Núcleo (passa pela defesa do upgrade) |
+| Lançamento | `launch_distance` 600 px no chão para longe do Núcleo, preso na área visível acima da bandeja (`Arena.boss_launch_bounds`: arena menos o raio nas laterais e na base e a altura do sprite no topo); voo `launch_time` 0,6 s (tween de física, ease-out) |
+| Atordoado | `stun_time` 2 s (sprite `boss_ogre_stunned.png`), não bate; no fim a defesa volta cheia e ele anda de volta |
+| Partículas | 50 ao morrer; vitória imediata |
 
-- Ciclo: `ADVANCE` → `ATTACK` (espera → aviso → efeito → espera…). Sorteio por peso da fase com `Boss.rng` (semente vinda da arena).
-- Ao derrotá-lo: Partículas, `boss_defeated` e **vitória imediata** (mesmo com invocados vivos).
-- **Balanceamento (estimativa, calibrar na T-116):** com DPS base 20, ~60 s; com ~250 Partículas distribuídas (DPS ~37) + `skill_pulse`, ~30 s. Só o projétil central do leque acerta o Núcleo (6 de dano); o anel acerta no máximo 1; o enxame invocado, 2 por contato.
+- **Defesa = escudo:** todo dano tira primeiro da defesa e, enquanto ela é > 0, a vida não muda (o excedente do golpe que zera a defesa não passa para a vida). Ao zerar, o chefe é lançado. Durante o voo e o atordoamento (defesa 0), o dano vai para a vida.
+- **Meteoro:** com defesa > 0, zera a defesa e lança na hora, sem dano na vida (vale qualquer meteoro cujo raio toque o chefe). Com defesa 0, causa o dano normal (40) na vida. Vem de `Enemy.take_skill_damage` (o `AreaSkill` chama esse método).
+- **Barra de defesa:** `HealthBar` com cor fixa aço `#7F93AD`, 96 px, sobre o chefe. A barra grande "Boss" (vida) é do HUD (AG02, T-152).
+- **Modos:** `ADVANCE → ATTACK (espera → wind-up → golpe) → LAUNCHED → STUNNED → ADVANCE`. Durante `LAUNCHED`/`STUNNED`, `Enemy.state = ATTACK` (parado para a mira e o meteoro).
 
 ## Ondas
 
@@ -149,8 +149,8 @@ WaveEntry: enemy (EnemyData), count, interval (s), spawn_edge, start_delay (s)
 - O i-ésimo inimigo de um grupo nasce em `start_delay + i × interval`.
 - A fase vem de `data/waves/<config.stage_id>.tres`.
 - Uma onda termina quando todos os inimigos dela nasceram **e** morreram. Depois vem o respiro `wave_break` (3 s).
-- **Chefe na onda 10, com acompanhantes** (T-116), e não numa onda 11 só dele: o "Onda 10/10" bate com o fim da fase e os acompanhantes mantêm pressão enquanto o jogador foca o chefe. `StageData.boss_id = boss_warden` (informativo).
-- **Vitória ao derrotar o chefe** (`Arena._on_enemy_died`), mesmo com acompanhantes vivos. Derrota: HP do Núcleo = 0.
+- **Chefe na onda 10, sozinho** (T-150; antes vinha com 4 corredores + 1 atirador): o "Onda 10/10" bate com o fim da fase. Uma onda só fecha num passo sem spawn (correção da T-150: antes, a onda com só o chefe terminava no passo em que ele nascia). `StageData.boss_id = boss_warden` (informativo).
+- **Vitória ao derrotar o chefe** (`Arena._on_enemy_died`). Derrota: HP do Núcleo = 0.
 
 **Curva da fase 1 (`stage_01`, T-116).** Balanceada para **1 skill (slot 1, hoje `skill_meteor`; antes `skill_pulse`) + upgrades da partida**, independente do tipo da skill de área (T-139). Um arquétipo novo a cada 2–3 ondas. Partículas pela média do enxame (5–8 por grupo, média 6,5); "tempo" = último spawn + tempo de limpeza estimado (sem simulação de combate).
 
@@ -165,7 +165,7 @@ WaveEntry: enemy (EnemyData), count, interval (s), spawn_edge, start_delay (s)
 | 7 | 10 corredores + 2 enxames + 2 tanques + 2 atiradores (**novo**) | ~27 | ~35 | ~146 | ~22 s |
 | 8 | 14 corredores + 3 enxames + 2 tanques + 2 atiradores | ~37,5 | ~45,5 | ~191,5 | ~26 s |
 | 9 | 14 corredores + 3 enxames + 3 tanques + 3 atiradores | ~39,5 | ~51,5 | **~243** | ~27 s |
-| 10 | **chefe** + 4 corredores + 1 atirador (+ enxames invocados) | 6+ | 6 + 50 do chefe | — | ~48 s |
+| 10 | **chefe ogro sozinho** | 1 | 50 do chefe | — | ~50 s |
 
 - **Partículas antes do chefe:** ~243 depois do BRF-051 (antes ~255; faixa ~222–264 conforme o tamanho dos enxames), alinhado aos ~250 de `docs/meta.md`. Nenhum `particle_drop` mudou.
 - **Duração estimada (antes do BRF-051):** ~235 s de ondas + 27 s de respiros ≈ **4,5 min** jogando bem (alvo ~5 min; limite 3–10 min). Sem skill nem upgrades, a simulação do teste de integração perde na onda 4–5 (~80 s), como esperado.
@@ -185,7 +185,7 @@ O dono achou a fase 1 difícil demais no iPhone. Mudanças **só em dados** (ant
 | Atiradores nas ondas 7 / 8 / 9 | 3 / 3 / 4 | **2 / 2 / 3** |
 | Respiro entre ondas (`wave_break`) | 3 s | **5 s** |
 | Custo dos upgrades (`docs/meta.md`) | 5, 7, 10 … 104 | **4, 6, 8 … 83** |
-| Chefe: HP / tiro (novo `projectile_boss_bolt`) | 1200 / 6 (tiro comum) | **2500 / 14** (tiro próprio, para o chefe seguir perigoso) |
+| Chefe (substituído pelo ogro na T-150, ver abaixo) | 1200 / tiro 6 | 2500 / tiro próprio 14 |
 
 Meteoro e Partículas por inimigo não mudaram (o custo menor já faz os upgrades chegarem cedo: o 1º sai na onda 1).
 
@@ -202,6 +202,8 @@ godot --headless --path . --fixed-fps 60 -s tests/tools/run_sim.gd -- --seeds=20
 | Antes (40 seeds) | **0 %** (cai nas ondas 7–8) | 0 % | — | — | ~2,4 min | ~135 |
 | Depois (seeds 1–40) | **100 %** | **58 %** | 53 % | ~214 s | ~4,6 min | ~275 |
 | Depois (seeds 1001–1100) | **100 %** | **62 %** | 55 % | ~214 s | ~4,6 min | ~279 |
+
+**T-150 (chefe ogro), seeds 1–100 e 1001–1100:** chega ao chefe **100%**, vence **63% / 56%**, HP do Núcleo ao chegar **56% / 55%**, chefe entra aos ~204 s, partida ~4,2 min (luta ~50 s). Calibrado só nos dados do chefe: HP 600, defesa 500, 110 px/s, golpe 21 a cada 1,5 s. O meteoro (cooldown ~8–10 s) lança o chefe quase a cada uso; a velocidade decide se ele volta a tempo de bater (70–80 px/s: nunca bate; 130: o bot perde sempre), por isso o ajuste fino é no dano do golpe. O `run_sim.gd` agora fixa a janela em retrato (405×720 → base 720×1280); antes a janela headless saía quadrada e a arena tinha 1280 px de largura (os números do BRF-051 acima foram medidos assim; refeitos em retrato, a chegada ao chefe e o HP continuam iguais).
 
 Limite: o bot reage na hora (compra e usa a skill no mesmo quadro); um jogador real tende a ser um pouco pior. Confirmar no playtest no iPhone.
 
@@ -225,7 +227,8 @@ Emitidos pelo nó raiz da partida (`Arena`). Na T-105 já existem `core_hp_chang
 | `skill_ready(slot: int)` | quando o cooldown chega a 0 |
 | `particles_changed(total: int)` | `total` = **total** de Partículas na partida (não o incremento). Partículas começam em 0 e zeram a cada partida (decisão 29). `coins_changed(amount)` é um alias temporário, emitido junto, até a T-141 migrar o HUD |
 | `boss_spawned(id: StringName)` | entrada do chefe (logo depois vem `boss_hp_changed` com a vida cheia) |
-| `boss_hp_changed(current: int, max: int)` | entrada e a cada dano no chefe (`current` nunca negativo; 0 na morte, antes de `match_ended`) |
+| `boss_hp_changed(current: int, max: int)` | entrada e a cada dano **na vida** do chefe (a defesa absorve antes; `current` nunca negativo; 0 na morte, antes de `match_ended`) |
+| `boss_defense_changed(current: int, max: int)` | entrada (cheia) e a cada mudança da defesa (dano, meteoro, volta cheia no fim do atordoamento) |
 | `boss_defeated` | chefe abatido (antes do `match_ended` de vitória) |
 | `upgrade_changed(id: StringName, level: int, max_level: int, next_cost: int)` | ver "Upgrades da partida (T-134)" abaixo |
 | `match_ended(result: MatchResult)` | vitória ou derrota (uma vez) |
@@ -241,8 +244,10 @@ Também na `Arena`, só em eventos (nenhum por quadro; as ligações são feitas
 | `enemy_died(at: Vector2, archetype_id: StringName, cause: int)` | toda morte; `cause` = `Enemy.DeathCause` (KILLED 0, CONTACT 1) |
 | `particles_gained(at: Vector2, amount: int)` | abate com `particle_drop > 0` (depois de `particles_changed`) |
 | `skill_cast(slot: int, at: Vector2, radius: float)` | impacto da skill de área (meteoro), não no acionamento |
-| `boss_telegraph_started(pattern_id: StringName, duration: float, at: Vector2, radius: float)` | início do aviso de um padrão; `at` = posição do chefe, `radius` = `telegraph_radius` |
-| `boss_phase_changed(phase: int)` | troca de fase do chefe (0-based) |
+| `boss_telegraph_started(pattern_id: StringName, duration: float, at: Vector2, radius: float)` | início do wind-up do golpe: `pattern_id` = `attack_id` (`&"boss_slam"`), `duration` = `attack_windup`, `at` = posição do chefe, `radius` = `telegraph_radius` |
+| `boss_launched(from: Vector2, to: Vector2)` | chefe lançado (defesa esgotada ou meteoro); `to` = fim do voo |
+
+`boss_phase_changed` **deixou de existir** (uma fase; T-150).
 
 ### Upgrades da partida (T-134)
 
@@ -296,5 +301,6 @@ O `project.godot` é do AG07. Layers sugeridas:
 | Skill de controle | pendente | T-109 |
 | Skill de defesa | pendente | T-110 |
 | Arquétipos (tanque, atirador, enxame) | protótipo | T-111 |
-| Chefe | protótipo | T-115 |
+| Chefe (ogro) | protótipo | T-115, T-150 |
+| Barra de vida dos inimigos | protótipo | T-149 |
 | Upgrades da partida | protótipo | T-134 |

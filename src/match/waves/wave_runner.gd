@@ -14,6 +14,7 @@ var phase: Phase = Phase.IDLE
 var wave_index := -1 ## 0-based; -1 antes da primeira onda
 
 var _wave_time := 0.0
+var _spawned_now := false
 var _break_left := 0.0
 var _spawned := PackedInt32Array()
 
@@ -44,7 +45,9 @@ func tick(delta: float, alive_count: int) -> void:
 		Phase.RUNNING:
 			_wave_time += delta
 			var all_spawned := _spawn_due()
-			if all_spawned and alive_count == 0:
+			# alive_count é anterior aos spawns deste passo: só fecha a onda num passo sem spawn
+			# (senão uma onda cujo último spawn sai agora, ex.: o chefe sozinho, terminaria na hora).
+			if all_spawned and alive_count == 0 and not _spawned_now:
 				if wave_index + 1 >= total_waves():
 					_clear()
 				else:
@@ -70,11 +73,13 @@ func _begin_wave(index: int) -> void:
 func _spawn_due() -> bool:
 	var entries := stage.waves[wave_index].entries
 	var done := true
+	_spawned_now = false
 	for i in entries.size():
 		var e := entries[i]
 		while _spawned[i] < e.count and _wave_time >= e.start_delay + _spawned[i] * e.interval:
 			_spawned[i] += 1
 			spawn_requested.emit(e.enemy, e.spawn_edge)
+			_spawned_now = true
 		if _spawned[i] < e.count:
 			done = false
 	return done

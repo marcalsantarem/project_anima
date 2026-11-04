@@ -17,6 +17,8 @@ var target_position: Vector2
 
 var _fire_timer := 0.0
 var _ring: Sprite2D
+var health_bar: HealthBar
+var _body: Sprite2D
 
 @onready var _hitbox: CollisionShape2D = $Hitbox
 
@@ -78,8 +80,15 @@ func take_damage(amount: int) -> void:
 	if state == State.DEAD or amount <= 0:
 		return
 	hp -= amount
+	if health_bar:
+		health_bar.set_ratio(float(hp) / data.hp)
 	if hp <= 0:
 		die(DeathCause.KILLED)
+
+
+## Dano de skill de área (meteoro). Igual ao dano comum; o chefe trata à parte (lançamento).
+func take_skill_damage(amount: int) -> void:
+	take_damage(amount)
 
 
 func die(cause: DeathCause) -> void:
@@ -97,8 +106,20 @@ func _build_art() -> void:
 		_ring = SpriteArt.make(data.ring_sprite, data.ring_anchor)
 		_ring.position = Vector2(0.0, -data.ring_height)
 		add_child(_ring)
-	add_child(SpriteArt.make(data.sprite, data.sprite_anchor))
+	_body = SpriteArt.make(data.sprite, data.sprite_anchor)
+	add_child(_body)
+	if data.show_health_bar:
+		health_bar = HealthBar.new()
+		health_bar.configure(data.radius, sprite_top())
+		add_child(health_bar)
 	set_process(_ring != null and data.ring_spin_speed != 0.0)
+
+
+## px (1x) do topo do sprite acima da âncora (sem sprite: o diâmetro).
+func sprite_top() -> float:
+	if data.sprite == null:
+		return data.radius * 2.0
+	return data.sprite_anchor.y * SpriteArt.SCALE.y
 
 
 func _process(delta: float) -> void:

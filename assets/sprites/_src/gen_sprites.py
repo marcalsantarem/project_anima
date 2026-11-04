@@ -109,6 +109,91 @@ BOSS_RING = (
     '<ellipse cx="128" cy="64" rx="112" ry="34" fill="none" stroke="#725A1B" stroke-width="9" stroke-dasharray="18 12" opacity="0.9"/>'
     '<ellipse cx="128" cy="64" rx="112" ry="34" fill="none" stroke="#FFC93D" stroke-width="5" stroke-dasharray="18 12"/>')
 
+# ---------- Chefe da fase 1: ogro (BRF-057, decisão 39). Canvas 1x 256x256, chão em (128, 236) ----------
+O_SK, O_SH, O_OL = "#B39A4A", "#6E5A26", "#3D2F14"  # pele oliva quente, sombra, contorno
+O_BELLY, O_LEA, O_LEA_D, O_WOOD = "#E2CC86", "#8A5530", "#5E3820", "#A86B38"
+
+
+def limb(x1, y1, x2, y2, w, fill=O_SK):
+    d = f"M{x1} {y1} L{x2} {y2}"
+    return (f'<path d="{d}" stroke="{O_OL}" stroke-width="{w + 7}" stroke-linecap="round"/>'
+            f'<path d="{d}" stroke="{fill}" stroke-width="{w}" stroke-linecap="round"/>')
+
+
+def fist(x, y, r=16):
+    return (f'<circle cx="{x}" cy="{y}" r="{r}" fill="{O_SK}" stroke="{O_OL}" stroke-width="3.5"/>'
+            f'<path d="M{x - 7} {y - 4} q3 -4 6 0 m1 0 q3 -4 6 0" fill="none" stroke="{O_OL}" stroke-width="2" stroke-linecap="round"/>')
+
+
+def club(x1, y1, x2, y2, hx, hy, ang):
+    return (limb(x1, y1, x2, y2, 11, O_WOOD)
+            + f'<ellipse cx="{hx}" cy="{hy}" rx="23" ry="16" fill="{O_WOOD}" stroke="{O_OL}" stroke-width="3.5" '
+              f'transform="rotate({ang} {hx} {hy})"/>'
+            + f'<circle cx="{hx - 4}" cy="{hy - 3}" r="2.5" fill="{O_LEA_D}"/><circle cx="{hx + 5}" cy="{hy + 2}" r="2" fill="{O_LEA_D}"/>')
+
+
+def spiral(cx, cy):
+    return (f'<circle cx="{cx}" cy="{cy}" r="6.5" fill="#FFFFFF" stroke="{EYE_LINE}" stroke-width="1.75"/>'
+            f'<path d="M{cx} {cy} a1.5 1.5 0 1 1 2 1.5 a3 3 0 1 1 -4.5 -3.5 a4.5 4.5 0 1 1 6.5 5" fill="none" '
+            f'stroke="{PUPIL}" stroke-width="1.6" stroke-linecap="round"/>')
+
+
+def star(x, y, r=7):
+    q = r * 0.3
+    return (f'<path d="M{x} {y - r} Q{x + q} {y - q} {x + r} {y} Q{x + q} {y + q} {x} {y + r} Q{x - q} {y + q} {x - r} {y} '
+            f'Q{x - q} {y - q} {x} {y - r} Z" fill="#FFC93D" stroke="#725A1B" stroke-width="2" stroke-linejoin="round"/>')
+
+
+def ogre(pose):
+    """pose: idle | attack (wind-up, clava no alto) | stunned (curvado, olhos em espiral, clava no chão)."""
+    s = (limb(104, 196, 100, 224, 30) + limb(152, 196, 156, 224, 30)
+         + f'<ellipse cx="96" cy="230" rx="22" ry="8" fill="{O_SH}" stroke="{O_OL}" stroke-width="3.5"/>'
+         + f'<ellipse cx="160" cy="230" rx="22" ry="8" fill="{O_SH}" stroke="{O_OL}" stroke-width="3.5"/>')
+    if pose == "stunned":  # clava largada no chão, braços caídos
+        s += club(170, 228, 208, 228, 230, 222, 0)
+        lf, rf = (60, 206), (194, 206)
+    elif pose == "attack":
+        lf, rf = (46, 176), (198, 50)
+    else:
+        lf, rf = (50, 196), (206, 196)
+    s += limb(72, 124, lf[0], lf[1] - 6, 30) + limb(184, 122, rf[0], rf[1] + (8 if pose == "attack" else -6), 30)
+    dy = 10 if pose == "stunned" else 0  # curvado: tronco e cabeça descem
+    s += f'<g transform="translate(0 {dy})">'
+    s += body("ob", 128, 160, 74, 64, O_SK, O_SH, O_OL, sw=4)
+    s += (f'<ellipse cx="128" cy="178" rx="44" ry="36" fill="{O_BELLY}" opacity="0.85"/>'
+          f'<path d="M124 178 q4 4 8 0" fill="none" stroke="{O_SH}" stroke-width="2.5" stroke-linecap="round"/>'
+          f'<path d="M66 128 Q78 104 104 100 L100 150 Q84 156 70 150 Z" fill="{O_LEA}" stroke="{O_OL}" stroke-width="3" stroke-linejoin="round"/>'
+          f'<path d="M190 128 Q178 104 152 100 L156 150 Q172 156 186 150 Z" fill="{O_LEA}" stroke="{O_OL}" stroke-width="3" stroke-linejoin="round"/>'
+          f'<path d="M74 196 Q128 214 182 196 L180 206 Q128 224 76 206 Z" fill="{O_LEA_D}" stroke="{O_OL}" stroke-width="3" stroke-linejoin="round"/>'
+          f'<path d="M110 210 L146 210 L142 234 L114 234 Z" fill="{O_LEA}" stroke="{O_OL}" stroke-width="3" stroke-linejoin="round"/>')
+    hd = 'transform="translate(0 6) rotate(-12 128 82)"' if pose == "stunned" else ""
+    s += (f'<g {hd}>'
+          f'<ellipse cx="99" cy="78" rx="9" ry="6" fill="{O_SK}" stroke="{O_OL}" stroke-width="3" transform="rotate(-20 99 78)"/>'
+          f'<ellipse cx="157" cy="78" rx="9" ry="6" fill="{O_SK}" stroke="{O_OL}" stroke-width="3" transform="rotate(20 157 78)"/>'
+          + body("oh", 128, 82, 30, 27, O_SK, O_SH, O_OL, sw=4)
+          + f'<ellipse cx="128" cy="89" rx="6" ry="4" fill="{O_SH}"/>')
+    if pose == "stunned":
+        s += (spiral(117, 78) + spiral(139, 78)
+              + f'<path d="M115 99 Q121 95 128 99 Q135 103 141 99" fill="none" stroke="{O_OL}" stroke-width="3" stroke-linecap="round"/>'
+              '<path d="M130 100 q2 8 7 3 z" fill="#E86A7A" stroke="#3D2F14" stroke-width="1.5"/>')
+    else:
+        open_ = 6 if pose == "attack" else 0
+        s += (eye(117, 79, 5, 5.5, 2.8) + eye(139, 79, 5, 5.5, 2.8)
+              + brow("M107 68 L122 75", 4.5) + brow("M149 68 L134 75", 4.5)
+              + f'<path d="M113 95 Q128 103 143 95 L141 {102 + open_} Q128 {109 + open_} 115 {102 + open_} Z" fill="#4A1E1A" '
+                f'stroke="{O_OL}" stroke-width="2.5" stroke-linejoin="round"/>'
+              + f'<path d="M118 {101 + open_} L115 89 L123 {99 + open_} Z" fill="#F4E8C8" stroke="{O_OL}" stroke-width="2" stroke-linejoin="round"/>'
+              + f'<path d="M138 {101 + open_} L141 89 L133 {99 + open_} Z" fill="#F4E8C8" stroke="{O_OL}" stroke-width="2" stroke-linejoin="round"/>')
+    s += '</g></g>'
+    if pose == "stunned":
+        s += star(96, 42) + star(128, 32, 8) + star(162, 44)
+    if pose == "attack":
+        s += club(198, 50, 184, 28, 176, 22, -35)
+    elif pose == "idle":
+        s += club(206, 196, 222, 206, 232, 214, 35)
+    return s + fist(*lf) + fist(*rf)
+
+
 # ---------- Projéteis, coleta e sombra ----------
 PROJ_PLAYER = ('<rect x="3" y="2" width="26" height="12" rx="6" fill="#2FE6D2" stroke="#177369" stroke-width="2"/>'
                '<rect x="11" y="5.5" width="15" height="5" rx="2.5" fill="#E8FFFC"/>')
@@ -172,6 +257,9 @@ SPRITES = {
     "projectile_enemy": (32, 32, PROJ_ENEMY),
     "pickup_particle": (32, 32, place(PICKUP, 16, 28, 260, 614)),
     "shadow_ground": (64, 32, SHADOW),
+    "boss_ogre": (256, 256, ogre("idle")),
+    "boss_ogre_attack": (256, 256, ogre("attack")),
+    "boss_ogre_stunned": (256, 256, ogre("stunned")),
     "skill_meteor": (64, 112, METEOR),
     "skill_meteor_crater": (128, 96, CRATER),
 }

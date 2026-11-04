@@ -70,7 +70,7 @@ Pedestal cilíndrico neutro (`vessel`) com aro ciano + **cristal losango ciano f
 | **Tanque** | cúpula grande carmim, chifres, placa frontal, pezinhos, barra de HP | pesado, blindado | 28 | ~72 | ~95 | 128×128 |
 | **Atirador** | gota magenta pontuda com garras laterais e **orbe** acima | angular; o orbe anuncia o tiro | 18 | ~48 | ~90 | 128×128 |
 | **Enxame** | bolinha violeta de um olho com asinhas, em bando | pequeno, numeroso | 10 | ~23 | ~37 | 64×64 |
-| **Chefe** | massa violeta enorme, olho único, coroa dourada, braços, anel girando | domina a tela; anel = fases | [A definir] | ~145 | ~200 | 256×256 |
+| **Chefe** | **ogro** barrigudo, pele oliva quente, cabeça pequena, presas, colete e clava curta (decisão 39, BRF-057: `boss_ogre*`, poses parado/wind-up/atordoado; substitui a massa violeta com anel) | domina a tela; só corpo a corpo, sem anel | [A definir] | ~145 | ~200 | 256×256 |
 | Projétil do jogador | cápsula ciano com núcleo branco e rastro | lado "amigo" | 6 | — | 26×14 | 32×16 |
 | Projétil inimigo | losango magenta com núcleo rosado e halo | lê como ameaça | [AG01] | — | 26×18 | 32×32 |
 | Partícula (moeda) | estrela de 4 pontas dourada com brilho | não confundir com projétil | — | ~16 | 22 | 32×32 |

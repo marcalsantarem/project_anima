@@ -24,7 +24,10 @@ signal enemy_died(at: Vector2, archetype_id: StringName, cause: int) ## cause = 
 signal particles_gained(at: Vector2, amount: int)
 signal skill_cast(slot: int, at: Vector2, radius: float)
 signal boss_telegraph_started(pattern_id: StringName, duration: float, at: Vector2, radius: float)
-signal boss_phase_changed(phase: int) ## 0-based
+## Defesa do chefe (escudo na frente da vida). Início e a cada mudança.
+signal boss_defense_changed(current: int, max_defense: int)
+## Chefe lançado (defesa esgotada ou meteoro): de `from` até `to` (âncora no chão, tela).
+signal boss_launched(from: Vector2, to: Vector2)
 
 ## Upgrades da partida, na ordem da fileira do HUD.
 const UPGRADE_IDS: Array[StringName] = [
@@ -160,21 +163,28 @@ func spawn(enemy_data: EnemyData, edge: WaveEntry.SpawnEdge) -> Enemy:
 
 
 func _bind_boss(boss: Boss) -> void:
-	boss.rng.seed = _rng.randi()
+	boss.launch_bounds = boss_launch_bounds(boss)
 	boss.hp_changed.connect(func(c: int, m: int) -> void: boss_hp_changed.emit(c, m))
-	boss.summon_requested.connect(_on_boss_summon)
-	boss.phase_changed.connect(boss_phase_changed.emit)
+	boss.defense_changed.connect(boss_defense_changed.emit)
+	boss.launched.connect(boss_launched.emit)
+	boss.attack_landed.connect(_on_boss_attack)
 	boss.telegraph_started.connect(func(pattern_id: StringName, duration: float) -> void:
-		boss_telegraph_started.emit(pattern_id, duration, boss.position, boss.current_pattern.telegraph_radius))
+		boss_telegraph_started.emit(pattern_id, duration, boss.position, boss.boss_data.telegraph_radius))
 	boss_spawned.emit(boss.data.id)
 	boss_hp_changed.emit(boss.hp, boss.data.hp)
+	boss_defense_changed.emit(boss.defense, boss.boss_data.defense_max)
 
 
-func _on_boss_summon(enemy_data: EnemyData, at: Vector2) -> void:
-	if is_over:
-		return
-	var e := spawn(enemy_data, WaveEntry.SpawnEdge.TOP)
-	e.position = at
+## Área visível onde o chefe pode cair ao ser lançado: a arena acima da bandeja, com folga para o
+## corpo inteiro (laterais e base = raio; topo = altura do sprite).
+func boss_launch_bounds(boss: Boss) -> Rect2:
+	var r := boss.data.radius
+	return arena_rect().grow_individual(-r, -boss.sprite_top(), -r, -r)
+
+
+func _on_boss_attack(damage: int) -> void:
+	if not is_over:
+		anima.take_core_damage(damage)
 
 
 ## Spawn de um grupo (group_min..group_max) espalhado em volta do mesmo ponto de borda.

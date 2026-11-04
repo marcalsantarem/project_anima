@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="StageData" load_steps=55 format=3]
+[gd_resource type="Resource" script_class="StageData" load_steps=52 format=3]
 
 [ext_resource type="Script" path="res://src/match/waves/stage_data.gd" id="1"]
 [ext_resource type="Script" path="res://src/match/waves/wave_data.gd" id="2"]
@@ -318,26 +318,10 @@ interval = 1.0
 spawn_edge = 0
 start_delay = 1.0
 
-[sub_resource type="Resource" id="w10_e2"]
-script = ExtResource("3")
-enemy = ExtResource("4")
-count = 4
-interval = 2.0
-spawn_edge = 4
-start_delay = 4.0
-
-[sub_resource type="Resource" id="w10_e3"]
-script = ExtResource("3")
-enemy = ExtResource("6")
-count = 1
-interval = 1.0
-spawn_edge = 1
-start_delay = 8.0
-
 [sub_resource type="Resource" id="w10"]
 script = ExtResource("2")
 id = &"wave_10"
-entries = Array[ExtResource("3")]([SubResource("w10_e1"), SubResource("w10_e2"), SubResource("w10_e3")])
+entries = Array[ExtResource("3")]([SubResource("w10_e1")])
 
 [resource]
 script = ExtResource("1")

@@ -20,6 +20,12 @@ const TRAY_HEIGHT := 282
 ## Altura do HUD de cima (pausa/ONDA/Partículas + barra do Núcleo) sem safe area e sem a barra do chefe.
 ## O fundo da arena passa por trás do topo; o gameplay usa isto para não pôr alvos sob o HUD (docs/ui.md §4.4).
 const TOP_INSET := 164
+## Altura extra do topo com a barra "Boss" visível (gap 16 + barra 36). top_inset() já soma quando ela aparece.
+const BOSS_BAR_INSET := 52
+## Trilho da barra "Boss": ~89% do trilho do Núcleo (36), decisão 39.
+const BOSS_TRACK_HEIGHT := 32.0
+const BOSS_BAR_HEIGHT := 36
+const BOSS_FILL_TIME := 0.15
 ## Degradê escuro atrás do topo, só para leitura sobre o fundo da arena (alfa no alto da tela).
 const TOP_SCRIM_ALPHA := 0.35
 ## Padrão do M1 (decisão 25): slot 1 liberado; 2 e 3 bloqueados até os níveis 7 e 12.
@@ -45,7 +51,8 @@ var upgrade_row: HBoxContainer
 var _core_bar: UiBar
 var _boss_bar: UiBar
 var _boss_row: Control
-var _boss_label: Label
+var _boss_tween: Tween
+var _boss_hiding := false
 var _wave_label: Label
 var _particles_label: Label
 var _pause_button: Button
@@ -74,6 +81,7 @@ func bind(arena: Node) -> void:
 	_connect(&"skill_ready", _on_skill_ready)
 	_connect(&"boss_spawned", _on_boss_spawned)
 	_connect(&"boss_hp_changed", _on_boss_hp_changed)
+	_connect(&"boss_defeated", _on_boss_defeated)
 	_connect(&"match_ended", _on_match_ended)
 
 
@@ -194,22 +202,26 @@ func _build_top() -> void:
 	_core_bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row2.add_child(_core_bar)
 
-	# Chefe (aparece com boss_spawned)
-	var boss_col := VBoxContainer.new()
-	boss_col.add_theme_constant_override("separation", UiTokens.SPACE_XS)
-	boss_col.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	boss_col.visible = false
-	top_col.add_child(boss_col)
-	_boss_row = boss_col
-	_boss_label = _label(&"LabelCaption")
-	_boss_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	boss_col.add_child(_boss_label)
+	# Linha 3: barra "Boss" (decisão 39), mesma largura útil da do Núcleo; aparece com o chefe.
+	var row3 := _hbox(UiTokens.SPACE_XS)
+	row3.name = "BossRow"
+	row3.visible = false
+	top_col.add_child(row3)
+	_boss_row = row3
+	var spacer := Control.new()
+	spacer.custom_minimum_size = Vector2(CORE_ICON_SIZE.x, 0)
+	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row3.add_child(spacer)
 	_boss_bar = UiBar.new()
+	_boss_bar.name = "BossBar"
 	_boss_bar.color_mode = UiBar.ColorMode.FIXED
 	_boss_bar.fill_color = UiTokens.BOSS_HP
-	_boss_bar.show_numbers = false
-	_boss_bar.custom_minimum_size.y = UiArt.BAR_TRACK_HEIGHT
-	boss_col.add_child(_boss_bar)
+	_boss_bar.title = "Boss"
+	_boss_bar.track_height = BOSS_TRACK_HEIGHT
+	_boss_bar.fill_time = BOSS_FILL_TIME
+	_boss_bar.custom_minimum_size.y = BOSS_BAR_HEIGHT
+	_boss_bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row3.add_child(_boss_bar)
 
 
 func _build_tray() -> void:
@@ -356,9 +368,10 @@ func apply_safe_area() -> void:
 	_top_scrim.offset_bottom = top_inset()
 
 
-## Altura ocupada pelo HUD de cima, com a safe area (px da resolução base). Sem a barra do chefe.
+## Altura ocupada pelo HUD de cima, com a safe area (px da resolução base). Soma a barra "Boss" se visível.
 func top_inset() -> float:
-	return TOP_INSET + safe_insets().top
+	var boss := BOSS_BAR_INSET if _boss_row and _boss_row.visible and not _boss_hiding else 0
+	return TOP_INSET + boss + safe_insets().top
 
 
 ## Altura ocupada pela bandeja inferior, com a safe area (px da resolução base).
@@ -421,18 +434,46 @@ func _on_skill_ready(slot: int) -> void:
 		sb.set_ready()
 
 
-func _on_boss_spawned(id: StringName) -> void:
-	_boss_label.text = String(id).trim_prefix("boss_").capitalize()
-	_boss_row.visible = true
+func _on_boss_spawned(_id: StringName) -> void:
+	_show_boss(true)
 
 
 func _on_boss_hp_changed(current: int, max_hp: int) -> void:
+	if current > 0 and not _boss_row.visible:
+		_show_boss(true)
 	_boss_bar.set_value(current, max_hp)
 	if current <= 0:
-		_boss_row.visible = false
+		_show_boss(false)
+
+
+func _on_boss_defeated() -> void:
+	_show_boss(false)
+
+
+## Fade curto (ANIM_UI) ao entrar e ao sair; o topo e o degradê crescem/encolhem com a barra.
+func _show_boss(on: bool) -> void:
+	if on == (_boss_row.visible and not _boss_hiding):
+		return
+	if _boss_tween:
+		_boss_tween.kill()
+	_boss_hiding = not on
+	_boss_tween = _boss_row.create_tween()
+	if on:
+		_boss_row.visible = true
+		_top_scrim.offset_bottom = top_inset()
+		_boss_tween.tween_property(_boss_row, "modulate:a", 1.0, UiTokens.ANIM_UI).from(0.0)
+	else:
+		_boss_tween.tween_property(_boss_row, "modulate:a", 0.0, UiTokens.ANIM_UI)
+		_boss_tween.tween_callback(_hide_boss_row)
+
+
+func _hide_boss_row() -> void:
+	_boss_row.visible = false
+	_top_scrim.offset_bottom = top_inset()
 
 
 func _on_match_ended(_result) -> void:
+	_show_boss(false)
 	for sb in _skills:
 		sb.set_disabled(true)
 	_pause_button.disabled = true

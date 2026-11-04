@@ -14,7 +14,13 @@ func _initialize() -> void:
 	_run.call_deferred()
 
 
+## Janela em retrato (resolução base 720×1280 com stretch expand). Sem isso, a janela headless
+## sai quadrada e a arena fica com 1280 px de largura.
+const WINDOW_SIZE := Vector2i(405, 720)
+
+
 func _run() -> void:
+	root.size = WINDOW_SIZE
 	var opts := {"seeds": 20, "start": 1, "max-time": 900.0, "bot": 1.0}
 	for arg in OS.get_cmdline_user_args():
 		var kv := arg.trim_prefix("--").split("=")

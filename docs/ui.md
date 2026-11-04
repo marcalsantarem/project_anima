@@ -45,7 +45,7 @@ Fonte única: `src/ui/theme/ui_tokens.gd`. Estilo das decisões 31–36 e do [do
 | `skill_fill` / `badge` / `locked` | `#957CE6` / `#CDF1FF` / `#9D98AE` | slot de skill, badge da tecla, bloqueado/desabilitado |
 | `bar_track` | `#5B4A7A` | trilho das barras |
 | `core_hp` | `#6CF0A4` → `#FFC93D` → `#FF5A6E` | HP do Núcleo: > 50% / 25–50% / < 25% |
-| `boss_hp` | `#C056F0` | barra do chefe |
+| `boss_hp` | `#FF5A6E` (= `danger`) | barra "Boss" (decisão 39) |
 | `danger` | `#FF5A6E` | dano, derrota |
 | `particles` | `#FFC93D` | estrela de Partículas, "Vitória" |
 | `cooldown_dim` | `#1A0F2E` a 55% | véu da skill em recarga |
@@ -95,8 +95,8 @@ y=0    ┌───────────────────────�
        ├──────────────────────────────┤ ← topo do HUD = safe_top + 16
        │ [II]   (ONDA 3/10)  (★ 1.250)│  linha 1: 88 px
        │ ◆ [NÚCLEO 1.170 / 1.500 ███] │  linha 2: 44 px
-       │ [barra do chefe — só c/ boss]│  linha 3 (oculta sem chefe)
-       ├──────────────────────────────┤ ← ~y 180 + safe_top
+       │   [Boss ████████ 2.140/2.500]│  linha 3: 36 px (só com chefe, +52)
+       ├──────────────────────────────┤ ← y 164 (216 c/ chefe) + safe_top
        │       ZONA DE COMBATE        │  Anima no centro; a arena encolhe (AG01)
        ├──────────────────────────────┤ ← bandeja, ~y 1000 − safe_bottom
        │ [up][up][up][up][up]         │  fileira de upgrades 5 × 128×80 (T-135)
@@ -114,7 +114,7 @@ y=1280 └───────────────────────�
 | "ONDA X/Y" | linha 1, centro | pílula `bg_panel`, `font_hud` | pulso de escala (200 ms) ao trocar de onda |
 | Partículas | linha 1, à direita | pílula `surface`, estrela `particles` (`StarIcon`) + número `particles` | total de Partículas da partida, com milhar |
 | HP do Núcleo | linha 2, largura total | altura 40 px, cristal `accent` à esquerda | texto "NÚCLEO atual / máx", cor por faixa, flash `danger` e barra fantasma |
-| Barra do chefe | linha 3, largura total | altura 28 px | aparece em `boss_spawned`; cor `boss_hp`, nome do chefe em cima |
+| Barra "Boss" | linha 3, mesma largura útil da barra do Núcleo | controle 36 px, trilho 32 px (~89% do Núcleo) | vermelha (`boss_hp`), rótulo "Boss" à esquerda e "atual / máx" à direita, com contorno; fade de 200 ms ao aparecer (`boss_spawned` ou `boss_hp_changed`) e ao sumir (`boss_defeated`, vida 0 ou `match_ended`); queda do preenchimento em 150 ms (BRF-058) |
 
 - **Sem faixa de fundo (BRF-039):** o fundo da arena passa por trás do topo; os elementos ficam sobrepostos a ele. Para leitura, um degradê `ink` (alfa 0,35 → 0) cobre só a altura do topo (`Hud/Root/TopScrim`). Pílulas e barra mantêm o contorno.
 
@@ -137,6 +137,7 @@ y=1280 └───────────────────────�
 | API | Valor (base 720 px de largura) | Uso |
 |---|---|---|
 | `Hud.TOP_INSET` | 164 px | altura do topo (margem 16 + linha 1 88 + gap 16 + barra 44), sem safe area e sem a barra do chefe |
+| `Hud.BOSS_BAR_INSET` | 52 px | altura extra do topo com a barra "Boss" (gap 16 + barra 36); `top_inset()` já soma enquanto ela está visível |
 | `Hud.TRAY_HEIGHT` | 282 px | altura da bandeja (upgrades + skills), sem safe area. Medida; a arena usava ~293 |
 | `hud.top_inset()` / `hud.tray_height()` | constante + safe area | valores reais em tempo de execução, em px da resolução base |
 
@@ -165,7 +166,7 @@ Teste: `tests/unit/ui/test_hud_layout.gd` confere as constantes contra o layout.
 
 ### 5.2 `Bar` (HP do Núcleo / chefe)
 
-- Arte (T-138): trilho `ui_bar_track` (altura fixa 36, centrado no controle), preenchimento `ui_bar_fill` branco (24 px, 4 px de folga) tingido pelo token (`core_hp_*`, `boss_hp`), brilho `ui_bar_shine`; texto `label_prefix` + "atual / máx" com contorno. Barra do chefe com 36 px de altura.
+- Arte (T-138): trilho `ui_bar_track` (altura fixa 36, centrado no controle), preenchimento `ui_bar_fill` branco (24 px, 4 px de folga) tingido pelo token (`core_hp_*`, `boss_hp`), brilho `ui_bar_shine`; texto `label_prefix` + "atual / máx" com contorno. Opções: `track_height` (escala trilho, preenchimento e brilho), `title` (rótulo à esquerda; números vão para a direita) e `fill_time` (queda animada). Barra "Boss": trilho 32, `fill_time` 0,15 s.
 - **Interpolação:** o preenchimento principal vai direto ao novo valor, e uma "barra fantasma" clara vai atrás em ~300 ms, mostrando quanto foi perdido.
 
 ### 5.3 `Button` (telas)
@@ -201,8 +202,9 @@ Os sinais são emitidos pelo nó raiz `Match`.
 | `cooldown_changed(slot, remaining, total)` | SkillButton[slot] | estado `cooldown`, setor e segundos (≤ ~10×/s, interpolado) |
 | `skill_ready(slot)` | SkillButton[slot] | estado `ready` + flash |
 | `particles_changed(total)` | rótulo de Partículas | `total` é o acumulado da partida: o rótulo anima do valor exibido até ele (≤ 200 ms), sem somar nada |
-| `boss_spawned(id)` | Bar do chefe | mostrar a barra + nome |
-| `boss_hp_changed(current, max)` | Bar do chefe | valor; ocultar ao chegar a 0 |
+| `boss_spawned(id)` | Barra "Boss" | mostrar com fade (o `id` não é exibido) |
+| `boss_hp_changed(current, max)` | Barra "Boss" | valor (mostra se ainda oculta); ocultar ao chegar a 0 |
+| `boss_defeated` | Barra "Boss" | ocultar com fade |
 | `upgrade_changed(id, level, max_level, next_cost)` | UpgradeButton[id] | nível, custo (`-1` = MAX); "+1" quando o nível sobe |
 | `match_ended(result)` | fluxo de telas | abrir Resultado com `result`; HUD desabilita skills, pausa e upgrades |
 

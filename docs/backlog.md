@@ -61,10 +61,10 @@
 | T-145 | Retema da UI no estilo cartoon (tokens, tema, fonte) | M1 | AG02 | feita |
 | T-146 | Remover mockups rejeitados e excluir referências do export Web | M1 | AG07 | feita |
 | T-147 | Anima com skin trocável (Resource de aparência) | M2 | AG01 | a fazer |
-| T-149 | Barra de vida pequena sobre cada inimigo (verde, amarela, vermelha) | M1 | AG01 | pronta p/ briefing |
-| T-150 | Chefe ogro: ataque corpo a corpo, sem minions, defesa como escudo e lançamento | M1 | AG01 | pronta p/ briefing |
-| T-151 | Arte do chefe ogro (humanoide grande e gordo) | M1 | AG08 | pronta p/ briefing |
-| T-152 | Barra de vida grande e vermelha "Boss" no topo do HUD | M1 | AG02 | pronta p/ briefing |
+| T-149 | Barra de vida pequena sobre cada inimigo (verde, amarela, vermelha) | M1 | AG01 | feita |
+| T-150 | Chefe ogro: ataque corpo a corpo, sem minions, defesa como escudo e lançamento | M1 | AG01 | feita |
+| T-151 | Arte do chefe ogro (humanoide grande e gordo) | M1 | AG08 | feita |
+| T-152 | Barra de vida grande e vermelha "Boss" no topo do HUD | M1 | AG02 | feita |
 | T-148 | Sinais da Arena para VFX (projectile_fired, projectile_hit, enemy_died, particles_gained, skill_cast, boss_telegraph_started, boss_phase_changed) | M1 | AG01 | feita |
 
 ## Próximas prontas p/ briefing
@@ -358,21 +358,21 @@
 - **Pronto quando:** mockups A/B removidos; filtro do preset Web exclui mockups e referências; export e testes OK.
 
 ### T-149 — Barra de vida sobre os inimigos
-- **Marco:** M1 · **Dono:** AG01 · **Status:** pronta p/ briefing
+- **Marco:** M1 · **Dono:** AG01 · **Status:** feita
 - **Depende de:** decisão 38 · **Desbloqueia:** —
 - **Pronto quando:** cada inimigo comum mostra uma barra pequena sobre ele (verde ≥ 60%, amarela < 60%, vermelha ≤ 30%), sem alocar por quadro e sem custo relevante com 150 inimigos.
 
 ### T-150 — Chefe ogro
-- **Marco:** M1 · **Dono:** AG01 · **Status:** pronta p/ briefing
+- **Marco:** M1 · **Dono:** AG01 · **Status:** feita
 - **Depende de:** decisão 39 · **Desbloqueia:** T-131 (VFX do chefe), T-152
 - **Pronto quando:** um só ataque corpo a corpo, sem minions; barra de defesa sobre ele como escudo na frente da vida; ao esgotar a defesa ou ao ser atingido pelo meteoro, é lançado para trás em direção à borda; fase 1 continua vencível (~60% no bot).
 
 ### T-151 — Arte do chefe ogro
-- **Marco:** M1 · **Dono:** AG08 · **Status:** pronta p/ briefing
+- **Marco:** M1 · **Dono:** AG08 · **Status:** feita
 - **Depende de:** decisão 39 · **Desbloqueia:** T-150 (aplicação da arte)
 
 ### T-152 — Barra "Boss" no HUD
-- **Marco:** M1 · **Dono:** AG02 · **Status:** pronta p/ briefing
+- **Marco:** M1 · **Dono:** AG02 · **Status:** feita
 - **Depende de:** decisão 39 (usa `boss_hp_changed`, já existente) · **Desbloqueia:** —
 - **Pronto quando:** barra vermelha grande no topo da tela com o rótulo "Boss", de tamanho próximo ao da barra do Núcleo; aparece só quando o chefe entra.
 

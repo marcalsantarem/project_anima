@@ -16,6 +16,8 @@ extends Resource
 @export var group_max: int = 1
 @export var group_spread: float = 0.0 ## px de espalhamento do grupo
 @export var color: Color = Color(1.0, 0.45, 0.35)
+## Barra pequena de vida sobre o inimigo (decisão 38). O chefe usa a barra de defesa no lugar.
+@export var show_health_bar := true
 ## Arte (PNG 2x; âncora em px do PNG, no chão). Ver assets/sprites/README.md.
 @export var sprite: Texture2D
 @export var sprite_anchor: Vector2

@@ -51,6 +51,8 @@ func test_wave_with_several_entries_waits_for_all() -> void:
 	assert_eq(r.phase, WaveRunner.Phase.RUNNING, "não encerra com grupo pendente")
 	r.tick(3.0, 0) # t = 3.1: os 2 do 2º grupo nasceram
 	assert_signal_emit_count(r, "spawn_requested", 3)
+	assert_signal_not_emitted(r, "stage_cleared", "não fecha no passo do último spawn")
+	r.tick(0.1, 0) # morreram
 	assert_signal_emitted(r, "stage_cleared")
 
 
@@ -70,11 +72,27 @@ func test_zero_break_starts_next_wave_on_next_tick() -> void:
 	var r := WaveRunner.new(_stage([[_entry(1, 0.0)], [_entry(1, 0.0)]], 0.0))
 	watch_signals(r)
 	r.start()
-	r.tick(0.1, 0)
+	r.tick(0.1, 0) # spawn
+	r.tick(0.0, 0) # morto: respiro
 	assert_eq(r.phase, WaveRunner.Phase.BREAK)
 	r.tick(0.0, 0)
 	assert_eq(r.current_wave(), 2)
 	assert_signal_emitted_with_parameters(r, "wave_started", [2, 2])
+
+
+## Regressão (T-150): a onda do chefe sozinho não pode fechar no mesmo passo em que ele nasce
+## (alive_count é lido antes dos spawns do passo).
+func test_last_spawn_does_not_close_wave_in_same_tick() -> void:
+	var r := WaveRunner.new(_stage([[_entry(1, 0.0)]]))
+	watch_signals(r)
+	r.start()
+	r.tick(0.1, 0)
+	assert_signal_emit_count(r, "spawn_requested", 1)
+	assert_signal_not_emitted(r, "stage_cleared")
+	r.tick(0.1, 1) # vivo
+	assert_signal_not_emitted(r, "stage_cleared")
+	r.tick(0.1, 0)
+	assert_signal_emitted(r, "stage_cleared")
 
 
 func test_stage_01_data_is_valid() -> void:

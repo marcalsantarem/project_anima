@@ -88,7 +88,7 @@ static func apply_damage(center: Vector2, enemies: Array[Enemy], radius: float, 
 			continue
 		var reach := radius + e.data.radius
 		if GroundPlane.distance_squared(center, e.position) <= reach * reach:
-			e.take_damage(damage)
+			e.take_skill_damage(damage)
 			hits += 1
 	return hits
 

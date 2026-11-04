@@ -80,17 +80,19 @@ func test_skill_cast_on_meteor_impact() -> void:
 	assert_signal_emit_count(arena, "skill_cast", 1)
 
 
-func test_boss_telegraph_and_phase() -> void:
+func test_boss_telegraph_defense_and_launch() -> void:
 	await wait_physics_frames(1)
-	var boss := _parked(BOSS, Vector2(0, -300)) as Boss
-	boss.state = Enemy.State.ATTACK
-	boss.tick_patterns(BOSS.interval_for(0) + 0.01) # espera → aviso
+	var boss := _parked(BOSS, GroundPlane.to_screen(Vector2(0, -BOSS.attack_range + 1.0))) as Boss
+	await wait_seconds(BOSS.attack_interval - BOSS.attack_windup + 0.1)
 	assert_signal_emitted(arena, "boss_telegraph_started")
 	var p: Array = get_signal_parameters(arena, "boss_telegraph_started")
-	assert_eq(p[0], boss.current_pattern.id)
-	assert_eq(p[1], boss.current_pattern.telegraph)
+	assert_eq(p[0], BOSS.attack_id)
+	assert_eq(p[1], BOSS.attack_windup)
 	assert_eq(p[2], boss.position)
-	assert_eq(p[3], boss.current_pattern.telegraph_radius)
-	var hp_to_phase_1 := BOSS.hp - int(BOSS.hp * BOSS.phase_thresholds[0]) + 1
-	boss.take_damage(hp_to_phase_1)
-	assert_signal_emitted_with_parameters(arena, "boss_phase_changed", [1])
+	assert_eq(p[3], BOSS.telegraph_radius)
+	boss.take_damage(100)
+	assert_signal_emitted_with_parameters(arena, "boss_defense_changed", [BOSS.defense_max - 100, BOSS.defense_max])
+	var from := boss.position
+	boss.take_skill_damage(40)
+	assert_signal_emitted(arena, "boss_launched")
+	assert_eq(get_signal_parameters(arena, "boss_launched")[0], from)
