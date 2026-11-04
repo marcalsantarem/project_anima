@@ -84,6 +84,7 @@
 | T-169 | Bandeja até a borda inferior, menos espaço sob os Módulos, Anima centralizado na área livre | M1 | AG02 + AG01 | feita |
 | T-170 | Tela de logo do estúdio (preta, ~1 s) antes da splash de carregamento | M1 | AG02 | feita |
 | T-171 | Logo horizontal do estúdio na base da tela de título; remover o crédito "Criado por Marçal Santarem" | M1 | AG02 | feita |
+| T-172 | Canvas até a borda inferior no Safari do iPhone, sem faixa e sem somar a safe area duas vezes; diagnóstico no log | M1 | AG02 | pronta p/ briefing |
 | T-148 | Sinais da Arena para VFX (projectile_fired, projectile_hit, enemy_died, particles_gained, skill_cast, boss_telegraph_started, boss_phase_changed) | M1 | AG01 | feita |
 
 ## Próximas prontas p/ briefing
@@ -490,6 +491,10 @@
 ### T-171 — Logo na tela de título
 - **Marco:** M1 · **Dono:** AG02 · **Status:** feita
 - **Pronto quando:** a tela de título mostra o logo horizontal "Anima Games" pequeno, centralizado na parte de baixo (acima da safe area); o crédito "Criado por Marçal Santarem" foi removido.
+
+### T-172 — Canvas até a borda inferior no iPhone
+- **Marco:** M1 · **Dono:** AG02 · **Status:** pronta p/ briefing
+- **Pronto quando:** no iPhone o canvas cobre a tela até a borda inferior (sem faixa de cor atrás), a safe area inferior não é somada duas vezes (a bandeja deixa pouco espaço sob os Módulos) e o cabeçalho do log traz as medidas de viewport para confirmar.
 
 ### T-148 — Sinais da Arena para VFX
 - **Marco:** M1 · **Dono:** AG01 · **Status:** feita
