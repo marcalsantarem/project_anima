@@ -1,0 +1,9 @@
+# BRF-071 — AG08 — T-174 Ícones do app (tela de início, favicon)
+**Contexto:** o dono instalou o jogo na tela de início do iPhone e quer um **manifesto de app** (T-175, AG02). Preciso dos ícones. Estilo da demo (2D cartoon casual, `docs/arte.md`); o núcleo-Anima (cristal flutuando sobre o pedestal) é o símbolo do jogo; há a arte `assets/splash/splash_logo_core.png` (logotipo + núcleo, branco/colorido sobre transparente, 720×713; o núcleo está nela) e os sprites `assets/sprites/anima_default_base.png`, `anima_default_crystal.png`, `anima_default_node.png` (2x).
+**Fazer** em `assets/app/` (nova pasta, com `.gdignore`):
+- Arte-mestre **1024×1024** `app_icon_master.png`: o **núcleo-Anima** (cristal ciano com brilho e o pedestal) grande e centralizado, sobre o **degradê roxo do jogo** (`#8E72EC` no topo → `#7B5CE0` → `#5A4A9A` embaixo, como a splash B), com um selo rúnico discreto ao fundo; **sem texto**; legível a 48 px; **sem transparência** (o iOS aplica os cantos).
+- Derivados (PNG): `apple-touch-icon-180.png` (180×180), `icon-192.png`, `icon-512.png`, `icon-maskable-512.png` (mesma arte com o símbolo dentro da **zona segura de 80%** e fundo roxo até as bordas), `favicon-32.png`, `favicon-48.png` e `favicon.ico` (16/32/48). Compressão leve (cada PNG ≤ 40 KB quando possível).
+- README curto em `assets/app/README.md` (arquivo, tamanho, uso) e registro em `assets/LICENSES.md` (edição pontual). Gerador reproduzível em `assets/app/_src/gen_icons.py`.
+**Validação:** folha de contato com todos os tamanhos e uma simulação da grade da tela de início do iPhone (cantos arredondados) ao lado de outros fundos escuros e claros; legibilidade a 48 px.
+**Arquivos permitidos:** `assets/app/`, `assets/LICENSES.md`, `docs/arte.md` (nota curta). **Proibido:** `web/`, `src/`.
+**Entrega:** no máximo 6 linhas, com os caminhos.

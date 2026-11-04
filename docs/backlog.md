@@ -86,6 +86,8 @@
 | T-171 | Logo horizontal do estúdio na base da tela de título; remover o crédito "Criado por Marçal Santarem" | M1 | AG02 | feita |
 | T-172 | Canvas até a borda inferior no Safari do iPhone, sem faixa e sem somar a safe area duas vezes; diagnóstico no log | M1 | AG02 | feita (falta confirmar no iPhone) |
 | T-173 | Meteoro: reavaliar o alvo perto do impacto (2 dos 6 lançamentos contra a horda acertaram 0 inimigos, 1 acertou 1) | M1 | AG01 | feita |
+| T-174 | Ícones do app (tela de início do iPhone, favicon, maskable) | M1 | AG08 | pronta p/ briefing |
+| T-175 | Manifesto web (modo app, tela cheia, retrato) + meta tags do iOS + cópia no deploy | M1 | AG02 | pronta p/ briefing |
 | T-148 | Sinais da Arena para VFX (projectile_fired, projectile_hit, enemy_died, particles_gained, skill_cast, boss_telegraph_started, boss_phase_changed) | M1 | AG01 | feita |
 
 ## Próximas prontas p/ briefing
@@ -501,6 +503,15 @@
 - **Marco:** M1 · **Dono:** AG01 · **Status:** feita
 - **Evidência (log do iPhone, partida de 3:59):** dos 6 meteoros contra a horda, **2 acertaram 0 inimigos** (1:08 e 3:22, alvo perto do Anima, onde os inimigos já morreram antes do impacto) e 1 acertou 1; os outros acertaram 3, 9 e 9.
 - **Pronto quando:** o ponto de impacto é **reavaliado no fim do aviso** (antes da queda) escolhendo o maior grupo no raio; se não houver nenhum inimigo no raio no momento do impacto, o meteoro **não gasta o cooldown** (ou reembolsa a maior parte) ou re-mira para o inimigo mais próximo; teste e bot de simulação confirmando mais acertos por lançamento.
+
+### T-174 — Ícones do app
+- **Marco:** M1 · **Dono:** AG08 · **Status:** pronta p/ briefing
+- **Pronto quando:** `apple-touch-icon` 180×180, ícones 192 e 512 (comum e maskable) e favicon 32/48, com o núcleo-Anima sobre o roxo do jogo, legíveis em tamanho pequeno.
+
+### T-175 — Manifesto e modo app
+- **Marco:** M1 · **Dono:** AG02 · **Status:** pronta p/ briefing
+- **Depende de:** T-174 e T-172 (correção do viewport)
+- **Pronto quando:** `manifest.webmanifest` (nome, `display: standalone`, retrato, cores), meta tags do iOS (`apple-mobile-web-app-capable`, status bar translúcida, título, ícone), arquivos copiados para o site no deploy (o export do Godot não copia arquivos extras de `web/`), sem service worker que cache versões antigas; no iPhone o jogo abre sem a barra do Safari.
 
 ### T-148 — Sinais da Arena para VFX
 - **Marco:** M1 · **Dono:** AG01 · **Status:** feita
