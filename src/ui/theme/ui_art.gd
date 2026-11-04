@@ -4,7 +4,9 @@ class_name UiArt
 
 const PAUSE := preload("res://assets/ui/ui_icon_pause.png")
 const LOCK := preload("res://assets/ui/ui_icon_lock.png")
-const PARTICLE := preload("res://assets/ui/ui_icon_particle.png")
+## Partículas (T-160/T-161). O `ui_icon_particle.png` dourado é obsoleto (reservado à Moeda do M2).
+const PARTICLE := preload("res://assets/ui/ui_icon_particles.png")
+const PARTICLE_OFF := preload("res://assets/ui/ui_icon_particles_off.png")
 const SKILL_PULSE := preload("res://assets/ui/ui_icon_skill_pulse.png") ## fallback do slot sem ícone
 ## Ícone da skill de área atual (decisão 37). Carregado por caminho: se faltar, o slot cai no SKILL_PULSE.
 const SKILL_METEOR_PATH := "res://assets/ui/ui_icon_skill_meteor.png"

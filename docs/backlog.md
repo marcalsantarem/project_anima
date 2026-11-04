@@ -67,13 +67,13 @@
 | T-152 | Barra de vida grande e vermelha "Boss" no topo do HUD | M1 | AG02 | feita |
 | T-153 | Arte das pílulas do topo (ONDA e Partículas) e do botão secundário | M1 | AG08 | pronta p/ briefing |
 | T-154 | Texto "MAX" na pílula de custo dos upgrades (hoje desenhado por código) | M1 | AG08 + AG02 | pronta p/ briefing |
-| T-155 | "Voltar ao título" a partir da tela de Resultado | M1 | AG02 + AG07 | pronta p/ briefing (aprovada pelo dono) |
+| T-155 | "Voltar ao título" a partir da tela de Resultado | M1 | AG02 + AG07 | feita |
 | T-156 | Chão: quebrar a repetição das pedrinhas do tile | M1 | AG08 + AG01 | depende do teste no iPhone |
 | T-157 | Ajustar o escurecimento do topo (degradê do chão + do HUD) | M1 | AG02 + AG01 | depende do teste no iPhone |
 | T-158 | Teste no iPhone: splash, título, partida e chefe (ajustes saem daqui) | M1 | usuário + AG00 | a fazer (o dono fará o teste) |
 | T-159 | Remover o ícone provisório do `skill_pulse` e deixar o do meteoro como padrão | M1 | AG02 | pronta p/ briefing |
-| T-160 | Arte do ícone de Partículas: estrela verde, estilo "chip" (e nova cor dos efeitos de coleta) | M1 | AG08 | pronta p/ briefing |
-| T-161 | Aplicar o ícone verde de Partículas no HUD, Resultado, botões de upgrade e efeitos (hoje dourado) | M1 | AG02 + AG09 | pronta p/ briefing |
+| T-160 | Arte do ícone de Partículas: estrela verde, estilo "chip" (e nova cor dos efeitos de coleta) | M1 | AG08 | feita |
+| T-161 | Aplicar o ícone verde de Partículas no HUD, Resultado, botões de upgrade e efeitos (hoje dourado) | M1 | AG02 + AG09 | feita |
 | T-162 | Arte do ícone de Moeda (moeda dourada) e do glossário na UI (para o M2) | M2 | AG08 | a fazer |
 | T-163 | Textos do jogo e docs com os nomes oficiais (Módulo, Fragmento, Núcleo, Moeda); decidir a colisão de "Núcleo" | M2 | AG00 + AG04 + AG02 | a fazer |
 | T-164 | Rótulo da vida do Anima: "NÚCLEO" vira "ENERGIA" no HUD, Resultado e docs de UI | M1 | AG02 | feita |
@@ -401,7 +401,7 @@
 - **Pronto quando:** o README e o PNG de `ui_upgrade_cost_pill_max` ficam de acordo (ou a pílula sem texto, ou com "MAX"); a UI não desenha o texto duas vezes.
 
 ### T-155 — Voltar ao título a partir do Resultado
-- **Marco:** M1 · **Dono:** AG02 + AG07 · **Status:** pronta p/ briefing (aprovada pelo dono)
+- **Marco:** M1 · **Dono:** AG02 + AG07 · **Status:** feita
 - **Depende de:** — (o Resultado hoje só tem "Jogar de novo") · **Desbloqueia:** —
 - **Arquivos:** `src/ui/screens/` (AG02), `src/core/scene_flow.gd` (AG07)
 - **Pronto quando:** o Resultado oferece também "Voltar ao título" (botão secundário), o fluxo muda para a cena de título sem reiniciar o jogo e sem vazar a partida; testes de fluxo.
@@ -430,13 +430,13 @@
 - **Pronto quando:** o ícone do meteoro vem de uma fonte única (hoje por caminho no HUD, ver `Hud.slot_icon_paths`); o `ui_icon_skill_pulse.png` e o `skill_pulse` provisório deixam de aparecer no jogo e nas demos; o número de recarga continua legível sobre o ícone (que ocupa pouco do quadro de 88 px).
 
 ### T-160 — Ícone de Partículas verde
-- **Marco:** M1 · **Dono:** AG08 · **Status:** pronta p/ briefing
+- **Marco:** M1 · **Dono:** AG08 · **Status:** feita
 - **Depende de:** decisão 40 · **Desbloqueia:** T-161
 - **Arquivos:** `assets/ui/`, `assets/LICENSES.md`
 - **Pronto quando:** estrela de 4 pontas **verde** em estilo "chipzinho" (contorno escuro, brilho), legível a 24–32 px, **diferente do verde da barra de vida dos inimigos** e sem ciano; paleta de coleta definida para o AG09.
 
 ### T-161 — Partículas em verde na UI e nos efeitos
-- **Marco:** M1 · **Dono:** AG02 + AG09 · **Status:** pronta p/ briefing
+- **Marco:** M1 · **Dono:** AG02 + AG09 · **Status:** feita
 - **Depende de:** T-160 · **Desbloqueia:** —
 - **Arquivos:** `src/ui/` (AG02), `src/fx/` (AG09)
 - **Pronto quando:** o HUD, o Resultado, o custo dos botões de upgrade e o efeito de coleta usam a estrela verde (`UiTokens.PARTICLES` deixa de ser dourado); nenhuma Partícula cai no mapa.

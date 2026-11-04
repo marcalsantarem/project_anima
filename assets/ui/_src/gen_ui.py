@@ -72,6 +72,24 @@ G_LOCK = ('<path d="M-10 -2 v-8 a10 10 0 0 1 20 0 v8" fill="none" stroke="#3A2A5
 G_PARTICLE = ('<path d="M0 -11 Q2 -2 11 0 Q2 2 0 11 Q-2 2 -11 0 Q-2 -2 0 -11 Z" fill="#FFC93D" stroke="#725A1B" stroke-width="2.2" stroke-linejoin="round"/>'
               '<circle cx="-2" cy="-2.5" r="1.8" fill="#FFF"/>')
 
+# Partículas = estrela verde "chip" (decisão 40, BRF-061). G_PARTICLE (dourada) fica obsoleta: reservada à Moeda do M2.
+P_GREEN = {"light": "#D2FFB0", "mid": "#7CF05A", "deep": "#3CC23A", "dark": "#1F8A3B", "out": "#124F24"}
+P_OFF = {"light": "#E4E2EA", "mid": "#B8B4C6", "deep": "#9C97AE", "dark": "#7A7490", "out": "#4A4560"}
+
+
+def g_particles(p):
+    tri = lambda a, b, c: f'M{a} L{b} L{c} Z'
+    faces = [(p["light"], ["0,-28", "-8,-8", "0,0"]), (p["mid"], ["0,-28", "8,-8", "0,0"]),
+             (p["light"], ["-28,0", "-8,-8", "0,0"]), (p["mid"], ["-28,0", "-8,8", "0,0"]),
+             (p["deep"], ["28,0", "8,-8", "0,0"]), (p["dark"], ["28,0", "8,8", "0,0"]),
+             (p["deep"], ["0,28", "-8,8", "0,0"]), (p["dark"], ["0,28", "8,8", "0,0"])]
+    star = "M0 -28 L8 -8 L28 0 L8 8 L0 28 L-8 8 L-28 0 L-8 -8 Z"
+    return (f'<path d="{star}" fill="{p["out"]}" transform="translate(0 2.5)"/>'
+            + "".join(f'<path d="{tri(*v)}" fill="{c}"/>' for c, v in faces)
+            + f'<path d="{star}" fill="none" stroke="{p["out"]}" stroke-width="3.5" stroke-linejoin="round"/>'
+            + f'<path d="M0 -7 L7 0 L0 7 L-7 0 Z" fill="{p["light"]}" stroke="{p["out"]}" stroke-width="2" stroke-linejoin="round"/>'
+            + '<circle cx="-3" cy="-17" r="2.6" fill="#FFFFFF" opacity="0.9"/>')
+
 
 def at(x, y, s, inner):
     return f'<g transform="translate({x} {y}) scale({s})">{inner}</g>'
@@ -150,7 +168,9 @@ ASSETS.update({
     "ui_icon_skill_pulse": (64, 64, at(32, 32, 1.0, G_SKILL_PULSE)),
     "ui_icon_skill_meteor": (64, 64, at(32, 32, 1.0, G_SKILL_METEOR)),
     "ui_icon_lock": (64, 64, at(32, 35, 1.25, G_LOCK)),
-    "ui_icon_particle": (32, 32, at(16, 16, 1.3, G_PARTICLE)),
+    "ui_icon_particle": (32, 32, at(16, 16, 1.3, G_PARTICLE)),  # obsoleto (dourado = Moeda do M2)
+    "ui_icon_particles": (64, 64, at(32, 31, 1.0, g_particles(P_GREEN))),
+    "ui_icon_particles_off": (64, 64, at(32, 31, 1.0, g_particles(P_OFF))),
     "ui_icon_pause": (64, 64, PAUSE),
     "ui_upgrade_btn_normal": (132, 90, upgrade_btn(PURPLE, INK, CYAN)),
     "ui_upgrade_btn_disabled": (132, 90, upgrade_btn(GRAY, INK, None)),

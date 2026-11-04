@@ -27,6 +27,10 @@ const FLASH_COLOR := Color("#FFFFFF")
 @export var fill := false ## GROUND_RING: telegraph (preenche até o fim)
 @export var default_color := Color("#2FE6D2")
 @export var outline_width := 4.0
+## Contorno fixo da paleta do tipo (usado com a cor padrão); alfa 0 = cor −55%.
+@export var outline_color := Color(0, 0, 0, 0)
+## Brilho/faísca das gotas do SPARKLE.
+@export var highlight_color := Color("#FFFFFF")
 
 var active := false
 var elapsed := 0.0
@@ -49,7 +53,7 @@ func _ready() -> void:
 func start(anchor: Vector2, fx_color: Color, fx_size: float, reduced_mode: bool) -> void:
 	position = anchor
 	color = default_color if fx_color.a == 0.0 else fx_color
-	_outline = color.darkened(OUTLINE_DARKEN)
+	_outline = outline_color if outline_color.a > 0.0 and color == default_color else color.darkened(OUTLINE_DARKEN)
 	size_scale = fx_size
 	reduced = reduced_mode
 	elapsed = 0.0
@@ -157,7 +161,7 @@ func _draw_sparkle(p: float) -> void:
 		var pos := base + Vector2(cos(ang) * r * 0.8 * e, sin(ang) * r * 0.3 - rise)
 		_dot(pos, dot + 2.0, Color(_outline, a))
 		_dot(pos, dot, Color(color, a))
-		_dot(pos + Vector2(-dot * 0.3, -dot * 0.3), dot * 0.35, Color(FLASH_COLOR, a))
+		_dot(pos + Vector2(-dot * 0.3, -dot * 0.3), dot * 0.35, Color(highlight_color, a))
 
 
 func _draw_streak(p: float) -> void:

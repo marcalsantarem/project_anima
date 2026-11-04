@@ -1,7 +1,7 @@
 class_name StarIcon
 extends Control
-## Ícone de Partículas (moeda da partida): estrela de 4 pontas dourada com contorno.
-## Usa a arte `ui_icon_particle` (T-138); com `texture = null` volta à estrela desenhada.
+## Ícone de Partículas (recurso da partida): estrela verde "chip" de 4 pontas.
+## Usa a arte `ui_icon_particles` (T-161); com `texture = null` volta à estrela desenhada (verde).
 
 @export var texture: Texture2D = UiArt.PARTICLE:
 	set(v):

@@ -1,5 +1,5 @@
 extends Node
-## Autoload `SceneFlow`: Título → Partida (Arena + HUD + Pausa) → Resultado → Partida.
+## Autoload `SceneFlow`: Título → Partida (Arena + HUD + Pausa) → Resultado → Partida ou Título.
 ##
 ## Contrato da cena de partida (nó raiz):
 ## - `setup(config: MatchConfig)`, chamado antes de entrar na árvore;
@@ -101,6 +101,7 @@ func _on_match_ended(result: MatchResult) -> void:
 	var screen: ResultScreen = _instantiate(RESULT_SCENE)
 	screen.show_result(result)
 	screen.play_again_requested.connect(func() -> void: start_match(last_config), CONNECT_ONE_SHOT)
+	screen.title_requested.connect(go_to_title, CONNECT_ONE_SHOT)
 	_swap(screen, RESULT_SCENE)
 
 

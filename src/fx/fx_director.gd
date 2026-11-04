@@ -13,7 +13,6 @@ const DEATH_COLORS := {
 }
 const DEATH_SIZES := {&"enemy_tank": 1.4, &"enemy_swarm": 0.7}
 const BOSS_COLOR := Color("#C040F5")
-const GOLD := Color("#FFC93D")
 const CORE_HIT_COLOR := Color("#E8344E")
 const NO_COLOR := Color(0, 0, 0, 0)
 const DEATH_CAUSE_CONTACT := 1 ## Enemy.DeathCause.CONTACT (repetido: fx/ não depende de match/)
@@ -124,7 +123,7 @@ func _on_enemy_died(at: Vector2, archetype_id: StringName, cause: int) -> void:
 
 
 func _on_particles_gained(at: Vector2, amount: int) -> void:
-	_play(&"fx_pickup", _to_pool(at), GOLD, clampf(1.0 + 0.1 * (amount - 1), 1.0, 1.5))
+	_play(&"fx_pickup", _to_pool(at), NO_COLOR, clampf(1.0 + 0.1 * (amount - 1), 1.0, 1.5)) # verde da cena
 
 
 func _on_skill_cast(_slot: int, at: Vector2, radius: float) -> void:

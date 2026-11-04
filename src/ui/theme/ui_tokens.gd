@@ -24,7 +24,8 @@ const CORE_HP_MID := Color("#FFC93D")
 const CORE_HP_LOW := Color("#FF5A6E")
 const BOSS_HP := Color("#FF5A6E") # barra "Boss" (decisão 39: vermelha, igual a `danger`)
 const DANGER := Color("#FF5A6E")
-const PARTICLES := Color("#FFC93D") # estrela de Partículas (moeda da partida), "Vitória"
+const PARTICLES := Color("#7CF05A") # Partículas (verde do ícone `ui_icon_particles`, decisão 40); sempre com contorno `ink`
+const GOLD := Color("#FFC93D") # "Vitória", "+1" de nível, MAX; reservado à futura Moeda (M2)
 const COOLDOWN_DIM := Color(0.10, 0.06, 0.18, 0.55)
 const HIGHLIGHT := Color(1, 1, 1, 0.18) # faixa de brilho no topo dos botões
 

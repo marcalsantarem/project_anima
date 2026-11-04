@@ -25,6 +25,11 @@ func before_each() -> void:
 	director.bind(arena)
 
 
+## Cores das .tscn têm 4 casas decimais: compara com tolerância de ~1/255.
+func _near(a: Color, b: Color) -> bool:
+	return absf(a.r - b.r) < 0.004 and absf(a.g - b.g) < 0.004 and absf(a.b - b.b) < 0.004
+
+
 func _active(type: StringName) -> FxEffect:
 	for fx: FxEffect in pool.get_children():
 		if fx.active and fx.name.begins_with(type + "_"):
@@ -79,9 +84,13 @@ func test_enemy_died_uses_archetype_color_and_size() -> void:
 	assert_eq(fx.position, Vector2(50, 60))
 
 
-func test_particles_gained_plays_gold_pickup() -> void:
+func test_particles_gained_plays_green_pickup() -> void:
 	arena.emit_signal("particles_gained", Vector2(5, 5), 1)
-	assert_eq(_active(&"fx_pickup").color, FxDirector.GOLD)
+	var fx := _active(&"fx_pickup")
+	assert_eq(fx.position, Vector2(5, 5), "brilho no ponto da morte (sem item no chão)")
+	assert_true(_near(fx.color, Color("#7CF05A")), "corpo verde médio")
+	assert_true(_near(fx._outline, Color("#124F24")), "contorno da paleta")
+	assert_true(_near(fx.highlight_color, Color("#D2FFB0")), "faísca verde clara")
 
 
 func test_skill_cast_scales_to_radius() -> void:

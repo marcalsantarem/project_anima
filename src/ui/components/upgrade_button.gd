@@ -254,7 +254,7 @@ func _draw() -> void:
 	else:
 		draw_texture_rect(UiArt.UPGRADE_COST_PILL, PILL, false)
 		var star := Rect2(PILL.position + Vector2(4.0, (PILL.size.y - PILL_STAR) * 0.5), Vector2(PILL_STAR, PILL_STAR))
-		draw_texture_rect(UiArt.PARTICLE, star, false, Color(1, 1, 1, DIM_ALPHA) if state == State.DISABLED else Color.WHITE)
+		draw_texture_rect(UiArt.PARTICLE_OFF if state == State.DISABLED else UiArt.PARTICLE, star, false)
 		var cost := UiTokens.format_int(next_cost) if _known and next_cost >= 0 else "—"
 		var color := COST_POOR if state == State.POOR else (UiTokens.TEXT_SECONDARY if state == State.DISABLED else UiTokens.TEXT_PRIMARY)
 		draw_string(font, Vector2(PILL.position.x + 26.0, cy), cost, HORIZONTAL_ALIGNMENT_RIGHT, PILL.size.x - 34.0, COST_SIZE, color)
@@ -264,4 +264,4 @@ func _draw() -> void:
 		var a := 1.0 - maxf(_plus - 0.5, 0.0) * 2.0
 		var p := Vector2(ICON_C.x - 18.0, -6.0 - PLUS_RISE * _plus)
 		draw_string_outline(font, p, "+1", HORIZONTAL_ALIGNMENT_LEFT, -1, LEVEL_SIZE, UiTokens.TEXT_OUTLINE, Color(UiTokens.INK, a))
-		draw_string(font, p, "+1", HORIZONTAL_ALIGNMENT_LEFT, -1, LEVEL_SIZE, Color(UiTokens.PARTICLES, a))
+		draw_string(font, p, "+1", HORIZONTAL_ALIGNMENT_LEFT, -1, LEVEL_SIZE, Color(UiTokens.GOLD, a))

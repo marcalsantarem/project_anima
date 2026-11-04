@@ -16,7 +16,9 @@ Fonte: `_src/gen_ui.py` (SVG por código → Chrome headless). Para regenerar, r
 | `ui_icon_skill_pulse.png` | 128×128 | 64×64 (~88 na moldura) | Skill de área atual (pulso). **Provisório até a T-125**: para trocar, edite só `G_SKILL_PULSE` no script |
 | `ui_icon_skill_meteor.png` | 128×128 | 64×64 (~88 na moldura) | Skill do slot 1: meteoro de fogo (BRF-047). Substitui o `ui_icon_skill_pulse.png`, mantido até o AG02 trocar o uso. Fonte: `G_SKILL_METEOR` |
 | `ui_icon_lock.png` | 128×128 | 64×64 | Cadeado dos slots bloqueados (acima do texto "NV 7"/"NV 12") |
-| `ui_icon_particle.png` | 64×64 | 32×32 (18–24 na pílula) | Estrela de Partículas (custo, contador) |
+| `ui_icon_particles.png` | 128×128 | 64×64 (24–32 no HUD/pílula) | **Partículas** (decisão 40, BRF-061): estrela verde de 4 pontas com facetas tipo "chip", núcleo claro e brilho. Fonte: `g_particles(P_GREEN)` |
+| `ui_icon_particles_off.png` | 128×128 | 64×64 | Variante apagada (cinza-lilás) para custo sem Partículas (alternativa ao `modulate.a`) |
+| `ui_icon_particle.png` | 64×64 | 32×32 | **Obsoleto**: estrela dourada, reservada para a Moeda do M2. Não usar para Partículas |
 | `ui_icon_pause.png` | 128×128 | 64×64 | Botão de pausa completo (quadrado branco + barras), canto superior esquerdo |
 
 Ícone sem Partículas: `modulate.a = 0.55` (o círculo fica colorido; o mockup usa cinza, aceitável a 55%).
@@ -58,3 +60,15 @@ Margens em **px do PNG (2x)**; em 1x, metade.
 | `ui_button_big_pressed.png` | 192×144 | 52 / 52 / 52 / 68 | Pressionado: corpo desce 4 px (1x) e escurece; mesmo canvas, troca direta |
 
 Barra: use `TextureProgressBar` com `nine_patch_stretch = true` e as mesmas margens, ou `NinePatchRect` + recorte.
+
+## Paleta de Partículas (coleta, para o AG09)
+
+Verde-limão/esmeralda, sem ciano e distinto do verde das barras de vida (`#3FD27F`). Mesmos tokens de `P_GREEN` no `gen_ui.py`.
+
+| Tom | Hex | Uso sugerido |
+|---|---|---|
+| Claro | `#D2FFB0` | núcleo, brilho, faísca |
+| Médio | `#7CF05A` | corpo da partícula |
+| Médio-escuro | `#3CC23A` | faceta sombreada, rastro |
+| Escuro | `#1F8A3B` | borda, fim do rastro |
+| Contorno | `#124F24` | contorno do ícone |

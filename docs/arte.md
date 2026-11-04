@@ -36,7 +36,7 @@
 | `enemy_swarm` | `#9B5CFF` | `#B07CFF` | enxame (violeta) |
 | `boss` | `#C040F5` | `#C040F5` | chefe (igual a `boss_hp`) |
 | `projectile_enemy` | `#FF2DAA` + núcleo `#FFD6F0` | igual | projéteis inimigos |
-| `gold` | `#FFC93D` | `#FFD23D` | Partículas, coroa do chefe, runas (B) |
+| `gold` | `#FFC93D` | `#FFD23D` | Moeda do M2 (antes Partículas; decisão 40), coroa do chefe, runas (B) |
 | `floor` / `floor_alt` | `#F6E9CF` / `#EEDDBD` | `#3A3178` / `#433A86` | piso em xadrez (A) ou lajotas (B) |
 | `rune` | `#B9A5E8` | `#8A6CFF` | círculo rúnico do chão |
 | `wall` | `#9C8BE0` / `#6E5CC0` | `#5B4EB0` / `#221C4A` | borda da arena (topo / face frontal) |
@@ -73,7 +73,7 @@ Pedestal cilíndrico neutro (`vessel`) com aro ciano + **cristal losango ciano f
 | **Chefe** | **ogro** barrigudo, pele oliva quente, cabeça pequena, presas, colete e clava curta (decisão 39, BRF-057: `boss_ogre*`, poses parado/wind-up/atordoado; substitui a massa violeta com anel) | domina a tela; só corpo a corpo, sem anel | [A definir] | ~145 | ~200 | 256×256 |
 | Projétil do jogador | cápsula ciano com núcleo branco e rastro | lado "amigo" | 6 | — | 26×14 | 32×16 |
 | Projétil inimigo | losango magenta com núcleo rosado e halo | lê como ameaça | [AG01] | — | 26×18 | 32×32 |
-| Partícula (moeda) | estrela de 4 pontas dourada com brilho | não confundir com projétil | — | ~16 | 22 | 32×32 |
+| Partícula (moeda) | estrela de 4 pontas **verde "chip"** (decisão 40, BRF-061: `ui_icon_particles.png`, paleta no `assets/ui/README.md`); o `pickup_particle` dourado ainda não foi trocado | não confundir com projétil | — | ~16 | 22 | 32×32 |
 
 - **Arquivos finais (T-127):** tamanhos, âncoras e offsets de cada sprite em [`assets/sprites/README.md`](../assets/sprites/README.md). O atirador e o enxame ganharam canvas maior (garras e asas); o anel do chefe e os nós do Anima são sprites separados.
 - **Proporções:** inimigos têm cabeça = corpo (1 "cabeça" de altura), olhos ocupando ~30% da largura. Quanto mais perigoso, **maior e mais saturado**, nunca mais escuro.

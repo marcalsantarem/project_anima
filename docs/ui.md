@@ -47,7 +47,8 @@ Fonte única: `src/ui/theme/ui_tokens.gd`. Estilo das decisões 31–36 e do [do
 | `core_hp` | `#6CF0A4` → `#FFC93D` → `#FF5A6E` | Energia: > 50% / 25–50% / < 25% |
 | `boss_hp` | `#FF5A6E` (= `danger`) | barra "Boss" (decisão 39) |
 | `danger` | `#FF5A6E` | dano, derrota |
-| `particles` | `#FFC93D` | estrela de Partículas, "Vitória" |
+| `particles` | `#7CF05A` | número de Partículas (sempre com contorno `ink`; decisão 40, T-161) |
+| `gold` | `#FFC93D` | "Vitória", "+1" de nível, MAX; reservado à futura Moeda (M2) |
 | `cooldown_dim` | `#1A0F2E` a 55% | véu da skill em recarga |
 | `highlight` | branco a 18% | faixa de brilho no topo de botões e barras |
 
@@ -112,7 +113,7 @@ y=1280 └───────────────────────�
 |---|---|---|---|
 | Pausa | linha 1, à esquerda | **88×88**, botão claro | "II"; também `Esc` |
 | "ONDA X/Y" | linha 1, centro | pílula `bg_panel`, `font_hud` | pulso de escala (200 ms) ao trocar de onda |
-| Partículas | linha 1, à direita | pílula `surface`, estrela `particles` (`StarIcon`) + número `particles` | total de Partículas da partida, com milhar |
+| Partículas | linha 1, à direita | pílula `surface`, ícone verde `ui_icon_particles` (`StarIcon`) + número `particles` com contorno `ink` | total de Partículas da partida, com milhar |
 | Energia (vida do Anima) | linha 2, largura total | altura 40 px, cristal `accent` à esquerda | texto "ENERGIA atual / máx" (decisão 41), cor por faixa, flash `danger` e barra fantasma |
 | Barra "Boss" | linha 3, mesma largura útil da barra de Energia | controle 36 px, trilho 32 px (~89% da Energia) | vermelha (`boss_hp`), rótulo "Boss" à esquerda e "atual / máx" à direita, com contorno; fade de 200 ms ao aparecer (`boss_spawned` ou `boss_hp_changed`) e ao sumir (`boss_defeated`, vida 0 ou `match_ended`); queda do preenchimento em 150 ms (BRF-058) |
 
@@ -180,13 +181,13 @@ Teste: `tests/unit/ui/test_hud_layout.gd` confere as constantes contra o layout.
 
 ### 5.4 `UpgradeButton` (T-135, decisão 35)
 
-- `src/ui/components/upgrade_button.gd`. 128×80 (alvo de toque inteiro, ≥ 44 px). Ícone circular à esquerda, "Nv N" à direita e pílula de custo embaixo (estrela `particles` + número com milhar).
+- `src/ui/components/upgrade_button.gd`. 128×80 (alvo de toque inteiro, ≥ 44 px). Ícone circular à esquerda, "Nv N" à direita e pílula de custo embaixo (ícone `ui_icon_particles` + número com milhar).
 - Estados: **comprável** (fundo azul, anel `accent`), **sem Partículas** (fundo `locked`-claro, ícone apagado, custo rosado), **MAX** (moldura dourada, pílula dourada "MAX"), **desabilitado** (antes do 1º `upgrade_changed` e após `match_ended`).
-- Toque/clique/`ui_accept` emitem `buy_requested(id)` **só se comprável**; nos outros estados o botão treme. Compra = afunda (≤ 150 ms) + "+1" dourado que sobe e some (2 × `ANIM_UI`) quando o nível sobe.
+- Toque/clique/`ui_accept` emitem `buy_requested(id)` **só se comprável**; nos outros estados o botão treme. Compra = afunda (≤ 150 ms) + "+1" `gold` que sobe e some (2 × `ANIM_UI`) quando o nível sobe.
 - Teclado: `focus_mode = ALL` (Tab/setas) com anel `accent` por fora; `Enter` compra. **`Espaço` nunca compra** (é `skill_4`): o botão ignora eventos que casam com `skill_*`/`pause`. Clique/toque soltam o foco, para o anel só aparecer pelo teclado.
-- Nomes (`accessibility_name`): Atk power, Atk spd, Defesa, Vida máxima, Cooldown. Arte (T-138): molduras `ui_upgrade_btn_normal/disabled/max` (canvas 132×90 em (−2, −2), sombra até y = 88), ícone `ui_icon_upgrade_*` Ø 40 em (31, 28) (`icon_texture` sobrescreve), pílula `ui_upgrade_cost_pill(_max)` em (9, 52) com estrela `ui_icon_particle` 20 px; sem Partículas = ícone a 55%.
+- Nomes (`accessibility_name`): Atk power, Atk spd, Defesa, Vida máxima, Cooldown. Arte (T-138): molduras `ui_upgrade_btn_normal/disabled/max` (canvas 132×90 em (−2, −2), sombra até y = 88), ícone `ui_icon_upgrade_*` Ø 40 em (31, 28) (`icon_texture` sobrescreve), pílula `ui_upgrade_cost_pill(_max)` em (9, 52) com o ícone `ui_icon_particles` 20 px (sem Partículas no estado desabilitado: `ui_icon_particles_off`); sem Partículas = ícone do upgrade a 55%. O `ui_icon_particle` dourado é obsoleto (reservado à Moeda do M2).
 - Desenho só quando o estado muda (sem `_process`, StyleBoxes em cache).
-- **HUD (T-138):** pausa = `ui_icon_pause` (64 px, alvo de toque 88 px); estrela de Partículas (`StarIcon`) usa `ui_icon_particle` no HUD e no Resultado. Pílulas do topo e cristal da barra de Energia continuam desenhados (sem arte).
+- **HUD (T-138):** pausa = `ui_icon_pause` (64 px, alvo de toque 88 px); ícone de Partículas (`StarIcon`) usa `ui_icon_particles` (verde, T-161) no HUD e no Resultado. Pílulas do topo e cristal da barra de Energia continuam desenhados (sem arte).
 
 **Sem tooltips (BRF-039):** nenhum controle do HUD ou das telas usa `tooltip_text`; no toque o Godot exibia o tooltip sobre os botões. A descrição fica só em `accessibility_name`.
 
@@ -230,6 +231,7 @@ Os sinais são emitidos pelo nó raiz `Match`.
 
 ```
 Boot/Loading (HTML shell) → Toque para começar → Partida ⇄ Pausa → Resultado → (Jogar de novo) → Partida
+                                                                   → (Voltar ao título) → Toque para começar
 ```
 
 | Tela | Conteúdo | Saídas |
@@ -238,10 +240,11 @@ Boot/Loading (HTML shell) → Toque para começar → Partida ⇄ Pausa → Resu
 | **Toque para começar** | continuação da splash B (§11.1): fundo, núcleo e logotipo iguais; botão grande "Toque para começar" pulsando no lugar da barra | qualquer toque, clique ou tecla → **libera o áudio** → Partida |
 | **Partida** | HUD (§4) | ⏸ / `Esc` → Pausa; `match_ended` → Resultado |
 | **Pausa** (overlay) | véu `bg_panel` sobre o jogo, título "Pausado", botões **Continuar** e **Recomeçar** | Continuar / `Esc` → Partida; Recomeçar → nova Partida |
-| **Resultado** | "Vitória" (`particles`) ou "Derrota" (`danger`) em `font_display`, num cartão com moldura; "Onda wave_reached/waves_total", estrela + "Partículas: N", inimigos derrotados, tempo (mm:ss); botão **Jogar de novo** | Jogar de novo → nova Partida |
+| **Resultado** | "Vitória" (`gold`) ou "Derrota" (`danger`) em `font_display`, num cartão com moldura; "Onda wave_reached/waves_total", ícone verde + "Partículas: N", inimigos derrotados, tempo (mm:ss); botões **Jogar de novo** (primário, foco inicial) e **Voltar ao título** (secundário, abaixo; T-155) | Jogar de novo → nova Partida (`play_again_requested`); Voltar ao título → Toque para começar (`title_requested`) |
 
 - **Perda de foco** (troca de aba ou app, `NOTIFICATION_APPLICATION_FOCUS_OUT` / `visibilitychange`): abre a Pausa automaticamente. A volta **não** retoma sozinha; o jogador toca em Continuar.
 - **Sem menu/hangar no M1** (meta-jogo fora do escopo). "Jogar de novo" volta direto à partida.
+- **Voltar ao título (T-155):** o `SceneFlow` troca a cena inteira (a partida, com Arena, HUD, Pausa e efeitos, é liberada como em "Jogar de novo") e abre o Título novo. O Título **pede o toque de novo**, por simplicidade: o áudio já está liberado e o gesto só confirma o início.
 - Transições entre telas: fade de 200 ms.
 - Textos em pt-BR, guardados em um só lugar (prontos para `tr()` no futuro) **[Proposta]**.
 

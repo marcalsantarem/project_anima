@@ -1,9 +1,11 @@
 class_name ResultScreen
 extends Control
 ## Resultado da partida (docs/ui.md §8).
-## Contrato: show_result(result: MatchResult) (antes ou depois de entrar na árvore); sinal `play_again_requested`.
+## Contrato: show_result(result: MatchResult) (antes ou depois de entrar na árvore); sinais
+## `play_again_requested` ("Jogar de novo") e `title_requested` ("Voltar ao título", T-155).
 
 signal play_again_requested
+signal title_requested
 
 var _result: MatchResult
 var _title: Label
@@ -34,7 +36,16 @@ func _ready() -> void:
 	col.add_child(particles_row)
 	_stats_tail = ScreenKit.label("", &"LabelHud")
 	col.add_child(_stats_tail)
-	col.add_child(ScreenKit.button("Jogar de novo", true, func() -> void: play_again_requested.emit()))
+	var play := ScreenKit.button("Jogar de novo", true, func() -> void: play_again_requested.emit())
+	play.name = "PlayAgain"
+	col.add_child(play)
+	var back := ScreenKit.button("Voltar ao título", false, func() -> void: title_requested.emit())
+	back.name = "BackToTitle"
+	col.add_child(back)
+	# Teclado: foco inicial no principal; setas/Tab levam ao secundário e a action de aceitar confirma.
+	play.focus_neighbor_bottom = play.get_path_to(back)
+	back.focus_neighbor_top = back.get_path_to(play)
+	play.call_deferred(&"grab_focus")
 	ScreenKit.fade_in(root)
 	_refresh()
 
@@ -54,7 +65,7 @@ func _refresh() -> void:
 		return
 	var won := _result.outcome == MatchResult.Outcome.VICTORY
 	_title.text = "Vitória" if won else "Derrota"
-	_title.add_theme_color_override("font_color", UiTokens.PARTICLES if won else UiTokens.DANGER)
+	_title.add_theme_color_override("font_color", UiTokens.GOLD if won else UiTokens.DANGER)
 	_stats.text = "Onda %d/%d" % [_result.wave_reached, _result.waves_total]
 	_particles_label.text = "Partículas: %s" % UiTokens.format_int(_result.particles)
 	_stats_tail.text = "Inimigos: %d\nTempo: %s" % [
