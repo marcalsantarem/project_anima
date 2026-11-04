@@ -88,8 +88,8 @@ func test_victory_after_last_wave_with_particles() -> void:
 	assert_eq(result.wave_reached, 2)
 	assert_eq(result.waves_total, 2)
 	assert_eq(result.enemies_killed, 4)
-	assert_eq(result.coins, 4 * RUNNER.particle_drop)
-	assert_signal_emitted_with_parameters(arena, "particles_changed", [result.coins])
+	assert_eq(result.particles, 4 * RUNNER.particle_drop)
+	assert_signal_emitted_with_parameters(arena, "particles_changed", [result.particles])
 	assert_gt(result.duration_s, 0.0)
 
 
@@ -101,6 +101,6 @@ func test_defeat_when_core_hp_reaches_zero() -> void:
 	var result: MatchResult = get_signal_parameters(arena, "match_ended")[0]
 	assert_eq(result.outcome, MatchResult.Outcome.DEFEAT)
 	assert_eq(arena.anima.core.current, 0)
-	assert_eq(result.coins, 0)
+	assert_eq(result.particles, 0)
 	await wait_physics_frames(5)
 	assert_signal_emit_count(arena, "match_ended", 1, "emitido uma vez só")

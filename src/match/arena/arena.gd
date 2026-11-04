@@ -7,15 +7,24 @@ extends Node2D
 signal core_hp_changed(current: int, max_hp: int)
 signal wave_changed(current: int, total: int)
 signal particles_changed(total: int)
-## [Temporário, até a T-141] Alias de particles_changed para o HUD atual (src/ui/hud/hud.gd).
-signal coins_changed(amount: int)
 signal match_ended(result: MatchResult)
 signal skill_used(slot: int)
 signal cooldown_changed(slot: int, remaining: float, total: float)
 signal skill_ready(slot: int)
+signal boss_spawned(id: StringName)
+signal boss_hp_changed(current: int, max_hp: int)
+signal boss_defeated
+## Estado de um upgrade da partida. next_cost = -1 no nível máximo (contrato em docs/gameplay.md).
+signal upgrade_changed(id: StringName, level: int, max_level: int, next_cost: int)
+
+## Upgrades da partida, na ordem da fileira do HUD.
+const UPGRADE_IDS: Array[StringName] = [
+	&"upgrade_atk_power", &"upgrade_atk_spd", &"upgrade_defense", &"upgrade_max_hp", &"upgrade_cooldown",
+]
 
 const FLOOR_Z_INDEX := -10 ## fundo atrás de tudo (sombras e decalques usam z -1)
 const ENEMY_SCENE := preload("res://src/match/enemies/enemy.tscn")
+const BOSS_SCENE := preload("res://src/match/enemies/boss/boss.tscn")
 
 @export var spawn_margin: float = 32.0 ## px além da borda da arena
 ## Faixa da tela ocupada pela arena (mockup A, base 720×1280: y de 164 a 987). O resto é HUD
@@ -40,6 +49,8 @@ var is_over := false
 var particles := 0 ## moeda da partida: começa em 0 e zera a cada partida
 var enemies_killed := 0
 var elapsed := 0.0
+## Níveis dos upgrades desta partida (novo a cada partida).
+var upgrades: MatchUpgrades
 ## Inimigos vivos; compartilhado com a mira do Anima.
 var active_enemies: Array[Enemy] = []
 
@@ -68,6 +79,8 @@ func _ready() -> void:
 	waves.wave_started.connect(func(c: int, t: int) -> void: wave_changed.emit(c, t))
 	waves.stage_cleared.connect(func() -> void: _end(MatchResult.Outcome.VICTORY))
 
+	upgrades = MatchUpgrades.from_ids(UPGRADE_IDS)
+	anima.upgrades = upgrades
 	projectiles.build(anima.data.projectile_pool_size, anima.data.projectile)
 	enemy_projectiles.build(enemy_projectile_pool_size, enemy_projectile)
 	anima.setup_attack(active_enemies, projectiles)
@@ -86,6 +99,8 @@ func _ready() -> void:
 
 	core_hp_changed.emit(anima.core.current, anima.core.max_hp)
 	_emit_particles()
+	for id in UPGRADE_IDS:
+		_emit_upgrade(id)
 	if waves_enabled:
 		waves.start()
 
@@ -103,16 +118,48 @@ func use_skill(slot: int) -> bool:
 	return skills.use_skill(slot)
 
 
+## Compra 1 nível do upgrade se houver Partículas e não estiver no máximo. Não pausa.
+func buy_upgrade(id: StringName) -> bool:
+	if is_over or not upgrades.can_buy(id, particles):
+		return false
+	var hp_before := upgrades.apply(MatchUpgrades.STAT_CORE_HP_MAX, anima.data.core_hp_max)
+	particles -= upgrades.level_up(id)
+	var hp_gain := roundi(upgrades.apply(MatchUpgrades.STAT_CORE_HP_MAX, anima.data.core_hp_max) - hp_before)
+	if hp_gain > 0:
+		anima.core.raise_max(hp_gain)
+	skills.cooldown_scale = upgrades.apply(MatchUpgrades.STAT_COOLDOWN, 1.0)
+	_emit_particles()
+	_emit_upgrade(id)
+	return true
+
+
 func spawn(enemy_data: EnemyData, edge: WaveEntry.SpawnEdge) -> Enemy:
 	if edge == WaveEntry.SpawnEdge.RANDOM:
 		edge = _rng.randi_range(WaveEntry.SpawnEdge.TOP, WaveEntry.SpawnEdge.RIGHT) as WaveEntry.SpawnEdge
-	var enemy: Enemy = ENEMY_SCENE.instantiate()
+	var enemy: Enemy = (BOSS_SCENE if enemy_data is BossData else ENEMY_SCENE).instantiate()
 	enemy.setup(enemy_data, edge_point(edge, arena_rect(), spawn_margin, _rng.randf()), anima.position)
 	enemy.projectile_pool = enemy_projectiles
 	enemy.died.connect(_on_enemy_died)
 	_enemies.add_child(enemy)
 	active_enemies.append(enemy)
+	if enemy is Boss:
+		_bind_boss(enemy as Boss)
 	return enemy
+
+
+func _bind_boss(boss: Boss) -> void:
+	boss.rng.seed = _rng.randi()
+	boss.hp_changed.connect(func(c: int, m: int) -> void: boss_hp_changed.emit(c, m))
+	boss.summon_requested.connect(_on_boss_summon)
+	boss_spawned.emit(boss.data.id)
+	boss_hp_changed.emit(boss.hp, boss.data.hp)
+
+
+func _on_boss_summon(enemy_data: EnemyData, at: Vector2) -> void:
+	if is_over:
+		return
+	var e := spawn(enemy_data, WaveEntry.SpawnEdge.TOP)
+	e.position = at
 
 
 ## Spawn de um grupo (group_min..group_max) espalhado em volta do mesmo ponto de borda.
@@ -161,6 +208,9 @@ func _on_enemy_died(enemy: Enemy, cause: Enemy.DeathCause) -> void:
 		enemies_killed += 1
 		particles += enemy.data.particle_drop
 		_emit_particles()
+		if enemy is Boss:
+			boss_defeated.emit()
+			_end(MatchResult.Outcome.VICTORY)
 
 
 func _end(outcome: MatchResult.Outcome) -> void:
@@ -176,7 +226,7 @@ func _end(outcome: MatchResult.Outcome) -> void:
 	result.outcome = outcome
 	result.wave_reached = waves.current_wave()
 	result.waves_total = waves.total_waves()
-	result.coins = particles # MatchResult.coins mantido (src/core, usado pela UI)
+	result.particles = particles
 	result.enemies_killed = enemies_killed
 	result.duration_s = elapsed
 	match_ended.emit(result)
@@ -186,6 +236,9 @@ func _center_anima() -> void:
 	anima.position = arena_rect().get_center()
 	_floor.position = anima.position
 
+func _emit_upgrade(id: StringName) -> void:
+	upgrade_changed.emit(id, upgrades.level(id), upgrades.max_level(id), upgrades.next_cost(id))
+
+
 func _emit_particles() -> void:
 	particles_changed.emit(particles)
-	coins_changed.emit(particles) # alias temporário (T-141)

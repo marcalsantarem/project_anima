@@ -109,18 +109,22 @@ Arquivo de dados: `data/enemies/enemy_<id>.tres` (`EnemyData`). Campos: `id, hp,
 
 ## Chefe
 
-Arquivo de dados: `data/enemies/boss_<id>.tres` (`BossData`). Um chefe no M1: `boss_warden` (nome provisório).
+Arquivo de dados: `data/enemies/boss_<id>.tres` (`BossData`, herda `EnemyData`; padrões como `BossPattern` embutidos). Código em `src/match/enemies/boss/` (`Boss` herda `Enemy`; cena `boss.tscn`). Um chefe no M1: `boss_warden` (nome provisório). Entra numa onda como qualquer inimigo (`WaveEntry.enemy = boss_warden.tres`, `count` 1): a `Arena.spawn` usa a cena do chefe quando os dados são `BossData`.
 
 | Parâmetro | Valor |
 |---|---|
-| HP | 1500 |
-| Posição | entra pelo topo e para a ~420 px do centro |
-| Fases | 100–60%, 60–25%, 25–0% (cada fase muda o peso dos padrões e a cadência) |
-| Padrões | leque de projéteis, anel de projéteis, invocar enxame (com pesos por fase) |
-| Aviso | ≥ 0,8 s de telegraph antes de cada padrão forte |
-| Partículas | 50 |
+| HP | 1200 |
+| Posição | entra pela borda, a 60 px/s, e para a 420 px do centro (`attack_range`) |
+| Fases | `phase_thresholds` [0,6, 0,3]: 100–60%, 60–30%, abaixo de 30% |
+| Espera entre padrões | `pattern_interval` 3,0 / 2,4 / 1,8 s por fase |
+| Padrões (peso por fase) | `pattern_fan` leque de 5 `projectile_enemy_bolt` em 40°, mirado no Núcleo (3/2/2); `pattern_ring` anel de 12 com ângulo inicial aleatório (0/2/3); `pattern_summon` 4 `enemy_swarm` a 70 px do chefe (1/1/2) |
+| Aviso | antes de cada padrão, 1,0–1,2 s (≥ 0,8 s). `BossTelegraph` desenhado por código: cone (leque) ou círculo (anel, invocação) que se preenche até o efeito. VFX final: AG09 |
+| Projéteis | pool inimigo da arena (128), alcance `projectile_range` 700 px |
+| Partículas | 50 ao morrer |
 
-As ondas normais param enquanto o chefe está vivo. Ao derrotá-lo: vitória.
+- Ciclo: `ADVANCE` → `ATTACK` (espera → aviso → efeito → espera…). Sorteio por peso da fase com `Boss.rng` (semente vinda da arena).
+- Ao derrotá-lo: Partículas, `boss_defeated` e **vitória imediata** (mesmo com invocados vivos).
+- **Balanceamento (estimativa, calibrar na T-116):** com DPS base 20, ~60 s; com ~250 Partículas distribuídas (DPS ~37) + `skill_pulse`, ~30 s. Só o projétil central do leque acerta o Núcleo (6 de dano); o anel acerta no máximo 1; o enxame invocado, 2 por contato.
 
 ## Ondas
 
@@ -171,9 +175,22 @@ Emitidos pelo nó raiz da partida (`Arena`). Na T-105 já existem `core_hp_chang
 | `cooldown_changed(slot: int, remaining: float, total: float)` | ao usar a skill e durante o cooldown, no máximo ~10×/s |
 | `skill_ready(slot: int)` | quando o cooldown chega a 0 |
 | `particles_changed(total: int)` | `total` = **total** de Partículas na partida (não o incremento). Partículas começam em 0 e zeram a cada partida (decisão 29). `coins_changed(amount)` é um alias temporário, emitido junto, até a T-141 migrar o HUD |
-| `boss_spawned(id: StringName)` | entrada do chefe |
-| `boss_hp_changed(current: int, max: int)` | a cada dano no chefe |
+| `boss_spawned(id: StringName)` | entrada do chefe (logo depois vem `boss_hp_changed` com a vida cheia) |
+| `boss_hp_changed(current: int, max: int)` | entrada e a cada dano no chefe (`current` nunca negativo; 0 na morte, antes de `match_ended`) |
+| `boss_defeated` | chefe abatido (antes do `match_ended` de vitória) |
+| `upgrade_changed(id: StringName, level: int, max_level: int, next_cost: int)` | ver "Upgrades da partida (T-134)" abaixo |
 | `match_ended(result: MatchResult)` | vitória ou derrota (uma vez) |
+
+### Upgrades da partida (T-134)
+
+Valores e curva de custo em [meta.md](meta.md). Lógica em `src/match/upgrades/`, dados em `data/upgrades/<id>.tres` (`UpgradeData`).
+
+- **IDs, nesta ordem** (`Arena.UPGRADE_IDS`): `upgrade_atk_power`, `upgrade_atk_spd`, `upgrade_defense`, `upgrade_max_hp`, `upgrade_cooldown`.
+- **`Arena.buy_upgrade(id: StringName) -> bool`**: compra 1 nível se `particles ≥ custo` e `nível < max_level`; desconta as Partículas (emite `particles_changed`) e aplica o efeito. Não pausa a partida. Devolve `false` sem efeito se não puder comprar, se o id for desconhecido ou se a partida acabou.
+- **Sinal `upgrade_changed(id: StringName, level: int, max_level: int, next_cost: int)`**: emitido para os 5 upgrades no início da partida (no `_ready` da Arena, em `UPGRADE_IDS`) e para o upgrade comprado após cada compra. `next_cost = -1` quando o nível está no máximo.
+- Consulta síncrona (opcional): `Arena.upgrades.level(id)`, `.next_cost(id)`, `.max_level(id)`.
+- A UI decide "indisponível" comparando `next_cost` com o total do último `particles_changed`.
+- Reset: os níveis vivem na `Arena`; cada partida nova começa com todos no nível 0.
 
 **Mudanças em relação ao §9 do AG01 (precisam de aprovação):**
 1. **Novo:** `skill_used(slot: int)`, já citado no §7 do AG01 mas ausente do §9. Serve ao feedback de acionamento no HUD.
@@ -215,4 +232,5 @@ O `project.godot` é do AG07. Layers sugeridas:
 | Skill de controle | pendente | T-109 |
 | Skill de defesa | pendente | T-110 |
 | Arquétipos (tanque, atirador, enxame) | protótipo | T-111 |
-| Chefe | pendente | T-115 |
+| Chefe | protótipo | T-115 |
+| Upgrades da partida | protótipo | T-134 |

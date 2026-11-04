@@ -2,8 +2,8 @@ class_name Hud
 extends CanvasLayer
 ## HUD da partida (docs/ui.md §4–6). Só escuta os sinais da Arena; toques chamam Arena.use_skill(slot).
 ## Chame bind(arena) ANTES de a arena entrar na árvore: os valores iniciais saem no _ready dela.
-## Layout cartoon (T-145): topo = pausa · pílula "ONDA x/y" · pílula de moedas, barra do Núcleo;
-## bandeja inferior = fileira de upgrades (reservada, T-135) + 3 slots de skill (Ø 144, centros 150/360/570).
+## Layout cartoon (T-145): topo = pausa · pílula "ONDA x/y" · pílula de Partículas, barra do Núcleo;
+## bandeja inferior = fileira de 5 upgrades (T-135) + 3 slots de skill (Ø 144, centros 150/360/570).
 
 ## Pedido de pausa (botão). O botão também injeta a action `pause`; a tela de pausa (T-113) ouve um dos dois.
 signal pause_requested
@@ -11,7 +11,7 @@ signal pause_requested
 const THEME := preload("res://src/ui/theme/anima_theme.tres")
 const SKILL_COUNT := 3
 const SKILL_ICONS := [SkillButton.Icon.CIRCLE, SkillButton.Icon.DIAMOND, SkillButton.Icon.HEX]
-const COIN_SIZE := 36
+const PARTICLES_ICON_SIZE := 36
 const CORE_ICON_SIZE := Vector2(36, 44)
 const UPGRADE_BAND_PAD := 10
 ## Padrão do M1 (decisão 25): slot 1 liberado; 2 e 3 bloqueados até os níveis 7 e 12.
@@ -27,18 +27,19 @@ var _top: MarginContainer
 var _tray: PanelContainer
 var _upgrade_margin: MarginContainer
 var _skills_margin: MarginContainer
-## Contêiner da fileira de 5 upgrades (vazio até a T-135).
+## Contêiner da fileira de 5 upgrades (UpgradeButton, T-135).
 var upgrade_row: HBoxContainer
 var _core_bar: UiBar
 var _boss_bar: UiBar
 var _boss_row: Control
 var _boss_label: Label
 var _wave_label: Label
-var _coin_label: Label
+var _particles_label: Label
 var _pause_button: Button
 var _skills: Array[SkillButton] = []
-var _coins_shown := 0
-var _coin_tween: Tween
+var _upgrades: Array[UpgradeButton] = []
+var _particles_shown := 0
+var _particles_tween: Tween
 var _wave_tween: Tween
 
 
@@ -53,7 +54,8 @@ func bind(arena: Node) -> void:
 	_arena = arena
 	_connect(&"core_hp_changed", _on_core_hp_changed)
 	_connect(&"wave_changed", _on_wave_changed)
-	_connect(&"coins_changed", _on_coins_changed)
+	_connect(&"particles_changed", _on_particles_changed)
+	_connect(&"upgrade_changed", _on_upgrade_changed)
 	_connect(&"skill_used", _on_skill_used)
 	_connect(&"cooldown_changed", _on_cooldown_changed)
 	_connect(&"skill_ready", _on_skill_ready)
@@ -93,7 +95,7 @@ func _build_top() -> void:
 	top_col.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_top.add_child(top_col)
 
-	# Linha 1: pausa · ONDA x/y (centralizada) · moedas. Os lados têm a mesma largura.
+	# Linha 1: pausa · ONDA x/y (centralizada) · Partículas. Os lados têm a mesma largura.
 	var row1 := _hbox(UiTokens.SPACE_XS)
 	top_col.add_child(row1)
 	var left := _hbox(0)
@@ -120,18 +122,20 @@ func _build_top() -> void:
 	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	right.alignment = BoxContainer.ALIGNMENT_END
 	row1.add_child(right)
-	var coin_pill := _panel(&"PanelPillLight")
-	coin_pill.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	right.add_child(coin_pill)
-	var coin_row := _hbox(UiTokens.SPACE_XS)
-	coin_pill.add_child(coin_row)
-	coin_row.add_child(_icon(Vector2(COIN_SIZE, COIN_SIZE), _draw_star))
-	_coin_label = _label(&"LabelHud")
-	_coin_label.text = "0"
-	_coin_label.add_theme_color_override("font_color", UiTokens.COIN)
-	_coin_label.custom_minimum_size.x = 72
-	_coin_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	coin_row.add_child(_coin_label)
+	var particles_pill := _panel(&"PanelPillLight")
+	particles_pill.name = "ParticlesPill"
+	particles_pill.tooltip_text = "Partículas"
+	particles_pill.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	right.add_child(particles_pill)
+	var particles_row := _hbox(UiTokens.SPACE_XS)
+	particles_pill.add_child(particles_row)
+	particles_row.add_child(StarIcon.new(PARTICLES_ICON_SIZE))
+	_particles_label = _label(&"LabelHud")
+	_particles_label.text = "0"
+	_particles_label.add_theme_color_override("font_color", UiTokens.PARTICLES)
+	_particles_label.custom_minimum_size.x = 72
+	_particles_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	particles_row.add_child(_particles_label)
 
 	# Linha 2: cristal + barra do Núcleo
 	var row2 := _hbox(UiTokens.SPACE_XS)
@@ -173,7 +177,7 @@ func _build_tray() -> void:
 	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_tray.add_child(col)
 
-	# Faixa da fileira de upgrades (decisão 35). Os botões vêm na T-135.
+	# Faixa da fileira de upgrades (decisão 35, T-135).
 	var band := _panel(&"")
 	var band_sb := StyleBoxFlat.new()
 	band_sb.bg_color = UiTokens.TRAY_BAND
@@ -188,6 +192,13 @@ func _build_tray() -> void:
 	upgrade_row.alignment = BoxContainer.ALIGNMENT_CENTER
 	upgrade_row.custom_minimum_size.y = UiTokens.UPGRADE_SIZE.y
 	_upgrade_margin.add_child(upgrade_row)
+	for id in UpgradeButton.IDS:
+		var ub := UpgradeButton.new()
+		ub.upgrade_id = id
+		ub.name = String(id)
+		ub.buy_requested.connect(_on_upgrade_buy)
+		upgrade_row.add_child(ub)
+		_upgrades.append(ub)
 
 	# Slots de skill
 	_skills_margin = _margin_box()
@@ -252,17 +263,6 @@ func _icon(min_size: Vector2, painter: Callable) -> Control:
 	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	c.draw.connect(painter.bind(c))
 	return c
-
-
-## Estrela de 4 pontas (moedas/Partículas), dourada com contorno.
-func _draw_star(c: Control) -> void:
-	var ctr := c.size * 0.5
-	var s := minf(c.size.x, c.size.y) * 0.5
-	var pts := PackedVector2Array()
-	for i in 8:
-		var a := TAU * i / 8.0 - PI * 0.5
-		pts.append(ctr + Vector2(cos(a), sin(a)) * (s if i % 2 == 0 else s * 0.38))
-	_outlined(c, pts, UiTokens.COIN)
 
 
 ## Cristal do Núcleo, ciano com contorno.
@@ -334,17 +334,25 @@ func _on_wave_changed(current: int, total: int) -> void:
 	_wave_tween.tween_property(_wave_label, "scale", Vector2.ONE, UiTokens.ANIM_FAST)
 
 
-func _on_coins_changed(amount: int) -> void:
-	# amount é o total da partida.
-	if _coin_tween:
-		_coin_tween.kill()
-	_coin_tween = create_tween()
-	_coin_tween.tween_method(_set_coins_shown, _coins_shown, amount, UiTokens.ANIM_UI)
+func _on_particles_changed(total: int) -> void:
+	# total é o acumulado da partida.
+	if _particles_tween:
+		_particles_tween.kill()
+	_particles_tween = create_tween()
+	_particles_tween.tween_method(_set_particles_shown, _particles_shown, total, UiTokens.ANIM_UI)
+	for ub in _upgrades:
+		ub.set_particles(total) # habilitação imediata; só o número anima
 
 
-func _set_coins_shown(v: int) -> void:
-	_coins_shown = v
-	_coin_label.text = UiTokens.format_int(v)
+func _on_upgrade_changed(id: StringName, level: int, max_level: int, next_cost: int) -> void:
+	var ub := upgrade_button(id)
+	if ub:
+		ub.set_upgrade(level, max_level, next_cost)
+
+
+func _set_particles_shown(v: int) -> void:
+	_particles_shown = v
+	_particles_label.text = UiTokens.format_int(v)
 
 
 func _on_skill_used(slot: int) -> void:
@@ -380,6 +388,8 @@ func _on_match_ended(_result) -> void:
 	for sb in _skills:
 		sb.set_disabled(true)
 	_pause_button.disabled = true
+	for ub in _upgrades:
+		ub.set_disabled(true)
 
 
 # --- Entrada ---
@@ -394,6 +404,15 @@ func _on_skill_pressed(slot: int) -> void:
 		_skill(slot).reject()
 
 
+func _on_upgrade_buy(id: StringName) -> void:
+	if _arena == null or not _arena.has_method(&"buy_upgrade"):
+		return
+	if not _arena.buy_upgrade(id):
+		var ub := upgrade_button(id)
+		if ub:
+			ub.reject()
+
+
 func _on_pause_pressed() -> void:
 	pause_requested.emit()
 	var ev := InputEventAction.new()
@@ -404,3 +423,10 @@ func _on_pause_pressed() -> void:
 
 func _skill(slot: int) -> SkillButton:
 	return _skills[slot - 1] if slot >= 1 and slot <= _skills.size() else null
+
+
+func upgrade_button(id: StringName) -> UpgradeButton:
+	for ub in _upgrades:
+		if ub.upgrade_id == id:
+			return ub
+	return null

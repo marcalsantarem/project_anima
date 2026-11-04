@@ -9,6 +9,8 @@ const PARKED_POSITION := Vector2(-100000.0, -100000.0)
 
 var active := false
 var data: ProjectileData
+## Dano deste disparo (data.damage, ou o valor com upgrades passado em fire()).
+var damage := 0
 
 var _direction := Vector2.ZERO ## no chão
 var _distance_left := 0.0
@@ -46,9 +48,11 @@ func configure(p_data: ProjectileData) -> void:
 
 ## direction em tela; vira direção no chão. max_distance em px no chão.
 ## p_data troca o tipo do projétil (pool compartilhado entre atiradores).
-func fire(origin: Vector2, direction: Vector2, max_distance: float, p_data: ProjectileData = null) -> void:
+## p_damage < 0 usa data.damage.
+func fire(origin: Vector2, direction: Vector2, max_distance: float, p_data: ProjectileData = null, p_damage: int = -1) -> void:
 	if p_data != null and p_data != data:
 		configure(p_data)
+	damage = p_damage if p_damage >= 0 else data.damage
 	position = origin
 	_direction = GroundPlane.to_ground(direction).normalized()
 	_distance_left = max_distance
@@ -85,7 +89,7 @@ func _on_area_entered(area: Area2D) -> void:
 			return
 	_hit_ids[_hit_count] = enemy_id
 	_hit_count += 1
-	enemy.take_damage(data.damage)
+	enemy.take_damage(damage)
 	_hits_left -= 1
 	if _hits_left <= 0:
 		_expire()

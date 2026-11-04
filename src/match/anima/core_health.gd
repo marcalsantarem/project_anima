@@ -28,3 +28,12 @@ func take_damage(amount: int) -> int:
 	if is_depleted():
 		depleted.emit()
 	return lost
+
+
+## Sobe o HP máximo e o atual pelo mesmo valor (não é cura total). Ignora se esgotado.
+func raise_max(amount: int) -> void:
+	if amount <= 0 or is_depleted():
+		return
+	max_hp += amount
+	current += amount
+	changed.emit(current, max_hp)

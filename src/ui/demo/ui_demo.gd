@@ -16,6 +16,11 @@ var _remaining: Array[float] = [0.0, 0.0, 0.0]
 var _signal_t := 0.0
 var _disabled := false
 var _locked := true
+var _particles := 1250
+var _upgrades: Array[UpgradeButton] = []
+var _levels := {}
+var _costs := {}
+var _particles_label: Label
 
 
 func _ready() -> void:
@@ -69,25 +74,42 @@ func _build() -> void:
 	row2.add_child(_button("Desativar skills", &"", _on_toggle_disabled))
 	row2.add_child(_button("Cadeados", &"", _on_toggle_locked))
 
-	var hud := _label("ONDA 3/10    1.250", &"LabelHud")
-	col.add_child(hud)
+	var row3 := HBoxContainer.new()
+	row3.add_theme_constant_override("separation", UiTokens.SPACE_S)
+	col.add_child(row3)
+	row3.add_child(_button("+300 Partículas", &"", _on_add_particles))
+	row3.add_child(_button("Zerar Partículas", &"", _on_zero_particles))
+
+	var hud_row := HBoxContainer.new()
+	hud_row.add_theme_constant_override("separation", UiTokens.SPACE_XS)
+	col.add_child(hud_row)
+	hud_row.add_child(_label("ONDA 3/10", &"LabelHud"))
+	hud_row.add_child(StarIcon.new(32))
+	_particles_label = _label("", &"LabelHud")
+	hud_row.add_child(_particles_label)
 
 	var spacer := Control.new()
 	spacer.size_flags_vertical = SIZE_EXPAND_FILL
 	spacer.mouse_filter = MOUSE_FILTER_IGNORE
 	col.add_child(spacer)
 
-	# Fileira de upgrades: só demonstração de medidas (128×80); o componente real é da T-135.
+	# Fileira de upgrades (T-135), com upgrade_changed/particles_changed simulados como no mockup.
 	var up_row := HBoxContainer.new()
 	up_row.alignment = BoxContainer.ALIGNMENT_CENTER
 	up_row.add_theme_constant_override("separation", UiTokens.UPGRADE_GAP)
 	col.add_child(up_row)
-	for t in ["Atk", "Vel", "Def", "Vida", "Cd"]:
-		var ub := Button.new()
-		ub.text = t
-		ub.disabled = true
-		ub.custom_minimum_size = UiTokens.UPGRADE_SIZE
+	var start_levels := [2, 4, 1, 10, 3] # mockup: custos 120 / 340 / 1.400 / MAX / 260
+	var start_costs := [120, 340, 1400, -1, 260]
+	for i in UpgradeButton.IDS.size():
+		var ub := UpgradeButton.new()
+		ub.upgrade_id = UpgradeButton.IDS[i]
+		ub.buy_requested.connect(_on_buy)
 		up_row.add_child(ub)
+		_upgrades.append(ub)
+		_levels[ub.upgrade_id] = start_levels[i]
+		_costs[ub.upgrade_id] = start_costs[i]
+		_emit_upgrade(ub)
+	_set_particles(_particles)
 
 	var skills_row := HBoxContainer.new()
 	skills_row.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -101,6 +123,36 @@ func _build() -> void:
 		skills_row.add_child(sb)
 		_skills.append(sb)
 	_apply_locks()
+
+
+## Simulado: custo × 1,5 por nível, MAX no nível 10. No jogo vem de data/upgrades/.
+func _emit_upgrade(ub: UpgradeButton) -> void:
+	ub.set_upgrade(_levels[ub.upgrade_id], 10, _costs[ub.upgrade_id])
+
+
+func _set_particles(v: int) -> void:
+	_particles = v
+	_particles_label.text = UiTokens.format_int(v)
+	for ub in _upgrades:
+		ub.set_particles(v) # particles_changed(total)
+
+
+func _on_buy(id: StringName) -> void:
+	for ub in _upgrades:
+		if ub.upgrade_id == id and ub.next_cost >= 0 and _particles >= ub.next_cost:
+			var cost := ub.next_cost
+			_levels[id] += 1
+			_costs[id] = -1 if _levels[id] >= 10 else roundi(cost * 1.5)
+			_set_particles(_particles - cost)
+			_emit_upgrade(ub)
+
+
+func _on_add_particles() -> void:
+	_set_particles(_particles + 300)
+
+
+func _on_zero_particles() -> void:
+	_set_particles(0)
 
 
 func _label(text: String, variation: StringName) -> Label:
@@ -180,6 +232,8 @@ func _on_toggle_disabled() -> void:
 	_disabled = not _disabled
 	for sb in _skills:
 		sb.set_disabled(_disabled)
+	for ub in _upgrades:
+		ub.set_disabled(_disabled)
 
 
 ## T-136: slots 2 e 3 bloqueados ("NV 7" / "NV 12"), como no padrão do HUD no M1.

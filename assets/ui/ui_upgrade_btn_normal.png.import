@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ci5ih25hk5mad"
-path="res://.godot/imported/mockup_arena.svg-a47d1af7fce9357411744a949353dddf.ctex"
+uid="uid://cjcr75vag2qsq"
+path="res://.godot/imported/ui_upgrade_btn_normal.png-1416cdea4fb7d83a7e1e99b134f690aa.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/backgrounds/mockup_arena.svg"
-dest_files=["res://.godot/imported/mockup_arena.svg-a47d1af7fce9357411744a949353dddf.ctex"]
+source_file="res://assets/ui/ui_upgrade_btn_normal.png"
+dest_files=["res://.godot/imported/ui_upgrade_btn_normal.png-1416cdea4fb7d83a7e1e99b134f690aa.ctex"]
 
 [params]
 
@@ -38,6 +38,3 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=1.0
-editor/scale_with_editor_scale=false
-editor/convert_colors_with_editor_theme=false

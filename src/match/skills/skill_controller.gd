@@ -13,6 +13,8 @@ const COOLDOWN_EMIT_INTERVAL := 0.1 ## s; no máximo ~10 emissões/s por slot
 @export var skills: Array[SkillData] = []
 
 var enabled := true
+## Multiplicador de cooldown (upgrade_cooldown). Vale a partir do próximo uso.
+var cooldown_scale := 1.0
 
 var _slots: Array[SkillSlot] = []
 var _behaviors: Array[SkillBehavior] = []
@@ -59,10 +61,10 @@ func use_skill(slot: int) -> bool:
 	var behavior := _behaviors[slot - 1]
 	if not behavior.can_activate():
 		return false
-	s.start_cooldown()
+	s.start_cooldown(cooldown_scale)
 	behavior.activate()
 	skill_used.emit(slot)
-	cooldown_changed.emit(slot, s.remaining, s.data.cooldown)
+	cooldown_changed.emit(slot, s.remaining, s.total)
 	return true
 
 
@@ -84,7 +86,7 @@ func _physics_process(delta: float) -> void:
 		if s == null or s.is_ready():
 			continue
 		if s.tick(delta):
-			cooldown_changed.emit(i + 1, 0.0, s.data.cooldown)
+			cooldown_changed.emit(i + 1, 0.0, s.total)
 			skill_ready.emit(i + 1)
 		elif emit_now:
-			cooldown_changed.emit(i + 1, s.remaining, s.data.cooldown)
+			cooldown_changed.emit(i + 1, s.remaining, s.total)

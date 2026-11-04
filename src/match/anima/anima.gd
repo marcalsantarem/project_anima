@@ -11,6 +11,8 @@ signal core_depleted
 
 var core: CoreHealth
 var target: Enemy
+## Upgrades da partida (dano, cadência, defesa). Nulo = valores base.
+var upgrades: MatchUpgrades
 
 var _enemies: Array[Enemy] = []
 var _pool: ProjectilePool
@@ -55,8 +57,26 @@ func _physics_process(delta: float) -> void:
 	var projectile := _pool.acquire()
 	if projectile == null:
 		return
-	projectile.fire(position, target.position - position, data.attack_range)
-	_fire_timer = 1.0 / data.fire_rate
+	projectile.fire(position, target.position - position, data.attack_range, null, shot_damage())
+	_fire_timer = 1.0 / fire_rate()
+
+
+## Dano de cada tiro do ataque automático, com upgrades.
+func shot_damage() -> int:
+	var base := data.projectile.damage
+	return roundi(upgrades.apply(MatchUpgrades.STAT_DAMAGE, base)) if upgrades else base
+
+
+## Tiros/s do ataque automático, com upgrades.
+func fire_rate() -> float:
+	return upgrades.apply(MatchUpgrades.STAT_FIRE_RATE, data.fire_rate) if upgrades else data.fire_rate
+
+
+## Dano no Núcleo com a defesa aplicada (antes do escudo, quando houver).
+func take_core_damage(amount: int) -> int:
+	if upgrades:
+		amount = upgrades.damage_taken(amount)
+	return core.take_damage(amount)
 
 
 func _is_target_valid() -> bool:
@@ -66,12 +86,12 @@ func _is_target_valid() -> bool:
 func _on_area_entered(area: Area2D) -> void:
 	if area is Enemy:
 		var enemy := area as Enemy
-		core.take_damage(enemy.data.contact_damage)
+		take_core_damage(enemy.data.contact_damage)
 		enemy.die(Enemy.DeathCause.CONTACT)
 	elif area is Projectile:
 		var p := area as Projectile
 		if p.active:
-			core.take_damage(p.data.damage)
+			take_core_damage(p.damage)
 			p.consume()
 
 

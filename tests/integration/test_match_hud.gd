@@ -64,7 +64,7 @@ func test_hud_gets_initial_values() -> void:
 	assert_eq(hud._core_bar.current, max_hp)
 	assert_eq(hud._core_bar.maximum, max_hp)
 	assert_eq(hud._wave_label.text, "ONDA 1/3")
-	assert_eq(hud._coin_label.text, "0")
+	assert_eq(hud._particles_label.text, "0")
 
 
 func test_hud_follows_core_damage() -> void:
@@ -78,7 +78,7 @@ func test_hud_follows_core_damage() -> void:
 	await wait_seconds(1.0)
 	assert_eq(hud._core_bar.current, max_hp - 2 * RUNNER.contact_damage, "dano de contato chega ao HUD")
 	assert_eq(arena.enemies_killed, 0, "morte por contato não conta abate")
-	assert_eq(hud._coin_label.text, "0", "morte por contato não dá moeda")
+	assert_eq(hud._particles_label.text, "0", "morte por contato não dá Partículas")
 
 
 func test_victory_reaches_hud_and_result() -> void:
@@ -88,10 +88,10 @@ func test_victory_reaches_hud_and_result() -> void:
 	var r := _result()
 	assert_eq(r.outcome, MatchResult.Outcome.VICTORY)
 	assert_eq(r.enemies_killed, 5)
-	assert_eq(r.coins, 5 * RUNNER.particle_drop)
+	assert_eq(r.particles, 5 * RUNNER.particle_drop)
 	await wait_seconds(TWEEN_WAIT)
 	assert_eq(hud._wave_label.text, "ONDA 2/2")
-	assert_eq(hud._coin_label.text, UiTokens.format_int(r.coins))
+	assert_eq(hud._particles_label.text, UiTokens.format_int(r.particles))
 	assert_eq(hud._core_bar.current, arena.anima.core.current)
 
 
@@ -161,7 +161,7 @@ func test_defeat_locks_hud_and_freezes_match() -> void:
 	if alive.size() > 0:
 		alive[0].take_damage(9999) # abate após o fim não pontua
 	assert_eq(get_signal_emit_count(arena, "particles_changed"), particle_emits)
-	assert_eq(arena.particles, r.coins)
+	assert_eq(arena.particles, r.particles)
 	assert_signal_emit_count(arena, "match_ended", 1)
 
 
@@ -177,7 +177,7 @@ func test_stage_01_full_match_is_consistent() -> void:
 	var r := _result()
 	gut.p("stage_01 sem skills: %s, onda %d/%d, %d abates, %d Partículas, %.1f s" % [
 		MatchResult.Outcome.keys()[r.outcome], r.wave_reached, r.waves_total,
-		r.enemies_killed, r.coins, r.duration_s])
+		r.enemies_killed, r.particles, r.duration_s])
 	assert_eq(r.waves_total, 3)
 	assert_between(r.wave_reached, 1, 3)
 	if r.outcome == MatchResult.Outcome.VICTORY:
@@ -187,5 +187,42 @@ func test_stage_01_full_match_is_consistent() -> void:
 		assert_eq(arena.anima.core.current, 0)
 	await wait_seconds(TWEEN_WAIT)
 	assert_eq(hud._wave_label.text, "ONDA %d/3" % r.wave_reached)
-	assert_eq(hud._coin_label.text, UiTokens.format_int(r.coins))
+	assert_eq(hud._particles_label.text, UiTokens.format_int(r.particles))
 	assert_eq(hud._core_bar.current, arena.anima.core.current)
+
+
+# --- Upgrades (T-135) ---
+
+func test_upgrade_row_has_five_buttons_with_initial_state() -> void:
+	_start(null, false)
+	assert_eq(hud.upgrade_row.get_child_count(), 5)
+	for id in Arena.UPGRADE_IDS:
+		var ub := hud.upgrade_button(id)
+		assert_not_null(ub, String(id))
+		assert_eq(ub.level, arena.upgrades.level(id))
+		assert_eq(ub.next_cost, arena.upgrades.next_cost(id))
+		assert_eq(ub.state, UpgradeButton.State.POOR, "começa sem Partículas")
+
+
+func test_buy_through_hud_button() -> void:
+	_start(null, false)
+	var id: StringName = Arena.UPGRADE_IDS[0]
+	var ub := hud.upgrade_button(id)
+	var cost := arena.upgrades.next_cost(id)
+	arena.particles = cost
+	arena.particles_changed.emit(arena.particles)
+	assert_eq(ub.state, UpgradeButton.State.AFFORDABLE)
+	ub._activate()
+	assert_eq(arena.upgrades.level(id), 1)
+	assert_eq(arena.particles, 0)
+	assert_eq(ub.level, 1)
+	assert_eq(ub.next_cost, arena.upgrades.next_cost(id))
+	assert_eq(ub.state, UpgradeButton.State.POOR)
+
+
+func test_match_end_disables_upgrades() -> void:
+	_start(null, false)
+	arena.anima.core.take_damage(999999)
+	await wait_physics_frames(2)
+	for ub in hud._upgrades:
+		assert_eq(ub.state, UpgradeButton.State.DISABLED)

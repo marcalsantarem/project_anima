@@ -1,0 +1,72 @@
+[gd_resource type="Resource" script_class="BossData" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://src/match/enemies/boss/boss_data.gd" id="1"]
+[ext_resource type="Script" path="res://src/match/enemies/boss/boss_pattern.gd" id="2"]
+[ext_resource type="Resource" path="res://data/projectiles/projectile_enemy_bolt.tres" id="3"]
+[ext_resource type="Resource" path="res://data/enemies/enemy_swarm.tres" id="4"]
+[ext_resource type="Texture2D" path="res://assets/sprites/boss_warden.png" id="tex_sprite"]
+[ext_resource type="Texture2D" path="res://assets/sprites/boss_warden_ring.png" id="tex_ring"]
+
+[sub_resource type="Resource" id="pattern_fan"]
+script = ExtResource("2")
+id = &"pattern_fan"
+kind = 0
+weights = PackedFloat32Array(3, 2, 2)
+telegraph = 1.0
+telegraph_radius = 180.0
+projectile_count = 5
+spread_deg = 40.0
+summon_count = 0
+summon_radius = 0.0
+
+[sub_resource type="Resource" id="pattern_ring"]
+script = ExtResource("2")
+id = &"pattern_ring"
+kind = 1
+weights = PackedFloat32Array(0, 2, 3)
+telegraph = 1.2
+telegraph_radius = 130.0
+projectile_count = 12
+spread_deg = 0.0
+summon_count = 0
+summon_radius = 0.0
+
+[sub_resource type="Resource" id="pattern_summon"]
+script = ExtResource("2")
+id = &"pattern_summon"
+kind = 2
+weights = PackedFloat32Array(1, 1, 2)
+telegraph = 1.0
+telegraph_radius = 90.0
+projectile_count = 0
+spread_deg = 0.0
+summon = ExtResource("4")
+summon_count = 4
+summon_radius = 70.0
+
+[resource]
+script = ExtResource("1")
+id = &"boss_warden"
+hp = 1200
+speed = 60.0
+contact_damage = 30
+attack_range = 420.0
+fire_rate = 0.0
+projectile = ExtResource("3")
+target_priority = 0
+particle_drop = 50
+radius = 48.0
+group_min = 1
+group_max = 1
+group_spread = 0.0
+color = Color(0.85, 0.3, 0.95, 1)
+sprite = ExtResource("tex_sprite")
+sprite_anchor = Vector2(256, 472)
+ring_sprite = ExtResource("tex_ring")
+ring_anchor = Vector2(256, 128)
+ring_height = 70.0
+ring_spin_speed = 0.6
+phase_thresholds = PackedFloat32Array(0.6, 0.3)
+pattern_interval = PackedFloat32Array(3.0, 2.4, 1.8)
+patterns = Array[ExtResource("2")]([SubResource("pattern_fan"), SubResource("pattern_ring"), SubResource("pattern_summon")])
+projectile_range = 700.0

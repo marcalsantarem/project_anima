@@ -82,6 +82,8 @@ Pedestal cilíndrico neutro (`vessel`) com aro ciano + **cristal losango ciano f
 
 ## 6. HUD e molduras por raridade (guia para a T-145)
 
+> **Arte pronta (T-128):** ícones, botões de upgrade, molduras de skill, barra, painel e botão grande em `assets/ui/` (lista, tamanhos e margens 9-patch no [`assets/ui/README.md`](../assets/ui/README.md)). O botão principal usa `accent` (ciano), como manda o `ui.md`.
+
 - **Botões encorpados:** forma arredondada, contorno escuro de 4 px, "sombra de base" sólida deslocada 4–6 px para baixo, faixa de brilho branca a ~18% no topo.
 - **Skill (demo M1, decisão 28):** bandeja com **3 slots**, sem botão defensivo/`ESPAÇO`. Botão redondo **Ø ≥ 144 px**, centros em x = 150 / 360 / 570 (folga ~66 px), cy ≈ 1192 em 720×1280. Pronta = anel ciano + halo; recarga = setor escuro a 55% + segundos; bloqueada = cinza com cadeado e o nível de desbloqueio (slot 2 "NV 7", slot 3 "NV 12"). Badge da tecla (`1`, `2`, `3`) no canto superior direito.
 - **Fileira de upgrades (decisão 35):** faixa própria no topo da bandeja, logo acima das skills; 5 botões de 128×80 px (gap 12, margem 16), na ordem Atk power, Atk spd, Defesa, Vida máxima, Cooldown. Cada botão: ícone num círculo colorido (espada laranja, chevrons âmbar, placa hexagonal azul, coração rosa com "+", ampulheta verde-água), "Nv X" e pílula escura com a estrela de Partículas + custo. Estados: comprável = anel ciano interno e custo dourado (toque mostra "+1" ciano); sem Partículas = cinza, ícone a 55% e custo vermelho-claro; máximo = moldura dourada e pílula dourada "MAX". A arena encolhe (87%) para caber, com o núcleo ainda no centro. Mockup: [`mockup_cartoon_a_upgrades.png`](../assets/backgrounds/mockup_cartoon_a_upgrades.png).

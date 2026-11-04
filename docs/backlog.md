@@ -28,7 +28,7 @@
 | T-112 | HUD ligado aos sinais | M1 | AG02 | feita |
 | T-113 | Telas: toque para começar, pausa, resultado | M1 | AG02 | feita |
 | T-114 | Testes GUT de ondas, dano e cooldowns | M1 | AG03 | feita |
-| T-115 | Chefe da fase 1 | M1 | AG01 | pronta p/ briefing |
+| T-115 | Chefe da fase 1 | M1 | AG01 | feita |
 | T-116 | Fase 1 completa (~10 ondas + chefe) | M1 | AG01 | a fazer |
 | T-117 | Game feel | M1 | AG01 + AG09 | a fazer |
 | T-118 | Desempenho no iPhone (150 inimigos / 300 projéteis) | M1 | AG01 | a fazer |
@@ -41,25 +41,25 @@
 | T-125 | Proposta da skill de área: meteoro × onda de choque | M1 | AG01 + AG08 | pronta p/ briefing |
 | T-126 | Guia de estilo `docs/arte.md` + mockup da arena | M1 | AG08 | pronta p/ briefing |
 | T-127 | Arte do Anima, inimigos, chefe, projéteis e fundo | M1 | AG08 | feita |
-| T-128 | Ícones e arte da UI | M1 | AG08 | a fazer |
+| T-128 | Ícones e arte da UI | M1 | AG08 | feita |
 | T-129 | `docs/vfx.md` + pool de efeitos | M1 | AG09 | a fazer |
 | T-130 | VFX do ataque, acertos e mortes | M1 | AG09 | a fazer |
 | T-131 | VFX da skill e do chefe | M1 | AG09 | a fazer |
 | T-132 | Modo de efeitos reduzidos | M1 | AG09 | a fazer |
 | T-133 | Dados e balanceamento dos upgrades da partida | M1 | AG04 | feita |
-| T-134 | Lógica dos upgrades em tempo real (5 atributos) | M1 | AG01 | a fazer |
-| T-135 | Fileira de 5 botões de upgrade no HUD | M1 | AG02 | a fazer |
+| T-134 | Lógica dos upgrades em tempo real (5 atributos) | M1 | AG01 | feita |
+| T-135 | Fileira de 5 botões de upgrade no HUD | M1 | AG02 | feita |
 | T-136 | Slots 2 e 3 do HUD bloqueados (cadeado) | M1 | AG02 | feita |
 | T-137 | Trocar placeholders da partida pela arte final | M1 | AG01 | feita (sem chefe) |
 | T-138 | Aplicar a arte da UI no HUD e nas telas | M1 | AG02 | a fazer |
 | T-139 | Ajustar a skill de área à opção escolhida | M1 | AG01 | bloqueada |
 | T-140 | Moeda da partida vira Partículas: sinais, código e `gameplay.md` | M1 | AG01 | feita |
-| T-141 | Moeda da partida vira Partículas: HUD, telas e `ui.md` | M1 | AG02 | a fazer |
+| T-141 | Moeda da partida vira Partículas: HUD, telas e `ui.md` | M1 | AG02 | feita |
 | T-142 | Novo guia de estilo 2D cartoon 3/4 + mockups PNG | M1 | AG08 | pronta p/ briefing |
 | T-143 | Pipeline e fonte da arte final (opções e custos) | M1 | AG08 | pronta p/ briefing |
 | T-144 | Arena em 3/4: Y-sort, âncoras, sombras, spawn | M1 | AG01 | feita |
 | T-145 | Retema da UI no estilo cartoon (tokens, tema, fonte) | M1 | AG02 | feita |
-| T-146 | Remover mockups rejeitados e excluir referências do export Web | M1 | AG07 | pronta p/ briefing |
+| T-146 | Remover mockups rejeitados e excluir referências do export Web | M1 | AG07 | feita |
 | T-147 | Anima com skin trocável (Resource de aparência) | M2 | AG01 | a fazer |
 
 ## Próximas prontas p/ briefing
@@ -255,7 +255,7 @@
 - **Pronto quando:** testes cobrem leitura de ondas, dano/HP do Núcleo, vitória/derrota e cooldown; rodam headless e passam.
 
 ### T-115 — Chefe da fase 1
-- **Marco:** M1 · **Dono:** AG01 · **Status:** pronta p/ briefing
+- **Marco:** M1 · **Dono:** AG01 · **Status:** feita
 - **Depende de:** T-111 · **Desbloqueia:** T-116, T-127 (arte do chefe), T-131
 - **Arquivos:** `src/match/enemies/boss/`, `data/enemies/boss_*.tres`
 - **Pronto quando:** chefe com fases por vida, ao menos 2 padrões de ataque e aviso visual (telegraph) antes de cada padrão; vencível com 1 skill + upgrades da partida.
@@ -347,7 +347,7 @@
 - **Pronto quando:** tokens e tema refeitos (botões grandes com contorno e sombra, painéis com moldura, cores por raridade); fonte arredondada OFL avaliada; HUD e telas atuais continuam funcionando.
 
 ### T-146 — Remover mockups rejeitados e excluir referências do export Web
-- **Marco:** M1 · **Dono:** AG07 · **Status:** pronta p/ briefing
+- **Marco:** M1 · **Dono:** AG07 · **Status:** feita
 - **Depende de:** — · **Desbloqueia:** —
 - **Arquivos:** `assets/backgrounds/mockup_arena*.svg`, `assets/LICENSES.md`, `export_presets.cfg`
 - **Pronto quando:** mockups A/B removidos; filtro do preset Web exclui mockups e referências; export e testes OK.
@@ -377,7 +377,7 @@
 - **Pronto quando:** Anima, 4 arquétipos, chefe, projéteis (inimigos sem ciano) e fundo seguem o `docs/arte.md`; silhuetas distintas; tamanhos para 720×1280; licenças registradas.
 
 ### T-128 — Ícones e arte da UI
-- **Marco:** M1 · **Dono:** AG08 · **Status:** a fazer
+- **Marco:** M1 · **Dono:** AG08 · **Status:** feita
 - **Depende de:** T-142, T-143, T-125 (ícone da skill), T-133 (ícones dos upgrades) · **Desbloqueia:** T-138
 - **Arquivos:** `assets/ui/`
 - **Pronto quando:** ícone da skill, cadeado dos slots, ícones dos upgrades, botões, barras e painéis no estilo do guia; legíveis no toque no iPhone.
@@ -415,13 +415,13 @@
 - **Pronto quando:** os 5 upgrades (Atk power, Atk spd, Defesa, Vida máxima, Cooldown) com efeito por nível, nível máximo e curva de custo em Partículas documentados, com valores coerentes com as Partículas ganhas na fase 1 e com tetos que não quebrem o balanceamento (ex.: redução de cooldown).
 
 ### T-134 — Lógica dos upgrades em tempo real (5 atributos)
-- **Marco:** M1 · **Dono:** AG01 · **Status:** a fazer
+- **Marco:** M1 · **Dono:** AG01 · **Status:** feita
 - **Depende de:** T-133, T-105, T-140 · **Desbloqueia:** T-135, T-116
 - **Arquivos:** `src/match/upgrades/`, `data/upgrades/`
 - **Pronto quando:** `Arena.buy_upgrade(id)->bool` compra 1 nível durante a partida, sem pausar; desconta Partículas e aplica o efeito até o fim; custo cresce por nível e há nível máximo; sinais `upgrade_changed(id, level, next_cost)` e `can_afford` para a UI; valores em `.tres`; testes GUT da compra e da aplicação.
 
 ### T-135 — Fileira de 5 botões de upgrade no HUD
-- **Marco:** M1 · **Dono:** AG02 · **Status:** a fazer
+- **Marco:** M1 · **Dono:** AG02 · **Status:** feita
 - **Depende de:** T-134, T-141 (os sinais podem ser simulados antes) · **Desbloqueia:** T-138, T-120
 - **Arquivos:** `src/ui/hud/`, `src/ui/components/`
 - **Pronto quando:** fileira de 5 botões acima da linha de skills (Atk power, Atk spd, Defesa, Vida máxima, Cooldown), cada um com ícone, nível e custo em Partículas; desabilitado quando não há Partículas ou no nível máximo; alvo de toque de 44 px ou mais; funciona com toque, mouse e teclado em retrato; não cobre inimigos nem as skills.
@@ -458,7 +458,7 @@
 - **Nota:** o identificador em código não deve colidir com nós de partículas do Godot nem com `src/fx/`; o AG07 confirma o nome (decisão do AG00).
 
 ### T-141 — Moeda da partida vira Partículas: HUD, telas e `ui.md`
-- **Marco:** M1 · **Dono:** AG02 · **Status:** a fazer
+- **Marco:** M1 · **Dono:** AG02 · **Status:** feita
 - **Depende de:** T-140 · **Desbloqueia:** T-135, T-138
 - **Arquivos:** `src/ui/hud/`, `src/ui/screens/`, `docs/ui.md`
 - **Pronto quando:** HUD e Resultado mostram "Partículas"; ligados aos sinais renomeados; nenhuma menção a "moedas" para a moeda da partida.

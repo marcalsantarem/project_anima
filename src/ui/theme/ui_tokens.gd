@@ -24,7 +24,7 @@ const CORE_HP_MID := Color("#FFC93D")
 const CORE_HP_LOW := Color("#FF5A6E")
 const BOSS_HP := Color("#C056F0")
 const DANGER := Color("#FF5A6E")
-const COIN := Color("#FFC93D") # estrela de Partículas / ouro
+const PARTICLES := Color("#FFC93D") # estrela de Partículas (moeda da partida), "Vitória"
 const COOLDOWN_DIM := Color(0.10, 0.06, 0.18, 0.55)
 const HIGHLIGHT := Color(1, 1, 1, 0.18) # faixa de brilho no topo dos botões
 

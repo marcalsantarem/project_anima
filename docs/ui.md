@@ -37,7 +37,7 @@ Fonte única: `src/ui/theme/ui_tokens.gd`. Estilo das decisões 31–36 e do [do
 | `bg_panel_alt` | `#5A4A9A` | bandeja inferior (skills) |
 | `tray_band` | `#64549F` | faixa da fileira de upgrades |
 | `bg_dim` | `ink` a 70% | véu atrás da pausa |
-| `surface` | `#FFFFFF` | botão secundário, pílula de moedas, botão de pausa |
+| `surface` | `#FFFFFF` | botão secundário, pílula de Partículas, botão de pausa |
 | `text_primary` | `#FFFFFF` + contorno `ink` | texto sobre painéis e arena |
 | `text_secondary` | `#E2DAFF` | rótulos, legendas |
 | `text_on_light` | `#3A2A55` | texto de botão claro/ciano |
@@ -47,7 +47,7 @@ Fonte única: `src/ui/theme/ui_tokens.gd`. Estilo das decisões 31–36 e do [do
 | `core_hp` | `#6CF0A4` → `#FFC93D` → `#FF5A6E` | HP do Núcleo: > 50% / 25–50% / < 25% |
 | `boss_hp` | `#C056F0` | barra do chefe |
 | `danger` | `#FF5A6E` | dano, derrota |
-| `coin` | `#FFC93D` | estrela de moedas/Partículas, "Vitória" |
+| `particles` | `#FFC93D` | estrela de Partículas, "Vitória" |
 | `cooldown_dim` | `#1A0F2E` a 55% | véu da skill em recarga |
 | `highlight` | branco a 18% | faixa de brilho no topo de botões e barras |
 
@@ -67,7 +67,7 @@ Fonte única: `src/ui/theme/ui_tokens.gd`. Estilo das decisões 31–36 e do [do
 |---|---|---|---|
 | `font_display` | 72 | 800 | "Vitória" / "Derrota" |
 | `font_title` | 48 | 800 | títulos de tela, segundos do cooldown |
-| `font_hud` | 32 | 800 | "ONDA X/Y", moedas |
+| `font_hud` | 32 | 800 | "ONDA X/Y", Partículas |
 | `font_body` | 28 | 600/800 | textos de tela, botões |
 | `font_caption` | 22 | 800 | número na barra, badge da tecla, rótulos |
 
@@ -112,7 +112,7 @@ y=1280 └───────────────────────�
 |---|---|---|---|
 | Pausa | linha 1, à esquerda | **88×88**, botão claro | "II"; também `Esc` |
 | "ONDA X/Y" | linha 1, centro | pílula `bg_panel`, `font_hud` | pulso de escala (200 ms) ao trocar de onda |
-| Moedas | linha 1, à direita | pílula `surface`, estrela `coin` + número `coin` | contagem da partida, com milhar |
+| Partículas | linha 1, à direita | pílula `surface`, estrela `particles` (`StarIcon`) + número `particles` | total de Partículas da partida, com milhar |
 | HP do Núcleo | linha 2, largura total | altura 40 px, cristal `accent` à esquerda | texto "NÚCLEO atual / máx", cor por faixa, flash `danger` e barra fantasma |
 | Barra do chefe | linha 3, largura total | altura 28 px | aparece em `boss_spawned`; cor `boss_hp`, nome do chefe em cima |
 
@@ -125,7 +125,7 @@ y=1280 └───────────────────────�
 ### 4.3 Bandeja inferior (`Hud/Tray`)
 
 - Painel `bg_panel_alt` de largura total com contorno superior `ink`; vai até a borda inferior (a safe area entra como margem interna).
-- **Fileira de upgrades** (`Hud.upgrade_row`, decisão 35): faixa `tray_band` com 80 px úteis (padding 10), 5 botões de 128×80 com gap 12 e margem 16. **O contêiner fica vazio até a T-135.**
+- **Fileira de upgrades** (`Hud.upgrade_row`, decisão 35): faixa `tray_band` com 80 px úteis (padding 10), 5 botões `UpgradeButton` de 128×80 com gap 12 e margem 16 (5×128 + 4×12 = 688 = 720 − 2×16), na ordem `UpgradeButton.IDS` (§5.4). A faixa fica abaixo da arena: não cobre inimigos nem os slots.
 - **3 slots de skill de Ø 144 px**, gap 66, centros em x = 150 / 360 / 570, cy ≈ 1194 sem safe area.
 - Slots 2 e 3 bloqueados com cadeado e "NV 7"/"NV 12" (T-136). Os níveis vêm de `Hud.slot_unlock_levels` (padrão do M1 `[0, 7, 12]`, 0 = liberado); no M2 o meta-jogo passa a lista com `set_slot_unlock_levels()` conforme o nível da conta.
 - **Área de toque = o círculo inteiro.** Toques entre os botões não fazem nada.
@@ -163,6 +163,15 @@ y=1280 └───────────────────────�
 - Painéis (`PanelContainer`): `bg_panel` com moldura; variações `PanelPill`, `PanelPillLight` e `PanelTray`. Pausa e resultado usam um cartão central (`ScreenKit.card`).
 - Foco por teclado visível (borda `accent` 4 px por fora); `Enter`/`Espaço` ativam.
 
+### 5.4 `UpgradeButton` (T-135, decisão 35)
+
+- `src/ui/components/upgrade_button.gd`. 128×80 (alvo de toque inteiro, ≥ 44 px). Ícone circular à esquerda, "Nv N" à direita e pílula de custo embaixo (estrela `particles` + número com milhar).
+- Estados: **comprável** (fundo azul, anel `accent`), **sem Partículas** (fundo `locked`-claro, ícone apagado, custo rosado), **MAX** (moldura dourada, pílula dourada "MAX"), **desabilitado** (antes do 1º `upgrade_changed` e após `match_ended`).
+- Toque/clique/`ui_accept` emitem `buy_requested(id)` **só se comprável**; nos outros estados o botão treme. Compra = afunda (≤ 150 ms) + "+1" dourado que sobe e some (2 × `ANIM_UI`) quando o nível sobe.
+- Teclado: `focus_mode = ALL` (Tab/setas) com anel `accent` por fora; `Enter` compra. **`Espaço` nunca compra** (é `skill_4`): o botão ignora eventos que casam com `skill_*`/`pause`. Clique/toque soltam o foco, para o anel só aparecer pelo teclado.
+- Nomes (tooltip e `accessibility_name`): Atk power, Atk spd, Defesa, Vida máxima, Cooldown. Ícones provisórios desenhados à mão (espada, dupla seta, hexágono, coração, ampulheta); a arte da T-128 entra por `icon_texture`.
+- Desenho só quando o estado muda (sem `_process`, StyleBoxes em cache).
+
 ## 6. Ligação com o gameplay (contrato em [docs/gameplay.md](gameplay.md))
 
 Os sinais são emitidos pelo nó raiz `Match`.
@@ -174,14 +183,16 @@ Os sinais são emitidos pelo nó raiz `Match`.
 | `skill_used(slot)` | SkillButton[slot] | flash de acionamento (§5.1) |
 | `cooldown_changed(slot, remaining, total)` | SkillButton[slot] | estado `cooldown`, setor e segundos (≤ ~10×/s, interpolado) |
 | `skill_ready(slot)` | SkillButton[slot] | estado `ready` + flash |
-| `coins_changed(amount)` | rótulo de moedas | `amount` é o **total** da partida: o rótulo anima do valor exibido até ele (≤ 200 ms), sem somar nada |
+| `particles_changed(total)` | rótulo de Partículas | `total` é o acumulado da partida: o rótulo anima do valor exibido até ele (≤ 200 ms), sem somar nada |
 | `boss_spawned(id)` | Bar do chefe | mostrar a barra + nome |
 | `boss_hp_changed(current, max)` | Bar do chefe | valor; ocultar ao chegar a 0 |
-| `match_ended(result)` | fluxo de telas | abrir Resultado com `result` |
+| `upgrade_changed(id, level, max_level, next_cost)` | UpgradeButton[id] | nível, custo (`-1` = MAX); "+1" quando o nível sobe |
+| `match_ended(result)` | fluxo de telas | abrir Resultado com `result`; HUD desabilita skills, pausa e upgrades |
 
 - A UI **só ouve** esses sinais. Ela não lê nós da arena nem faz cálculos de jogo.
-- `MatchResult`: `outcome` (`victory`|`defeat`), `wave_reached`, `waves_total`, `coins`, `enemies_killed`, `duration_s`.
+- `MatchResult`: `outcome` (`victory`|`defeat`), `wave_reached`, `waves_total`, `particles`, `enemies_killed`, `duration_s`.
 - **`slot` é 1-based** (1 a 3) e casa com `skill_1`..`skill_3`.
+- Compra: `UpgradeButton.buy_requested(id)` → `Hud` chama `Arena.buy_upgrade(id)`; se devolver `false`, o botão treme. A habilitação usa o `total` de `particles_changed` (imediato; só o número do topo anima).
 
 ## 7. Entrada
 
@@ -193,7 +204,7 @@ Os sinais são emitidos pelo nó raiz `Match`.
 | `ui_accept` (telas) | botão | `Enter` / `Espaço` |
 
 - Nada de teclas fixas no código: tudo via Input Actions. Alterar o Input Map exige autorização do AG00.
-- Durante a partida, `Espaço` é `skill_4`. A UI não usa `ui_accept` enquanto o HUD estiver ativo.
+- Durante a partida, `Espaço` é `skill_4`. No HUD, só os botões de upgrade aceitam `ui_accept`, e apenas por `Enter` (eventos que também são `skill_*`/`pause` são ignorados).
 - **Multitoque:** é possível tocar duas skills ao mesmo tempo (cada botão trata o próprio toque).
 
 ## 8. Fluxo de telas do M1
@@ -208,7 +219,7 @@ Boot/Loading (HTML shell) → Toque para começar → Partida ⇄ Pausa → Resu
 | **Toque para começar** | nome do jogo (`font_title`), "Toque para começar" pulsando (`font_body`) | qualquer toque, clique ou tecla → **libera o áudio** → Partida |
 | **Partida** | HUD (§4) | ⏸ / `Esc` → Pausa; `match_ended` → Resultado |
 | **Pausa** (overlay) | véu `bg_panel` sobre o jogo, título "Pausado", botões **Continuar** e **Recomeçar** | Continuar / `Esc` → Partida; Recomeçar → nova Partida |
-| **Resultado** | "Vitória" (`coin`) ou "Derrota" (`danger`) em `font_display`, num cartão com moldura; "Onda wave_reached/waves_total", moedas, inimigos derrotados, tempo (mm:ss); botão **Jogar de novo** | Jogar de novo → nova Partida |
+| **Resultado** | "Vitória" (`particles`) ou "Derrota" (`danger`) em `font_display`, num cartão com moldura; "Onda wave_reached/waves_total", estrela + "Partículas: N", inimigos derrotados, tempo (mm:ss); botão **Jogar de novo** | Jogar de novo → nova Partida |
 
 - **Perda de foco** (troca de aba ou app, `NOTIFICATION_APPLICATION_FOCUS_OUT` / `visibilitychange`): abre a Pausa automaticamente. A volta **não** retoma sozinha; o jogador toca em Continuar.
 - **Sem menu/hangar no M1** (meta-jogo fora do escopo). "Jogar de novo" volta direto à partida.
@@ -227,7 +238,6 @@ Boot/Loading (HTML shell) → Toque para começar → Partida ⇄ Pausa → Resu
 |---|---|
 | Paleta de projéteis inimigos sem ciano | AG01 |
 | Arena encolhida (87%) para caber a bandeja de ~280 px sem cobrir inimigos | AG01 (T-144) |
-| Botões de upgrade no `Hud.upgrade_row` / slots bloqueados | AG02 (T-135 / T-136) |
 | Leitura da safe area no Safari (`animaGetSafeArea()` já está no shell) | AG02 (T-005) |
 
 ## 10b. HUD (implementação, T-112)
