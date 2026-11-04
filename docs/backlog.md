@@ -51,7 +51,7 @@
 | T-135 | Fileira de 5 botões de upgrade no HUD | M1 | AG02 | feita |
 | T-136 | Slots 2 e 3 do HUD bloqueados (cadeado) | M1 | AG02 | feita |
 | T-137 | Trocar placeholders da partida pela arte final | M1 | AG01 | feita (sem chefe) |
-| T-138 | Aplicar a arte da UI no HUD e nas telas | M1 | AG02 | a fazer |
+| T-138 | Aplicar a arte da UI no HUD e nas telas | M1 | AG02 | feita |
 | T-139 | Ajustar a skill de área à opção escolhida | M1 | AG01 | bloqueada |
 | T-140 | Moeda da partida vira Partículas: sinais, código e `gameplay.md` | M1 | AG01 | feita |
 | T-141 | Moeda da partida vira Partículas: HUD, telas e `ui.md` | M1 | AG02 | feita |
@@ -439,7 +439,7 @@
 - **Pronto quando:** Anima, inimigos, chefe, projéteis e fundo usam a arte final; colisões continuam corretas; nenhum placeholder geométrico.
 
 ### T-138 — Aplicar a arte da UI no HUD e nas telas
-- **Marco:** M1 · **Dono:** AG02 · **Status:** a fazer
+- **Marco:** M1 · **Dono:** AG02 · **Status:** feita
 - **Depende de:** T-128, T-135, T-136, T-145 · **Desbloqueia:** T-120
 - **Arquivos:** `src/ui/`
 - **Pronto quando:** HUD, telas e tela de upgrade usam os ícones e a arte final; legibilidade conferida no iPhone.

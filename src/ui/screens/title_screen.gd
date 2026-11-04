@@ -14,7 +14,7 @@ var _hint: Label
 func _ready() -> void:
 	set_anchors_and_offsets_preset(PRESET_FULL_RECT)
 	var root := ScreenKit.root(self)
-	var col := ScreenKit.column(root, UiTokens.SPACE_L)
+	var col := ScreenKit.card(root, UiTokens.SPACE_L)
 	col.add_child(ScreenKit.label("Project: Anima", &"LabelTitle"))
 	col.add_child(ScreenKit.label("Criado por Marçal Santarem", &"LabelCaption"))
 	var gap := Control.new()

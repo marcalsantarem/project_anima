@@ -1,5 +1,5 @@
 extends SceneTree
-## Gera anima_theme.tres a partir de UiTokens (estilo cartoon, T-145).
+## Gera anima_theme.tres a partir de UiTokens (estilo cartoon, T-145) e da arte de UiArt (T-138).
 ## Uso: godot --headless --path . -s res://src/ui/theme/build_theme.gd
 
 const OUTPUT := "res://src/ui/theme/anima_theme.tres"
@@ -38,9 +38,17 @@ static func build() -> Theme:
 	theme.set_font("font", "Button", bold)
 	theme.set_type_variation("ButtonPrimary", "Button")
 	_button(theme, "ButtonPrimary", UiTokens.ACCENT, UiTokens.TEXT_ON_LIGHT)
+	# Botão principal com a arte 9-patch (T-138). O secundário (branco) não tem arte: fica no StyleBoxFlat.
+	theme.set_stylebox("normal", "ButtonPrimary", UiArt.button_big(false))
+	theme.set_stylebox("hover", "ButtonPrimary", UiArt.button_big(false))
+	theme.set_stylebox("pressed", "ButtonPrimary", UiArt.button_big(true))
+	theme.set_stylebox("hover_pressed", "ButtonPrimary", UiArt.button_big(true))
+	var primary_off := UiArt.button_big(false)
+	primary_off.modulate_color = Color(0.7, 0.7, 0.75, 0.8)
+	theme.set_stylebox("disabled", "ButtonPrimary", primary_off)
 
 	# Painéis com moldura
-	theme.set_stylebox("panel", "PanelContainer", UiTokens.cartoon_box(UiTokens.BG_PANEL, UiTokens.RADIUS_L))
+	theme.set_stylebox("panel", "PanelContainer", UiArt.panel()) # arte ui_panel (T-138)
 	theme.set_type_variation("PanelPill", "PanelContainer")
 	theme.set_stylebox("panel", "PanelPill", _pill(UiTokens.BG_PANEL))
 	theme.set_type_variation("PanelPillLight", "PanelContainer")

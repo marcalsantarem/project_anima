@@ -12,6 +12,7 @@ const THEME := preload("res://src/ui/theme/anima_theme.tres")
 const SKILL_COUNT := 3
 const SKILL_ICONS := [SkillButton.Icon.CIRCLE, SkillButton.Icon.DIAMOND, SkillButton.Icon.HEX]
 const PARTICLES_ICON_SIZE := 36
+const PAUSE_ICON_SIZE := 64
 const CORE_ICON_SIZE := Vector2(36, 44)
 const UPGRADE_BAND_PAD := 10
 ## Altura da bandeja inferior (upgrades + skills) sem safe area, em px da resolução base (docs/ui.md §4.4).
@@ -134,10 +135,20 @@ func _build_top() -> void:
 	row1.add_child(left)
 	_pause_button = Button.new()
 	_pause_button.name = "Pause"
-	_pause_button.text = "II"
+	_pause_button.accessibility_name = "Pausa"
+	# Arte ui_icon_pause (o botão inteiro, 64 px) no canto; o alvo de toque continua com 88 px.
+	_pause_button.icon = UiArt.PAUSE
+	var empty := StyleBoxEmpty.new()
+	for st in ["normal", "hover", "pressed", "hover_pressed", "disabled", "focus"]:
+		_pause_button.add_theme_stylebox_override(st, empty)
+	_pause_button.expand_icon = true
+	_pause_button.icon_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	_pause_button.add_theme_constant_override("icon_max_width", PAUSE_ICON_SIZE)
+	_pause_button.add_theme_color_override("icon_pressed_color", Color(0.82, 0.8, 0.9))
+	_pause_button.add_theme_color_override("icon_hover_pressed_color", Color(0.82, 0.8, 0.9))
+	_pause_button.add_theme_color_override("icon_disabled_color", Color(1, 1, 1, 0.55))
 	_pause_button.custom_minimum_size = Vector2(UiTokens.TOUCH_MIN, UiTokens.TOUCH_MIN)
 	_pause_button.focus_mode = Control.FOCUS_NONE
-	_pause_button.add_theme_font_size_override("font_size", UiTokens.FONT_HUD)
 	_pause_button.pressed.connect(_on_pause_pressed)
 	left.add_child(_pause_button)
 
@@ -193,7 +204,7 @@ func _build_top() -> void:
 	_boss_bar.color_mode = UiBar.ColorMode.FIXED
 	_boss_bar.fill_color = UiTokens.BOSS_HP
 	_boss_bar.show_numbers = false
-	_boss_bar.custom_minimum_size.y = 28
+	_boss_bar.custom_minimum_size.y = UiArt.BAR_TRACK_HEIGHT
 	boss_col.add_child(_boss_bar)
 
 

@@ -1,9 +1,9 @@
 class_name StarIcon
 extends Control
 ## Ícone de Partículas (moeda da partida): estrela de 4 pontas dourada com contorno.
-## Provisório até a arte da T-128; para trocar por textura, defina `texture`.
+## Usa a arte `ui_icon_particle` (T-138); com `texture = null` volta à estrela desenhada.
 
-@export var texture: Texture2D:
+@export var texture: Texture2D = UiArt.PARTICLE:
 	set(v):
 		texture = v
 		queue_redraw()

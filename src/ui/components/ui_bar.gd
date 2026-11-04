@@ -2,6 +2,7 @@
 class_name UiBar
 extends Control
 ## Barra de vida (Núcleo ou chefe). docs/ui.md §5.2.
+## Arte em assets/ui/ (ui_bar_*); altura do trilho fixa em 36 px, centrada no controle.
 ## O preenchimento vai direto ao valor; a "barra fantasma" vai atrás e mostra a perda.
 
 enum ColorMode { FIXED, CORE_HP }
@@ -34,11 +35,16 @@ var _ghost := 1.0
 var _flash := 0.0
 var _ghost_tween: Tween
 var _flash_tween: Tween
+var _track_box := UiArt.bar_track()
+var _fill_box := UiArt.bar_fill()
+var _ghost_box := UiArt.bar_fill()
+var _shine_box := UiArt.bar_shine()
 
 
 func _init() -> void:
 	custom_minimum_size = Vector2(0, UiTokens.CORE_BAR_HEIGHT)
 	mouse_filter = MOUSE_FILTER_IGNORE
+	_ghost_box.modulate_color = Color(UiTokens.TEXT_PRIMARY, 0.45)
 
 
 ## Liga direto a core_hp_changed(current, max) / boss_hp_changed(current, max).
@@ -84,36 +90,25 @@ func _current_color() -> Color:
 
 
 func _draw() -> void:
-	# Trilho escuro com contorno; o preenchimento fica por dentro do contorno.
-	var r := Rect2(Vector2.ZERO, size)
-	var radius := size.y * 0.5
-	draw_style_box(_rounded(UiTokens.BAR_TRACK, radius, UiTokens.BORDER), r)
-	var b := float(UiTokens.BORDER)
-	var inner := r.grow(-b)
-	var inner_radius := maxf(radius - b, 0.0)
+	# Arte T-128: trilho (altura fixa 36, centrado), preenchimento branco tingido (24) e brilho no topo.
+	var y0 := (size.y - UiArt.BAR_TRACK_HEIGHT) * 0.5
+	draw_style_box(_track_box, Rect2(0.0, y0, size.x, UiArt.BAR_TRACK_HEIGHT))
+	var pad := UiArt.BAR_FILL_INSET
+	var h := UiArt.BAR_FILL_HEIGHT
+	var inner := Rect2(pad, y0 + pad, maxf(size.x - 2.0 * pad, 0.0), h)
 	if _ghost > _fill:
-		draw_style_box(_rounded(Color(UiTokens.TEXT_PRIMARY, 0.45), inner_radius), Rect2(inner.position, Vector2(inner.size.x * _ghost, inner.size.y)))
+		draw_style_box(_ghost_box, Rect2(inner.position, Vector2(maxf(inner.size.x * _ghost, h), h)))
 	if _fill > 0.0:
-		var fill_rect := Rect2(inner.position, Vector2(maxf(inner.size.x * _fill, inner.size.y), inner.size.y))
-		draw_style_box(_rounded(_current_color(), inner_radius), fill_rect)
-		# Faixa de brilho no topo do preenchimento
-		var hl := Rect2(fill_rect.position + Vector2(inner_radius * 0.5, inner.size.y * 0.14), Vector2(maxf(fill_rect.size.x - inner_radius, 0.0), inner.size.y * 0.22))
-		draw_style_box(_rounded(UiTokens.HIGHLIGHT, hl.size.y * 0.5), hl)
+		var fill_w := maxf(inner.size.x * _fill, h)
+		_fill_box.modulate_color = _current_color()
+		draw_style_box(_fill_box, Rect2(inner.position, Vector2(fill_w, h)))
+		var shine_w := fill_w - h * 0.5
+		if shine_w >= UiArt.BAR_SHINE_HEIGHT * 2.0:
+			draw_style_box(_shine_box, Rect2(inner.position + Vector2(h * 0.25, 2.0), Vector2(shine_w, UiArt.BAR_SHINE_HEIGHT)))
 	if show_numbers:
 		var font := get_theme_font("font", "UiBar")
 		var fs := get_theme_font_size("font_size", "UiBar")
 		var text := "%s%s / %s" % [label_prefix, UiTokens.format_int(current), UiTokens.format_int(maximum)]
-		var baseline := (size.y + font.get_ascent(fs) - font.get_descent(fs)) * 0.5
+		var baseline := inner.get_center().y + (font.get_ascent(fs) - font.get_descent(fs)) * 0.5
 		draw_string_outline(font, Vector2(0, baseline), text, HORIZONTAL_ALIGNMENT_CENTER, size.x, fs, UiTokens.TEXT_OUTLINE - 2, UiTokens.INK)
 		draw_string(font, Vector2(0, baseline), text, HORIZONTAL_ALIGNMENT_CENTER, size.x, fs, UiTokens.TEXT_PRIMARY)
-
-
-static func _rounded(color: Color, radius: float, border := 0) -> StyleBoxFlat:
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = color
-	sb.set_corner_radius_all(int(radius))
-	if border > 0:
-		sb.border_color = UiTokens.INK
-		sb.set_border_width_all(border)
-	sb.anti_aliasing = true
-	return sb

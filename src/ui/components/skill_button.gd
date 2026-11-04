@@ -4,6 +4,8 @@ extends Control
 ## Botão circular de skill. docs/ui.md §5.1.
 ## Não chama a skill: toque/clique emitem `activated(slot)` e, se `inject_action`, a Input Action `skill_<slot>`.
 ## O estado vem do gameplay: on_used() ← skill_used, set_cooldown() ← cooldown_changed, set_ready() ← skill_ready.
+## Arte da T-128 (T-138): molduras por estado, ícone (`icon_texture`; Icon.CIRCLE usa `ui_icon_skill_pulse`),
+## cadeado e véu de recarga radial (`ui_skill_cooldown_mask`). O badge da tecla continua desenhado.
 ## `locked` (T-136): slot ainda não liberado. Cadeado + "NV x", ignora toque, clique, a action `skill_<slot>` e os sinais de gameplay.
 
 signal activated(slot: int)
@@ -17,6 +19,9 @@ const READY_POP := 1.08
 const SHAKE_PX := 6.0
 const GLOW_PERIOD := 1.5
 const BADGE_SIZE := 36.0
+const ICON_SIZE := 88.0
+const LOCK_SIZE := 64.0
+const DIM_ALPHA := 0.55
 
 ## 1-based (1 a 3), casa com `skill_1`..`skill_3`.
 @export_range(1, 4) var slot := 1:
@@ -27,6 +32,11 @@ const BADGE_SIZE := 36.0
 @export var icon := Icon.CIRCLE:
 	set(v):
 		icon = v
+		queue_redraw()
+## Vazio = arte padrão do `icon` (só Icon.CIRCLE tem arte; os outros são desenhados).
+@export var icon_texture: Texture2D:
+	set(v):
+		icon_texture = v
 		queue_redraw()
 ## Desligue quando quem ouve `activated` já aciona a skill (ex.: HUD → Arena.use_skill).
 @export var inject_action := true
@@ -42,6 +52,9 @@ var _glow_t := 0.0
 var _shortcut := ""
 var _touch_index := -1
 var _anim: Tween
+var _badge_box := _make_badge_box()
+var _veil_pts := PackedVector2Array()
+var _veil_uvs := PackedVector2Array()
 
 
 func _init() -> void:
@@ -258,38 +271,33 @@ func _shortcut_label() -> String:
 func _draw() -> void:
 	var c := _center()
 	var r := DIAMETER * 0.5
-	var inner := r - UiTokens.BORDER
 	var is_ready := state == State.READY
 	var locked := state == State.LOCKED
 	var disabled := state == State.DISABLED or locked
 
-	# Halo de "pronta" (pulsa), sombra de base sólida e contorno
+	# Halo extra que pulsa (a moldura "pronta" já tem o halo fixo) e moldura do estado
 	if is_ready and not Engine.is_editor_hint():
 		var pulse := 0.5 - 0.5 * cos(TAU * _glow_t / GLOW_PERIOD)
-		draw_circle(c, r + 8.0, Color(UiTokens.ACCENT, 0.15 + 0.25 * pulse))
-	draw_circle(c + Vector2(0, UiTokens.SHADOW_BASE), r, UiTokens.INK)
-	draw_circle(c, r, UiTokens.INK)
-	draw_circle(c, inner, UiTokens.LOCKED if disabled else UiTokens.SKILL_FILL)
-
-	# Anel ciano (pronta) ou anel escuro discreto
-	var ring := UiTokens.ACCENT if is_ready else UiTokens.INK.lightened(0.15)
+		draw_circle(c, r + 8.0, Color(UiTokens.ACCENT, 0.25 * pulse))
+	var frame := UiArt.SKILL_FRAME_LOCKED if disabled else (UiArt.SKILL_FRAME_READY if is_ready else UiArt.SKILL_FRAME_COOLDOWN)
+	draw_texture_rect(frame, Rect2(c - UiArt.SKILL_FRAME_CENTER, UiArt.SKILL_FRAME_SIZE), false)
 	if _flash > 0.0:
-		ring = ring.lerp(Color.WHITE, _flash)
-	if not disabled:
-		draw_arc(c, inner - 9.0, 0.0, TAU, 64, ring, 12.0 if is_ready or _flash > 0.0 else 4.0, true)
-	# Faixa de brilho no topo
-	draw_arc(c, inner - 3.0, PI * 1.2, PI * 1.8, 24, UiTokens.HIGHLIGHT, 5.0, true)
+		draw_arc(c, r - 8.0, 0.0, TAU, 64, Color(1, 1, 1, _flash), 8.0, true)
 
 	var font := get_theme_font("font_bold", "SkillButton")
 	if locked:
 		_draw_lock(c, r, font)
 	else:
-		# Ícone (provisório até a T-128): branco com contorno escuro
-		_draw_icon(c, r * 0.4, UiTokens.TEXT_SECONDARY if disabled else UiTokens.TEXT_PRIMARY)
+		var tex := _icon_texture()
+		if tex:
+			var half := ICON_SIZE * 0.5
+			draw_texture_rect(tex, Rect2(c - Vector2(half, half), Vector2(ICON_SIZE, ICON_SIZE)), false, Color(1, 1, 1, DIM_ALPHA) if disabled else Color.WHITE)
+		else:
+			_draw_icon(c, r * 0.4, UiTokens.TEXT_SECONDARY if disabled else UiTokens.TEXT_PRIMARY)
 
-	# Véu e setor de recarga (sentido horário a partir do topo)
+	# Véu de recarga (sentido horário a partir do topo)
 	if state == State.COOLDOWN and _total > 0.0:
-		_draw_sector(c, inner, clampf(_remaining / _total, 0.0, 1.0), UiTokens.COOLDOWN_DIM)
+		_draw_veil(c, clampf(_remaining / _total, 0.0, 1.0))
 
 	# Segundos restantes
 	if state == State.COOLDOWN and _remaining > 0.0:
@@ -301,40 +309,33 @@ func _draw() -> void:
 
 	# Badge da tecla / slot (canto superior direito)
 	var bc := c + Vector2(r, -r) * 0.72
-	var half := BADGE_SIZE * 0.5
-	var badge := UiTokens.cartoon_box(UiTokens.BADGE, 10, 3)
-	badge.set_border_width_all(3)
-	badge.border_width_bottom = 6
-	draw_style_box(badge, Rect2(bc - Vector2(half, half), Vector2(BADGE_SIZE, BADGE_SIZE + 3)))
+	var half_b := BADGE_SIZE * 0.5
+	draw_style_box(_badge_box, Rect2(bc - Vector2(half_b, half_b), Vector2(BADGE_SIZE, BADGE_SIZE + 3)))
 	var cs := get_theme_font_size("caption_size", "SkillButton")
 	var label := _shortcut if _shortcut != "" else str(slot)
 	var by := bc.y + (font.get_ascent(cs) - font.get_descent(cs)) * 0.5
-	draw_string(font, Vector2(bc.x - half, by), label, HORIZONTAL_ALIGNMENT_CENTER, BADGE_SIZE, cs, UiTokens.INK)
+	draw_string(font, Vector2(bc.x - half_b, by), label, HORIZONTAL_ALIGNMENT_CENTER, BADGE_SIZE, cs, UiTokens.INK)
+
+
+static func _make_badge_box() -> StyleBoxFlat:
+	var badge := UiTokens.cartoon_box(UiTokens.BADGE, 10, 3)
+	badge.set_border_width_all(3)
+	badge.border_width_bottom = 6
+	return badge
+
+
+func _icon_texture() -> Texture2D:
+	if icon_texture:
+		return icon_texture
+	return UiArt.SKILL_PULSE if icon == Icon.CIRCLE else null
 
 
 ## Cadeado (acima do centro) + "NV x" (abaixo), como no mockup aprovado.
 func _draw_lock(c: Vector2, r: float, font: Font) -> void:
 	var has_level := unlock_level > 0
-	var lc := c + Vector2(0, -r * 0.2 if has_level else 0.0)
-	var bw := r * 0.62
-	var bh := r * 0.46
-	var body := Rect2(lc + Vector2(-bw * 0.5, -bh * 0.15), Vector2(bw, bh))
-	# Alça: arco grosso com contorno
-	var sh_c := Vector2(lc.x, body.position.y)
-	var sh_r := bw * 0.3
-	draw_arc(sh_c, sh_r, PI, TAU, 24, UiTokens.INK, 15.0, true)
-	draw_line(sh_c + Vector2(-sh_r, 0), sh_c + Vector2(-sh_r, 4), UiTokens.INK, 15.0)
-	draw_line(sh_c + Vector2(sh_r, 0), sh_c + Vector2(sh_r, 4), UiTokens.INK, 15.0)
-	draw_arc(sh_c, sh_r, PI, TAU, 24, UiTokens.TEXT_PRIMARY, 7.0, true)
-	draw_line(sh_c + Vector2(-sh_r, 0), sh_c + Vector2(-sh_r, 4), UiTokens.TEXT_PRIMARY, 7.0)
-	draw_line(sh_c + Vector2(sh_r, 0), sh_c + Vector2(sh_r, 4), UiTokens.TEXT_PRIMARY, 7.0)
-	# Corpo arredondado + fechadura
-	var box := UiTokens.cartoon_box(UiTokens.TEXT_PRIMARY, 6, 0)
-	box.set_border_width_all(4)
-	draw_style_box(box, body)
-	var kc := body.get_center() + Vector2(0, -bh * 0.08)
-	draw_circle(kc, bh * 0.14, UiTokens.INK)
-	draw_line(kc, kc + Vector2(0, bh * 0.24), UiTokens.INK, 4.0)
+	var lc := c + Vector2(0, -r * 0.22 if has_level else 0.0)
+	var half := LOCK_SIZE * 0.5
+	draw_texture_rect(UiArt.LOCK, Rect2(lc - Vector2(half, half), Vector2(LOCK_SIZE, LOCK_SIZE)), false)
 	if not has_level:
 		return
 	var fs := UiTokens.FONT_HUD
@@ -370,13 +371,22 @@ func _draw_icon(c: Vector2, s: float, color: Color) -> void:
 		draw_circle(c, s * 0.28, UiTokens.ACCENT)
 
 
-func _draw_sector(c: Vector2, r: float, frac: float, color: Color) -> void:
+## Setor da máscara radial (textura em UV); buffers reaproveitados entre desenhos.
+func _draw_veil(c: Vector2, frac: float) -> void:
 	if frac <= 0.0:
 		return
+	var mr := UiArt.SKILL_MASK_RADIUS
+	if frac >= 0.999:
+		draw_texture_rect(UiArt.SKILL_COOLDOWN_MASK, Rect2(c - Vector2(mr, mr), Vector2(mr, mr) * 2.0), false)
+		return
 	var steps := maxi(int(64 * frac), 2)
-	var pts := PackedVector2Array([c])
-	var start := -PI * 0.5
+	_veil_pts.resize(steps + 2)
+	_veil_uvs.resize(steps + 2)
+	_veil_pts[0] = c
+	_veil_uvs[0] = Vector2(0.5, 0.5)
 	for i in steps + 1:
-		var a := start + TAU * frac * float(i) / steps
-		pts.append(c + Vector2(cos(a), sin(a)) * r)
-	draw_colored_polygon(pts, color)
+		var a := -PI * 0.5 + TAU * frac * float(i) / steps
+		var d := Vector2(cos(a), sin(a))
+		_veil_pts[i + 1] = c + d * mr
+		_veil_uvs[i + 1] = Vector2(0.5, 0.5) + d * 0.5
+	draw_colored_polygon(_veil_pts, Color.WHITE, _veil_uvs, UiArt.SKILL_COOLDOWN_MASK)

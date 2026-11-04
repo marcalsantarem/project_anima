@@ -161,18 +161,20 @@ Teste: `tests/unit/ui/test_hud_layout.gd` confere as constantes contra o layout.
 - Na transição `cooldown → ready` (`skill_ready`): flash `accent` + escala 1,08 → 1,0 em 200 ms.
 - **Badge da tecla:** quadradinho `badge` no canto superior direito com a tecla do Input Map (ou o número do slot), sempre visível (mockup aprovado).
 - **Toque e clique** disparam a mesma Input Action (§7). O botão não chama a skill diretamente.
-- Ícones: placeholders geométricos brancos com contorno (explosão de 8 pontas, losango, hexágono) até a T-128.
+- Arte (T-138): molduras `ui_skill_frame_ready/cooldown/locked` (pronta tem halo fixo + halo pulsante desenhado), ícone `ui_icon_skill_pulse` (88 px) no `Icon.CIRCLE` ou `icon_texture`, cadeado `ui_icon_lock` (64 px), véu `ui_skill_cooldown_mask` como setor texturizado (buffers reaproveitados). `disabled` usa a moldura cinza e o ícone a 55%. Losango/hexágono desenhados só como fallback sem arte.
 
 ### 5.2 `Bar` (HP do Núcleo / chefe)
 
-- Pílula: trilho `bar_track` com contorno `ink` 4 px, preenchimento na cor do token com faixa `highlight`, texto `label_prefix` + "atual / máx" com contorno.
+- Arte (T-138): trilho `ui_bar_track` (altura fixa 36, centrado no controle), preenchimento `ui_bar_fill` branco (24 px, 4 px de folga) tingido pelo token (`core_hp_*`, `boss_hp`), brilho `ui_bar_shine`; texto `label_prefix` + "atual / máx" com contorno. Barra do chefe com 36 px de altura.
 - **Interpolação:** o preenchimento principal vai direto ao novo valor, e uma "barra fantasma" clara vai atrás em ~300 ms, mostrando quanto foi perdido.
 
 ### 5.3 `Button` (telas)
 
 - Altura mínima de 88 px, largura ≥ 360 px nos botões principais, `radius_m`, contorno `ink` 4 px e sombra de base de 6 px (pressionado = afunda).
 - Principal: fundo `accent`, texto `text_on_light`. Secundário: fundo `surface`, texto `text_on_light`. Desabilitado: `locked`.
-- Painéis (`PanelContainer`): `bg_panel` com moldura; variações `PanelPill`, `PanelPillLight` e `PanelTray`. Pausa e resultado usam um cartão central (`ScreenKit.card`).
+- Arte (T-138): `ButtonPrimary` usa `ui_button_big_normal/pressed` (9-patch; pressionado desce 4 px; desabilitado = normal esmaecido). O secundário (branco) segue em `StyleBoxFlat` (não há arte).
+- Painéis (`PanelContainer`): `ui_panel` (9-patch, conteúdo a 20 px, 26 embaixo). `PanelPill`, `PanelPillLight` e `PanelTray` seguem em `StyleBoxFlat` (sem arte). Título, pausa e resultado usam o cartão central (`ScreenKit.card`).
+- **9-patch em 2x:** `UiNinePatch` (`src/ui/theme/ui_nine_patch.gd`) desenha o PNG em escala 0,5 com as margens do README; o `StyleBoxTexture` desenharia as bordas no tamanho do PNG (o dobro). Texturas e tamanhos em `UiArt` (`src/ui/theme/ui_art.gd`). Filtro Linear (padrão do projeto), sem mipmaps.
 - Foco por teclado visível (borda `accent` 4 px por fora); `Enter`/`Espaço` ativam.
 
 ### 5.4 `UpgradeButton` (T-135, decisão 35)
@@ -181,8 +183,9 @@ Teste: `tests/unit/ui/test_hud_layout.gd` confere as constantes contra o layout.
 - Estados: **comprável** (fundo azul, anel `accent`), **sem Partículas** (fundo `locked`-claro, ícone apagado, custo rosado), **MAX** (moldura dourada, pílula dourada "MAX"), **desabilitado** (antes do 1º `upgrade_changed` e após `match_ended`).
 - Toque/clique/`ui_accept` emitem `buy_requested(id)` **só se comprável**; nos outros estados o botão treme. Compra = afunda (≤ 150 ms) + "+1" dourado que sobe e some (2 × `ANIM_UI`) quando o nível sobe.
 - Teclado: `focus_mode = ALL` (Tab/setas) com anel `accent` por fora; `Enter` compra. **`Espaço` nunca compra** (é `skill_4`): o botão ignora eventos que casam com `skill_*`/`pause`. Clique/toque soltam o foco, para o anel só aparecer pelo teclado.
-- Nomes (`accessibility_name`): Atk power, Atk spd, Defesa, Vida máxima, Cooldown. Ícones provisórios desenhados à mão (espada, dupla seta, hexágono, coração, ampulheta); a arte da T-128 entra por `icon_texture`.
+- Nomes (`accessibility_name`): Atk power, Atk spd, Defesa, Vida máxima, Cooldown. Arte (T-138): molduras `ui_upgrade_btn_normal/disabled/max` (canvas 132×90 em (−2, −2), sombra até y = 88), ícone `ui_icon_upgrade_*` Ø 40 em (31, 28) (`icon_texture` sobrescreve), pílula `ui_upgrade_cost_pill(_max)` em (9, 52) com estrela `ui_icon_particle` 20 px; sem Partículas = ícone a 55%.
 - Desenho só quando o estado muda (sem `_process`, StyleBoxes em cache).
+- **HUD (T-138):** pausa = `ui_icon_pause` (64 px, alvo de toque 88 px); estrela de Partículas (`StarIcon`) usa `ui_icon_particle` no HUD e no Resultado. Pílulas do topo e cristal do Núcleo continuam desenhados (sem arte).
 
 **Sem tooltips (BRF-039):** nenhum controle do HUD ou das telas usa `tooltip_text`; no toque o Godot exibia o tooltip sobre os botões. A descrição fica só em `accessibility_name`.
 

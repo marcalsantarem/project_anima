@@ -56,7 +56,7 @@ func _build() -> void:
 	_boss_bar = UiBar.new()
 	_boss_bar.color_mode = UiBar.ColorMode.FIXED
 	_boss_bar.fill_color = UiTokens.BOSS_HP
-	_boss_bar.custom_minimum_size.y = 24
+	_boss_bar.custom_minimum_size.y = UiArt.BAR_TRACK_HEIGHT
 	_boss_bar.set_value(_boss_hp, BOSS_MAX)
 	col.add_child(_boss_bar)
 
