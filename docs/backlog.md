@@ -82,6 +82,7 @@
 | T-167 | Animação de passos do chefe ogro (balanço, ritmo pelo movimento; quadros de caminhada) | M1 | AG01 + AG08 | pronta p/ briefing |
 | T-168 | Círculo rúnico do chão menor (~70%) | M1 | AG01 | pronta p/ briefing |
 | T-169 | Bandeja até a borda inferior, menos espaço sob os Módulos, Anima centralizado na área livre | M1 | AG02 + AG01 | pronta p/ briefing |
+| T-170 | Tela de logo do estúdio (preta, ~1 s) antes da splash de carregamento | M1 | AG02 | pronta p/ briefing |
 | T-148 | Sinais da Arena para VFX (projectile_fired, projectile_hit, enemy_died, particles_gained, skill_cast, boss_telegraph_started, boss_phase_changed) | M1 | AG01 | feita |
 
 ## Próximas prontas p/ briefing
@@ -480,6 +481,10 @@
 ### T-169 — Layout da bandeja e centralização
 - **Marco:** M1 · **Dono:** AG02 + AG01 · **Status:** pronta p/ briefing
 - **Pronto quando:** a bandeja vai até a borda inferior (sem a faixa de cor de fundo), com pouco espaço sob os Módulos e a safe area respeitada; o Anima fica centralizado entre o topo do HUD e a bandeja; sem alteração de tamanho dos botões.
+
+### T-170 — Logo do estúdio antes da splash
+- **Marco:** M1 · **Dono:** AG02 (arte recortada pelo próprio agente a partir do arquivo do dono) · **Status:** pronta p/ briefing
+- **Pronto quando:** `web/shell.html` abre com tela preta e o logo "Anima Games" centralizado por ~1 s (sem atrasar o carregamento do jogo, que começa em paralelo), depois segue a splash atual; logo em `assets/branding/`.
 
 ### T-148 — Sinais da Arena para VFX
 - **Marco:** M1 · **Dono:** AG01 · **Status:** feita
