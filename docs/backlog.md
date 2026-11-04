@@ -85,7 +85,7 @@
 | T-170 | Tela de logo do estúdio (preta, ~1 s) antes da splash de carregamento | M1 | AG02 | feita |
 | T-171 | Logo horizontal do estúdio na base da tela de título; remover o crédito "Criado por Marçal Santarem" | M1 | AG02 | feita |
 | T-172 | Canvas até a borda inferior no Safari do iPhone, sem faixa e sem somar a safe area duas vezes; diagnóstico no log | M1 | AG02 | feita (falta confirmar no iPhone) |
-| T-173 | Meteoro: reavaliar o alvo perto do impacto (2 dos 6 lançamentos contra a horda acertaram 0 inimigos, 1 acertou 1) | M1 | AG01 | pronta p/ briefing |
+| T-173 | Meteoro: reavaliar o alvo perto do impacto (2 dos 6 lançamentos contra a horda acertaram 0 inimigos, 1 acertou 1) | M1 | AG01 | feita |
 | T-148 | Sinais da Arena para VFX (projectile_fired, projectile_hit, enemy_died, particles_gained, skill_cast, boss_telegraph_started, boss_phase_changed) | M1 | AG01 | feita |
 
 ## Próximas prontas p/ briefing
@@ -498,7 +498,7 @@
 - **Pronto quando:** no iPhone o canvas cobre a tela até a borda inferior (sem faixa de cor atrás), a safe area inferior não é somada duas vezes (a bandeja deixa pouco espaço sob os Módulos) e o cabeçalho do log traz as medidas de viewport para confirmar.
 
 ### T-173 — Meteoro acerta mais
-- **Marco:** M1 · **Dono:** AG01 · **Status:** pronta p/ briefing
+- **Marco:** M1 · **Dono:** AG01 · **Status:** feita
 - **Evidência (log do iPhone, partida de 3:59):** dos 6 meteoros contra a horda, **2 acertaram 0 inimigos** (1:08 e 3:22, alvo perto do Anima, onde os inimigos já morreram antes do impacto) e 1 acertou 1; os outros acertaram 3, 9 e 9.
 - **Pronto quando:** o ponto de impacto é **reavaliado no fim do aviso** (antes da queda) escolhendo o maior grupo no raio; se não houver nenhum inimigo no raio no momento do impacto, o meteoro **não gasta o cooldown** (ou reembolsa a maior parte) ou re-mira para o inimigo mais próximo; teste e bot de simulação confirmando mais acertos por lançamento.
 

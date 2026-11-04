@@ -4,6 +4,8 @@ extends Node2D
 
 ## Efeito da skill aplicado no chão (posição de tela, âncora no chão; raio em px no chão).
 signal cast(at: Vector2, radius: float)
+## A skill foi acionada mas anulada antes do efeito (nada no alvo): o controlador devolve o cooldown.
+signal fizzled(at: Vector2)
 
 var data: SkillData
 var context: SkillContext

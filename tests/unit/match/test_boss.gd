@@ -43,7 +43,7 @@ func _steps(seconds: float) -> void:
 
 func test_data_is_simple_ogre() -> void:
 	assert_true(WARDEN is BossData)
-	assert_eq([WARDEN.attack_interval, WARDEN.attack_windup], [1.5, 0.5])
+	assert_eq([WARDEN.attack_interval, WARDEN.attack_windup], [1.8, 0.5])
 	assert_eq(WARDEN.defense_max, 0, "defesa arquivada (decisão 42)")
 	assert_false(WARDEN.show_health_bar, "só a barra Boss do HUD")
 	assert_gt(WARDEN.attack_range, WARDEN.radius + _arena.anima.data.hurtbox_radius, "bate sem encostar na hurtbox")

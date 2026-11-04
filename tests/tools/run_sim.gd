@@ -58,6 +58,7 @@ func _play(seed: int, max_time: float, passive := false) -> Dictionary:
 		"wave": arena.waves.current_wave(), "core": bot.boss_core_pct * 100.0, "boss_at": bot.boss_at, "time": arena.elapsed,
 		"particles": bot.particles_earned, "upgrades": bot.upgrades_bought,
 		"dmg": bot.damage_by_source,
+		"casts": bot.horde_casts, "zero": bot.horde_zero_hits, "fizz": bot.fizzles,
 		"core_end": 100.0 * arena.anima.core.current / maxf(arena.anima.core.max_hp, 1.0),
 	}
 	print("%d,%s,%s,%d,%.0f,%.0f,%.0f,%d,%d" % [seed, r.boss, r.won, r.wave, r.core, r.boss_at, r.time, r.particles, r.upgrades])
@@ -84,10 +85,16 @@ func _summary(rows: Array[Dictionary]) -> void:
 	var fight_sum := 0.0 ## s de luta contra o chefe (todos que chegaram)
 	var won_fight_sum := 0.0
 	var won_core_sum := 0.0 ## Energia restante (%) de quem vence
+	var casts := 0
+	var zero := 0
+	var fizz := 0
 	for r in rows:
 		for k in r.dmg:
 			dmg[k] = dmg.get(k, 0) + r.dmg[k]
 		time_sum += r.time
+		casts += r.casts
+		zero += r.zero
+		fizz += r.fizz
 		part_sum += r.particles
 		if r.boss:
 			boss += 1
@@ -106,6 +113,8 @@ func _summary(rows: Array[Dictionary]) -> void:
 	print("chefe entra em media aos %.0f s" % (boss_at_sum / maxi(boss, 1)))
 	print("luta com o chefe: %.0f s (vitorias: %.0f s)  Energia restante de quem vence: %.0f%%" % [
 		fight_sum / maxi(boss, 1), won_fight_sum / maxi(won, 1), won_core_sum / maxi(won, 1)])
+	print("meteoros contra a horda: %d lancados, %d com 0 acertos (%.1f%%), %d anulados" % [
+		casts, zero, 100.0 * zero / maxi(casts, 1), fizz])
 	print("tempo medio: %.0f s  Particulas medias: %.0f" % [time_sum / n, float(part_sum) / n])
 	print("cai antes do chefe (onda: seeds): %s" % [falls])
 	for k in dmg:

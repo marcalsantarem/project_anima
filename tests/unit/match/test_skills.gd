@@ -189,3 +189,66 @@ func test_input_action_triggers_slot() -> void:
 	Input.parse_input_event(ev)
 	await wait_physics_frames(2)
 	assert_signal_emitted_with_parameters(arena, "skill_used", [1])
+
+
+# --- T-173: reavaliação do alvo no início da queda e meteoro anulado ---
+
+func test_meteor_retargets_at_fall_start() -> void:
+	var arena := _arena()
+	await wait_physics_frames(1)
+	var e := arena.spawn(TANK, WaveEntry.SpawnEdge.TOP)
+	e.position = arena.anima.position + Vector2(0, -300)
+	e.target_position = e.position
+	assert_true(arena.use_skill(1))
+	var moved := arena.anima.position + Vector2(200, 250) # longe do 1º alvo, ainda ao alcance
+	e.position = moved
+	e.target_position = moved
+	await wait_seconds(METEOR.telegraph_time + 0.1)
+	assert_eq(e.hp, TANK.hp - METEOR.damage, "o meteoro segue o inimigo até o fim do aviso")
+	assert_signal_emitted_with_parameters(arena, "skill_cast", [1, moved, METEOR.radius])
+	assert_signal_not_emitted(arena, "skill_fizzled")
+
+
+func test_meteor_fizzles_without_enemy_and_refunds_cooldown() -> void:
+	var arena := _arena()
+	await wait_physics_frames(1)
+	var e := arena.spawn(TANK, WaveEntry.SpawnEdge.TOP)
+	e.position = arena.anima.position + Vector2(0, -300)
+	e.target_position = e.position
+	assert_true(arena.use_skill(1))
+	var far := arena.anima.position + Vector2(0, -2000) # fora do alcance e do raio
+	e.position = far
+	e.target_position = far
+	await wait_seconds(METEOR.telegraph_time + 0.1)
+	assert_eq(e.hp, TANK.hp, "sem dano")
+	assert_signal_not_emitted(arena, "skill_cast")
+	assert_signal_emit_count(arena, "skill_fizzled", 1)
+	var slot := arena.skills.get_slot(1)
+	assert_lte(slot.remaining, METEOR.cooldown * METEOR.fizzle_cooldown_ratio, "cooldown devolvido")
+	assert_gt(slot.remaining, 0.0)
+	var b := arena.skills.get_behavior(1) as MeteorSkill
+	assert_false(b.visible, "sem telegraph nem cratera")
+
+
+func test_meteor_never_fizzles_with_boss_alive() -> void:
+	var arena := _arena()
+	await wait_physics_frames(1)
+	var boss := arena.spawn(load("res://data/enemies/boss_warden.tres"), WaveEntry.SpawnEdge.TOP)
+	boss.set_physics_process(false)
+	boss.position = arena.anima.position + Vector2(0, -300)
+	assert_true(arena.use_skill(1))
+	boss.position = arena.anima.position + Vector2(0, -2000)
+	await wait_seconds(METEOR.telegraph_time + 0.1)
+	assert_signal_not_emitted(arena, "skill_fizzled")
+	assert_signal_emit_count(arena, "skill_cast", 1)
+
+
+func test_slot_refund_caps_remaining() -> void:
+	var s := SkillSlot.new(METEOR)
+	s.start_cooldown()
+	s.refund(0.2)
+	assert_almost_eq(s.remaining, METEOR.cooldown * 0.2, 0.001)
+	s.refund(0.5)
+	assert_almost_eq(s.remaining, METEOR.cooldown * 0.2, 0.001, "nunca aumenta")
+	s.refund(0.0)
+	assert_true(s.is_ready())

@@ -3,7 +3,9 @@ extends AreaSkill
 ## Meteoro de fogo (decisão 37): telegraph no chão que enche em `telegraph_time`; nos últimos
 ## `fall_time` o meteoro cai do alto; no impacto, dano em área no chão (`radius`, `damage`).
 ## Alvo: o inimigo mais denso ao alcance (senão o mais próximo), adiantado pela distância que ele
-## anda até o impacto. Tudo é criado no _ready; a animação só move/redesenha nós existentes.
+## anda até o impacto. No início da queda (fim do aviso) o alvo é reavaliado com a mesma regra; se
+## não há inimigo no raio nesse ponto, o meteoro é anulado (sinal `fizzled`, sem dano nem cratera) e
+## o controlador devolve o cooldown. Com o chefe vivo nunca é anulado. Tudo é criado no _ready; a animação só move/redesenha nós existentes.
 
 const TELEGRAPH_FILL := Color(1.0, 0.45, 0.15, 0.22)
 const TELEGRAPH_EDGE := Color(1.0, 0.55, 0.2, 0.85)
@@ -20,6 +22,7 @@ const CRATER_FIT := 1.07
 var _meteor: Node2D
 var _meteor_sprite: Sprite2D
 var _crater_sprite: Sprite2D
+var _retargeted := false
 
 
 func _ready() -> void:
@@ -82,8 +85,53 @@ func fall_progress() -> float:
 func activate() -> void:
 	if _crater_sprite:
 		_crater_sprite.visible = false
+	_retargeted = false
 	super()
-	_on_windup_tick()
+	if _windup_left > 0.0 and _windup_left <= data.fall_time:
+		_retarget()
+	if _windup_left > 0.0:
+		_on_windup_tick()
+
+
+## Reavalia o alvo no início da queda (impacto em `_windup_left`). Devolve false se anulou.
+func _retarget() -> bool:
+	_retargeted = true
+	var e := densest_enemy(context.anima.position, context.enemies, data.target_range, data.radius)
+	if e != null:
+		_target = lead_point(e, _windup_left)
+		position = _target
+	if boss_alive(context.enemies) or count_in_radius(_target, context.enemies, data.radius) > 0:
+		return true
+	_fizzle()
+	return false
+
+
+func _fizzle() -> void:
+	_windup_left = 0.0
+	_fx_left = 0.0
+	_meteor.visible = false
+	visible = false
+	set_physics_process(false)
+	fizzled.emit(_target)
+
+
+## Inimigos vivos que tocam o círculo (mesma regra do dano), sem aplicar dano.
+static func count_in_radius(center: Vector2, enemies: Array[Enemy], radius: float) -> int:
+	var n := 0
+	for e in enemies:
+		if not is_instance_valid(e) or e.state == Enemy.State.DEAD:
+			continue
+		var reach := radius + e.data.radius
+		if GroundPlane.distance_squared(center, e.position) <= reach * reach:
+			n += 1
+	return n
+
+
+static func boss_alive(enemies: Array[Enemy]) -> bool:
+	for e in enemies:
+		if is_instance_valid(e) and e is Boss and e.state != Enemy.State.DEAD:
+			return true
+	return false
 
 
 func _on_windup_tick() -> void:
@@ -103,6 +151,12 @@ func _impact() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if not _retargeted and _windup_left > 0.0 and _windup_left - delta <= data.fall_time:
+		_windup_left -= delta # o alvo é escolhido com o tempo real até o impacto
+		var ok := _retarget()
+		_windup_left += delta
+		if not ok:
+			return
 	super(delta)
 	if _windup_left <= 0.0 and visible:
 		queue_redraw() # anel de impacto se apaga

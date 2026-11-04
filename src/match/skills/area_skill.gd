@@ -11,6 +11,8 @@ const RING_WIDTH := 4.0
 var _target := Vector2.ZERO
 var _windup_left := 0.0
 var _fx_left := 0.0
+## Inimigos atingidos no último impacto (medição: bot de balanceamento e testes).
+var last_hits := 0
 
 
 func _ready() -> void:
@@ -73,7 +75,7 @@ func _on_finished() -> void:
 
 
 func _impact() -> void:
-	apply_damage(_target, context.enemies, data.radius, data.damage)
+	last_hits = apply_damage(_target, context.enemies, data.radius, data.damage)
 	_fx_left = _fx_time()
 	cast.emit(_target, data.radius)
 	queue_redraw()

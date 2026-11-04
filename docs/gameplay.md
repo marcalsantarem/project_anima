@@ -71,7 +71,7 @@ Arquivos de dados: `data/anima/anima_default.tres` (`AnimaData`) e `data/project
 3 slots no M1. O 4º slot (`skill_4` / `Espaço`) fica para **depois do M1**.
 
 Cada skill é um `SkillData` (`data/skills/skill_<id>.tres`):
-`id, type (AREA|CONTROL|DEFENSE), delivery (INSTANT|METEOR), cooldown, radius, damage, duration, windup, target_range, effect_params, fx_id, sfx_id, icon` + grupo Meteoro (`telegraph_time, fall_time, fall_height, crater_time, meteor_texture/anchor, crater_texture/anchor`).
+`id, type (AREA|CONTROL|DEFENSE), delivery (INSTANT|METEOR), cooldown, radius, damage, duration, windup, target_range, effect_params, fx_id, sfx_id, icon` + grupo Meteoro (`telegraph_time, fall_time, fall_height, crater_time, fizzle_cooldown_ratio, meteor_texture/anchor, crater_texture/anchor`).
 O comportamento fica em um script por `type` (`SkillBehavior` → `AreaSkill`, ...), que só lê o Resource. Skill nova = dados novos; tipo novo = script novo + uma linha em `SkillController.behavior_for`.
 
 **Implementação (T-108):** `SkillController` (nó `Skills` da arena) guarda os slots (1-based), o cooldown (`SkillSlot`, lógica pura) e escuta `skill_1..3` em `_unhandled_input`. A UI aciona por `Arena.use_skill(slot) -> bool`. As skills do slot vêm do export `skills` da cena até o `MatchConfig` trazê-las (AG04).
@@ -91,7 +91,7 @@ O comportamento fica em um script por `type` (`SkillBehavior` → `AreaSkill`, .
 ### Meteoro de fogo (T-139, decisão 37)
 
 - `MeteorSkill` (estende `AreaSkill`), escolhido por `delivery = METEOR`. A `skill_pulse` saiu da partida; o `.tres` fica só para os testes do `AreaSkill` instantâneo.
-- **Alvo:** o inimigo ao alcance (`target_range`) com mais vizinhos no `radius` (no chão); empate, inclusive todos sozinhos, = o mais próximo do Anima. O ponto é **adiantado**: posição prevista desse inimigo após `telegraph_time` (só se ele está avançando; atirador parado = posição atual). O ponto fica fixo depois do acionamento.
+- **Alvo:** o inimigo ao alcance (`target_range`) com mais vizinhos no `radius` (no chão); empate, inclusive todos sozinhos, = o mais próximo do Anima. O ponto é **adiantado**: posição prevista desse inimigo após `telegraph_time` (só se ele está avançando; atirador parado = posição atual). **T-173:** no início da queda (fim do aviso, `fall_time` antes do impacto) o alvo é **reavaliado** com a mesma regra, adiantado pelo tempo que falta; o telegraph pula para o novo ponto. Se nesse ponto **não há inimigo no raio** (mesma regra do dano: `radius` + raio do inimigo), o meteoro é **anulado**: sem queda, dano, cratera nem `skill_cast`; o cooldown restante cai para `fizzle_cooldown_ratio` (0,2) do total e sai `skill_fizzled(slot, at)`. **Com o chefe vivo nunca é anulado** (sempre cai, lança e atordoa).
 - **Tempo:** telegraph no chão (elipse que enche) por `telegraph_time` = 0,6 s; o meteoro cai nos últimos `fall_time` = 0,35 s (de `fall_height` = 360 px acima, acelerando); no impacto, dano em área no chão e `skill_cast`; a cratera fica `crater_time` = 0,5 s. Nada é alocado na animação (nós criados no `_ready`).
 - **Arte:** `assets/sprites/skill_meteor.png` (âncora 64,164) e `skill_meteor_crater.png` (âncora 128,96, escalada para largura 1x = 2 × raio × 1,07); sem textura, desenho provisório por código. `icon` = `assets/ui/ui_icon_skill_meteor.png` (o HUD ainda não lê esse campo: AG02).
 - **Balanceamento:** 40 de dano mata enxame (8), corredor (20) e atirador (35); tanque (120) leva 1/3. Raio 160 cobre um grupo de enxame (espalhamento 48). Com 1 uso a cada 10 s, limpa grupos sem resolver as ondas 5+ (12–14 corredores vindos de bordas diferentes). Upgrades futuros: `radius`, `damage`, `cooldown` são campos separados; `upgrade_cooldown` já vale.
@@ -123,14 +123,14 @@ Arquivo de dados: `data/enemies/enemy_<id>.tres` (`EnemyData`). Campos: `id, hp,
 
 | Parâmetro | Valor |
 |---|---|
-| HP | 1200 (`hp`); defesa `defense_max = 0` (arquivada, ver abaixo) |
-| Movimento | 160 px/s até `attack_range` 100 px (no chão) do centro do Núcleo: encosta sem tocar a hurtbox (40 + raio 48) |
-| Golpe | a cada `attack_interval` 1,5 s; `attack_windup` 0,5 s de aviso (sprite `boss_ogre_attack.png`, cresce até +12% e puxa para vermelho) e `attack_damage` 30 no Núcleo (passa pela defesa do upgrade) |
+| HP | 1100 (`hp`; T-173: era 1200); defesa `defense_max = 0` (arquivada, ver abaixo) |
+| Movimento | 140 px/s (T-173: era 160) até `attack_range` 100 px (no chão) do centro do Núcleo: encosta sem tocar a hurtbox (40 + raio 48) |
+| Golpe | a cada `attack_interval` 1,8 s (T-173: era 1,5); `attack_windup` 0,5 s de aviso (sprite `boss_ogre_attack.png`, cresce até +12% e puxa para vermelho) e `attack_damage` 20 (T-173: era 30) no Núcleo (passa pela defesa do upgrade) |
 | Meteoro | **sempre** causa o dano (40) na vida **e** lança o chefe (`Boss.take_skill_damage`; vale qualquer meteoro cujo raio o toque). Se o meteoro o mata, não há lançamento |
 | Lançamento | `launch_distance` 600 px no chão para longe do Núcleo, preso na área visível acima da bandeja (`Arena.boss_launch_bounds`: arena menos o raio nas laterais e na base e a altura do sprite no topo); voo `launch_time` 0,6 s (tween de física, ease-out) |
 | Atordoado | `stun_time` 2 s (sprite `boss_ogre_stunned.png`), não bate; no fim anda de volta |
 | Imunidade | `relaunch_immunity` 1 s depois de acordar: o meteoro fere, mas não relança. Em voo ou atordoado também não relança. Evita prender o chefe longe com dois meteoros seguidos (o cooldown do meteoro com upgrade fica perto do ciclo voo + atordoamento + volta) |
-| Passos (T-167) | `WalkAnimator` (`src/match/enemies/walk_animator.gd`), só visual: `walk_bob` 7 px, inclinação ±`walk_tilt_deg` 5°, squash `walk_squash` 6% no apoio do pé e sombra encolhendo até 12% no alto do passo; ritmo = distância andada / `walk_step_length` 70 px (a 160 px/s ≈ 2,3 passos/s). Parado, atacando, em voo ou atordoado: pose neutra. `walk_frames` (opcional, um quadro por quarto de ciclo) alterna os quadros `boss_ogre_walk_1..4` (AG08; mesma âncora do `boss_ogre`). `walk_full = true` liga a pose completa; com `false` (inimigos comuns) só o balanço. **Inimigos comuns: desligado** (`walk_bob = 0`): medido com 150 inimigos andando, só o balanço de 3 px custa +0,7 ms/quadro de física no PC (0,6 → 1,3 ms; a pose completa, +1,6 ms) |
+| Passos (T-167) | `WalkAnimator` (`src/match/enemies/walk_animator.gd`), só visual: `walk_bob` 7 px, inclinação ±`walk_tilt_deg` 5°, squash `walk_squash` 6% no apoio do pé e sombra encolhendo até 12% no alto do passo; ritmo = distância andada / `walk_step_length` 70 px (a 140 px/s = 2 passos/s). Parado, atacando, em voo ou atordoado: pose neutra. `walk_frames` (opcional, um quadro por quarto de ciclo) alterna os quadros `boss_ogre_walk_1..4` (AG08; mesma âncora do `boss_ogre`). `walk_full = true` liga a pose completa; com `false` (inimigos comuns) só o balanço. **Inimigos comuns: desligado** (`walk_bob = 0`): medido com 150 inimigos andando, só o balanço de 3 px custa +0,7 ms/quadro de física no PC (0,6 → 1,3 ms; a pose completa, +1,6 ms) |
 | Partículas | 50 ao morrer; vitória imediata |
 
 - **Modos:** `ADVANCE → ATTACK (espera → wind-up → golpe) → LAUNCHED → STUNNED → ADVANCE`. Durante `LAUNCHED`/`STUNNED`, `Enemy.state = ATTACK` (parado para a mira e o meteoro).
@@ -228,6 +228,20 @@ godot --headless --path . --fixed-fps 60 -s tests/tools/run_sim.gd -- --seeds=20
 
 As linhas intermediárias usaram 50 seeds. Sem a defesa, o meteoro (cooldown 8–10 s) lança o chefe a cada uso e ele passa ~7 s fora (voo, 2 s atordoado e a volta), por isso a **velocidade** decide quanto ele bate. As metas "vitória ~60%" e "Energia de quem vence ≥ 25%" puxam em sentidos opostos (o dano do chefe é quase o mesmo em toda seed; quem vence é quem chega com mais Energia): 94% de vitória dá 27% de Energia, 54% dá 19%. Ficou no meio (73% / 22%), com a luta no limite de baixo da faixa de 25–45 s. Referência do log real no iPhone: o jogador tinha ~38 de DPS no chefe; com 1200 de vida, ~32 s de luta.
 
+**T-173 (chefe mais fácil; meteoro reavalia o alvo), seeds 1–100** (meta: vitória ≥ 85%, Energia de quem vence ≥ 35%, luta 25–45 s; log real no iPhone: o jogador terminou com 2% onde o bot dava 22%, por isso a mira ficou acima da meta). Defesa continua arquivada. `run_sim.gd` agora imprime os meteoros contra a horda (lançados, com 0 acertos e anulados).
+
+| Chefe | Chega | Vence | Luta (vitórias) | Energia restante de quem vence |
+|---|---|---|---|---|
+| Antes (T-166): HP 1200, 160 px/s, golpe 30 / 1,5 s | 100% | 73% | 27 s (28 s) | 22% |
+| Só o meteoro novo, chefe igual | 100% | 76% | 27 s (28 s) | 25% |
+| HP 1200, 140 px/s, golpe 22 / 1,8 s | 100% | 100% | 29 s | 35% |
+| HP 1000, 140 px/s, golpe 22 / 1,8 s | 100% | 100% | 24 s | 43% |
+| HP 1100, 140 px/s, golpe 22 / 1,8 s | 100% | 100% | 27 s | 38% |
+| HP 1200, 140 px/s, golpe 20 / 1,8 s | 100% | 100% | 29 s | 38% |
+| **Escolhido: HP 1100, 140 px/s, golpe 20 / 1,8 s** | **100%** | **100%** | **27 s** | **40%** (seeds 1001–1100: 100% / 27 s / 41%) |
+
+Meteoros contra a horda com **0 acertos** (bot, seeds 1–100): **13,6% → 7,9%** (267 → 154 de ~1950), e 25 anulados (1,3%) com o cooldown devolvido. Os 0 acertos que sobram são inimigos sozinhos (corredor/enxame com 5–8 de vida) que o ataque automático mata durante a queda (0,35 s); a reavaliação não prevê isso.
+
 Limite: o bot reage na hora (compra e usa a skill no mesmo quadro); um jogador real tende a ser um pouco pior. Confirmar no playtest no iPhone.
 
 ## Contrato de partida
@@ -267,6 +281,7 @@ Também na `Arena`, só em eventos (nenhum por quadro; as ligações são feitas
 | `enemy_died(at: Vector2, archetype_id: StringName, cause: int)` | toda morte; `cause` = `Enemy.DeathCause` (KILLED 0, CONTACT 1) |
 | `particles_gained(at: Vector2, amount: int)` | abate com `particle_drop > 0` (depois de `particles_changed`) |
 | `skill_cast(slot: int, at: Vector2, radius: float)` | impacto da skill de área (meteoro), não no acionamento |
+| `skill_fizzled(slot: int, at: Vector2)` | T-173: meteoro anulado no início da queda (nenhum inimigo no raio, sem chefe vivo); sem `skill_cast` nem cratera; `at` = ponto onde cairia; o cooldown já veio reduzido em `cooldown_changed`. Para um aviso discreto na UI (AG02) |
 | `boss_telegraph_started(pattern_id: StringName, duration: float, at: Vector2, radius: float)` | início do wind-up do golpe: `pattern_id` = `attack_id` (`&"boss_slam"`), `duration` = `attack_windup`, `at` = posição do chefe, `radius` = `telegraph_radius` |
 | `boss_launched(from: Vector2, to: Vector2)` | chefe lançado (meteoro; ou defesa arquivada esgotada); `to` = fim do voo |
 

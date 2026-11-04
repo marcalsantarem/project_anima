@@ -23,6 +23,7 @@ signal projectile_hit(at: Vector2, target_kind: StringName) ## &"enemy" | &"boss
 signal enemy_died(at: Vector2, archetype_id: StringName, cause: int) ## cause = Enemy.DeathCause
 signal particles_gained(at: Vector2, amount: int)
 signal skill_cast(slot: int, at: Vector2, radius: float)
+signal skill_fizzled(slot: int, at: Vector2) ## meteoro anulado (sem inimigo no raio); cooldown devolvido
 signal boss_telegraph_started(pattern_id: StringName, duration: float, at: Vector2, radius: float)
 ## Defesa do chefe (escudo na frente da vida; ARQUIVADA, decisão 42). Só é emitido por chefes com
 ## defense_max > 0 (o boss_warden não emite). Início e a cada mudança.
@@ -106,6 +107,7 @@ func _ready() -> void:
 	skills.cooldown_changed.connect(func(slot: int, r: float, t: float) -> void: cooldown_changed.emit(slot, r, t))
 	skills.skill_ready.connect(func(slot: int) -> void: skill_ready.emit(slot))
 	skills.skill_cast.connect(skill_cast.emit)
+	skills.skill_fizzled.connect(skill_fizzled.emit)
 	get_viewport().size_changed.connect(_layout)
 	_layout()
 

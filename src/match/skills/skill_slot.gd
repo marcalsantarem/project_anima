@@ -22,6 +22,11 @@ func start_cooldown(scale: float = 1.0) -> void:
 	remaining = total
 
 
+## Devolve parte do cooldown em curso: o restante cai para no máximo `ratio` × total.
+func refund(ratio: float) -> void:
+	remaining = minf(remaining, total * clampf(ratio, 0.0, 1.0))
+
+
 ## Avança o tempo. Devolve true no passo em que o cooldown termina.
 func tick(delta: float) -> bool:
 	if remaining <= 0.0:
