@@ -70,7 +70,7 @@
 | T-155 | "Voltar ao título" a partir da tela de Resultado | M1 | AG02 + AG07 | feita |
 | T-156 | Chão: quebrar a repetição das pedrinhas do tile | M1 | AG08 + AG01 | depende do teste no iPhone |
 | T-157 | Ajustar o escurecimento do topo (degradê do chão + do HUD) | M1 | AG02 + AG01 | depende do teste no iPhone |
-| T-158 | Teste no iPhone: splash, título, partida e chefe (ajustes saem daqui) | M1 | usuário + AG00 | a fazer (o dono fará o teste) |
+| T-158 | Teste no iPhone: splash, título, partida e chefe (ajustes saem daqui) | M1 | usuário + AG00 | feita |
 | T-159 | Remover o ícone provisório do `skill_pulse` e deixar o do meteoro como padrão | M1 | AG02 | pronta p/ briefing |
 | T-160 | Arte do ícone de Partículas: estrela verde, estilo "chip" (e nova cor dos efeitos de coleta) | M1 | AG08 | feita |
 | T-161 | Aplicar o ícone verde de Partículas no HUD, Resultado, botões de upgrade e efeitos (hoje dourado) | M1 | AG02 + AG09 | feita |
@@ -84,7 +84,7 @@
 | T-169 | Bandeja até a borda inferior, menos espaço sob os Módulos, Anima centralizado na área livre | M1 | AG02 + AG01 | feita |
 | T-170 | Tela de logo do estúdio (preta, ~1 s) antes da splash de carregamento | M1 | AG02 | feita |
 | T-171 | Logo horizontal do estúdio na base da tela de título; remover o crédito "Criado por Marçal Santarem" | M1 | AG02 | feita |
-| T-172 | Canvas até a borda inferior no Safari do iPhone, sem faixa e sem somar a safe area duas vezes; diagnóstico no log | M1 | AG02 | feita (falta confirmar no iPhone) |
+| T-172 | Canvas até a borda inferior no Safari do iPhone, sem faixa e sem somar a safe area duas vezes; diagnóstico no log | M1 | AG02 | feita |
 | T-173 | Meteoro: reavaliar o alvo perto do impacto (2 dos 6 lançamentos contra a horda acertaram 0 inimigos, 1 acertou 1) | M1 | AG01 | feita |
 | T-174 | Ícones do app (tela de início do iPhone, favicon, maskable) | M1 | AG08 | feita |
 | T-175 | Manifesto web (modo app, tela cheia, retrato) + meta tags do iOS + cópia no deploy | M1 | AG02 | feita |
