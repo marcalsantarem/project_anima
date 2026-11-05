@@ -43,9 +43,10 @@ Demo básica:
 - Som de ataque básico
 
 ## M3 — v0.2.1 — Hangar
-Tarefas: T-198 a T-202 no [backlog](backlog.md).
+Tarefas: T-198 a T-202 e T-240 no [backlog](backlog.md).
 
 - Reestruturar o menu para comportar todos os botões do hangar.
+- **Localização (decisão 56):** infra de tradução por chaves, aplicada só ao pt-BR (T-240). Inglês e espanhol continuam no M8.
 
 ## M4 — v0.2.2 — Núcleos
 Tarefas: T-203 a T-210 no [backlog](backlog.md).
@@ -86,7 +87,7 @@ Componentes (antigos "Fragmentos", renomeados; decisão 54):
 - Criar o upgrade de Componentes com Moedas, aumentando seus adicionais.
 
 ## M8 — v0.2.6 — Configurações e Localização
-Tarefas: T-236 a T-244 no [backlog](backlog.md).
+Tarefas: T-236 a T-244 (a T-240 foi para o M3) no [backlog](backlog.md).
 
 - Criar tela de configurações com volume, habilitar sons, efeitos ligados/desligados e idioma.
 - Criar a localização de tudo que é escrito no jogo para inglês e espanhol.

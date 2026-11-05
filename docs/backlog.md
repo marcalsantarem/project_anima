@@ -152,7 +152,7 @@
 | T-237 | Configurações no save: volume de música e efeitos, sons ligados, efeitos reduzidos (sai do `debug.cfg`), idioma (tam. P) | M8 | AG05 + AG07 | a fazer |
 | T-238 | Barramentos de áudio Música e Efeitos ligados ao volume (tam. P) | M8 | AG07 | a fazer |
 | T-239 | Tela de configurações (no hangar e na pausa) (tam. M) | M8 | AG02 | a fazer |
-| T-240 | Infra de localização: tradução por chaves em todos os textos (sem texto fixo no código) (tam. G) | M8 | AG07 + AG02 | a fazer |
+| T-240 | Infra de localização: tradução por chaves em todos os textos, só pt-BR por enquanto (os outros idiomas ficam na T-241, M8); toda tela nova do M3 em diante já nasce com chaves (tam. G) | M3 | AG07 + AG02 | a fazer |
 | T-241 | Tradução para inglês e espanhol, com glossário dos nomes oficiais (tam. M) | M8 | AG02 | a fazer |
 | T-242 | Layout com textos longos (espanhol) e fontes com acentos; teste de corte (tam. P) | M8 | AG02 | a fazer |
 | T-243 | Idioma do navegador como padrão (tam. P) | M8 | AG02 | a fazer |
@@ -811,7 +811,7 @@
 ## Depois (M3+)
 
 - **M2 quebrado** (2026-11-05): T-162, T-163, T-180, T-182 e T-184 a T-197.
-- **M3 a M7 quebrados** (2026-11-05, estimativa; o detalhe "pronto quando" é escrito no briefing): M3 T-198 a T-202 · M4 T-203 a T-210 · M5 T-109, T-110, T-211 a T-220 · M6 T-221 a T-225 · M7 T-226 a T-235 · M8 T-236 a T-244 · M9 T-245 a T-251 · M10 T-252 a T-266. Tamanho: P = até 1 sessão de agente, M = 1 a 2, G = 3 ou mais.
+- **M3 a M7 quebrados** (2026-11-05, estimativa; o detalhe "pronto quando" é escrito no briefing): M3 T-198 a T-202 e T-240 · M4 T-203 a T-210 · M5 T-109, T-110, T-211 a T-220 · M6 T-221 a T-225 · M7 T-226 a T-235 · M8 T-236 a T-244 (sem a T-240) · M9 T-245 a T-251 · M10 T-252 a T-266. Tamanho: P = até 1 sessão de agente, M = 1 a 2, G = 3 ou mais.
 - **Roadmap:** marcos e versões em [docs/roadmap.md](roadmap.md) (decisão 53). Tarefas do M3 em diante são quebradas quando o marco começar.
 
 - **Decisão 37 (meteoro de fogo):** T-139 (AG01) implementa o meteoro com raio de explosão e dano em dados, preparados para upgrades; o ícone (T-128, AG08) e o VFX (T-131, AG09) seguem o meteoro de fogo.
