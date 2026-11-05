@@ -91,7 +91,7 @@
 | T-176 | Foco manual: tocar num inimigo para o Anima focá-lo (marcador; volta ao automático) | M1 | AG01 | feita |
 | T-177 | Mira do meteoro: API de alvo manual e prévia do raio; chefe lançado dentro do alcance | M1 | AG01 | feita |
 | T-178 | Arrastar do botão do Módulo para mirar (toque/mouse), segurar 1 + clique no PC | M1 | AG02 | feita |
-| T-179 | Splash e tela de título no estilo holográfico/tecnológico (arte do Gemini como base; texto, barra e brilhos vivos) | M1 | AG02 + AG08 | pronta p/ briefing |
+| T-179 | Splash e tela de título no estilo holográfico/tecnológico (arte do Gemini como base; texto, barra e brilhos vivos) | M1 | AG02 + AG08 | em andamento (BRF-081) |
 | T-180 | **(1ª do M2)** Guia visual "HUD holográfico" para menus + mockups do menu principal e do hangar (Módulos, Fragmentos, Núcleos) | M2 | AG08 | a fazer (início do M2) |
 | T-148 | Sinais da Arena para VFX (projectile_fired, projectile_hit, enemy_died, particles_gained, skill_cast, boss_telegraph_started, boss_phase_changed) | M1 | AG01 | feita |
 
