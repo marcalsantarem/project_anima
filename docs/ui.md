@@ -242,7 +242,7 @@ Boot/Loading (HTML shell) → Toque para começar → Partida ⇄ Pausa → Resu
 | Tela | Conteúdo | Saídas |
 |---|---|---|
 | **Loading** (HTML, em `web/`) | logo/nome em texto, barra de progresso `accent` sobre `bg_void` | automática → Toque para começar |
-| **Toque para começar** | continuação da splash B (§11.1): fundo, núcleo e logotipo iguais; botão grande "Toque para começar" pulsando no lugar da barra | qualquer toque, clique ou tecla → **libera o áudio** → Partida |
+| **Toque para começar** | continuação da splash tecnológica (§11.1): mesma arte e título; botão holográfico "Toque para começar" pulsando no lugar da barra; sai com véu escuro de 0,3 s | qualquer toque, clique ou tecla → **libera o áudio** → Partida |
 | **Partida** | HUD (§4) | ⏸ / `Esc` → Pausa; `match_ended` → Resultado |
 | **Pausa** (overlay) | véu `bg_panel` sobre o jogo, título "Pausado", botões **Continuar** e **Recomeçar** | Continuar / `Esc` → Partida; Recomeçar → nova Partida |
 | **Resultado** | "Vitória" (`gold`) ou "Derrota" (`danger`) em `font_display`, num cartão com moldura; "Onda wave_reached/waves_total", ícone verde + "Partículas: N", inimigos derrotados, tempo (mm:ss); botões **Jogar de novo** (primário, foco inicial) e **Voltar ao título** (secundário, abaixo; T-155) | Jogar de novo → nova Partida (`play_again_requested`); Voltar ao título → Toque para começar (`title_requested`) |
@@ -329,25 +329,26 @@ Cenas independentes em `src/ui/screens/`, com o tema na raiz (via `ScreenKit`). 
   - viewport sem zoom com `viewport-fit=cover`;
   - página `position: fixed`, `overscroll-behavior: none`, `touch-action: none`; fundo da página `#5A4A9A` (`UiTokens.BG_PANEL_ALT`, a bandeja do HUD), para que uma sobra no rodapé não mostre o lilás da splash; o degradê fica só em `#status`;
   - canvas `position: fixed` no canto (tamanho inline do Godot, policy *adaptive* + stretch `expand` = janela inteira). Altura pela regra do §9.1 (T-170, T-172);
-  - **ordem das etapas: logo do estúdio → splash B → título** (T-170, decisão 44). `#brand`: preto puro (`#000`, `100dvh`, safe areas) por cima da splash, logo `assets/branding/anima_games_logo.webp` em base64 (largura `min(60vw, 420px, 60vh)`); fade-in 200 ms, 1 s parado, fade-out 250 ms (≈1,5 s; corte seco com `prefers-reduced-motion`). O engine carrega em paralelo desde o início; se o jogo ficar pronto antes, o título só aparece quando o logo sai (`animaBrand.whenDone`); erro ou falta de WebGL 2 cortam o logo na hora (`animaBrand.stop`). `theme-color` e fundo da página seguem a etapa (§9.1);
+  - **ordem das etapas: logo do estúdio → splash → título** (T-170, decisão 44). `#brand`: preto puro (`#000`, `100dvh`, safe areas) por cima da splash, logo `assets/branding/anima_games_logo.webp` em base64 (largura `min(60vw, 420px, 60vh)`); fade-in 200 ms, 1 s parado, fade-out 250 ms (≈1,5 s; corte seco com `prefers-reduced-motion`). O engine carrega em paralelo desde o início; se o jogo ficar pronto antes, o título só aparece quando o logo sai (`animaBrand.whenDone`); erro ou falta de WebGL 2 cortam o logo na hora (`animaBrand.stop`). `theme-color` e fundo da página seguem a etapa (§9.1);
   - bloqueio de pinça, duplo toque, rolagem e menu de contexto;
-  - **splash B** (BRF-053; arte em `assets/splash/`, `docs/arte.md` §9.3), **toda inline** no HTML, porque o export Web do Godot não copia arquivos extras de `web/`: fundo em gradiente CSS + estrelas em SVG (`slice`), anéis em SVG presos ao núcleo, disco de xadrez, brilho e sombra em CSS, e o `splash_logo_core.webp` em base64 (uma cópia, num `<img>` oculto) fatiado em cristal (flutua; parado com `prefers-reduced-motion`), pedestal e título. Sem WebP, o título vira texto. Peso do `index.html`: ~73 KB com o logo do estúdio (era ~46 KB), sem requisições externas. Para trocar a arte, substitua o base64 pelo novo `.webp` (mesmo tamanho 560×760);
-  - barra em pílula (`#5B4A7A`, contorno `#3A2A55`, preenchimento dourado) com progresso real do `onProgress` e modo indeterminado; texto "Carregando… N%" na fonte do sistema;
-  - erro de carregamento e "sem WebGL 2" usam o mesmo fundo e logotipo, com o aviso num painel no estilo do jogo; ao iniciar o jogo, a splash sai com fade de 250 ms;
-  - `theme-color` `#8E72EC` (topo do gradiente) depois do logo;
+  - **splash tecnológica** (T-179, BRF-081, decisão 48): arte do dono `assets/splash/tech/tech_splash_clean.png` (768×1376, sem texto) → `web/splash/tech_splash_bg.webp` (q90, ~72 KB; `.gdignore`, fora do `.pck`), copiada para o build por `web/copy_pwa.sh` e pedida cedo com `<link rel="preload">`. Quadro `#status-art` ancorado no topo e centralizado, escala `--s = min(100dvh/1376, max(100vw/768, 0,88 × 100dvh/1376))` (1 u = 1 px da arte): cobre a altura e corta as laterais; em telas mais altas a arte ocupa ao menos 88% da altura e o resto é a cor da base `#021423`; laterais e base somem nessa cor em degradê (sem faixas). Enquanto a arte não carrega, fica só a cor (o logo preto cobre esse tempo);
+  - por cima, em HTML/CSS (fonte do sistema): "PROJECT:"/"ANIMA" branco-ciano `#E6FFFF` com brilho (`text-shadow` ciano), topo em 895 u, 74 u e 132 u; **barra holográfica** (x 137 u, y 1194 u, 495×34 u, contorno ciano fino, preenchimento em degradê `#0E7F9C` → `#2FE6F2` → `#D8FFFF` com brilho e reflexo deslizando), progresso real do `onProgress` e modo indeterminado; "Carregando… N%" em `#9FF6FF` (1244 u);
+  - animações CSS baratas: brilho do cristal pulsando (2,4 s), dois anéis tracejados achatados girando (60 s e 90 s), 8 partículas piscando; tudo parado com `prefers-reduced-motion` (a barra indeterminada só desacelera);
+  - erro de carregamento e "sem WebGL 2" usam o mesmo fundo, com o aviso num painel holográfico no lugar da barra; ao iniciar o jogo, a splash sai com fade de 250 ms;
+  - cor da página/`theme-color`: `#000` no logo, `#021423` na splash e no título, a bandeja `#5A4A9A` na partida. `index.html` ~47 KB (sem o logotipo base64 da splash B);
   - `window.animaGetSafeArea()` devolve um JSON com os insets em px CSS.
 - **Teste local:** sirva `build/web/` por HTTP (ex.: `python -m http.server -d build/web 8000`); `file://` não funciona.
 
-### 11.1 Tela "Toque para começar" (BRF-054)
+### 11.1 Tela "Toque para começar" (BRF-054, T-179)
 
-`src/ui/screens/title_screen.gd` repete a splash B para a passagem parecer um único quadro:
-- mesma conta de tamanho do shell: `W = min(86vw, 440px, (altura − 64px) × 0,55)`, convertida para px da resolução base por `ScreenKit.safe_area().css_k`; bloco de 1000 u (palco 830 u + barra + texto) centralizado entre as safe areas;
-- fundo desenhado por código (degradê `#8E72EC` → `#7B5CE0` 55% → `#4E3F8F`, brilhos dourados, anéis rúnicos e disco de xadrez), sem textura extra; logotipo `assets/ui/ui_title_logo_core.png` (cópia do `splash_logo_core.png`) fatiado em cristal, pedestal e título;
-- cristal flutua (−12 u, 2,4 s), sombra e brilho acompanham, com tweens em loop (sem alocação por quadro);
-- no lugar da barra, botão `ButtonPrimary` (arte `ui_button_big_*`) de 440×120 u (mín. 88 px), com pulso de escala (0,8 s); no gesto mostra a arte pressionada;
-- sem fade de entrada (o fade da splash, 250 ms, faz a transição); logo horizontal do estúdio Anima Games (`ui_studio_logo_h.png`, branco, 88% de opacidade) centralizado na base, com ~30% da largura da tela (máx. 240 px) e 32 px acima da safe area inferior, sem receber toque (BRF-068);
-- contrato mantido: qualquer toque, clique ou tecla (inclui a action de aceitar) emite `start_requested` uma vez e libera o áudio.
-- Se a splash mudar no `web/shell.html`, ajuste as constantes do topo do script.
+`src/ui/screens/title_screen.gd` repete a splash tecnológica para a passagem parecer um único quadro:
+- mesma escala do shell (`TitleScreen.art_scale(view)`, igual ao `--s`), com o quadro da arte ancorado no topo; fundo `assets/ui/title_bg_tech.webp` (import **Lossy 0,85**, ~60 KB no `.pck`) e cor da base `#021423` (raiz e página);
+- "PROJECT:"/"ANIMA" em `LabelDisplay` com fonte proporcional à escala (74 u e 132 u), cor `#E6FFFF` e brilho pela sombra ciano sem deslocamento;
+- animações em tweens (sem alocação por quadro): brilho do cristal (`GradientTexture2D` radial) pulsando, anéis tracejados (desenhados uma vez, só giram) e partículas piscando; com efeitos reduzidos (`DebugSettings.reduced_effects()`), anéis e partículas ficam parados;
+- botão **"Toque para começar" holográfico** (StyleBoxFlat: fundo escuro translúcido, contorno ciano 3 px, sombra ciano; pressionado acende) no lugar da barra, 495×110 u (mín. 88 px), pulso de escala (0,8 s); em telas baixas sobe para não encostar no logo do estúdio;
+- logo horizontal do estúdio (branco, 88%) na base, versão em ciano-claro no canto e link "Último log" (quando houver) no topo;
+- contrato mantido: qualquer toque, clique ou tecla emite `start_requested` uma vez e libera o áudio. No mesmo gesto, `TitleScreen.fade_from_dark()` põe um véu `#021423` (CanvasLayer 128 na raiz, ignora toque) que some em 0,3 s sobre a partida: sem corte seco do escuro para o cartoon claro;
+- se a splash mudar no `web/shell.html`, ajuste as constantes do topo do script (px da arte).
 
 ## 12. App na tela de início (T-175)
 
