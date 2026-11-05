@@ -22,8 +22,8 @@
 | T-106 | Tema base e componentes de UI | M1 | AG02 | feita |
 | T-107 | Overlay de debug Web (FPS, logs) | M1 | AG02 | feita (com gravador de logs e botão Logs) |
 | T-108 | Base de skills + skill de área | M1 | AG01 | feita |
-| T-109 | Skill de controle | M5 | AG01 | a fazer |
-| T-110 | Skill de defesa | M5 | AG01 | a fazer |
+| T-109 | Módulo de controle: congelamento | M5 | AG01 | a fazer |
+| T-110 | Módulo de defesa: escudo | M5 | AG01 | a fazer |
 | T-111 | Arquétipos: tanque, atirador, enxame | M1 | AG01 | feita |
 | T-112 | HUD ligado aos sinais | M1 | AG02 | feita |
 | T-113 | Telas: toque para começar, pausa, resultado | M1 | AG02 | feita |
@@ -110,6 +110,44 @@
 | T-195 | Balanceamento da progressão: partidas até os níveis 3, 7 e 12 pela simulação do bot | M2 | AG04 | a fazer |
 | T-196 | Validação do M2 (inclui save persistindo no iPhone, no Safari e no modo app) | M2 | AG03 | a fazer |
 | T-197 | Fechar o M2 como v0.2.0: tag `v0.2.0`, branch `alfa` e deploy em `alfa--projectanimagame.netlify.app` (quando o dono pedir) | M2 | AG00 + AG02 + AG07 | a fazer (no fechamento) |
+| T-198 | Mockup do hangar: navegação entre Jogar, Núcleos, Módulos, Componentes e Configurações (abas ou barra inferior) (tam. M) | M3 | AG08 | a fazer |
+| T-199 | Arte do hangar: fundo, ícones das abas, estados ativo/bloqueado (tam. M) | M3 | AG08 | a fazer |
+| T-200 | Fluxo de cenas do hangar: telas filhas carregadas sob demanda, voltar, estado preservado (tam. P) | M3 | AG07 | a fazer |
+| T-201 | Hangar na UI: o menu vira hangar com abas; telas ainda vazias mostram "em breve" (tam. M) | M3 | AG02 | a fazer |
+| T-202 | Validação e fechamento da v0.2.1 (tag) (tam. P) | M3 | AG03 + AG00 | a fazer |
+| T-203 | Design da árvore de Núcleos: 10 a 12 talentos, efeitos, custos em Moeda, pré-requisitos; dados em `.tres` (tam. M) | M4 | AG04 | a fazer |
+| T-204 | Lógica dos Núcleos: compra, pré-requisitos, soma dos efeitos; save; testes GUT (tam. M) | M4 | AG04 + AG05 | a fazer |
+| T-205 | Partida aplica os Núcleos comprados (via `MatchConfig`) (tam. M) | M4 | AG01 | a fazer |
+| T-206 | Arte dos ícones dos Núcleos e das ligações da árvore (tam. M) | M4 | AG08 | a fazer |
+| T-207 | Tela de Núcleos: árvore, detalhe do talento, compra e saldo (tam. G) | M4 | AG02 | a fazer |
+| T-208 | VFX de compra e desbloqueio de Núcleo (tam. P) | M4 | AG09 | a fazer |
+| T-209 | Balanceamento com Núcleos (simulação do bot) (tam. P) | M4 | AG04 | a fazer |
+| T-210 | Validação e fechamento da v0.2.2 (tag) (tam. P) | M4 | AG03 + AG00 | a fazer |
+| T-211 | Design dos Módulos: congelamento, escudo e choque; níveis, efeito por nível e custos em Moeda (tam. M) | M5 | AG04 | a fazer |
+| T-212 | Módulo de ataque: choque que se espalha entre inimigos (tam. M) | M5 | AG01 | a fazer |
+| T-213 | Evolução dos Módulos com Moeda: lógica, save e testes (tam. M) | M5 | AG04 + AG05 | a fazer |
+| T-214 | Ícones dos 3 Módulos novos (tam. P) | M5 | AG08 | a fazer |
+| T-215 | VFX do congelamento, do escudo e do choque (tam. M) | M5 | AG09 | a fazer |
+| T-216 | Tela de Módulos: lista, detalhe e evolução (tam. M) | M5 | AG02 | a fazer |
+| T-217 | Seleção de Módulos por slot: equipar, salvar e levar ao `MatchConfig` (tam. M) | M5 | AG02 + AG07 | a fazer |
+| T-218 | Mira manual (arrastar) para os Módulos novos que precisarem (tam. P) | M5 | AG01 + AG02 | a fazer |
+| T-219 | Balanceamento dos 4 Módulos e bot que usa todos (tam. M) | M5 | AG04 | a fazer |
+| T-220 | Validação e fechamento da v0.2.3 (tag) (tam. P) | M5 | AG03 + AG00 | a fazer |
+| T-221 | Design das recompensas na partida: quando aparecem, cura × baú, conteúdo do baú (Moeda) (tam. P) | M6 | AG04 | a fazer |
+| T-222 | Lógica: escolha entre ondas, cura aplicada, Moeda do baú somada ao resultado (tam. M) | M6 | AG01 | a fazer |
+| T-223 | Janela de escolha na partida (pausa, 2 cartões, toque e teclado) (tam. M) | M6 | AG02 | a fazer |
+| T-224 | Arte do baú e do cartão de cura + VFX de abrir (tam. M) | M6 | AG08 + AG09 | a fazer |
+| T-225 | Validação e fechamento da v0.2.4 (tag) (tam. P) | M6 | AG03 + AG00 | a fazer |
+| T-226 | Design dos Componentes: ATK, DEF e híbrido; atributos, níveis, custos de upgrade, taxas de drop (tam. M) | M7 | AG04 | a fazer |
+| T-227 | Inventário e equipados: modelo, save e testes (tam. M) | M7 | AG04 + AG05 | a fazer |
+| T-228 | Drop de Componentes no fim da partida e no baú (T-222) (tam. M) | M7 | AG04 + AG01 | a fazer |
+| T-229 | Partida aplica os atributos dos Componentes equipados (tam. P) | M7 | AG01 | a fazer |
+| T-230 | Arte dos 3 Componentes e dos espaços de equipar no Anima (tam. M) | M7 | AG08 | a fazer |
+| T-231 | Tela de Componentes: inventário, equipar no Anima, detalhe (tam. G) | M7 | AG02 | a fazer |
+| T-232 | Upgrade de Componentes com Moeda (lógica e tela) (tam. M) | M7 | AG04 + AG02 | a fazer |
+| T-233 | Resultado e baú mostram os Componentes ganhos (tam. P) | M7 | AG02 | a fazer |
+| T-234 | Balanceamento com Componentes (simulação do bot) (tam. P) | M7 | AG04 | a fazer |
+| T-235 | Validação e fechamento da v0.2.5 (tag) (tam. P) | M7 | AG03 + AG00 | a fazer |
 | T-148 | Sinais da Arena para VFX (projectile_fired, projectile_hit, enemy_died, particles_gained, skill_cast, boss_telegraph_started, boss_phase_changed) | M1 | AG01 | feita |
 
 ## Próximas prontas p/ briefing
@@ -742,6 +780,7 @@
 ## Depois (M3+)
 
 - **M2 quebrado** (2026-11-05): T-162, T-163, T-180, T-182 e T-184 a T-197.
+- **M3 a M7 quebrados** (2026-11-05, estimativa; o detalhe "pronto quando" é escrito no briefing): M3 T-198 a T-202 · M4 T-203 a T-210 · M5 T-109, T-110, T-211 a T-220 · M6 T-221 a T-225 · M7 T-226 a T-235. Tamanho: P = até 1 sessão de agente, M = 1 a 2, G = 3 ou mais.
 - **Roadmap:** marcos e versões em [docs/roadmap.md](roadmap.md) (decisão 53). Tarefas do M3 em diante são quebradas quando o marco começar.
 
 - **Decisão 37 (meteoro de fogo):** T-139 (AG01) implementa o meteoro com raio de explosão e dano em dados, preparados para upgrades; o ícone (T-128, AG08) e o VFX (T-131, AG09) seguem o meteoro de fogo.

@@ -43,15 +43,21 @@ Demo básica:
 - Som de ataque básico
 
 ## M3 — v0.2.1 — Hangar
+Tarefas: T-198 a T-202 no [backlog](backlog.md).
+
 - Reestruturar o menu para comportar todos os botões do hangar.
 
 ## M4 — v0.2.2 — Núcleos
+Tarefas: T-203 a T-210 no [backlog](backlog.md).
+
 - Criar tela de Núcleos.
 - Criar árvore pequena de Núcleos (talentos), com 10 a 12.
 - Aplicar os efeitos dos Núcleos nas partidas.
 - Criar a compra dos talentos com Moedas e salvar localmente.
 
 ## M5 — v0.2.3 — Módulos
+Tarefas: T-109, T-110, T-211 a T-220 no [backlog](backlog.md).
+
 - Criar tela de Módulos.
 - Implementar Módulo de controle (congelamento).
 - Implementar Módulo de defesa (escudo).
@@ -61,9 +67,13 @@ Demo básica:
 - Criar tela de seleção de Módulos (haverá mais de 4; o jogador escolhe qual vai em cada slot).
 
 ## M6 — v0.2.4 — Recompensas
+Tarefas: T-221 a T-225 no [backlog](backlog.md).
+
 - Criar recompensas durante a partida, permitindo escolher entre recuperar vida ou um baú (neste momento, só com Moedas).
 
 ## M7 — v0.2.5 — Componentes
+Tarefas: T-226 a T-235 no [backlog](backlog.md).
+
 Componentes (antigos "Fragmentos", renomeados; decisão 54):
 - Criar Componentes, itens que podem ser equipados.
 - Criar Componentes no save (3 neste momento: 1 de ATK, 1 de DEF e 1 híbrido que pode ser os dois).
