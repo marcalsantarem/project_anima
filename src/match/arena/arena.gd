@@ -219,14 +219,16 @@ func set_focus(enemy: Enemy) -> void:
 
 
 ## Toque/clique na arena (eventos não consumidos pelo HUD): foca o inimigo tocado; tocar no mesmo
-## inimigo ou no chão vazio desfaz o foco.
+## inimigo ou no chão vazio desfaz o foco. O clique emulado a partir do toque
+## (`device == DEVICE_ID_EMULATION`) é ignorado: o toque já foi tratado e, sem isso, o par
+## toque + clique no mesmo inimigo focava e desfazia o foco em seguida (bug no iPhone).
 func _unhandled_input(event: InputEvent) -> void:
 	if is_over:
 		return
 	var at := Vector2.INF
 	if event is InputEventScreenTouch and event.pressed:
 		at = event.position
-	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT 			and event.device != InputEvent.DEVICE_ID_EMULATION:
 		at = event.position
 	if not at.is_finite():
 		return

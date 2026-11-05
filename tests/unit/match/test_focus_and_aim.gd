@@ -83,6 +83,49 @@ func test_tap_same_enemy_or_empty_ground_clears_focus() -> void:
 	assert_false(arena.tap_at(arena.anima.position + Vector2(250, 200)), "sem foco, toque no chão não é usado")
 
 
+
+## Bug do iPhone: o toque chega como ScreenTouch e também como clique emulado; o par não pode
+## desfazer o foco. Mouse real (PC) continua alternando.
+func _touch(at: Vector2) -> InputEventScreenTouch:
+	var ev := InputEventScreenTouch.new()
+	ev.pressed = true
+	ev.position = at
+	return ev
+
+
+func _click(at: Vector2, emulated: bool) -> InputEventMouseButton:
+	var ev := InputEventMouseButton.new()
+	ev.pressed = true
+	ev.button_index = MOUSE_BUTTON_LEFT
+	ev.position = at
+	if emulated:
+		ev.device = InputEvent.DEVICE_ID_EMULATION
+	return ev
+
+
+func test_touch_plus_emulated_click_keeps_focus() -> void:
+	var arena := _arena()
+	await wait_physics_frames(1)
+	var e := _still(arena, TANK, Vector2(0, -200))
+	var screen := arena.get_global_transform_with_canvas() * e.position
+	arena._unhandled_input(_touch(screen))
+	arena._unhandled_input(_click(screen, true))
+	assert_eq(arena.focused_enemy(), e, "clique emulado do mesmo toque é ignorado")
+	arena._unhandled_input(_touch(screen))
+	arena._unhandled_input(_click(screen, true))
+	assert_null(arena.focused_enemy(), "segundo toque no mesmo inimigo desfaz")
+
+
+func test_real_mouse_click_toggles_focus() -> void:
+	var arena := _arena()
+	await wait_physics_frames(1)
+	var e := _still(arena, TANK, Vector2(0, -200))
+	var screen := arena.get_global_transform_with_canvas() * e.position
+	arena._unhandled_input(_click(screen, false))
+	assert_eq(arena.focused_enemy(), e)
+	arena._unhandled_input(_click(screen, false))
+	assert_null(arena.focused_enemy())
+
 func test_tap_picks_enemy_closest_to_finger() -> void:
 	var arena := _arena()
 	await wait_physics_frames(1)
