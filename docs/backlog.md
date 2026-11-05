@@ -30,7 +30,7 @@
 | T-114 | Testes GUT de ondas, dano e cooldowns | M1 | AG03 | feita |
 | T-115 | Chefe da fase 1 | M1 | AG01 | feita |
 | T-116 | Fase 1 completa (~10 ondas + chefe) | M1 | AG01 | feita |
-| T-117 | Game feel | M1 | AG01 + AG09 | a fazer |
+| T-117 | Game feel | M1 | AG01 + AG09 | feita |
 | T-118 | Desempenho no iPhone (150 inimigos / 300 projéteis) | M1 | AG01 | a fazer |
 | T-119 | Otimização do build Web | M1 | AG02 | a fazer |
 | T-120 | Validação do M1 | M1 | AG03 | a fazer |
@@ -44,8 +44,8 @@
 | T-128 | Ícones e arte da UI | M1 | AG08 | feita |
 | T-129 | `docs/vfx.md` + pool de efeitos | M1 | AG09 | feita |
 | T-130 | VFX do ataque, acertos e mortes | M1 | AG09 | feita |
-| T-131 | VFX da skill e do chefe | M1 | AG09 | a fazer |
-| T-132 | Modo de efeitos reduzidos | M1 | AG09 | a fazer |
+| T-131 | VFX da skill e do chefe | M1 | AG09 | feita |
+| T-132 | Modo de efeitos reduzidos | M1 | AG09 | feita |
 | T-133 | Dados e balanceamento dos upgrades da partida | M1 | AG04 | feita |
 | T-134 | Lógica dos upgrades em tempo real (5 atributos) | M1 | AG01 | feita |
 | T-135 | Fileira de 5 botões de upgrade no HUD | M1 | AG02 | feita |

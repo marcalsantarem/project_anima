@@ -23,7 +23,11 @@ enum Icon { CIRCLE, DIAMOND, HEX }
 
 const DIAMETER := float(UiTokens.SKILL_DIAMETER)
 const PRESS_SCALE := 0.92
-const READY_POP := 1.08
+## Pulso de "pronto" (T-117): 1 → READY_POP → 1 em READY_PULSE_TIME, com o anel mais claro.
+const READY_POP := 1.12
+const READY_PULSE_TIME := 0.3
+## "Afundar" curto no uso (T-117), junto com o flash do anel.
+const USE_SINK := 0.88
 const SHAKE_PX := 6.0
 const GLOW_PERIOD := 1.5
 const BADGE_SIZE := 36.0
@@ -60,6 +64,10 @@ var state := State.READY
 var _remaining := 0.0
 var _total := 0.0
 var _flash := 0.0
+## 1 → 0 durante o pulso de "pronto" (brilho extra do anel).
+var ready_glow := 0.0
+## Houve recarga desde o último "pronto" (o cooldown_changed com 0 pode chegar antes do skill_ready).
+var _cooling := false
 var _glow_t := 0.0
 var _shortcut := ""
 var _touch_index := -1
@@ -97,6 +105,7 @@ func set_cooldown(remaining: float, total: float) -> void:
 	_total = maxf(total, 0.001)
 	state = State.COOLDOWN if _remaining > 0.0 else State.READY
 	if state != State.READY:
+		_cooling = true
 		cancel_aim()
 	queue_redraw()
 
@@ -104,11 +113,12 @@ func set_cooldown(remaining: float, total: float) -> void:
 func set_ready() -> void:
 	if state == State.LOCKED:
 		return
-	var was_cooldown := state == State.COOLDOWN
+	var was_cooldown := _cooling or state == State.COOLDOWN
+	_cooling = false
 	state = State.READY
 	_remaining = 0.0
 	if was_cooldown:
-		_pop(READY_POP)
+		_ready_pulse()
 	queue_redraw()
 
 
@@ -117,6 +127,7 @@ func on_used() -> void:
 		return
 	_flash = 1.0
 	_pending = false
+	_pop(USE_SINK)
 	queue_redraw()
 
 
@@ -139,6 +150,7 @@ func set_locked(locked: bool, level := 0) -> void:
 		state = State.LOCKED
 		_remaining = 0.0
 		_flash = 0.0
+		_cooling = false
 		cancel_aim()
 		_pending = false
 		_touch_index = -1
@@ -175,6 +187,9 @@ func _process(delta: float) -> void:
 		dirty = true
 	if _flash > 0.0:
 		_flash = maxf(_flash - delta / UiTokens.ANIM_UI, 0.0)
+		dirty = true
+	if ready_glow > 0.0:
+		ready_glow = maxf(ready_glow - delta / READY_PULSE_TIME, 0.0)
 		dirty = true
 	if dirty:
 		queue_redraw()
@@ -359,6 +374,18 @@ func _pop(peak: float) -> void:
 	_anim.tween_property(self, "scale", Vector2.ONE, UiTokens.ANIM_FAST).set_ease(Tween.EASE_IN)
 
 
+## Pulso ao ficar pronto (T-117): escala 1 → 1,12 → 1 e brilho do anel, ~0,3 s.
+func _ready_pulse() -> void:
+	if _anim:
+		_anim.kill()
+	scale = Vector2.ONE
+	ready_glow = 1.0
+	var half := READY_PULSE_TIME * 0.5
+	_anim = create_tween()
+	_anim.tween_property(self, "scale", Vector2.ONE * READY_POP, half).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_anim.tween_property(self, "scale", Vector2.ONE, half).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+
+
 func _shake() -> void:
 	if _anim:
 		_anim.kill()
@@ -392,6 +419,9 @@ func _draw() -> void:
 		draw_circle(c, r + 8.0, Color(UiTokens.ACCENT, 0.25 * pulse))
 	var frame := UiArt.SKILL_FRAME_LOCKED if disabled else (UiArt.SKILL_FRAME_READY if is_ready else UiArt.SKILL_FRAME_COOLDOWN)
 	draw_texture_rect(frame, Rect2(c - UiArt.SKILL_FRAME_CENTER, UiArt.SKILL_FRAME_SIZE), false)
+	if ready_glow > 0.0:
+		draw_circle(c, r + 10.0, Color(UiTokens.ACCENT, 0.45 * ready_glow))
+		draw_arc(c, r - 2.0, 0.0, TAU, 64, Color(1, 1, 1, 0.8 * ready_glow), 6.0, true)
 	if _flash > 0.0:
 		draw_arc(c, r - 8.0, 0.0, TAU, 64, Color(1, 1, 1, _flash), 8.0, true)
 	if aiming:

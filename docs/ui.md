@@ -157,10 +157,10 @@ Teste: `tests/unit/ui/test_hud_layout.gd` confere as constantes contra o layout 
 | `pressed` | escala 0,92 por 100 ms; volta em 100 ms |
 
 - **Bloqueado (T-136):** não responde a toque nem clique (o evento é consumido, não vaza para a arena) e engole a action `skill_<slot>` no `_input`, antes do `SkillController`. Ignora `skill_used`, `cooldown_changed`, `skill_ready` e `set_disabled`. Cursor "proibido" e `accessibility_name` com o nível. `set_locked(false)` volta a `ready`.
-- **Uso confirmado** (`skill_used`): flash curto `accent` no anel, e o botão entra em `cooldown`.
+- **Uso confirmado** (`skill_used`): flash curto branco no anel + "afundar" (escala 0,88 → 1 em 200 ms, T-117), e o botão entra em `cooldown`.
 - **Toque em recarga:** sem `skill_used`, o botão só treme de leve (100 ms), para mostrar que a skill está indisponível.
 - **Cooldown com no máximo ~10 sinais/s:** o setor radial é interpolado localmente entre um sinal e outro, porque é só visual. O valor de verdade é sempre o último `remaining` recebido. Os segundos são arredondados para cima.
-- Na transição `cooldown → ready` (`skill_ready`): flash `accent` + escala 1,08 → 1,0 em 200 ms.
+- **Pulso de pronto (T-117):** na transição `cooldown → ready` (`skill_ready`, mesmo se o `cooldown_changed` com 0 chegar antes): escala 1 → 1,12 → 1 em 0,3 s + halo `accent` e anel branco que apagam em 0,3 s (`ready_glow`). Sem pulso no início da partida (sem recarga antes).
 - **Badge da tecla:** quadradinho `badge` no canto superior direito com a tecla do Input Map (ou o número do slot), sempre visível (mockup aprovado).
 - **Toque e clique** disparam a mesma Input Action (§7). O botão não chama a skill diretamente.
 - **Arrastar para mirar (T-178, decisão 46; `drag_aim`, ligado no HUD):** com o botão `ready`, o toque só decide ao soltar: sem passar de `AIM_THRESHOLD` (24 px) = **toque simples** (`activated` ao soltar, alvo automático); passou = modo mira: anel extra `accent` (ou `danger` se o ponto é inválido) e ícone a 55%, sinais `aim_started(slot)`, `aim_moved(slot, at)` e `aim_ended(slot, at, cancelled)` com `at` em coordenadas do viewport. Soltar sobre o próprio botão, ou o botão sair de `ready` no meio (recarga, `disabled`, `locked`) = `cancelled`. Em recarga/bloqueado não há mira (recarga: aciona ao apertar e treme, como antes). O release do toque/mouse é tratado mesmo fora do círculo.
@@ -189,6 +189,8 @@ Teste: `tests/unit/ui/test_hud_layout.gd` confere as constantes contra o layout 
 - Teclado: `focus_mode = ALL` (Tab/setas) com anel `accent` por fora; `Enter` compra. **`Espaço` nunca compra** (é `skill_4`): o botão ignora eventos que casam com `skill_*`/`pause`. Clique/toque soltam o foco, para o anel só aparecer pelo teclado.
 - Nomes (`accessibility_name`): Atk power, Atk spd, Defesa, Vida máxima, Cooldown. Arte (T-138): molduras `ui_upgrade_btn_normal/disabled/max` (canvas 132×90 em (−2, −2), sombra até y = 88), ícone `ui_icon_upgrade_*` Ø 40 em (31, 28) (`icon_texture` sobrescreve), pílula `ui_upgrade_cost_pill(_max)` em (9, 52) com o ícone `ui_icon_particles` 20 px (sem Partículas no estado desabilitado: `ui_icon_particles_off`); sem Partículas = ícone do upgrade a 55%. O `ui_icon_particle` dourado é obsoleto (reservado à Moeda do M2).
 - Desenho só quando o estado muda (sem `_process`, StyleBoxes em cache).
+- **Primeira vez comprável (T-117):** pop discreto 1 → 1,06 → 1 (2 × `ANIM_FAST`) e sinal `first_affordable(id)`, uma vez por partida.
+- **Pílula de Partículas (T-117, `Hud.particles_pill`):** pulso 1,06 (200 ms) quando o saldo sobe (gasto não pulsa; não reinicia no meio de um pulso) e 1,12 quando um upgrade fica comprável pela 1ª vez (tem prioridade).
 - **HUD (T-138):** pausa = `ui_icon_pause` (64 px, alvo de toque 88 px); ícone de Partículas (`StarIcon`) usa `ui_icon_particles` (verde, T-161) no HUD e no Resultado. Pílulas do topo e cristal da barra de Energia continuam desenhados (sem arte).
 
 **Sem tooltips (BRF-039):** nenhum controle do HUD ou das telas usa `tooltip_text`; no toque o Godot exibia o tooltip sobre os botões. A descrição fica só em `accessibility_name`.
@@ -282,7 +284,8 @@ iPhone 375×812 CSS, Safari em aba (k = 1,92 px do jogo/CSS)
 
 - **Resultado:** botão secundário **"Logs"** (200×64), abaixo de "Voltar ao título". Abre o `LogViewer`.
 - **Título:** link **"Último log"** (180×64) no canto superior direito, só se houver `user://logs/last_match.json`. O toque nele não começa a partida.
-- **Pausa:** botão **"Debug: ligado/desligado"** (240×64), que liga o overlay.
+- **Pausa:** linha com dois interruptores 228×64: **"Efeitos reduzidos: sim/não"** (T-132, BRF-080) e **"Debug: ligado/desligado"**, que liga o overlay. Os dois ficam em `user://debug.cfg` (`DebugSettings`; seções `[debug] overlay` e `[fx] reduced_effects`).
+- **Efeitos reduzidos:** a pausa emite `reduced_effects_changed(on)`; o `SceneFlow` aplica na criação da partida e na hora (partida em curso) via `apply_reduced_effects(arena, director, on)`: `Arena.reduced_effects` (só se a propriedade existir) e `FxDirector.reduced_effects` (que repassa ao `FxPool`, de onde o `MatchRecorder` lê `reduced_effects` no log).
 - **HUD:** sinal `ui_pressed(button, ok)` para o gravador.
 - Detalhes, formato e como baixar no iPhone: [docs/debug.md](debug.md).
 

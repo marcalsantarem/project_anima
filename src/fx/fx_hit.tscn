@@ -10,3 +10,5 @@ radius = 24.0
 dot_count = 4
 height = 28.0
 default_color = Color(0.1843, 0.902, 0.8235, 1)
+flash_scale = 0.9
+flash_window = 0.35

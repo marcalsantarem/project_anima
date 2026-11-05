@@ -3,6 +3,8 @@ extends Area2D
 ## Inimigo genérico guiado por EnemyData: avança até o centro; com attack_range > 0, para e atira.
 
 signal died(enemy: Enemy, cause: DeathCause)
+## Dano na vida (antes de `died`). by_skill = meteoro/skill de área (números de dano, T-117).
+signal damaged(enemy: Enemy, amount: int, by_skill: bool)
 
 enum State { SPAWN, ADVANCE, ATTACK, DEAD }
 enum DeathCause { KILLED, CONTACT }
@@ -22,6 +24,8 @@ var _body: Sprite2D
 var _shadow: GroundShadow
 ## Passos procedurais; nulo quando data.walk_bob = 0.
 var walk: WalkAnimator
+## true durante take_skill_damage (o dano vem de skill).
+var _skill_hit := false
 
 @onready var _hitbox: CollisionShape2D = $Hitbox
 
@@ -92,6 +96,7 @@ func take_damage(amount: int) -> void:
 	if state == State.DEAD or amount <= 0:
 		return
 	hp -= amount
+	damaged.emit(self, amount, _skill_hit)
 	if health_bar:
 		health_bar.set_ratio(float(hp) / data.hp)
 	if hp <= 0:
@@ -100,7 +105,9 @@ func take_damage(amount: int) -> void:
 
 ## Dano de skill de área (meteoro). Igual ao dano comum; o chefe trata à parte (lançamento).
 func take_skill_damage(amount: int) -> void:
+	_skill_hit = true
 	take_damage(amount)
+	_skill_hit = false
 
 
 func die(cause: DeathCause) -> void:

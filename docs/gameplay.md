@@ -284,6 +284,17 @@ Também na `Arena`, só em eventos (nenhum por quadro; as ligações são feitas
 | `skill_fizzled(slot: int, at: Vector2)` | T-173: meteoro anulado no início da queda (nenhum inimigo no raio, sem chefe vivo); sem `skill_cast` nem cratera; `at` = ponto onde cairia; o cooldown já veio reduzido em `cooldown_changed`. Para um aviso discreto na UI (AG02) |
 | `boss_telegraph_started(pattern_id: StringName, duration: float, at: Vector2, radius: float)` | início do wind-up do golpe: `pattern_id` = `attack_id` (`&"boss_slam"`), `duration` = `attack_windup`, `at` = posição do chefe, `radius` = `telegraph_radius` |
 | `boss_launched(from: Vector2, to: Vector2)` | chefe lançado (meteoro; ou defesa arquivada esgotada); `to` = fim do voo |
+| `enemy_damaged(at: Vector2, amount: int, by_skill: bool)` | T-117: cada dano na vida de inimigo/chefe (antes de `enemy_died`); `by_skill` = meteoro. Dano na defesa arquivada não emite |
+
+`skill_used(slot)` e `skill_ready(slot)` já são repassados pela `Arena` (seção acima).
+
+### Game feel (T-117, BRF-079)
+
+Valores em `data/feel/game_feel.tres` (`GameFeelData`); `Arena.feel` nulo = esse arquivo.
+- **Tremor** (`ScreenShake`): deslocamento do nó raiz da `Arena` (o HUD é um `CanvasLayer` à parte, não treme). Um por vez; o novo só vale se for mais forte que o que resta; decai em k². Meteoro no impacto 14 px/0,25 s, golpe do ogro 9/0,2, morte do chefe 16/0,4, dano no Núcleo ≥ 10% do máximo 5/0,15. RNG próprio (não muda a seed dos spawns).
+- **Hit-stop** (`HitStop`): `Engine.time_scale` = 0 por 60 ms (meteoro), 50 ms (chefe lançado), 80 ms (morte do chefe), em tempo real; nunca empilha (1 ativo, os outros pedidos são ignorados); restaura o `time_scale` anterior, também ao sair da árvore. Efeitos de `_process` do HUD também param nesses ms (aceito: são 30–80 ms; tweens do HUD podem usar `ignore_time_scale`). `Arena.hit_stop_enabled` é falso no headless (testes, bot).
+- **Números de dano** (`DamageNumbers`): um nó, pool fixo de 48, desenhado com `draw_string` (Outfit peso 800). Branco 26 px no tiro, laranja 40 px no meteoro; sobem 56 px e somem em 0,6 s. Mesmo alvo no mesmo quadro de física = um número somado; até 12 números novos por quadro; pool cheio reusa o mais velho.
+- **`Arena.reduced_effects`** (o `SceneFlow` define; pode mudar no meio da partida): tremor a 30%, sem hit-stop (encerra um ativo), números só do meteoro e do chefe.
 
 `boss_phase_changed` **deixou de existir** (uma fase; T-150).
 
@@ -364,3 +375,4 @@ O `project.godot` é do AG07. Layers sugeridas:
 | Barra de vida dos inimigos | protótipo | T-149 |
 | Upgrades da partida | protótipo | T-134 |
 | Foco manual do ataque, mira manual do meteoro (API) | protótipo | T-176, T-177 |
+| Game feel: tremor, hit-stop, números de dano, efeitos reduzidos | protótipo | T-117 |

@@ -58,7 +58,8 @@ func start_match(config: MatchConfig = null) -> void:
 	pause.restart_requested.connect(func() -> void: start_match(config), CONNECT_ONE_SHOT)
 	arena.match_ended.connect(_on_match_ended, CONNECT_ONE_SHOT)
 	_link_bottom_inset(arena, hud)
-	_link_fx(arena, match_root)
+	var director := _link_fx(arena, match_root)
+	_link_reduced_effects(arena, director, pause)
 	_link_debug(arena, hud, pause, match_root)
 	match_root.add_child(arena)
 	_swap(match_root, config.match_scene_path)
@@ -66,8 +67,8 @@ func start_match(config: MatchConfig = null) -> void:
 
 ## Efeitos (docs/vfx.md §1.1): pool como filho direto da Arena (Y-sort com as entidades; decalques
 ## em z −1 acima do piso em z −10) e director no nó da partida, ligado depois do `_ready` da Arena.
-## Instâncias pré-criadas aqui, fora da partida. Sem opção de efeitos reduzidos ainda (T-132).
-func _link_fx(arena: Arena, match_root: Node) -> void:
+## Instâncias pré-criadas aqui, fora da partida. Efeitos reduzidos: ver `_link_reduced_effects`.
+func _link_fx(arena: Arena, match_root: Node) -> FxDirector:
 	var pool := FxPool.new()
 	pool.name = FX_POOL_NODE_NAME
 	pool.setup_default()
@@ -75,9 +76,25 @@ func _link_fx(arena: Arena, match_root: Node) -> void:
 	var director := FxDirector.new()
 	director.name = FX_DIRECTOR_NODE_NAME
 	director.pool = pool
-	director.reduced_effects = false
 	match_root.add_child(director)
 	arena.ready.connect(func() -> void: director.bind(arena), CONNECT_ONE_SHOT)
+	return director
+
+
+## "Efeitos reduzidos" (T-132, BRF-080): valor salvo em DebugSettings aplicado ao criar a partida e
+## de novo quando o interruptor da pausa muda (vale já na partida em curso).
+func _link_reduced_effects(arena: Node, director: FxDirector, pause: PauseScreen) -> void:
+	apply_reduced_effects(arena, director, DebugSettings.reduced_effects())
+	pause.reduced_effects_changed.connect(func(on: bool) -> void: apply_reduced_effects(arena, director, on))
+
+
+## Repassa para a Arena (AG01; só se ela já tiver a propriedade) e para o FxDirector (AG09, que repassa
+## ao FxPool, de onde o MatchRecorder lê `reduced_effects`).
+static func apply_reduced_effects(arena: Node, director: FxDirector, on: bool) -> void:
+	if is_instance_valid(arena) and &"reduced_effects" in arena:
+		arena.set(&"reduced_effects", on)
+	if is_instance_valid(director):
+		director.reduced_effects = on
 
 
 ## Debug (docs/debug.md): gravador sempre ligado e overlay (desligado por padrão), no nó da partida e

@@ -2,12 +2,14 @@ class_name DebugSettings
 extends RefCounted
 ## Estado do overlay de debug (docs/debug.md §4): desligado por padrão, salvo em `user://debug.cfg`.
 ## `?debug=1` na URL liga (e `?debug=0` desliga) e salva. Sem autoload: estado estático.
+## Também guarda a opção "Efeitos reduzidos" (T-132, BRF-080; seção `[fx]`), desligada por padrão.
 
 const DEFAULT_PATH := "user://debug.cfg"
 
 static var path := DEFAULT_PATH
 static var _loaded := false
 static var _overlay := false
+static var _reduced_effects := false
 
 
 static func overlay_enabled() -> bool:
@@ -18,8 +20,24 @@ static func overlay_enabled() -> bool:
 static func set_overlay_enabled(on: bool) -> void:
 	_load()
 	_overlay = on
+	_save()
+
+
+static func reduced_effects() -> bool:
+	_load()
+	return _reduced_effects
+
+
+static func set_reduced_effects(on: bool) -> void:
+	_load()
+	_reduced_effects = on
+	_save()
+
+
+static func _save() -> void:
 	var cfg := ConfigFile.new()
-	cfg.set_value("debug", "overlay", on)
+	cfg.set_value("debug", "overlay", _overlay)
+	cfg.set_value("fx", "reduced_effects", _reduced_effects)
 	cfg.save(path)
 
 
@@ -31,6 +49,7 @@ static func toggle_overlay() -> void:
 static func reset() -> void:
 	_loaded = false
 	_overlay = false
+	_reduced_effects = false
 
 
 static func _load() -> void:
@@ -40,6 +59,7 @@ static func _load() -> void:
 	var cfg := ConfigFile.new()
 	if cfg.load(path) == OK:
 		_overlay = bool(cfg.get_value("debug", "overlay", false))
+		_reduced_effects = bool(cfg.get_value("fx", "reduced_effects", false))
 	var param := url_param()
 	if param == "1" or param == "0":
 		set_overlay_enabled(param == "1")

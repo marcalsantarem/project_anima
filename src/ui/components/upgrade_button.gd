@@ -6,6 +6,8 @@ extends Control
 ## Arte da T-128 (T-138): moldura por estado, ícone do upgrade (UiArt.UPGRADE_ICONS ou `icon_texture`), pílula de custo.
 
 signal buy_requested(id: StringName)
+## Primeira vez na partida em que o botão fica `affordable` (T-117: pulso discreto no HUD).
+signal first_affordable(id: StringName)
 
 enum State { AFFORDABLE, POOR, MAX, DISABLED }
 
@@ -36,6 +38,7 @@ const COST_SIZE := 20
 const MAX_OUTLINE := 6 ## contorno total do "MAX" (assets/ui/README.md)
 const PLUS_RISE := 28.0
 const SHAKE_PX := 5.0
+const AFFORDABLE_POP := 1.06
 const PRESS_SCALE := 0.94
 
 @export var upgrade_id: StringName = &"upgrade_atk_power":
@@ -55,6 +58,7 @@ var next_cost := -1
 var particles := 0
 var state := State.DISABLED
 var _known := false ## recebeu ao menos um set_upgrade
+var _was_affordable := false ## já ficou `affordable` alguma vez (pulso só na primeira)
 var _disabled := false
 var _plus := 0.0 ## 0..1: progresso do "+1" (0 = invisível)
 var _touch_index := -1
@@ -136,6 +140,10 @@ func _refresh_state() -> void:
 	if s != state:
 		state = s
 		mouse_default_cursor_shape = CURSOR_POINTING_HAND if s == State.AFFORDABLE else CURSOR_ARROW
+		if s == State.AFFORDABLE and not _was_affordable:
+			_was_affordable = true
+			_affordable_pop()
+			first_affordable.emit(upgrade_id)
 	_update_accessibility()
 	queue_redraw()
 
@@ -204,6 +212,18 @@ func _press_pop() -> void:
 	scale = Vector2.ONE
 	_anim = create_tween()
 	_anim.tween_property(self, "scale", Vector2.ONE * PRESS_SCALE, UiTokens.ANIM_FAST * 0.5)
+	_anim.tween_property(self, "scale", Vector2.ONE, UiTokens.ANIM_FAST)
+
+
+## Pop discreto na primeira vez que fica comprável (T-117).
+func _affordable_pop() -> void:
+	if not is_inside_tree():
+		return
+	if _anim:
+		_anim.kill()
+	scale = Vector2.ONE
+	_anim = create_tween()
+	_anim.tween_property(self, "scale", Vector2.ONE * AFFORDABLE_POP, UiTokens.ANIM_FAST)
 	_anim.tween_property(self, "scale", Vector2.ONE, UiTokens.ANIM_FAST)
 
 

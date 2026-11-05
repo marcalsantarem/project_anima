@@ -32,6 +32,8 @@ signal boss_defense_changed(current: int, max_defense: int)
 signal boss_launched(from: Vector2, to: Vector2)
 ## Foco manual do ataque (T-176): o inimigo focado, ou null ao voltar ao automático.
 signal focus_changed(enemy: Node)
+## Dano na vida de um inimigo/chefe (T-117), por acerto: âncora no chão (tela), dano, se veio de skill.
+signal enemy_damaged(at: Vector2, amount: int, by_skill: bool)
 
 ## Upgrades da partida, na ordem da fileira do HUD.
 const UPGRADE_IDS: Array[StringName] = [
@@ -59,6 +61,17 @@ const BOSS_SCENE := preload("res://src/match/enemies/boss/boss.tscn")
 @export var focus_pick_radius: float = 44.0
 ## O chefe lançado cai a no máximo esta fração do alcance do ataque do Anima (decisão 47).
 @export var boss_launch_reach_ratio: float = 0.85
+## Tremor, hit-stop e números de dano (T-117). Nulo = GameFeelData.DEFAULT_PATH.
+@export var feel: GameFeelData
+
+## "Efeitos reduzidos" (definido pelo SceneFlow; pode mudar no meio da partida): tremor a
+## feel.shake_reduced_scale, sem hit-stop e números de dano só do meteoro e do chefe.
+var reduced_effects := false: set = set_reduced_effects
+## Hit-stop mexe em Engine.time_scale; desligado no headless (testes, bot) por padrão.
+var hit_stop_enabled := DisplayServer.get_name() != "headless"
+var shake := ScreenShake.new()
+var hit_stop := HitStop.new()
+var damage_numbers := DamageNumbers.new()
 
 var config: MatchConfig
 ## Se nulo no _ready, é carregada de data/waves/<config.stage_id>.tres.
@@ -76,6 +89,8 @@ var active_enemies: Array[Enemy] = []
 var _rng := RandomNumberGenerator.new()
 var _focus_marker := FocusMarker.new()
 var _skill_aim := SkillAim.new()
+var _shake_base := Vector2.ZERO
+var _last_core_hp := -1
 
 @onready var anima: Anima = $Anima
 @onready var projectiles: ProjectilePool = $Projectiles
@@ -91,6 +106,11 @@ func setup(p_config: MatchConfig) -> void:
 
 
 func _ready() -> void:
+	if feel == null:
+		feel = load(GameFeelData.DEFAULT_PATH)
+	set_reduced_effects(reduced_effects)
+	_shake_base = position
+	damage_numbers.setup(feel)
 	if config == null:
 		config = MatchConfig.new()
 	if stage == null:
@@ -109,15 +129,19 @@ func _ready() -> void:
 	enemy_projectiles.projectile_hit.connect(projectile_hit.emit)
 	anima.setup_attack(active_enemies, projectiles)
 	anima.core_hp_changed.connect(func(c: int, m: int) -> void: core_hp_changed.emit(c, m))
+	anima.core_hp_changed.connect(_on_core_hp_feel)
+	_last_core_hp = anima.core.current
 	anima.core_depleted.connect(func() -> void: _end(MatchResult.Outcome.DEFEAT))
 	skills.setup(SkillContext.new(anima, active_enemies))
 	skills.skill_used.connect(func(slot: int) -> void: skill_used.emit(slot))
 	skills.cooldown_changed.connect(func(slot: int, r: float, t: float) -> void: cooldown_changed.emit(slot, r, t))
 	skills.skill_ready.connect(func(slot: int) -> void: skill_ready.emit(slot))
 	skills.skill_cast.connect(skill_cast.emit)
+	skills.skill_cast.connect(_on_skill_impact)
 	skills.skill_fizzled.connect(skill_fizzled.emit)
 	add_child(_focus_marker)
 	add_child(_skill_aim)
+	add_child(damage_numbers)
 	get_viewport().size_changed.connect(_layout)
 	_layout()
 
@@ -258,6 +282,7 @@ func spawn(enemy_data: EnemyData, edge: WaveEntry.SpawnEdge) -> Enemy:
 	enemy.setup(enemy_data, edge_point(edge, screen_rect(), margin, _rng.randf()), anima.position)
 	enemy.projectile_pool = enemy_projectiles
 	enemy.died.connect(_on_enemy_died)
+	enemy.damaged.connect(_on_enemy_damaged)
 	_enemies.add_child(enemy)
 	active_enemies.append(enemy)
 	if enemy is Boss:
@@ -271,6 +296,7 @@ func _bind_boss(boss: Boss) -> void:
 	boss.hp_changed.connect(func(c: int, m: int) -> void: boss_hp_changed.emit(c, m))
 	boss.defense_changed.connect(boss_defense_changed.emit)
 	boss.launched.connect(boss_launched.emit)
+	boss.launched.connect(func(_from: Vector2, _to: Vector2) -> void: start_hit_stop(feel.hit_stop_boss_launch))
 	boss.attack_landed.connect(_on_boss_attack)
 	boss.telegraph_started.connect(func(pattern_id: StringName, duration: float) -> void:
 		boss_telegraph_started.emit(pattern_id, duration, boss.position, boss.boss_data.telegraph_radius))
@@ -289,6 +315,7 @@ func boss_launch_bounds(boss: Boss) -> Rect2:
 
 func _on_boss_attack(damage: int) -> void:
 	if not is_over:
+		shake.add(feel.shake_boss_hit, feel.shake_boss_hit_time)
 		anima.take_core_damage(damage)
 
 
@@ -387,6 +414,8 @@ func _on_enemy_died(enemy: Enemy, cause: Enemy.DeathCause) -> void:
 		if enemy.data.particle_drop > 0:
 			particles_gained.emit(enemy.position, enemy.data.particle_drop)
 		if enemy is Boss:
+			shake.add(feel.shake_boss_death, feel.shake_boss_death_time)
+			start_hit_stop(feel.hit_stop_boss_death)
 			boss_defeated.emit()
 			_end(MatchResult.Outcome.VICTORY)
 
@@ -423,3 +452,52 @@ func _emit_upgrade(id: StringName) -> void:
 
 func _emit_particles() -> void:
 	particles_changed.emit(particles)
+
+
+func set_reduced_effects(value: bool) -> void:
+	reduced_effects = value
+	if feel != null:
+		shake.scale = feel.shake_reduced_scale if value else 1.0
+	if value:
+		hit_stop.stop()
+
+
+## Hit-stop de `duration` s (tempo real), se permitido; nunca empilha. Devolve true se começou.
+func start_hit_stop(duration: float) -> bool:
+	if not hit_stop_enabled or reduced_effects or not is_inside_tree():
+		return false
+	return hit_stop.start(get_tree(), duration, feel.hit_stop_time_scale)
+
+
+## Tremor aplicado como deslocamento do nó raiz da Arena (o HUD é um CanvasLayer à parte).
+func _process(delta: float) -> void:
+	if shake.is_active():
+		position = _shake_base + shake.step(delta)
+	elif position != _shake_base:
+		position = _shake_base
+
+
+func _exit_tree() -> void:
+	hit_stop.stop()
+
+
+func _on_skill_impact(slot: int, _at: Vector2, _radius: float) -> void:
+	var s := skills.get_slot(slot)
+	if s == null or s.data.delivery != SkillData.Delivery.METEOR:
+		return
+	shake.add(feel.shake_meteor, feel.shake_meteor_time)
+	start_hit_stop(feel.hit_stop_meteor)
+
+
+func _on_core_hp_feel(current: int, max_hp: int) -> void:
+	if _last_core_hp >= 0 and _last_core_hp - current >= max_hp * feel.core_big_hit_ratio:
+		shake.add(feel.shake_core_big, feel.shake_core_big_time)
+	_last_core_hp = current
+
+
+func _on_enemy_damaged(enemy: Enemy, amount: int, by_skill: bool) -> void:
+	enemy_damaged.emit(enemy.position, amount, by_skill)
+	if reduced_effects and not by_skill and not enemy is Boss:
+		return
+	damage_numbers.show_damage(enemy.get_instance_id(), enemy.position - Vector2(0.0, enemy.sprite_top()),
+			amount, by_skill)

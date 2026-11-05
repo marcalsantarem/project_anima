@@ -11,6 +11,9 @@ signal pause_requested
 ## `ok` = a ação foi aceita (skill disparada, upgrade comprado). Sem posição do toque.
 signal ui_pressed(button: StringName, ok: bool)
 
+## Pulso da pílula de Partículas (T-117).
+const PILL_PULSE_GAIN := 1.06
+const PILL_PULSE_AFFORDABLE := 1.12
 const THEME := preload("res://src/ui/theme/anima_theme.tres")
 const SKILL_COUNT := 3
 const SKILL_ICONS := [SkillButton.Icon.CIRCLE, SkillButton.Icon.DIAMOND, SkillButton.Icon.HEX]
@@ -65,6 +68,12 @@ var _skills: Array[SkillButton] = []
 var _upgrades: Array[UpgradeButton] = []
 var _particles_shown := 0
 var _particles_tween: Tween
+## Pílula de Partículas e seu pulso (T-117): ao ganhar e quando um upgrade fica comprável pela 1ª vez.
+var particles_pill: PanelContainer
+var _particles_total := 0
+var _pill_tween: Tween
+## Quantos pulsos a pílula já deu (para testes).
+var pill_pulses := 0
 var _wave_tween: Tween
 ## Mira pela tecla segurada (T-178): slot cuja action `skill_<slot>` está pressionada (0 = nenhum).
 var _key_slot := 0
@@ -186,7 +195,7 @@ func _build_top() -> void:
 	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	right.alignment = BoxContainer.ALIGNMENT_END
 	row1.add_child(right)
-	var particles_pill := _panel(&"PanelPillLight")
+	particles_pill = _panel(&"PanelPillLight")
 	particles_pill.name = "ParticlesPill"
 	particles_pill.accessibility_name = "Partículas"
 	particles_pill.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -267,6 +276,7 @@ func _build_tray() -> void:
 		ub.upgrade_id = id
 		ub.name = String(id)
 		ub.buy_requested.connect(_on_upgrade_buy)
+		ub.first_affordable.connect(func(_id: StringName) -> void: _pulse_pill(PILL_PULSE_AFFORDABLE))
 		upgrade_row.add_child(ub)
 		_upgrades.append(ub)
 
@@ -417,7 +427,10 @@ func _on_wave_changed(current: int, total: int) -> void:
 
 
 func _on_particles_changed(total: int) -> void:
-	# total é o acumulado da partida.
+	# total é o saldo da partida; só pulsa quando sobe (gasto não pulsa).
+	if total > _particles_total:
+		_pulse_pill(PILL_PULSE_GAIN)
+	_particles_total = total
 	if _particles_tween:
 		_particles_tween.kill()
 	_particles_tween = create_tween()
@@ -430,6 +443,21 @@ func _on_upgrade_changed(id: StringName, level: int, max_level: int, next_cost: 
 	var ub := upgrade_button(id)
 	if ub:
 		ub.set_upgrade(level, max_level, next_cost)
+
+
+## Pulso discreto da pílula de Partículas (escala a partir do centro, ~0,2 s).
+func _pulse_pill(peak: float) -> void:
+	if particles_pill == null or not particles_pill.is_inside_tree():
+		return
+	pill_pulses += 1
+	if _pill_tween and _pill_tween.is_running():
+		if peak <= PILL_PULSE_GAIN:
+			return # não reinicia a cada partícula: um pulso por vez
+		_pill_tween.kill() # o de "comprável" tem prioridade
+	particles_pill.pivot_offset = particles_pill.size * 0.5
+	_pill_tween = create_tween()
+	_pill_tween.tween_property(particles_pill, "scale", Vector2.ONE * peak, UiTokens.ANIM_FAST).set_ease(Tween.EASE_OUT)
+	_pill_tween.tween_property(particles_pill, "scale", Vector2.ONE, UiTokens.ANIM_FAST).set_ease(Tween.EASE_IN)
 
 
 func _set_particles_shown(v: int) -> void:

@@ -105,6 +105,7 @@ func take_damage(amount: int) -> void:
 			launch()
 		return
 	hp = maxi(hp - amount, 0)
+	damaged.emit(self, amount, _skill_hit)
 	hp_changed.emit(hp, data.hp)
 	if hp == 0:
 		die(DeathCause.KILLED)
@@ -119,7 +120,9 @@ func take_skill_damage(amount: int) -> void:
 		_set_defense(0)
 		launch()
 		return
+	_skill_hit = true
 	take_damage(amount)
+	_skill_hit = false
 	if can_launch():
 		launch()
 

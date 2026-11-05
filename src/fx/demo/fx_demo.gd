@@ -3,7 +3,8 @@ extends Node2D
 ## nomes da Arena) e dispara o fluxo disparo → impacto → morte → coleta, além de dano no Núcleo,
 ## skill, telegraph e fase do chefe. Clique/toque alterna o modo reduzido. Não depende de match/.
 ## Medição (docs/vfx.md §3): rodar com `-- --fx-bench` simula ~150 inimigos e ~300 projéteis e
-## imprime o tempo médio de quadro com e sem efeitos (`--fx-reduced` mede o modo reduzido).
+## imprime o tempo médio de quadro com e sem efeitos (`--fx-reduced` mede o modo reduzido;
+## `--fx-boss` soma, a cada 20 quadros, meteoro (queda + impacto) e o ciclo do chefe, T-131).
 
 const FLOOR := Color("#F6E9CF")
 const CENTER := Vector2(360, 690)
@@ -20,6 +21,7 @@ var _step := 0
 var _core_hp := 100
 var _bench := false
 var _bench_fx := true
+var _bench_boss := false
 var _bench_frames := 0
 var _bench_usec := 0
 var _bench_emit_usec := 0
@@ -49,6 +51,7 @@ func _ready() -> void:
 	emit_signal(&"core_hp_changed", _core_hp, 100)
 	_bench = OS.get_cmdline_user_args().has("--fx-bench")
 	director.reduced_effects = OS.get_cmdline_user_args().has("--fx-reduced")
+	_bench_boss = OS.get_cmdline_user_args().has("--fx-boss")
 	if _bench:
 		_setup_bench()
 
@@ -79,12 +82,36 @@ func _fire(i: int) -> void:
 	if i % 5 == 0:
 		_core_hp = 100 if _core_hp <= 10 else _core_hp - 5
 		emit_signal(&"core_hp_changed", _core_hp, 100)
-	if i % 9 == 0:
-		emit_signal(&"skill_cast", 0, CENTER, 200.0)
-	if i % 14 == 0:
-		emit_signal(&"boss_telegraph_started", &"pattern_ring", 1.2, Vector2(360, 320), 110.0)
-	if i % 28 == 14:
-		emit_signal(&"boss_phase_changed", 2)
+	_meteor_and_boss(i)
+
+
+## Meteoro e chefe (T-131) e Módulo usado/pronto (T-117), em passos de 0,15 s.
+func _meteor_and_boss(i: int) -> void:
+	var meteor_at := Vector2(240, 430)
+	var boss_at := Vector2(360, 560)
+	match i % 40:
+		0:
+			emit_signal(&"skill_used", 1)
+		2:
+			emit_signal(&"skill_fall_started", 1, meteor_at, 0.35)
+		4:
+			emit_signal(&"skill_cast", 1, meteor_at, 160.0)
+		8:
+			emit_signal(&"skill_ready", 1)
+		10:
+			emit_signal(&"boss_telegraph_started", &"boss_slam", 0.5, boss_at, 110.0)
+		14:
+			_core_hp = 100 if _core_hp <= 20 else _core_hp - 10
+			emit_signal(&"core_hp_changed", _core_hp, 100)
+		18:
+			emit_signal(&"boss_telegraph_started", &"boss_slam", 0.5, boss_at, 110.0)
+		20:
+			emit_signal(&"skill_cast", 1, boss_at, 160.0)
+			emit_signal(&"boss_launched", boss_at, Vector2(360, 250))
+		36:
+			emit_signal(&"skill_fizzled", 1, Vector2(500, 420))
+		38:
+			emit_signal(&"boss_defeated")
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -139,10 +166,13 @@ func _bench_step() -> void:
 		var d := _enemies[(f * 7) % BENCH_ENEMIES]
 		emit_signal(&"enemy_died", d, ARCHETYPES[f % 4], 0)
 		emit_signal(&"particles_gained", d, 1)
+		if _bench_boss and f % 20 == 0:
+			for k in 41: # um ciclo inteiro do chefe e do meteoro (todos os passos de uma vez)
+				_meteor_and_boss(k)
 	if f > BENCH_WARMUP_FRAMES:
 		_bench_emit_usec += Time.get_ticks_usec() - t0
 	if f == BENCH_PHASE_FRAMES:
-		var key := ("fx_on" if _bench_fx else "fx_off") + ("_reduced" if director.reduced_effects else "")
+		var key := ("fx_on" if _bench_fx else "fx_off") + ("_reduced" if director.reduced_effects else "") + ("_boss" if _bench_boss else "")
 		_bench_result[key + "_signals_ms"] = _bench_emit_usec / float(f - BENCH_WARMUP_FRAMES) / 1000.0
 		_bench_result[key + "_draw_calls"] = Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)
 		_bench_emit_usec = 0

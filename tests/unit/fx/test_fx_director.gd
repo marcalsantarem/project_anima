@@ -103,8 +103,101 @@ func test_boss_telegraph_uses_duration_and_radius() -> void:
 	var fx := _active(&"fx_telegraph")
 	assert_almost_eq(fx.duration, 1.5, 0.001)
 	assert_almost_eq(fx.size_scale, 0.5, 0.001)
-	arena.emit_signal("boss_phase_changed", 2)
-	assert_eq(_active(&"fx_death").position, Vector2(360, 300), "fase nasce no último ponto do chefe")
+	assert_true(_near(fx.color, FxDirector.BOSS_WINDUP_COLOR), "aviso do golpe em vermelho")
+	assert_almost_eq(_active(&"fx_boss_windup").duration, 1.5, 0.001)
+	arena.emit_signal("boss_defeated")
+	assert_eq(_active(&"fx_death").position, Vector2(360, 300), "morte no último ponto do chefe")
+	assert_eq(pool.active_count(&"fx_meteor_explosion"), 1, "explosão maior na morte")
+	assert_eq(pool.active_count(&"fx_boss_windup"), 0)
+
+
+# --- T-131 / T-132 / T-117 -------------------------------------------------------------------
+
+func test_meteor_impact_plays_explosion_smoke_and_fallback_trail() -> void:
+	var sigs: Array = FxDirector.SIGNALS.keys()
+	sigs.erase(&"skill_fall_started")
+	var old := _fake_arena(sigs) # arena atual: sem o sinal da queda
+	add_child_autofree(old)
+	director.bind(old)
+	old.emit_signal("skill_cast", 1, Vector2(300, 500), 160.0)
+	assert_eq(pool.active_count(&"fx_skill_cast"), 1)
+	assert_almost_eq(_active(&"fx_meteor_explosion").size_scale, 1.0, 0.001)
+	assert_almost_eq(_active(&"fx_crater_smoke").delay, 0.12, 0.001)
+	var trail := _active(&"fx_meteor_trail")
+	assert_eq(trail.position, Vector2(300, 500 - FxDirector.METEOR_FALL_HEIGHT), "rastro começa no alto")
+	assert_eq(trail.target, Vector2(0, FxDirector.METEOR_FALL_HEIGHT))
+	assert_almost_eq(trail.elapsed, trail.travel_time, 0.001, "fallback: já na cauda")
+
+
+func test_meteor_trail_follows_fall_signal() -> void:
+	arena.emit_signal("skill_fall_started", 1, Vector2(300, 500), 0.35)
+	var trail := _active(&"fx_meteor_trail")
+	assert_almost_eq(trail.elapsed, 0.0, 0.001, "acompanha a queda desde o início")
+	arena.emit_signal("skill_cast", 1, Vector2(300, 500), 160.0)
+	assert_eq(pool.active_count(&"fx_meteor_trail"), 1, "com o sinal da queda não há fallback")
+
+
+func test_fizzle_plays_puff() -> void:
+	arena.emit_signal("skill_fizzled", 1, Vector2(10, 20))
+	assert_eq(_active(&"fx_fizzle").position, Vector2(10, 20))
+
+
+func test_module_used_and_ready_on_anima() -> void:
+	arena.emit_signal("skill_used", 1)
+	arena.emit_signal("skill_ready", 1)
+	assert_eq(_active(&"fx_module_used").position, director.core_anchor)
+	assert_eq(_active(&"fx_module_ready").position, director.core_anchor)
+
+
+func test_boss_launch_plays_flight_landing_and_stun() -> void:
+	arena.emit_signal("boss_launched", Vector2(360, 600), Vector2(360, 200))
+	var fly := _active(&"fx_boss_launch")
+	assert_eq(fly.target, Vector2(0, -400))
+	assert_almost_eq(_active(&"fx_boss_land").delay, FxDirector.BOSS_LAUNCH_TIME, 0.001)
+	var stun := _active(&"fx_boss_stun")
+	assert_almost_eq(stun.delay, FxDirector.BOSS_LAUNCH_TIME, 0.001)
+	assert_almost_eq(stun.duration, FxDirector.BOSS_STUN_TIME, 0.001)
+	stun.advance(FxDirector.BOSS_LAUNCH_TIME + FxDirector.BOSS_STUN_TIME + 0.01)
+	assert_false(stun.active, "estrelas somem ao fim do atordoamento")
+
+
+func test_boss_strike_on_core_only_after_windup() -> void:
+	arena.emit_signal("core_hp_changed", 100, 100)
+	arena.emit_signal("core_hp_changed", 90, 100)
+	assert_eq(pool.active_count(&"fx_boss_wave"), 0, "dano comum não é golpe do chefe")
+	arena.emit_signal("boss_telegraph_started", &"boss_slam", 0.5, Vector2(360, 600), 110.0)
+	arena.emit_signal("core_hp_changed", 70, 100)
+	assert_eq(pool.active_count(&"fx_boss_wave"), 1)
+	assert_eq(pool.active_count(&"fx_boss_slam"), 1)
+
+
+func test_launch_cancels_pending_strike() -> void:
+	arena.emit_signal("core_hp_changed", 100, 100)
+	arena.emit_signal("boss_telegraph_started", &"boss_slam", 0.5, Vector2(360, 600), 110.0)
+	arena.emit_signal("boss_launched", Vector2(360, 600), Vector2(360, 200))
+	assert_eq(pool.active_count(&"fx_boss_windup"), 0, "brilho do wind-up some no lançamento")
+	arena.emit_signal("core_hp_changed", 90, 100)
+	assert_eq(pool.active_count(&"fx_boss_wave"), 0)
+
+
+func test_reduced_keeps_warnings_and_cuts_extras() -> void:
+	director.reduced_effects = true
+	arena.emit_signal("core_hp_changed", 100, 100)
+	arena.emit_signal("boss_telegraph_started", &"boss_slam", 0.5, Vector2(360, 600), 110.0)
+	assert_eq(pool.active_count(&"fx_telegraph"), 1, "aviso do golpe sempre visível")
+	assert_eq(pool.active_count(&"fx_boss_windup"), 0, "sem brilho")
+	arena.emit_signal("core_hp_changed", 80, 100)
+	assert_eq(pool.active_count(&"fx_boss_wave"), 1, "onda do golpe mantida")
+	assert_eq(pool.active_count(&"fx_boss_slam"), 0, "sem poeira")
+	arena.emit_signal("boss_launched", Vector2(360, 600), Vector2(360, 200))
+	assert_eq(pool.active_count(&"fx_boss_launch"), 0, "sem rastro de voo")
+	assert_eq(pool.active_count(&"fx_boss_land"), 0)
+	assert_eq(pool.active_count(&"fx_boss_stun"), 1, "atordoamento continua legível")
+	arena.emit_signal("skill_cast", 1, Vector2(300, 500), 160.0)
+	assert_eq(pool.active_count(&"fx_meteor_explosion"), 1)
+	assert_eq(pool.active_count(&"fx_skill_cast"), 1)
+	assert_eq(pool.active_count(&"fx_crater_smoke"), 0, "sem fumaça")
+	assert_eq(pool.active_count(&"fx_meteor_trail"), 0, "sem rastro")
 
 
 func test_core_pulse_only_when_hp_drops() -> void:
