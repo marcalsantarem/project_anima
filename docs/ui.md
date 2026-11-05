@@ -346,14 +346,14 @@ Cenas independentes em `src/ui/screens/`, com o tema na raiz (via `ScreenKit`). 
 - "PROJECT:"/"ANIMA" em `LabelDisplay` com fonte proporcional à escala (74 u e 132 u), cor `#E6FFFF` e brilho pela sombra ciano sem deslocamento;
 - animações em tweens (sem alocação por quadro): brilho do cristal (`GradientTexture2D` radial) pulsando, anéis tracejados (desenhados uma vez, só giram) e partículas piscando; com efeitos reduzidos (`DebugSettings.reduced_effects()`), anéis e partículas ficam parados;
 - botão **"Toque para começar" holográfico** (StyleBoxFlat: fundo escuro translúcido, contorno ciano 3 px, sombra ciano; pressionado acende) no lugar da barra, 495×110 u (mín. 88 px), pulso de escala (0,8 s); em telas baixas sobe para não encostar no logo do estúdio;
-- logo horizontal do estúdio (branco, 88%) na base, versão em ciano-claro no canto e link "Último log" (quando houver) no topo;
+- logo horizontal do estúdio (branco, 88%) na base, versão em ciano-claro no canto e link "Último log" (quando houver) no canto inferior esquerdo (o topo direito tem a bateria da arte);
 - contrato mantido: qualquer toque, clique ou tecla emite `start_requested` uma vez e libera o áudio. No mesmo gesto, `TitleScreen.fade_from_dark()` põe um véu `#021423` (CanvasLayer 128 na raiz, ignora toque) que some em 0,3 s sobre a partida: sem corte seco do escuro para o cartoon claro;
 - se a splash mudar no `web/shell.html`, ajuste as constantes do topo do script (px da arte).
 
 ## 12. App na tela de início (T-175)
 
 - **Arquivos:** `web/pwa/manifest.webmanifest` e ícones (cópia de `assets/app/`, AG08; atualizar com `bash web/copy_pwa.sh --sync-icons`). O export do Godot não copia extras: `bash web/copy_pwa.sh build/web` roda depois do `--export-release` (local e no workflow `deploy-web.yml`) e também sobrescreve `index.apple-touch-icon.png`/`index.icon.png`, que o preset (`html/export_icon`) injeta com o ícone do projeto. `web/pwa/.gdignore` mantém os PNGs fora do `.pck`.
-- **Manifesto:** "Project: Anima"/"Anima", `start_url`/`scope` `./`, `display` standalone (`display_override` fullscreen → standalone), retrato, `background_color` `#5A4A9A`, `theme_color` `#8E72EC`, ícones 192/512 `any`, 512 `maskable` e 180.
+- **Manifesto:** "Project: Anima"/"Anima", `start_url`/`scope` `./`, `display` standalone (`display_override` fullscreen → standalone), retrato, `background_color` e `theme_color` `#021423` (fundo da splash, T-179), ícones 192/512 `any`, 512 `maskable` e 180.
 - **Sem service worker** (o PWA nativo do Godot gera um com cache offline; fica desligado): cada deploy aparece na próxima abertura.
 - **Shell:** `<link rel="manifest">`, `apple-touch-icon` 180, favicons 32/48/ico, `apple-mobile-web-app-capable`, `mobile-web-app-capable`, `apple-mobile-web-app-title` "Anima", status bar `black-translucent`, `viewport-fit=cover`.
 - **Standalone no iPhone:** sem barra do Safari; o web view vai da borda de cima (sob relógio/bateria) até a de baixo. O HUD já soma `safe-area-inset-top`. Altura do canvas pela regra do §9.1 (área visível real); se o canvas chega à borda, `covers_bottom = true` e a UI usa `max(12, 0,5 × inset)` embaixo. Conferir no log (`header.web.viewport`: `standalone`, `inner`, `vv`, `canvas`, `safe`).

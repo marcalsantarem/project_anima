@@ -259,7 +259,8 @@ func _layout() -> void:
 	ScreenKit.place_corner_label(version_label, get_viewport(), STUDIO_BOTTOM)
 	if last_log_link != null:
 		last_log_link.size = LINK_SIZE
-		last_log_link.position = Vector2(view.x - safe.right - LINK_SIZE.x - UiTokens.SPACE_XS, safe.top + UiTokens.SPACE_XS)
+		# Canto inferior esquerdo, espelhando a versão: o topo direito tem a bateria desenhada na arte.
+		last_log_link.position = Vector2(safe.left + UiTokens.SPACE_XS, view.y - safe.bottom - STUDIO_BOTTOM - LINK_SIZE.y + UiTokens.SPACE_XS)
 
 
 ## Label de largura total, topo em `top`; o brilho é a sombra sem deslocamento (proporcional à fonte).
