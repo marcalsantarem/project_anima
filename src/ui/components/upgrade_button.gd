@@ -33,6 +33,7 @@ const PILL := Rect2(9, 52, 112, 25)
 const PILL_STAR := 20.0
 const LEVEL_SIZE := 26
 const COST_SIZE := 20
+const MAX_OUTLINE := 6 ## contorno total do "MAX" (assets/ui/README.md)
 const PLUS_RISE := 28.0
 const SHAKE_PX := 5.0
 const PRESS_SCALE := 0.94
@@ -250,7 +251,10 @@ func _draw() -> void:
 	var cy := PILL.get_center().y + (font.get_ascent(COST_SIZE) - font.get_descent(COST_SIZE)) * 0.5
 	if state == State.MAX:
 		draw_texture_rect(UiArt.UPGRADE_COST_PILL_MAX, PILL, false)
-		draw_string(font, Vector2(PILL.position.x, cy), "MAX", HORIZONTAL_ALIGNMENT_CENTER, PILL.size.x, COST_SIZE, UiTokens.INK)
+		# Branco com contorno ink de 6 px (T-154; a arte não tem texto).
+		draw_string_outline(font, Vector2(PILL.position.x, cy), "MAX", HORIZONTAL_ALIGNMENT_CENTER, PILL.size.x, COST_SIZE,
+			MAX_OUTLINE, UiTokens.INK)
+		draw_string(font, Vector2(PILL.position.x, cy), "MAX", HORIZONTAL_ALIGNMENT_CENTER, PILL.size.x, COST_SIZE, UiTokens.TEXT_PRIMARY)
 	else:
 		draw_texture_rect(UiArt.UPGRADE_COST_PILL, PILL, false)
 		var star := Rect2(PILL.position + Vector2(4.0, (PILL.size.y - PILL_STAR) * 0.5), Vector2(PILL_STAR, PILL_STAR))

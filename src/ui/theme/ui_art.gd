@@ -46,6 +46,11 @@ const BAR_SHINE_HEIGHT := 8.0
 const PANEL := preload("res://assets/ui/ui_panel.png")
 const BUTTON_BIG_NORMAL := preload("res://assets/ui/ui_button_big_normal.png")
 const BUTTON_BIG_PRESSED := preload("res://assets/ui/ui_button_big_pressed.png")
+## Botão secundário (branco → lavanda) e pílulas do topo do HUD (T-153, BRF-075).
+const BUTTON_SECONDARY := preload("res://assets/ui/ui_button_secondary.png")
+const BUTTON_SECONDARY_PRESSED := preload("res://assets/ui/ui_button_secondary_pressed.png")
+const PILL_WAVE := preload("res://assets/ui/ui_pill_wave.png")
+const PILL_PARTICLES := preload("res://assets/ui/ui_pill_particles.png")
 
 
 ## Textura do caminho, ou null se vazio/inexistente (quem chama decide o fallback).
@@ -93,6 +98,25 @@ static func panel() -> UiNinePatch:
 
 ## Botão grande (ciano). Pressionado: o corpo desce 4 px, o conteúdo acompanha.
 static func button_big(pressed: bool) -> UiNinePatch:
+	return _button(BUTTON_BIG_PRESSED if pressed else BUTTON_BIG_NORMAL, pressed)
+
+
+## Botão secundário (branco → lavanda), mesma geometria e content margins do grande.
+static func button_secondary(pressed: bool) -> UiNinePatch:
+	return _button(BUTTON_SECONDARY_PRESSED if pressed else BUTTON_SECONDARY, pressed)
+
+
+static func _button(tex: Texture2D, pressed: bool) -> UiNinePatch:
 	var dy := 4 if pressed else 0
-	return nine(BUTTON_BIG_PRESSED if pressed else BUTTON_BIG_NORMAL, Vector4(52, 52, 52, 68),
+	return nine(tex, Vector4(52, 52, 52, 68),
 		Vector4(UiTokens.SPACE_M, UiTokens.SPACE_S + dy, UiTokens.SPACE_M, UiTokens.SPACE_S + UiTokens.SHADOW_BASE - dy))
+
+
+## Pílula roxa "ONDA x/y" (altura ideal 48; estica na largura).
+static func pill_wave() -> UiNinePatch:
+	return nine(PILL_WAVE, Vector4(48, 40, 48, 48), Vector4(20, 6, 20, 12))
+
+
+## Pílula branca de Partículas: estrela à esquerda, número à direita (altura ideal 52).
+static func pill_particles() -> UiNinePatch:
+	return nine(PILL_PARTICLES, Vector4(48, 44, 48, 52), Vector4(10, 6, 20, 12))

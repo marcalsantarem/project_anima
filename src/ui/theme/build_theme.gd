@@ -3,7 +3,6 @@ extends SceneTree
 ## Uso: godot --headless --path . -s res://src/ui/theme/build_theme.gd
 
 const OUTPUT := "res://src/ui/theme/anima_theme.tres"
-const PILL_RADIUS := 40
 
 
 func _init() -> void:
@@ -33,26 +32,18 @@ static func build() -> Theme:
 	# Texto escuro sem contorno, para fundos claros.
 	_label_variation(theme, "LabelOnLight", bold, UiTokens.FONT_BODY, UiTokens.TEXT_ON_LIGHT, 0)
 
-	# Button (secundário = padrão): claro, texto escuro.
-	_button(theme, "Button", UiTokens.SURFACE, UiTokens.TEXT_ON_LIGHT)
+	# Button (secundário = padrão) e ButtonPrimary: arte 9-patch (T-138; secundário T-153), texto escuro.
+	_button(theme, "Button", UiArt.button_secondary)
 	theme.set_font("font", "Button", bold)
 	theme.set_type_variation("ButtonPrimary", "Button")
-	_button(theme, "ButtonPrimary", UiTokens.ACCENT, UiTokens.TEXT_ON_LIGHT)
-	# Botão principal com a arte 9-patch (T-138). O secundário (branco) não tem arte: fica no StyleBoxFlat.
-	theme.set_stylebox("normal", "ButtonPrimary", UiArt.button_big(false))
-	theme.set_stylebox("hover", "ButtonPrimary", UiArt.button_big(false))
-	theme.set_stylebox("pressed", "ButtonPrimary", UiArt.button_big(true))
-	theme.set_stylebox("hover_pressed", "ButtonPrimary", UiArt.button_big(true))
-	var primary_off := UiArt.button_big(false)
-	primary_off.modulate_color = Color(0.7, 0.7, 0.75, 0.8)
-	theme.set_stylebox("disabled", "ButtonPrimary", primary_off)
+	_button(theme, "ButtonPrimary", UiArt.button_big)
 
 	# Painéis com moldura
 	theme.set_stylebox("panel", "PanelContainer", UiArt.panel()) # arte ui_panel (T-138)
 	theme.set_type_variation("PanelPill", "PanelContainer")
-	theme.set_stylebox("panel", "PanelPill", _pill(UiTokens.BG_PANEL))
+	theme.set_stylebox("panel", "PanelPill", UiArt.pill_wave()) # ONDA x/y (T-153)
 	theme.set_type_variation("PanelPillLight", "PanelContainer")
-	theme.set_stylebox("panel", "PanelPillLight", _pill(UiTokens.SURFACE))
+	theme.set_stylebox("panel", "PanelPillLight", UiArt.pill_particles()) # Partículas (T-153)
 	theme.set_type_variation("PanelTray", "PanelContainer")
 	var tray := StyleBoxFlat.new()
 	tray.bg_color = UiTokens.BG_PANEL_ALT
@@ -87,14 +78,15 @@ static func _label_variation(theme: Theme, type_name: StringName, font: Font, si
 	theme.set_constant("outline_size", type_name, outline)
 
 
-static func _button(theme: Theme, type_name: StringName, bg: Color, fg: Color) -> void:
-	theme.set_stylebox("normal", type_name, UiTokens.cartoon_box(bg))
-	theme.set_stylebox("hover", type_name, UiTokens.cartoon_box(bg.lightened(0.12)))
-	# Pressionado: afunda (sem sombra de base, conteúdo desce o mesmo tanto).
-	var pressed := UiTokens.cartoon_box(bg.darkened(0.12), UiTokens.RADIUS_M, 0)
-	pressed.expand_margin_top = -UiTokens.SHADOW_BASE
-	pressed.content_margin_top += UiTokens.SHADOW_BASE
-	theme.set_stylebox("pressed", type_name, pressed)
+## `art(pressed)` devolve o 9-patch do botão; desabilitado = normal acinzentado.
+static func _button(theme: Theme, type_name: StringName, art: Callable) -> void:
+	theme.set_stylebox("normal", type_name, art.call(false))
+	theme.set_stylebox("hover", type_name, art.call(false))
+	theme.set_stylebox("pressed", type_name, art.call(true))
+	theme.set_stylebox("hover_pressed", type_name, art.call(true))
+	var off: UiNinePatch = art.call(false)
+	off.modulate_color = Color(0.7, 0.7, 0.75, 0.8)
+	theme.set_stylebox("disabled", type_name, off)
 	var focus := StyleBoxFlat.new()
 	focus.draw_center = false
 	focus.border_color = UiTokens.ACCENT
@@ -102,15 +94,7 @@ static func _button(theme: Theme, type_name: StringName, bg: Color, fg: Color) -
 	focus.set_corner_radius_all(UiTokens.RADIUS_M + 4)
 	focus.set_expand_margin_all(UiTokens.BORDER_FOCUS + 2)
 	theme.set_stylebox("focus", type_name, focus)
-	theme.set_stylebox("disabled", type_name, UiTokens.cartoon_box(UiTokens.LOCKED))
 	for state in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color", "font_hover_pressed_color"]:
-		theme.set_color(state, type_name, fg)
+		theme.set_color(state, type_name, UiTokens.TEXT_ON_LIGHT)
 	theme.set_color("font_disabled_color", type_name, UiTokens.INK.lightened(0.35))
 	theme.set_constant("outline_size", type_name, 0)
-
-
-static func _pill(bg: Color) -> StyleBoxFlat:
-	var sb := UiTokens.cartoon_box(bg, PILL_RADIUS)
-	sb.content_margin_top = UiTokens.SPACE_XS
-	sb.content_margin_bottom = UiTokens.SPACE_XS
-	return sb

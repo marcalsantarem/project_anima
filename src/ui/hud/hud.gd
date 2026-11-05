@@ -14,7 +14,7 @@ signal ui_pressed(button: StringName, ok: bool)
 const THEME := preload("res://src/ui/theme/anima_theme.tres")
 const SKILL_COUNT := 3
 const SKILL_ICONS := [SkillButton.Icon.CIRCLE, SkillButton.Icon.DIAMOND, SkillButton.Icon.HEX]
-const PARTICLES_ICON_SIZE := 36
+const PARTICLES_ICON_SIZE := 32 ## estrela da pílula de Partículas (assets/ui/README.md)
 const PAUSE_ICON_SIZE := 64
 const CORE_ICON_SIZE := Vector2(36, 44)
 const UPGRADE_BAND_PAD := 6
@@ -192,9 +192,9 @@ func _build_top() -> void:
 	particles_row.add_child(StarIcon.new(PARTICLES_ICON_SIZE))
 	_particles_label = _label(&"LabelHud")
 	_particles_label.text = "0"
-	_particles_label.add_theme_color_override("font_color", UiTokens.PARTICLES)
-	_particles_label.add_theme_color_override("font_outline_color", UiTokens.INK)
-	_particles_label.add_theme_constant_override("outline_size", UiTokens.TEXT_OUTLINE)
+	# Pílula branca (T-153): número escuro, sem contorno.
+	_particles_label.add_theme_color_override("font_color", UiTokens.TEXT_ON_LIGHT)
+	_particles_label.add_theme_constant_override("outline_size", 0)
 	_particles_label.custom_minimum_size.x = 72
 	_particles_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	particles_row.add_child(_particles_label)

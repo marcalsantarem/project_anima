@@ -174,8 +174,8 @@ Teste: `tests/unit/ui/test_hud_layout.gd` confere as constantes contra o layout 
 
 - Altura mínima de 88 px, largura ≥ 360 px nos botões principais, `radius_m`, contorno `ink` 4 px e sombra de base de 6 px (pressionado = afunda).
 - Principal: fundo `accent`, texto `text_on_light`. Secundário: fundo `surface`, texto `text_on_light`. Desabilitado: `locked`.
-- Arte (T-138): `ButtonPrimary` usa `ui_button_big_normal/pressed` (9-patch; pressionado desce 4 px; desabilitado = normal esmaecido). O secundário (branco) segue em `StyleBoxFlat` (não há arte).
-- Painéis (`PanelContainer`): `ui_panel` (9-patch, conteúdo a 20 px, 26 embaixo). `PanelPill`, `PanelPillLight` e `PanelTray` seguem em `StyleBoxFlat` (sem arte). Título, pausa e resultado usam o cartão central (`ScreenKit.card`).
+- Arte (T-138): `ButtonPrimary` usa `ui_button_big_normal/pressed` (9-patch; pressionado desce 4 px; desabilitado = normal esmaecido). O secundário (`Button`, padrão) usa `ui_button_secondary/_pressed` (T-153, BRF-075), com a mesma geometria e content margins: Resultado ("Voltar ao título", "Logs"), pausa ("Recomeçar", "Debug") e visualizador de logs. O foco segue em `StyleBoxFlat`.
+- Painéis (`PanelContainer`): `ui_panel` (9-patch, conteúdo a 20 px, 26 embaixo). `PanelPill` = `ui_pill_wave` (ONDA x/y, content 20/6/20/12) e `PanelPillLight` = `ui_pill_particles` (estrela de 32 px e número `text_on_light` sem contorno, content 10/6/20/12), ambos `UiNinePatch` a 0,5 (T-153). Só o `PanelTray` segue em `StyleBoxFlat`. "MAX" do `UpgradeButton`: a arte não tem texto e o jogo desenha centralizado, branco com contorno `ink` de 6 px, bold, 20 px (T-154). Título, pausa e resultado usam o cartão central (`ScreenKit.card`).
 - **9-patch em 2x:** `UiNinePatch` (`src/ui/theme/ui_nine_patch.gd`) desenha o PNG em escala 0,5 com as margens do README; o `StyleBoxTexture` desenharia as bordas no tamanho do PNG (o dobro). Texturas e tamanhos em `UiArt` (`src/ui/theme/ui_art.gd`). Filtro Linear (padrão do projeto), sem mipmaps.
 - Foco por teclado visível (borda `accent` 4 px por fora); `Enter`/`Espaço` ativam.
 
