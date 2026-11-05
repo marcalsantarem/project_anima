@@ -2,13 +2,22 @@
 
 > Mantido pelo AG06. Tasks em [backlog.md](backlog.md). O AG06 propõe quando um marco está pronto para validação; quem fecha é o AG00, com o veredito do AG03 e o aval do usuário.
 
-| Marco | Status | Tasks feitas |
+| Marco | Versão | Status |
 |---|---|---|
-| M0 — Fundação | em andamento | 5/8 (63%) · 1 em validação |
-| M1 — Demo do combate | em andamento | 13/39 (33%) |
-| M2 — Meta-jogo local | não quebrado | 0/2 (T-109, T-110 movidas do M1) |
-| M3 — Online | não quebrado | — |
-| M4 — Monetização e polimento | não quebrado | — |
+| M0 — Fundação | — | feito |
+| M1 — Vertical slice | 0.1 | em fechamento |
+| M2 — Fundação do meta + áudio básico | 0.2 | a quebrar |
+| M3 — Núcleos | 0.3 | a quebrar |
+| M4 — Módulos | 0.4 | a quebrar (T-109, T-110) |
+| M5 — Fragmentos | 0.5 | a quebrar |
+| M6 — Conteúdo | 0.6 | a quebrar |
+| M7 — Áudio completo e onboarding | 0.7 | a quebrar |
+| M8 — Demo pública | 0.8 | a quebrar |
+| M9 — Backend | 0.9 | a quebrar |
+| M10 — Monetização | 0.10 | a quebrar |
+| M11 — Lançamento | 1.0 | a quebrar |
+
+Detalhe e ordem dos marcos: Roadmap da [Bíblia](00_biblia_projeto.md) (decisão 51).
 
 ## M0 — Fundação
 

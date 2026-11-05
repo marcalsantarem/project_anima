@@ -22,8 +22,8 @@
 | T-106 | Tema base e componentes de UI | M1 | AG02 | feita |
 | T-107 | Overlay de debug Web (FPS, logs) | M1 | AG02 | feita (com gravador de logs e botão Logs) |
 | T-108 | Base de skills + skill de área | M1 | AG01 | feita |
-| T-109 | Skill de controle | M2 | AG01 | a fazer |
-| T-110 | Skill de defesa | M2 | AG01 | a fazer |
+| T-109 | Skill de controle | M4 | AG01 | a fazer |
+| T-110 | Skill de defesa | M4 | AG01 | a fazer |
 | T-111 | Arquétipos: tanque, atirador, enxame | M1 | AG01 | feita |
 | T-112 | HUD ligado aos sinais | M1 | AG02 | feita |
 | T-113 | Telas: toque para começar, pausa, resultado | M1 | AG02 | feita |
@@ -60,7 +60,7 @@
 | T-144 | Arena em 3/4: Y-sort, âncoras, sombras, spawn | M1 | AG01 | feita |
 | T-145 | Retema da UI no estilo cartoon (tokens, tema, fonte) | M1 | AG02 | feita |
 | T-146 | Remover mockups rejeitados e excluir referências do export Web | M1 | AG07 | feita |
-| T-147 | Anima com skin trocável (Resource de aparência) | M2 | AG01 | a fazer |
+| T-147 | Anima com skin trocável (Resource de aparência) | M10 | AG01 | a fazer |
 | T-149 | Barra de vida pequena sobre cada inimigo (verde, amarela, vermelha) | M1 | AG01 | feita |
 | T-150 | Chefe ogro: ataque corpo a corpo, sem minions, defesa como escudo e lançamento | M1 | AG01 | feita |
 | T-151 | Arte do chefe ogro (humanoide grande e gordo) | M1 | AG08 | feita |
@@ -94,6 +94,8 @@
 | T-179 | Splash e tela de título no estilo holográfico/tecnológico (arte do Gemini como base; texto, barra e brilhos vivos) | M1 | AG02 + AG08 | feita |
 | T-180 | **(1ª do M2)** Guia visual "HUD holográfico" para menus + mockups do menu principal e do hangar (Módulos, Fragmentos, Núcleos) | M2 | AG08 | a fazer (início do M2) |
 | T-181 | Ícones do app (iPhone, PWA e favicon) na nova identidade tecnológica da splash e do menu | M1 | AG08 + AG02 | pronta p/ briefing |
+| T-182 | Áudio básico: música de entrada (título) e som do tiro básico, com volume salvo e respeitando o 1º toque na web | M2 | AG02 + AG01 | a fazer |
+| T-183 | Fechar o M1 como v0.1: versão `0.1.0` no jogo, tag `v0.1.0`, branch `demo` e deploy em `demo--projectanimagame.netlify.app` (quando o dono pedir) | M1 | AG00 + AG02 + AG07 | a fazer (no fechamento) |
 | T-148 | Sinais da Arena para VFX (projectile_fired, projectile_hit, enemy_died, particles_gained, skill_cast, boss_telegraph_started, boss_phase_changed) | M1 | AG01 | feita |
 
 ## Próximas prontas p/ briefing
@@ -535,6 +537,14 @@
 - **Depende de:** decisão 48 e T-179 (arte-base `assets/splash/tech/tech_splash_clean.png`); substitui os ícones da T-174
 - **Arquivos:** `assets/app/` (mestre, derivados e gerador), `web/pwa/` (cópia via `web/copy_pwa.sh --sync-icons`), `web/pwa/manifest.webmanifest` (só se mudar cor), `assets/LICENSES.md`
 - **Pronto quando:** ícone 1024 mestre e derivados (`apple-touch-icon` 180, 192, 512, maskable 512 e favicons 16/32/48/ico) com o **cristal holográfico ciano sobre o fundo azul-marinho** da arte do Gemini (recortado da arte ou redesenhado no mesmo estilo), legível a 48 px e no favicon; copiados para o deploy; README e licença atualizados; o dono reinstala o atalho para o iOS reler.
+
+### T-182 — Áudio básico (M2)
+- **Marco:** M2 · **Dono:** AG02 (música, volume, desbloqueio de áudio na web) + AG01 (som do tiro) · **Status:** a fazer
+- **Pronto quando:** uma música toca na entrada (título) em loop e o tiro básico tem um som curto (variação leve de tom, limite de vozes simultâneas para não saturar); áudio só começa após o 1º toque (web/iOS); volume de música e efeitos salvo; sem sons de menu, botões, skills e demais efeitos (ficam para o M7); assets próprios ou CC0 com licença registrada.
+
+### T-183 — Fechar o M1 como v0.1 (demo v1)
+- **Marco:** M1 · **Dono:** AG00 (PR e tag) + AG02 (deploy) + AG07 (versão) · **Status:** a fazer (no fechamento do M1, quando o dono pedir)
+- **Pronto quando:** `DEFAULT_VERSION` = `0.1.0`; PR `dev → main` com título/descrição no chat; tag `v0.1.0`; branch `demo` criada a partir da tag; o workflow publica a branch `demo` em `demo--projectanimagame.netlify.app`; nada mais é commitado na `demo`.
 
 ### T-148 — Sinais da Arena para VFX
 - **Marco:** M1 · **Dono:** AG01 · **Status:** feita

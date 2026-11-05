@@ -71,15 +71,27 @@ Nomes oficiais que o jogador vê. Os **identificadores de código continuam em i
 - **Núcleos (a árvore de talentos):** continua, comprada com Moeda. O detalhe fica no AG04.
 - **[A DEFINIR]:** quais atributos os Fragmentos dão (dano, velocidade de ataque, vida, armadura, regeneração, redução de cooldown).
 
-## Roadmap
+## Roadmap (decisão 51, 2026-11-05)
 
-| Marco | Objetivo | Agentes |
-|---|---|---|
-| **M0 — Fundação** | Docs, ambiente, projeto Godot, exportação Web vazia rodando no PC e no iPhone | AG07, AG02, AG03 |
-| **M1 — Demo do combate** *(1º marco jogável)* | 1 fase completa, divertida e **visualmente polida, pronta para divulgar como demo** | AG01, AG02, AG03, AG08, AG09 |
-| **M2 — Meta-jogo local** | Nível de conta, slots e Módulos (controle e defesa), Fragmentos, fusão de Fragmentos, save local | AG04, AG01, AG02, AG05 (local), AG08 |
-| **M3 — Online** | Backend escolhido: conta guest, sincronização, economia no servidor, config remota | AG05, AG04 |
-| **M4 — Monetização e lançamento** | Ads, loja, skins, áudio final, lojas nativas | **[A DEFINIR]** |
+Cada marco entrega **um ciclo jogável completo** e vira **uma versão** `0.x`, fechada com PR `dev → main` e tag. Algumas versões fechadas ficam também numa **branch própria** (decisão 52).
+
+| Marco | Versão | Objetivo | Entrega principal |
+|---|---|---|---|
+| **M0 — Fundação** | — | Ambiente e exportação Web | Feito |
+| **M1 — Vertical slice** | 0.1 | Provar o combate e o visual | 1 fase, 1 chefe, meteoro, upgrades, efeitos, splash/título tecnológicos. Ao fechar, vira a **demo v1** na branch `demo` |
+| **M2 — Fundação do meta + áudio básico** | 0.2 | Ciclo "jogar → ganhar → voltar" | Menu holográfico (T-180), save local, **Moeda** e XP por partida, **nível de conta** com os slots, Resultado com recompensa; **áudio básico**: música de entrada e som do tiro básico (sem sons de menu, botões, skills nem demais efeitos) |
+| **M3 — Núcleos** | 0.3 | Progressão permanente | Árvore de talentos pequena, comprada com Moeda |
+| **M4 — Módulos** | 0.4 | Variedade de poderes | Módulos de controle e de defesa (T-109, T-110), equipar Módulos no hangar, evolução simples com Moeda |
+| **M5 — Fragmentos** | 0.5 | Progressão de equipamento | 6 espaços, raridades, upgrade com Moeda, fusão 3→1, origem dos Fragmentos |
+| **M6 — Conteúdo** | 0.6 | Duração e desafio | Fases 2 a 5, 2–3 chefes e inimigos novos, seleção de fase |
+| **M7 — Áudio completo e onboarding** | 0.7 | Primeira impressão | Sons de UI, skills e efeitos, mais músicas, tutorial do 1º minuto, configurações (volume, idioma) |
+| **M8 — Demo pública** | 0.8 | Divulgar | Polimento, balanceamento (bot + playtest), build desktop, publicação (web, itch.io, página "Em breve" na Steam) |
+| **M9 — Backend** | 0.9 | Contas e nuvem | Conta guest, save na nuvem, economia validada no servidor, Remote Config |
+| **M10 — Monetização** | 0.10 | Receita | Anúncios recompensados, loja de skins, moeda premium |
+| **M11 — Lançamento** | 1.0 | Lojas | Steam, Android e iOS nativos, marketing |
+
+- **Ordem M3 → M5** por facilidade e utilidade para testar: Núcleos, depois Módulos, depois Fragmentos (decisão 51).
+- **[A DEFINIR]:** o dono vai detalhar a quebra dos marcos seguintes.
 
 ## Escopo atual: M1 (demo do combate)
 
