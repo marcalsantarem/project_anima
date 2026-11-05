@@ -11,7 +11,7 @@
 | T-003 | `docs/ui.md` (tokens, layout, fluxo de telas) | M0 | AG02 | feita |
 | T-004 | Preset Web + HTML shell mínimo | M0 | AG02 | feita |
 | T-005 | Build vazio no Chrome PC e no iPhone | M0 | AG02 | feita |
-| T-006 | Cena de estresse para confirmar metas de desempenho | M0 | AG02 | pronta p/ briefing |
+| T-006 | Cena de estresse para confirmar metas de desempenho | M0 | AG10 | pronta p/ briefing |
 | T-007 | ADR das metas de desempenho e da exportação single-threaded | M0 | AG07 | a fazer |
 | T-008 | Deploy automático Web (GitHub Actions → Netlify) | M0 | AG02 | feita |
 | T-101 | `docs/gameplay.md` (parâmetros e sinais) | M1 | AG01 | feita |
@@ -32,7 +32,7 @@
 | T-116 | Fase 1 completa (~10 ondas + chefe) | M1 | AG01 | feita |
 | T-117 | Game feel | M1 | AG01 + AG09 | feita |
 | T-118 | Desempenho no iPhone (150 inimigos / 300 projéteis) | M1 | AG01 | a fazer |
-| T-119 | Otimização do build Web | M1 | AG02 | a fazer |
+| T-119 | Otimização do build Web | M1 | AG10 | a fazer |
 | T-120 | Validação do M1 | M1 | AG03 | a fazer |
 | T-121 | Tema global no `project.godot` | M1 | AG07 | feita |
 | T-122 | Ligar a arena real ao SceneFlow | M1 | AG07 | feita |
@@ -93,9 +93,9 @@
 | T-178 | Arrastar do botão do Módulo para mirar (toque/mouse), segurar 1 + clique no PC | M1 | AG02 | feita |
 | T-179 | Splash e tela de título no estilo holográfico/tecnológico (arte do Gemini como base; texto, barra e brilhos vivos) | M1 | AG02 + AG08 | feita |
 | T-180 | **(1ª do M2)** Guia visual "HUD holográfico" para menus + mockups do menu principal e do Resultado com recompensa | M2 | AG08 | a fazer (início do M2) |
-| T-181 | Ícones do app (iPhone, PWA e favicon) na nova identidade tecnológica da splash e do menu | M1 | AG08 + AG02 | pronta p/ briefing |
-| T-182 | Áudio básico: música de entrada (título) e som do tiro básico, com volume salvo e respeitando o 1º toque na web | M2 | AG02 + AG01 | a fazer |
-| T-183 | Fechar o M1 como v0.1.0: versão `0.1.0` no jogo e tag `v0.1.0`, sem branch (decisão 55; quando o dono pedir) | M1 | AG00 + AG02 + AG07 | a fazer (no fechamento) |
+| T-181 | Ícones do app (iPhone, PWA e favicon) na nova identidade tecnológica da splash e do menu | M1 | AG08 + AG10 | pronta p/ briefing |
+| T-182 | Áudio básico: música de entrada (título) e som do tiro básico, com volume salvo e respeitando o 1º toque na web | M2 | AG11 | a fazer |
+| T-183 | Fechar o M1 como v0.1.0: versão `0.1.0` no jogo e tag `v0.1.0`, sem branch (decisão 55; quando o dono pedir) | M1 | AG00 + AG10 | a fazer (no fechamento) |
 | T-184 | Economia do M2: curva de XP (níveis 1 a 15), XP e Moeda por partida, dados em `.tres` e `docs/economia.md` | M2 | AG04 | a fazer |
 | T-185 | Save local: autoload `Backend` (interface) + `LocalBackend` em `user://` com versão, migração e recuperação; ADR | M2 | AG05 + AG07 | a fazer |
 | T-186 | Lógica pura do meta em `src/meta/`: recompensa do `MatchResult`, XP → nível, slots liberados; testes GUT | M2 | AG04 | a fazer |
@@ -106,10 +106,10 @@
 | T-191 | Resultado com recompensa: XP e Moeda animados, barra enchendo, subida de nível e aviso de slot liberado | M2 | AG02 + AG09 | a fazer |
 | T-192 | HUD: slots bloqueados mostram o nível que os libera | M2 | AG02 | a fazer |
 | T-193 | Debug do meta: zerar save e dar XP/Moeda pelo overlay `?debug=1`; meta no log da partida | M2 | AG02 + AG05 | a fazer |
-| T-194 | Assets de áudio do M2: música de entrada e som do tiro (próprios ou CC0, licença registrada) | M2 | AG08 | a fazer |
+| T-194 | Assets de áudio do M2: música de entrada e som do tiro (próprios ou CC0, licença registrada) | M2 | AG11 | a fazer |
 | T-195 | Balanceamento da progressão: partidas até os níveis 3, 7 e 12 pela simulação do bot | M2 | AG04 | a fazer |
 | T-196 | Validação do M2 (inclui save persistindo no iPhone, no Safari e no modo app) | M2 | AG03 | a fazer |
-| T-197 | Fechar o M2 como v0.2.0: tag `v0.2.0`, branch `alfa` e deploy em `alfa--projectanimagame.netlify.app` (quando o dono pedir) | M2 | AG00 + AG02 + AG07 | a fazer (no fechamento) |
+| T-197 | Fechar o M2 como v0.2.0: tag `v0.2.0`, branch `alfa` e deploy em `alfa--projectanimagame.netlify.app` (quando o dono pedir) | M2 | AG00 + AG10 | a fazer (no fechamento) |
 | T-198 | Mockup do hangar: navegação entre Jogar, Núcleos, Módulos, Componentes e Configurações (abas ou barra inferior) (tam. M) | M3 | AG08 | a fazer |
 | T-199 | Arte do hangar: fundo, ícones das abas, estados ativo/bloqueado (tam. M) | M3 | AG08 | a fazer |
 | T-200 | Fluxo de cenas do hangar: telas filhas carregadas sob demanda, voltar, estado preservado (tam. P) | M3 | AG07 | a fazer |
@@ -150,7 +150,7 @@
 | T-235 | Validação e fechamento da v0.2.5 (tag) (tam. P) | M7 | AG03 + AG00 | a fazer |
 | T-236 | Mockup da tela de configurações (tam. P) | M8 | AG08 | a fazer |
 | T-237 | Configurações no save: volume de música e efeitos, sons ligados, efeitos reduzidos (sai do `debug.cfg`), idioma (tam. P) | M8 | AG05 + AG07 | a fazer |
-| T-238 | Barramentos de áudio Música e Efeitos ligados ao volume (tam. P) | M8 | AG07 | a fazer |
+| T-238 | Barramentos de áudio Música e Efeitos ligados ao volume (tam. P) | M8 | AG11 + AG07 | a fazer |
 | T-239 | Tela de configurações (no hangar e na pausa) (tam. M) | M8 | AG02 | a fazer |
 | T-240 | Infra de localização: tradução por chaves em todos os textos, só pt-BR por enquanto (os outros idiomas ficam na T-241, M8); toda tela nova do M3 em diante já nasce com chaves (tam. G) | M3 | AG07 + AG02 | a fazer |
 | T-241 | Tradução para inglês e espanhol, com glossário dos nomes oficiais (tam. M) | M8 | AG02 | a fazer |
@@ -164,21 +164,21 @@
 | T-249 | Arte do tutorial: mão, balões, destaque (tam. P) | M9 | AG08 | a fazer |
 | T-250 | Textos dos tutoriais em português, inglês e espanhol (tam. P) | M9 | AG02 | a fazer |
 | T-251 | Validação com jogador novo e fechamento da v0.2.7 (tag) (tam. P) | M9 | AG03 + AG00 | a fazer |
-| T-252 | Design das 5 fases: tipos de fase, inimigos por fase, curva de dificuldade (tam. M) | M10 | AG04 + AG01 | a fazer |
+| T-252 | Design das 5 fases: tipos de fase, inimigos por fase, curva de dificuldade (tam. M) | M10 | AG12 | a fazer |
 | T-253 | Novos inimigos (3 a 4 arquétipos) (tam. G) | M10 | AG01 | a fazer |
 | T-254 | Arte dos novos inimigos (tam. G) | M10 | AG08 | a fazer |
 | T-255 | Chefe 2 (tam. M) | M10 | AG01 | a fazer |
 | T-256 | Chefe 3 (tam. M) | M10 | AG01 | a fazer |
 | T-257 | Arte dos chefes 2 e 3 (tam. M) | M10 | AG08 | a fazer |
 | T-258 | Cenários das fases 2 a 5 (tam. G) | M10 | AG08 | a fazer |
-| T-259 | Ondas das 5 fases em dados (tam. M) | M10 | AG01 + AG04 | a fazer |
+| T-259 | Ondas das 5 fases em dados (tam. M) | M10 | AG12 | a fazer |
 | T-260 | Seleção e progressão de fases (mapa, desbloqueio, save) (tam. M) | M10 | AG02 + AG04 + AG05 | a fazer |
 | T-261 | Recompensas durante a partida nas fases novas (revisar a T-222) (tam. P) | M10 | AG04 | a fazer |
 | T-262 | VFX dos novos inimigos e chefes (tam. M) | M10 | AG09 | a fazer |
-| T-263 | Balanceamento das 5 fases (bot e playtest) (tam. M) | M10 | AG04 | a fazer |
+| T-263 | Balanceamento das 5 fases (bot e playtest) (tam. M) | M10 | AG12 + AG04 | a fazer |
 | T-264 | Polimento de gráficos, efeitos e gameplay (lista do playtest) (tam. G) | M10 | AG01 + AG02 + AG09 | a fazer |
-| T-265 | Desempenho no iPhone com o conteúdo novo (tam. M) | M10 | AG01 + AG02 | a fazer |
-| T-266 | Validação e fechamento da v0.3.0: tag, branch `beta` e deploy em `beta--projectanimagame.netlify.app` (tam. M) | M10 | AG03 + AG00 + AG02 + AG07 | a fazer |
+| T-265 | Desempenho no iPhone com o conteúdo novo (tam. M) | M10 | AG01 + AG10 | a fazer |
+| T-266 | Validação e fechamento da v0.3.0: tag, branch `beta` e deploy em `beta--projectanimagame.netlify.app` (tam. M) | M10 | AG03 + AG00 + AG10 | a fazer |
 | T-148 | Sinais da Arena para VFX (projectile_fired, projectile_hit, enemy_died, particles_gained, skill_cast, boss_telegraph_started, boss_phase_changed) | M1 | AG01 | feita |
 
 ## Próximas prontas p/ briefing

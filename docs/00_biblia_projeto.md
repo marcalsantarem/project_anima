@@ -142,14 +142,17 @@ Proibido usar personagens, criaturas, nomes, ícones, sons, interface ou arte de
 |---|---|---|---|
 | AG00 | Game Dev Líder | Gerencia (não implementa): plano, Bíblia, decisões, briefings, validação, integração, commits | Sempre |
 | AG01 | Gameplay / Combate | Arena, Anima, ataque automático, skills, inimigos, ondas, chefe | M1 |
-| AG02 | UI / Plataforma Web | HUD, telas, entrada, tema, exportação Web (`export_presets.cfg`, `web/`), desempenho no Safari | M0/M1 |
+| AG02 | UI | HUD, telas, menus, entrada, tema, localização (chaves), tutoriais | M0/M1 |
 | AG03 | QA / Revisor | Testes, revisão, medições, veredito passa ou não passa | M1 |
-| AG04 | Meta-jogo / Dados | Nível de conta, Fragmentos, fusão, upgrades da partida (dados e balanceamento), economia | M1/M2 |
+| AG04 | Meta-jogo / Dados | Nível de conta, Núcleos, Módulos (evolução), Componentes, fusão, upgrades da partida (dados e balanceamento), economia | M1/M2 |
 | AG05 | Backend | Interface `Backend`, save, provedor online, segurança | M2/M3 |
-| AG06 | Backlog | Quebra dos marcos em tasks, quadro de status, andamento dos marcos e riscos | Sempre |
+| AG06 | Backlog | **Arquivado** (decisão 57): o AG00 mantém o backlog | — |
 | AG07 | Arquiteto Técnico | `project.godot` (Input Map, layers, autoloads), `src/core/`, arquitetura, contratos entre módulos, ADRs, metas de desempenho | Sempre |
 | AG08 | Diretor de Arte | Direção visual, paleta, sprites, ícones, fundo da arena, arte da UI, guia de estilo (`docs/arte.md`) | M1 em diante |
 | AG09 | VFX | Shaders, partículas, brilho, impactos, telegraphs e feedback visual, dentro do orçamento do iPhone | M1 em diante |
+| AG10 | Plataforma | Exportação Web (`export_presets.cfg`, `web/`), PWA, deploy, tamanho e desempenho do build, build desktop | M1 em diante |
+| AG11 | Áudio | Música, efeitos, mixagem, barramentos e desbloqueio de áudio na web | M2 em diante |
+| AG12 | Conteúdo / Fases | Fases, ondas, distribuição de inimigos e curva de dificuldade (em dados) | M10 em diante |
 
 Equipe: 1 usuário + agentes de IA. O prazo é por marcos, sem datas fixas.
 
@@ -161,14 +164,17 @@ Cada agente roda numa **sessão própria** do Claude Code, com o nome do agente.
 |---|---|
 | AG00_gamedev-lider (sessão principal) | [agentes/AG00_gamedev-lider.md](agentes/AG00_gamedev-lider.md) |
 | AG01_gameplay | [agentes/AG01_gameplay.md](agentes/AG01_gameplay.md) |
-| AG02_uiweb | [agentes/AG02_uiweb.md](agentes/AG02_uiweb.md) |
+| AG02 (UI) | [agentes/AG02_uiweb.md](agentes/AG02_uiweb.md) |
 | AG03_qa | [agentes/AG03_qa.md](agentes/AG03_qa.md) |
 | AG04_metajogo | [agentes/AG04_metajogo.md](agentes/AG04_metajogo.md) |
 | AG05_backend | [agentes/AG05_backend.md](agentes/AG05_backend.md) |
-| Backlog | [agentes/AG06_backlog.md](agentes/AG06_backlog.md) |
-| Arquiteto | [agentes/AG07_arquiteto.md](agentes/AG07_arquiteto.md) |
-| (a criar) | [agentes/AG08_arte.md](agentes/AG08_arte.md) |
-| (a criar) | [agentes/AG09_vfx.md](agentes/AG09_vfx.md) |
+| AG06 (Backlog, arquivado) | [agentes/AG06_backlog.md](agentes/AG06_backlog.md) |
+| AG07 (Arquiteto) | [agentes/AG07_arquiteto.md](agentes/AG07_arquiteto.md) |
+| AG08 (Arte) | [agentes/AG08_arte.md](agentes/AG08_arte.md) |
+| AG09 (VFX) | [agentes/AG09_vfx.md](agentes/AG09_vfx.md) |
+| AG10 (Plataforma) | [agentes/AG10_plataforma.md](agentes/AG10_plataforma.md) |
+| AG11 (Áudio) | [agentes/AG11_audio.md](agentes/AG11_audio.md) |
+| AG12 (Conteúdo/Fases) | [agentes/AG12_conteudo.md](agentes/AG12_conteudo.md) |
 
 Regras:
 1. **Usuário → AG00 → agentes.** O usuário fala só com o AG00, que transforma o pedido em briefing e delega.
