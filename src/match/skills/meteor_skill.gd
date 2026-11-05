@@ -20,10 +20,14 @@ const METEOR_Z := 2 ## relativo ao decalque (z -1): fica acima dos corpos
 ## Largura da cratera (1x) = 2 × raio × CRATER_FIT (assets/sprites/README.md).
 const CRATER_FIT := 1.07
 
+## Início da queda (meteoro aparece no alto): ponto de impacto e s restantes até ele.
+signal fall_started(at: Vector2, fall_time: float)
+
 var _meteor: Node2D
 var _meteor_sprite: Sprite2D
 var _crater_sprite: Sprite2D
 var _retargeted := false
+var _fall_emitted := false
 
 
 func _ready() -> void:
@@ -86,6 +90,7 @@ func fall_progress() -> float:
 func activate(at: Vector2 = Vector2.INF) -> void:
 	if _crater_sprite:
 		_crater_sprite.visible = false
+	_fall_emitted = false
 	_retargeted = at.is_finite() # mira manual (T-177): cai exatamente em `at`, sem reavaliar nem anular
 	super(at)
 	if not _retargeted and _windup_left > 0.0 and _windup_left <= data.fall_time:
@@ -140,6 +145,9 @@ func _on_windup_tick() -> void:
 	_meteor.visible = t >= 0.0 and _windup_left > 0.0
 	if _meteor.visible:
 		_meteor.position = Vector2(0.0, -data.fall_height * (1.0 - t * t)) # acelera na queda
+		if not _fall_emitted:
+			_fall_emitted = true
+			fall_started.emit(_target, _windup_left)
 		_meteor.queue_redraw()
 	queue_redraw()
 

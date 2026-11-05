@@ -106,6 +106,7 @@ func take_damage(amount: int) -> void:
 		return
 	hp = maxi(hp - amount, 0)
 	damaged.emit(self, amount, _skill_hit)
+	flash()
 	hp_changed.emit(hp, data.hp)
 	if hp == 0:
 		die(DeathCause.KILLED)

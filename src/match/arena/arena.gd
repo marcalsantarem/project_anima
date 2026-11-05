@@ -34,6 +34,10 @@ signal boss_launched(from: Vector2, to: Vector2)
 signal focus_changed(enemy: Node)
 ## Dano na vida de um inimigo/chefe (T-117), por acerto: âncora no chão (tela), dano, se veio de skill.
 signal enemy_damaged(at: Vector2, amount: int, by_skill: bool)
+## Meteoro começa a cair (início da queda): ponto de impacto e s até ele.
+signal skill_fall_started(slot: int, at: Vector2, fall_time: float)
+## Golpe do ogro acerta o Núcleo: `at` = âncora do Núcleo (tela), antes do dano.
+signal boss_attack_landed(at: Vector2)
 
 ## Upgrades da partida, na ordem da fileira do HUD.
 const UPGRADE_IDS: Array[StringName] = [
@@ -139,6 +143,7 @@ func _ready() -> void:
 	skills.skill_cast.connect(skill_cast.emit)
 	skills.skill_cast.connect(_on_skill_impact)
 	skills.skill_fizzled.connect(skill_fizzled.emit)
+	skills.skill_fall_started.connect(skill_fall_started.emit)
 	add_child(_focus_marker)
 	add_child(_skill_aim)
 	add_child(damage_numbers)
@@ -283,6 +288,8 @@ func spawn(enemy_data: EnemyData, edge: WaveEntry.SpawnEdge) -> Enemy:
 	enemy.projectile_pool = enemy_projectiles
 	enemy.died.connect(_on_enemy_died)
 	enemy.damaged.connect(_on_enemy_damaged)
+	enemy.hit_flash_time = feel.hit_flash_time
+	enemy.hit_flash_color = feel.hit_flash_color
 	_enemies.add_child(enemy)
 	active_enemies.append(enemy)
 	if enemy is Boss:
@@ -315,6 +322,7 @@ func boss_launch_bounds(boss: Boss) -> Rect2:
 
 func _on_boss_attack(damage: int) -> void:
 	if not is_over:
+		boss_attack_landed.emit(anima.position)
 		shake.add(feel.shake_boss_hit, feel.shake_boss_hit_time)
 		anima.take_core_damage(damage)
 

@@ -26,6 +26,10 @@ var _shadow: GroundShadow
 var walk: WalkAnimator
 ## true durante take_skill_damage (o dano vem de skill).
 var _skill_hit := false
+## Flash branco ao levar dano (T-117); a Arena define a partir do GameFeelData. 0 = desligado.
+var hit_flash_time := 0.07
+var hit_flash_color := Color(3.0, 3.0, 3.0)
+var _flash_left := 0.0
 
 @onready var _hitbox: CollisionShape2D = $Hitbox
 
@@ -97,6 +101,7 @@ func take_damage(amount: int) -> void:
 		return
 	hp -= amount
 	damaged.emit(self, amount, _skill_hit)
+	flash()
 	if health_bar:
 		health_bar.set_ratio(float(hp) / data.hp)
 	if hp <= 0:
@@ -131,7 +136,7 @@ func _build_art() -> void:
 		health_bar = HealthBar.new()
 		health_bar.configure(data.radius, sprite_top())
 		add_child(health_bar)
-	set_process(_ring != null and data.ring_spin_speed != 0.0)
+	set_process(_spins())
 
 
 ## px (1x) do topo do sprite acima da âncora (sem sprite: o diâmetro).
@@ -141,5 +146,29 @@ func sprite_top() -> float:
 	return data.sprite_anchor.y * SpriteArt.SCALE.y
 
 
+func _spins() -> bool:
+	return _ring != null and data.ring_spin_speed != 0.0
+
+
+## Flash de acerto: corpo em hit_flash_color por hit_flash_time s (sem alocar).
+func flash() -> void:
+	if hit_flash_time <= 0.0 or _body == null or state == State.DEAD:
+		return
+	_flash_left = hit_flash_time
+	_body.self_modulate = hit_flash_color
+	set_process(true)
+
+
+func is_flashing() -> bool:
+	return _flash_left > 0.0
+
+
 func _process(delta: float) -> void:
-	_ring.rotation += data.ring_spin_speed * delta
+	if _spins():
+		_ring.rotation += data.ring_spin_speed * delta
+	if _flash_left > 0.0:
+		_flash_left -= delta
+		if _flash_left <= 0.0:
+			_flash_left = 0.0
+			_body.self_modulate = Color.WHITE
+			set_process(_spins())

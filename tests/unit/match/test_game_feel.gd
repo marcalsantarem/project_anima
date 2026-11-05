@@ -179,3 +179,43 @@ func test_reduced_effects_shows_only_skill_and_boss_numbers() -> void:
 	var b: Boss = _parked(BOSS, Vector2(0, -150))
 	b.take_damage(1)
 	assert_eq(arena.damage_numbers.active_count(), 2, "chefe aparece")
+
+
+# --- sinais extras para o AG09 e flash de acerto ---
+
+func test_skill_fall_started_once_before_impact() -> void:
+	var meteor: SkillData = arena.skills.get_slot(1).data
+	watch_signals(arena)
+	await wait_physics_frames(1)
+	var e := _parked(TANK, Vector2(0, -250))
+	assert_true(arena.use_skill(1, e.position))
+	assert_signal_not_emitted(arena, "skill_fall_started", "não no acionamento")
+	await wait_seconds(meteor.telegraph_time - meteor.fall_time * 0.5)
+	assert_signal_emit_count(arena, "skill_fall_started", 1)
+	assert_signal_not_emitted(arena, "skill_cast", "antes do impacto")
+	var p: Array = get_signal_parameters(arena, "skill_fall_started")
+	assert_eq(p[0], 1)
+	assert_eq(p[1], e.position)
+	assert_almost_eq(p[2], meteor.fall_time, 0.05)
+	await wait_seconds(meteor.fall_time)
+	assert_signal_emit_count(arena, "skill_fall_started", 1)
+	assert_signal_emitted(arena, "skill_cast")
+
+
+func test_boss_attack_landed_at_core() -> void:
+	watch_signals(arena)
+	arena._on_boss_attack(1)
+	assert_signal_emitted_with_parameters(arena, "boss_attack_landed", [arena.anima.position])
+
+
+func test_hit_flash_on_damage_and_reset() -> void:
+	var e := _parked(TANK, Vector2(0, -200))
+	var b: Boss = _parked(BOSS, Vector2(0, -150))
+	e.take_damage(1)
+	b.take_damage(1)
+	for x: Enemy in [e, b]:
+		assert_true(x.is_flashing())
+		assert_eq(x._body.self_modulate, arena.feel.hit_flash_color)
+		x._process(arena.feel.hit_flash_time + 0.01)
+		assert_false(x.is_flashing())
+		assert_eq(x._body.self_modulate, Color.WHITE)

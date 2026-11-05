@@ -285,6 +285,8 @@ Também na `Arena`, só em eventos (nenhum por quadro; as ligações são feitas
 | `boss_telegraph_started(pattern_id: StringName, duration: float, at: Vector2, radius: float)` | início do wind-up do golpe: `pattern_id` = `attack_id` (`&"boss_slam"`), `duration` = `attack_windup`, `at` = posição do chefe, `radius` = `telegraph_radius` |
 | `boss_launched(from: Vector2, to: Vector2)` | chefe lançado (meteoro; ou defesa arquivada esgotada); `to` = fim do voo |
 | `enemy_damaged(at: Vector2, amount: int, by_skill: bool)` | T-117: cada dano na vida de inimigo/chefe (antes de `enemy_died`); `by_skill` = meteoro. Dano na defesa arquivada não emite |
+| `skill_fall_started(slot: int, at: Vector2, fall_time: float)` | meteoro começa a cair (uma vez por uso, só se não foi anulado): `at` = ponto de impacto, `fall_time` = s até o impacto (≈ `fall_time` dos dados) |
+| `boss_attack_landed(at: Vector2)` | golpe do ogro acerta o Núcleo (antes do dano); `at` = âncora do Núcleo |
 
 `skill_used(slot)` e `skill_ready(slot)` já são repassados pela `Arena` (seção acima).
 
@@ -294,6 +296,7 @@ Valores em `data/feel/game_feel.tres` (`GameFeelData`); `Arena.feel` nulo = esse
 - **Tremor** (`ScreenShake`): deslocamento do nó raiz da `Arena` (o HUD é um `CanvasLayer` à parte, não treme). Um por vez; o novo só vale se for mais forte que o que resta; decai em k². Meteoro no impacto 14 px/0,25 s, golpe do ogro 9/0,2, morte do chefe 16/0,4, dano no Núcleo ≥ 10% do máximo 5/0,15. RNG próprio (não muda a seed dos spawns).
 - **Hit-stop** (`HitStop`): `Engine.time_scale` = 0 por 60 ms (meteoro), 50 ms (chefe lançado), 80 ms (morte do chefe), em tempo real; nunca empilha (1 ativo, os outros pedidos são ignorados); restaura o `time_scale` anterior, também ao sair da árvore. Efeitos de `_process` do HUD também param nesses ms (aceito: são 30–80 ms; tweens do HUD podem usar `ignore_time_scale`). `Arena.hit_stop_enabled` é falso no headless (testes, bot).
 - **Números de dano** (`DamageNumbers`): um nó, pool fixo de 48, desenhado com `draw_string` (Outfit peso 800). Branco 26 px no tiro, laranja 40 px no meteoro; sobem 56 px e somem em 0,6 s. Mesmo alvo no mesmo quadro de física = um número somado; até 12 números novos por quadro; pool cheio reusa o mais velho.
+- **Flash de acerto**: todo dano na vida de inimigo/chefe deixa o corpo em `self_modulate` = `hit_flash_color` (3,3,3: estoura para branco) por 70 ms (`hit_flash_time`; 0 = desligado). Não conflita com o tom do wind-up do chefe (`modulate`). Igual no modo reduzido.
 - **`Arena.reduced_effects`** (o `SceneFlow` define; pode mudar no meio da partida): tremor a 30%, sem hit-stop (encerra um ativo), números só do meteoro e do chefe.
 
 `boss_phase_changed` **deixou de existir** (uma fase; T-150).

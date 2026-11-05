@@ -26,6 +26,11 @@ const DEFAULT_PATH := "res://data/feel/game_feel.tres"
 ## Engine.time_scale durante o hit-stop (0 = congela a simulação).
 @export_range(0.0, 1.0) var hit_stop_time_scale: float = 0.0
 
+@export_group("Flash de acerto")
+@export var hit_flash_time: float = 0.07 ## s; sprite do inimigo/chefe atingido fica branco
+## self_modulate do corpo no flash (> 1 estoura para branco; o contorno escuro continua).
+@export var hit_flash_color: Color = Color(3.0, 3.0, 3.0)
+
 @export_group("Números de dano")
 @export var damage_font: Font
 @export var damage_font_weight: int = 800

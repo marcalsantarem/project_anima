@@ -10,6 +10,8 @@ signal skill_cast(slot: int, at: Vector2, radius: float)
 ## Skill acionada mas anulada antes do efeito (meteoro sem inimigo no raio): sem skill_cast; o
 ## cooldown cai para `fizzle_cooldown_ratio` do total. `at` = ponto onde cairia (tela).
 signal skill_fizzled(slot: int, at: Vector2)
+## Início da queda do meteoro: ponto de impacto (tela, chão) e s até o impacto.
+signal skill_fall_started(slot: int, at: Vector2, fall_time: float)
 
 const ACTIONS: Array[StringName] = [&"skill_1", &"skill_2", &"skill_3"]
 const COOLDOWN_EMIT_INTERVAL := 0.1 ## s; no máximo ~10 emissões/s por slot
@@ -35,6 +37,8 @@ func setup(context: SkillContext) -> void:
 			behavior.setup(data, context)
 			behavior.cast.connect(_on_cast.bind(_slots.size()))
 			behavior.fizzled.connect(_on_fizzled.bind(_slots.size()))
+			if behavior.has_signal(&"fall_started"):
+				behavior.connect(&"fall_started", _on_fall_started.bind(_slots.size()))
 			add_child(behavior)
 
 
@@ -54,6 +58,10 @@ static func behavior_for(data: SkillData) -> SkillBehavior:
 
 func _on_cast(at: Vector2, radius: float, slot: int) -> void:
 	skill_cast.emit(slot, at, radius)
+
+
+func _on_fall_started(at: Vector2, fall_time: float, slot: int) -> void:
+	skill_fall_started.emit(slot, at, fall_time)
 
 
 func _on_fizzled(at: Vector2, slot: int) -> void:
