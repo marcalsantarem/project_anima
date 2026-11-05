@@ -8,7 +8,7 @@ Regras definidas pelo dono do projeto. Elas valem para qualquer pessoa ou agente
 |---|---|---|
 | `main` | Versão estável mais atual | **Protegida.** Push direto bloqueado; só recebe mudanças por Pull Request. Publica no site oficial. |
 | `dev` | Desenvolvimento do dia a dia (versão de trabalho) | **Única branch onde se faz commit.** Publica em `dev--projectanimagame.netlify.app`. |
-| `demo` (e outras de versão fechada) | Versões fechadas e jogáveis que não mudam mais (ex.: **demo v1**, o M1) | Criada a partir da `main` **só quando o dono pedir**, ao fechar o marco; publica em `demo--projectanimagame.netlify.app`; **sem commits depois de criada** (decisão 52). |
+| `alfa`, `beta` (versões fechadas) | Versões fechadas e jogáveis que não mudam mais: `alfa` = v0.2.0 (M2), `beta` = v0.3.0 (M10) | Criada a partir da tag **só quando o dono pedir**, ao fechar o marco; publica em `<branch>--projectanimagame.netlify.app`; **sem commits depois de criada** (decisões 52 e 55). |
 
 - **Não crie outras branches** (feature, fix, experimento etc.) sem pedido explícito do dono do projeto.
 - **Não faça commit nem push na `main`.**
@@ -29,4 +29,4 @@ Regras definidas pelo dono do projeto. Elas valem para qualquer pessoa ou agente
 ## Versões
 
 - Cada marco fecha com PR `dev → main`, **tag** `v0.x.0` na `main` e a versão aparecendo no título do jogo (`src/debug/build_info.gd`).
-- Versões fechadas importantes ganham uma branch própria a partir da tag (ex.: `demo` = v0.1, o M1), criada só quando o dono pedir.
+- Versões fechadas importantes ganham uma branch própria a partir da tag (`alfa` = v0.2.0, `beta` = v0.3.0; a v0.1.0 fica só na tag; decisão 55), criada só quando o dono pedir.

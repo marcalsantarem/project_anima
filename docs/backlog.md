@@ -75,7 +75,7 @@
 | T-160 | Arte do ícone de Partículas: estrela verde, estilo "chip" (e nova cor dos efeitos de coleta) | M1 | AG08 | feita |
 | T-161 | Aplicar o ícone verde de Partículas no HUD, Resultado, botões de upgrade e efeitos (hoje dourado) | M1 | AG02 + AG09 | feita |
 | T-162 | Arte do ícone de Moeda (moeda dourada) e do glossário na UI (para o M2) | M2 | AG08 | a fazer |
-| T-163 | Textos do jogo e docs com os nomes oficiais (Módulo, Fragmento, Núcleo, Moeda); decidir a colisão de "Núcleo" | M2 | AG00 + AG04 + AG02 | a fazer |
+| T-163 | Textos do jogo e docs com os nomes oficiais (Módulo, Componente, Núcleo, Moeda); decidir a colisão de "Núcleo" | M2 | AG00 + AG04 + AG02 | a fazer |
 | T-164 | Rótulo da vida do Anima: "NÚCLEO" vira "ENERGIA" no HUD, Resultado e docs de UI | M1 | AG02 | feita |
 | T-165 | Build e versão no cabeçalho do log (commit e data do deploy) | M1 | AG07 + AG02 | feita |
 | T-166 | Chefe sem barra de defesa (mecânica arquivada, desligada por dados); meteoro lança e atordoa; rebalancear | M1 | AG01 | feita |
@@ -92,10 +92,24 @@
 | T-177 | Mira do meteoro: API de alvo manual e prévia do raio; chefe lançado dentro do alcance | M1 | AG01 | feita |
 | T-178 | Arrastar do botão do Módulo para mirar (toque/mouse), segurar 1 + clique no PC | M1 | AG02 | feita |
 | T-179 | Splash e tela de título no estilo holográfico/tecnológico (arte do Gemini como base; texto, barra e brilhos vivos) | M1 | AG02 + AG08 | feita |
-| T-180 | **(1ª do M2)** Guia visual "HUD holográfico" para menus + mockups do menu principal e do hangar (Módulos, Fragmentos, Núcleos) | M2 | AG08 | a fazer (início do M2) |
+| T-180 | **(1ª do M2)** Guia visual "HUD holográfico" para menus + mockups do menu principal e do Resultado com recompensa | M2 | AG08 | a fazer (início do M2) |
 | T-181 | Ícones do app (iPhone, PWA e favicon) na nova identidade tecnológica da splash e do menu | M1 | AG08 + AG02 | pronta p/ briefing |
 | T-182 | Áudio básico: música de entrada (título) e som do tiro básico, com volume salvo e respeitando o 1º toque na web | M2 | AG02 + AG01 | a fazer |
-| T-183 | Fechar o M1 como v0.1: versão `0.1.0` no jogo, tag `v0.1.0`, branch `demo` e deploy em `demo--projectanimagame.netlify.app` (quando o dono pedir) | M1 | AG00 + AG02 + AG07 | a fazer (no fechamento) |
+| T-183 | Fechar o M1 como v0.1.0: versão `0.1.0` no jogo e tag `v0.1.0`, sem branch (decisão 55; quando o dono pedir) | M1 | AG00 + AG02 + AG07 | a fazer (no fechamento) |
+| T-184 | Economia do M2: curva de XP (níveis 1 a 15), XP e Moeda por partida, dados em `.tres` e `docs/economia.md` | M2 | AG04 | a fazer |
+| T-185 | Save local: autoload `Backend` (interface) + `LocalBackend` em `user://` com versão, migração e recuperação; ADR | M2 | AG05 + AG07 | a fazer |
+| T-186 | Lógica pura do meta em `src/meta/`: recompensa do `MatchResult`, XP → nível, slots liberados; testes GUT | M2 | AG04 | a fazer |
+| T-187 | Fluxo de cenas com menu: Título → Menu → Partida → Resultado → Menu; aplica a recompensa e salva | M2 | AG07 | a fazer |
+| T-188 | Partida monta os slots pelo nível da conta (`MatchConfig`); conta sem Módulo joga só com ataque básico | M2 | AG01 | a fazer |
+| T-189 | Arte do menu holográfico: painéis, botões, barra de XP, selo de nível, ícone de XP | M2 | AG08 | a fazer |
+| T-190 | Tela do menu principal: Jogar, nível e barra de XP, saldo de Moeda, som liga/desliga | M2 | AG02 | a fazer |
+| T-191 | Resultado com recompensa: XP e Moeda animados, barra enchendo, subida de nível e aviso de slot liberado | M2 | AG02 + AG09 | a fazer |
+| T-192 | HUD: slots bloqueados mostram o nível que os libera | M2 | AG02 | a fazer |
+| T-193 | Debug do meta: zerar save e dar XP/Moeda pelo overlay `?debug=1`; meta no log da partida | M2 | AG02 + AG05 | a fazer |
+| T-194 | Assets de áudio do M2: música de entrada e som do tiro (próprios ou CC0, licença registrada) | M2 | AG08 | a fazer |
+| T-195 | Balanceamento da progressão: partidas até os níveis 3, 7 e 12 pela simulação do bot | M2 | AG04 | a fazer |
+| T-196 | Validação do M2 (inclui save persistindo no iPhone, no Safari e no modo app) | M2 | AG03 | a fazer |
+| T-197 | Fechar o M2 como v0.2.0: tag `v0.2.0`, branch `alfa` e deploy em `alfa--projectanimagame.netlify.app` (quando o dono pedir) | M2 | AG00 + AG02 + AG07 | a fazer (no fechamento) |
 | T-148 | Sinais da Arena para VFX (projectile_fired, projectile_hit, enemy_died, particles_gained, skill_cast, boss_telegraph_started, boss_phase_changed) | M1 | AG01 | feita |
 
 ## Próximas prontas p/ briefing
@@ -530,7 +544,7 @@
 ### T-180 — Guia "HUD holográfico" dos menus (1ª do M2)
 - **Marco:** M2 (primeira tarefa) · **Dono:** AG08 · **Status:** a fazer (início do M2)
 - **Depende de:** decisões 48 e 49; T-179 (mesma base visual)
-- **Pronto quando:** `docs/arte.md` ganha a seção de menus holográficos (paleta, painéis, botões, molduras por raridade, tipografia, brilhos e animações baratas) e há 2 a 3 mockups em PNG (menu principal, hangar com Módulos/Fragmentos/Núcleos, tela de raridade/fusão), aprovados pelo dono; regras de desempenho no iPhone.
+- **Pronto quando:** `docs/arte.md` ganha a seção de menus holográficos (paleta, painéis, botões, molduras por raridade, tipografia, brilhos e animações baratas) e há 2 a 3 mockups em PNG (menu principal, Resultado com recompensa e subida de nível; o hangar fica para o M3), aprovados pelo dono; regras de desempenho no iPhone.
 
 ### T-181 — Ícones do app na identidade tecnológica
 - **Marco:** M1 · **Dono:** AG08 (arte) + AG02 (deploy) · **Status:** pronta p/ briefing
@@ -540,11 +554,67 @@
 
 ### T-182 — Áudio básico (M2)
 - **Marco:** M2 · **Dono:** AG02 (música, volume, desbloqueio de áudio na web) + AG01 (som do tiro) · **Status:** a fazer
-- **Pronto quando:** uma música toca na entrada (título) em loop e o tiro básico tem um som curto (variação leve de tom, limite de vozes simultâneas para não saturar); áudio só começa após o 1º toque (web/iOS); volume de música e efeitos salvo; sem sons de menu, botões, skills e demais efeitos (ficam para o M7); assets próprios ou CC0 com licença registrada.
+- **Pronto quando:** uma música toca na entrada (título) em loop e o tiro básico tem um som curto (variação leve de tom, limite de vozes simultâneas para não saturar); áudio só começa após o 1º toque (web/iOS); volume de música e efeitos salvo; sem sons de menu, botões, skills e demais efeitos (ficam para o M16); assets da T-194; assets próprios ou CC0 com licença registrada.
 
-### T-183 — Fechar o M1 como v0.1 (demo v1)
+### T-183 — Fechar o M1 como v0.1.0
 - **Marco:** M1 · **Dono:** AG00 (PR e tag) + AG02 (deploy) + AG07 (versão) · **Status:** a fazer (no fechamento do M1, quando o dono pedir)
-- **Pronto quando:** `DEFAULT_VERSION` = `0.1.0`; PR `dev → main` com título/descrição no chat; tag `v0.1.0`; branch `demo` criada a partir da tag; o workflow publica a branch `demo` em `demo--projectanimagame.netlify.app`; nada mais é commitado na `demo`.
+- **Pronto quando:** `DEFAULT_VERSION` = `0.1.0`; PR `dev → main` com título/descrição no chat; tag `v0.1.0`; **sem branch** (decisão 55: a primeira branch fechada é a `alfa`, no M2).
+
+### T-184 — Economia do M2
+- **Marco:** M2 · **Dono:** AG04 · **Depende de:** decisões 25 e 40
+- **Pronto quando:** `docs/economia.md` com a curva de XP dos níveis 1 a 15 (slots nos níveis 3, 7 e 12), XP e Moeda por partida (vitória, derrota, onda alcançada, chefe), sem gasto de Moeda no M2 (o 1º gasto é no M4); valores em `data/meta/*.tres`, prontos para o Remote Config.
+
+### T-185 — Save local
+- **Marco:** M2 · **Dono:** AG05 + AG07 · **Depende de:** —
+- **Pronto quando:** autoload `Backend` com interface (carregar, salvar, zerar) e `LocalBackend` em `user://save.json` com campo de versão, migração e cópia de segurança se o arquivo vier corrompido; `PlayerProfile` (nível, XP, Moeda, configurações); persiste no IndexedDB da web após recarregar; ADR em `docs/`; testes GUT.
+
+### T-186 — Lógica pura do meta em `src/meta/`
+- **Marco:** M2 · **Dono:** AG04 · **Depende de:** T-184, T-185
+- **Pronto quando:** funções puras em `src/meta/` (sem cena nem rede): `MatchResult` → XP e Moeda; aplicar XP com várias subidas de nível; slots liberados por nível; testes GUT dos limites.
+
+### T-187 — Fluxo de cenas com menu
+- **Marco:** M2 · **Dono:** AG07 · **Depende de:** T-185, T-186
+- **Pronto quando:** o `SceneFlow` vai do Título ao Menu principal; "Jogar" monta o `MatchConfig` a partir do perfil; ao fim, aplica a recompensa, salva e mostra o Resultado; "Voltar" leva ao Menu; a partida continua sem falar com o backend.
+
+### T-188 — Partida monta os slots pelo nível da conta
+- **Marco:** M2 · **Dono:** AG01 · **Depende de:** T-187
+- **Pronto quando:** `MatchConfig` traz os Módulos liberados; a arena aceita 0 a 3 slots; com 0, só o ataque básico (o 1º Módulo, meteoro, entra no nível 3); testes e simulação do bot atualizados.
+
+### T-189 — Arte do menu holográfico
+- **Marco:** M2 · **Dono:** AG08 · **Depende de:** T-180
+- **Pronto quando:** sprites e 9-slices do menu na identidade holográfica, em `assets/ui/`, leves para o iPhone, com licença.
+
+### T-190 — Tela do menu principal
+- **Marco:** M2 · **Dono:** AG02 · **Depende de:** T-187, T-189, T-162
+- **Pronto quando:** menu em retrato com Jogar em destaque, nível e barra de XP, saldo de Moeda e botão de som; funciona de 720×1280 a 720×1560, toque e mouse.
+
+### T-191 — Resultado com recompensa
+- **Marco:** M2 · **Dono:** AG02 + AG09 · **Depende de:** T-186, T-187
+- **Pronto quando:** o Resultado mostra XP e Moeda ganhos contando, a barra de XP enchendo, a subida de nível com destaque e o aviso "slot liberado"; respeita os efeitos reduzidos.
+
+### T-192 — HUD: slots bloqueados com o nível
+- **Marco:** M2 · **Dono:** AG02 · **Depende de:** T-188
+- **Pronto quando:** slot bloqueado com cadeado e "Nv 3/7/12"; slot vazio não reage ao toque.
+
+### T-193 — Debug do meta
+- **Marco:** M2 · **Dono:** AG02 + AG05 · **Depende de:** T-185
+- **Pronto quando:** no overlay de debug: zerar save, +XP, +Moeda e definir nível; o log da partida registra nível, XP e Moeda antes e depois.
+
+### T-194 — Assets de áudio do M2
+- **Marco:** M2 · **Dono:** AG08 · **Depende de:** —
+- **Pronto quando:** música curta de entrada em loop e 2 a 3 variações de tiro, em `.ogg` leves, com fonte e licença em `assets/LICENSES.md`.
+
+### T-195 — Balanceamento da progressão
+- **Marco:** M2 · **Dono:** AG04 · **Depende de:** T-186, T-188
+- **Pronto quando:** relatório com as partidas necessárias para os níveis 3, 7 e 12 (alvo a definir com o dono); valores ajustados nos `.tres`.
+
+### T-196 — Validação do M2
+- **Marco:** M2 · **Dono:** AG03 · **Depende de:** todas do M2
+- **Pronto quando:** veredito do AG03: ciclo jogar → ganhar → voltar sem erro, save sobrevive a recarregar e fechar no iPhone (Safari e modo app), áudio após o 1º toque, testes passando.
+
+### T-197 — Fechar o M2 como v0.2.0
+- **Marco:** M2 · **Dono:** AG00 + AG02 + AG07 · **Depende de:** T-196 e aval do dono
+- **Pronto quando:** `DEFAULT_VERSION` = `0.2.0`; PR `dev → main` com título e texto no chat; tag `v0.2.0`; branch `alfa` criada da tag; o workflow publica a `alfa` em `alfa--projectanimagame.netlify.app`; nada mais é commitado nela.
 
 ### T-148 — Sinais da Arena para VFX
 - **Marco:** M1 · **Dono:** AG01 · **Status:** feita
@@ -669,20 +739,9 @@
 
 - **Voltar ao título a partir do Resultado:** hoje "Jogar de novo" vai direto para a partida. Exigiria um sinal novo no ResultScreen (AG02). Decisão do usuário via AG00.
 
-## Depois (M2+; só T-109 e T-110 já têm task)
+## Depois (M3+)
 
-- **M2:**
-  - nível de conta (XP das partidas);
-  - desbloqueio dos slots: slot 1 no nível 3, slot 2 no nível 7, slot 3 no nível 12 (ajustáveis; decisão #25 revisada);
-  - skills de controle e defesa (T-109, T-110);
-  - **Gold** (moeda do meta-jogo, decisão #29): calculado a partir do `MatchResult`, com ganho variável por partida;
-  - módulos: equipamentos do Anima, melhorados com Gold, com raridade;
-  - fusão de módulos 3→1;
-  - **árvore de talentos comprada com Gold** (decisão #30);
-  - save local.
-- **Roadmap:** marcos e versões em [docs/roadmap.md](roadmap.md) (decisão 53). Tarefas de M2 em diante são quebradas quando o marco começar.
-- **[A definir] para o M2:** evolução das skills; atributos dos módulos; prêmios por nível de conta além dos slots.
-- **M3:** escolha do backend, conta guest, sincronização, economia no servidor, Remote Config.
-- **M4:** ads, loja, skins, áudio final, lojas nativas, mais fases, localização.
+- **M2 quebrado** (2026-11-05): T-162, T-163, T-180, T-182 e T-184 a T-197.
+- **Roadmap:** marcos e versões em [docs/roadmap.md](roadmap.md) (decisão 53). Tarefas do M3 em diante são quebradas quando o marco começar.
 
 - **Decisão 37 (meteoro de fogo):** T-139 (AG01) implementa o meteoro com raio de explosão e dano em dados, preparados para upgrades; o ícone (T-128, AG08) e o VFX (T-131, AG09) seguem o meteoro de fogo.

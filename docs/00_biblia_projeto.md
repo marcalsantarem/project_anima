@@ -78,8 +78,8 @@ Visão do dono, **não definitiva**; detalhe completo em [docs/roadmap.md](roadm
 
 | Marco | Versão | Tag | Foco |
 |---|---|---|---|
-| M1 | v0.1.0 | Vertical slice | combate e visual (vira a demo v1, branch `demo`) |
-| M2 | v0.2.0 | **Versão Alfa** | menu holográfico, ciclo jogar → ganhar → voltar, Moeda, save local, nível de conta, XP, música de entrada e som do tiro |
+| M1 | v0.1.0 | Vertical slice | combate e visual (só tag, sem branch) |
+| M2 | v0.2.0 | **Versão Alfa** (branch `alfa`) | menu holográfico, ciclo jogar → ganhar → voltar, Moeda, save local, nível de conta, XP, música de entrada e som do tiro |
 | M3 | v0.2.1 | Hangar | menu reestruturado |
 | M4 | v0.2.2 | Núcleos | árvore de 10–12 talentos |
 | M5 | v0.2.3 | Módulos | congelamento, escudo, choque; seleção; slots por nível; evolução com Moeda |
@@ -87,7 +87,7 @@ Visão do dono, **não definitiva**; detalhe completo em [docs/roadmap.md](roadm
 | M7 | v0.2.5 | Componentes | equipamentos (ex-Fragmentos), drop, inventário, upgrade |
 | M8 | v0.2.6 | Configurações e Localização | volume, sons, efeitos, idioma; inglês e espanhol |
 | M9 | v0.2.7 | Onboarding | tutoriais |
-| M10 | v0.3.0 | **Versão Beta** (demo pública) | 5 fases, inimigos, 2 chefes, progressão, polimento |
+| M10 | v0.3.0 | **Versão Beta** (demo pública, branch `beta`) | 5 fases, inimigos, 2 chefes, progressão, polimento |
 | M11 | v0.3.1 | Desktop | build desktop |
 | M12 | v0.3.2 | Skins | skins do Anima |
 | M13 | v0.4.0 | Expansão: Componentes | 6 espaços, raridades, fusão |

@@ -1,12 +1,12 @@
 # Roadmap de versões — Project: Anima
 
 > Visão do dono do projeto (2026-11-05, decisão 53). **Não é definitivo**: guia a ordem das versões. As tarefas técnicas de cada marco ficam no [backlog](backlog.md), quebradas pelo AG00 quando o marco começar.
-> Cada marco = uma versão com **tag** (nome entre parênteses), fechada com PR `dev → main`. Versões fechadas importantes ganham branch própria (decisão 52; a primeira é `demo` = v0.1.0).
+> Cada marco = uma versão com **tag** (nome entre parênteses), fechada com PR `dev → main`. Versões fechadas importantes ganham branch própria (decisões 52 e 55: `alfa` = v0.2.0 e `beta` = v0.3.0; a v0.1.0 fica só na tag).
 
 | Marco | Versão | Nome da tag | Foco |
 |---|---|---|---|
 | M1 | v0.1.0 | Vertical slice | o que já está mapeado |
-| M2 | v0.2.0 | **Versão Alfa** | ciclo básico do meta + áudio básico |
+| M2 | v0.2.0 | **Versão Alfa** (branch `alfa`) | ciclo básico do meta + áudio básico |
 | M3 | v0.2.1 | Hangar | menu reestruturado |
 | M4 | v0.2.2 | Núcleos | talentos |
 | M5 | v0.2.3 | Módulos | 3 novos Módulos e seleção |
@@ -14,7 +14,7 @@
 | M7 | v0.2.5 | Componentes | equipamentos |
 | M8 | v0.2.6 | Configurações e Localização | opções e idiomas |
 | M9 | v0.2.7 | Onboarding | tutoriais |
-| M10 | v0.3.0 | **Versão Beta** (demo pública) | expansão de conteúdo |
+| M10 | v0.3.0 | **Versão Beta** (demo pública, branch `beta`) | expansão de conteúdo |
 | M11 | v0.3.1 | Desktop | build desktop |
 | M12 | v0.3.2 | Skins | skins do Anima |
 | M13 | v0.4.0 | Expansão: Componentes | 6 espaços, raridades, fusão |
@@ -30,6 +30,8 @@
 - O que já temos mapeado (backlog M1).
 
 ## M2 — v0.2.0 — Versão Alfa
+Tarefas: T-180 e T-182 a T-197 no [backlog](backlog.md). Gera a branch `alfa`.
+
 Demo básica:
 - Menu e botões holográficos
 - Ciclo "jogar → ganhar → voltar"
@@ -145,7 +147,7 @@ Expansão de conteúdo:
 - Passe de batalha.
 - Duelo de progressão entre jogadores em fases infinitas.
 
-## Pontos a confirmar com o dono
-- No M8, os itens estavam marcados "v0.5.6" e "v0.5.7": entendido como erro de digitação (o marco é v0.2.6).
-- No M12, "desbloqueáveis com gold": entendido como **Moeda** (Gold foi renomeado na decisão 40).
-- O áudio básico (música de entrada e tiro) entra no M2; os demais sons, no M16.
+## Confirmado pelo dono (2026-11-05)
+- M8: os itens marcados "v0.5.6/v0.5.7" eram erro de digitação; o marco é v0.2.6.
+- M12: "gold" = **Moeda**.
+- Áudio básico (música de entrada e tiro) no M2; os demais sons no M16.
