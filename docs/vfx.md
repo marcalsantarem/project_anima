@@ -43,14 +43,14 @@ Custo = gotas desenhadas no pico (cada gota = 2 círculos) + arcos. "Sinal exist
 
 | Tipo | Efeito | Sinal | Duração | Cor | Inst. | Pico | Reduzido |
 |---|---|---|---|---|---|---|---|
-| `fx_meteor_trail` (TRAVEL) | rastro de fogo da queda (360 px, acelerando) | `skill_fall_started(slot, at, fall_time)` **pedido ao AG01**; sem ele, fallback no `skill_cast` (só a cauda se desfazendo) | 0,35 + 0,15 s | `#FF8A3D`, cabeça `#FFE066` | 2 | 7 gotas | cortado |
+| `fx_meteor_trail` (TRAVEL) | rastro de fogo da queda (360 px, acelerando) | `skill_fall_started(slot, at, fall_time)` (percurso = `fall_time`; fallback sem o sinal: no `skill_cast`, só a cauda) | `fall_time` + 0,15 s | `#FF8A3D`, cabeça `#FFE066` | 2 | 7 gotas | cortado |
 | `fx_skill_cast` (GROUND_RING) | anel de choque do impacto (agora quente) | `skill_cast` | 0,45 s | `#FF9A3D` | 2 | 2 arcos | mantido |
 | `fx_meteor_explosion` (EXPLOSION) | flash + bola de fogo + chamas + brasas + fumaça curta | `skill_cast` (`size` = raio / 160) | 0,55 s | `#FF8A3D`/`#FFE066`, brasas `#FFF3B0` | 2 | 6 chamas + miolo + 6 brasas + 3 fumaças | sem flash, brasas e fumaça; 3 chamas |
 | `fx_crater_smoke` (PUFF) | cratera fumegando | `skill_cast` (atraso 0,12 s) | 0,9 s | `#8A7F8C` | 2 | 5 gotas | cortado |
 | `fx_fizzle` (PUFF) | "puf" discreto do meteoro anulado | `skill_fizzled` | 0,35 s | `#B8B0BC` | 2 | 4 gotas | 2 gotas |
 | `fx_telegraph` (GROUND_RING fill) | aviso do golpe do ogro, **vermelho** | `boss_telegraph_started` | `duration` | `#E8344E` | 6 | 1 elipse + 2 arcos | **mantido** |
 | `fx_boss_windup` (GLOW) | brilho vermelho pulsando no corpo do ogro + flash no fim | `boss_telegraph_started` (some no lançamento/morte) | `duration` | `#E8344E` | 1 | 4 gotas | cortado |
-| `fx_boss_wave` (GROUND_RING) | onda do golpe no Núcleo | queda de `core_hp_changed` com wind-up pendente (sem `boss_launched` entre eles) | 0,4 s | poeira `#D9B98C` | 2 | 2 arcos | mantido |
+| `fx_boss_wave` (GROUND_RING) | onda do golpe no Núcleo | `boss_attack_landed(at)` (fallback sem o sinal: queda de `core_hp_changed` com wind-up pendente, sem `boss_launched` entre eles) | 0,4 s | poeira `#D9B98C` | 2 | 2 arcos | mantido |
 | `fx_boss_slam` (PUFF) | poeira do golpe no Núcleo | idem | 0,45 s | `#D9B98C` | 2 | 6 gotas | cortado |
 | `fx_boss_launch` (TRAVEL) | voo: rastro de poeira + 3 estrelas na cabeça | `boss_launched(from, to)` | 0,6 + 0,2 s | `#D9B98C`, estrelas `#FFE066` | 1 | 7 gotas + 3 | cortado |
 | `fx_boss_land` (PUFF) | poeira do pouso | `boss_launched` (atraso 0,6 s = `launch_time`) | 0,45 s | `#D9B98C` | 1 | 6 gotas | cortado |
@@ -98,6 +98,6 @@ Os sinais marcados T-148 estão sendo criados pelo AG01; o `FxDirector` só cone
 
 - Medir o custo no build Web e no iPhone (o `--fx-bench` só roda no desktop).
 - Ligação na partida (§1.1), pelo AG00/AG01.
-- **Pedido ao AG01:** sinal `skill_fall_started(slot, at, fall_time)` no início da queda do meteoro (o `FxDirector` já conecta se existir); até lá o rastro aparece no impacto (fallback). Opcional: `boss_attack_landed(at)`, para o golpe não depender da heurística wind-up → queda de HP.
-- Flash branco **no sprite** do inimigo atingido (modulate) é do `match/` (AG01); o `fx_hit` dá um flash branco maior sobre o ponto do acerto.
+- `skill_fall_started` e `boss_attack_landed` existem (AG01); os fallbacks ficam só para arenas sem eles.
+- Flash branco **no sprite** do inimigo atingido (70 ms) é feito pelo `match/` (AG01); o `fx_hit` soma um flash maior sobre o ponto do acerto.
 - Brilho contínuo do próprio projétil (no sprite, AG08/AG01); o `fx_trail` cobre só o rastro do disparo.

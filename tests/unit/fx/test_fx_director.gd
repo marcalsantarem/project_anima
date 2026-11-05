@@ -116,7 +116,7 @@ func test_boss_telegraph_uses_duration_and_radius() -> void:
 func test_meteor_impact_plays_explosion_smoke_and_fallback_trail() -> void:
 	var sigs: Array = FxDirector.SIGNALS.keys()
 	sigs.erase(&"skill_fall_started")
-	var old := _fake_arena(sigs) # arena atual: sem o sinal da queda
+	var old := _fake_arena(sigs) # arena antiga: sem o sinal da queda
 	add_child_autofree(old)
 	director.bind(old)
 	old.emit_signal("skill_cast", 1, Vector2(300, 500), 160.0)
@@ -133,6 +133,8 @@ func test_meteor_trail_follows_fall_signal() -> void:
 	arena.emit_signal("skill_fall_started", 1, Vector2(300, 500), 0.35)
 	var trail := _active(&"fx_meteor_trail")
 	assert_almost_eq(trail.elapsed, 0.0, 0.001, "acompanha a queda desde o início")
+	assert_almost_eq(trail.travel_time, 0.35, 0.001, "usa o fall_time")
+	assert_almost_eq(trail.duration, 0.35 + FxDirector.METEOR_TRAIL_TAIL, 0.001)
 	arena.emit_signal("skill_cast", 1, Vector2(300, 500), 160.0)
 	assert_eq(pool.active_count(&"fx_meteor_trail"), 1, "com o sinal da queda não há fallback")
 
@@ -161,7 +163,30 @@ func test_boss_launch_plays_flight_landing_and_stun() -> void:
 	assert_false(stun.active, "estrelas somem ao fim do atordoamento")
 
 
-func test_boss_strike_on_core_only_after_windup() -> void:
+func test_boss_attack_landed_plays_strike() -> void:
+	arena.emit_signal("core_hp_changed", 100, 100)
+	arena.emit_signal("boss_telegraph_started", &"boss_slam", 0.5, Vector2(360, 600), 110.0)
+	arena.emit_signal("boss_attack_landed", Vector2(360, 690))
+	assert_eq(_active(&"fx_boss_wave").position, Vector2(360, 690))
+	assert_eq(pool.active_count(&"fx_boss_slam"), 1)
+	arena.emit_signal("core_hp_changed", 80, 100)
+	assert_eq(pool.active_count(&"fx_boss_wave"), 1, "com o sinal, a queda de HP não duplica")
+
+
+func test_pool_restores_scene_duration() -> void:
+	arena.emit_signal("skill_fall_started", 1, Vector2(300, 500), 0.2)
+	var trail := _active(&"fx_meteor_trail")
+	trail.stop()
+	var again := pool.play(&"fx_meteor_trail", Vector2.ZERO)
+	assert_almost_eq(again.travel_time, 0.35, 0.001, "valor da cena volta a cada play")
+
+
+func test_boss_strike_fallback_without_signal() -> void:
+	var sigs: Array = FxDirector.SIGNALS.keys()
+	sigs.erase(&"boss_attack_landed")
+	arena = _fake_arena(sigs)
+	add_child_autofree(arena)
+	director.bind(arena)
 	arena.emit_signal("core_hp_changed", 100, 100)
 	arena.emit_signal("core_hp_changed", 90, 100)
 	assert_eq(pool.active_count(&"fx_boss_wave"), 0, "dano comum não é golpe do chefe")
@@ -186,7 +211,7 @@ func test_reduced_keeps_warnings_and_cuts_extras() -> void:
 	arena.emit_signal("boss_telegraph_started", &"boss_slam", 0.5, Vector2(360, 600), 110.0)
 	assert_eq(pool.active_count(&"fx_telegraph"), 1, "aviso do golpe sempre visível")
 	assert_eq(pool.active_count(&"fx_boss_windup"), 0, "sem brilho")
-	arena.emit_signal("core_hp_changed", 80, 100)
+	arena.emit_signal("boss_attack_landed", Vector2(360, 690))
 	assert_eq(pool.active_count(&"fx_boss_wave"), 1, "onda do golpe mantida")
 	assert_eq(pool.active_count(&"fx_boss_slam"), 0, "sem poeira")
 	arena.emit_signal("boss_launched", Vector2(360, 600), Vector2(360, 200))

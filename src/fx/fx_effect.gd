@@ -61,6 +61,8 @@ var delay := 0.0
 ## TRAVEL: fim do percurso, relativo à âncora. Definido por quem chama, após o play().
 var target := Vector2.ZERO
 var _outline := Color.BLACK
+var _scene_duration := -1.0
+var _scene_travel_time := -1.0
 var _angle_offset := 0.0
 
 
@@ -77,6 +79,11 @@ func start(anchor: Vector2, fx_color: Color, fx_size: float, reduced_mode: bool)
 	_outline = outline_color if outline_color.a > 0.0 and color == default_color else color.darkened(OUTLINE_DARKEN)
 	size_scale = fx_size
 	reduced = reduced_mode
+	if _scene_duration < 0.0: # valores da cena; quem chama pode mudá-los por uso
+		_scene_duration = duration
+		_scene_travel_time = travel_time
+	duration = _scene_duration
+	travel_time = _scene_travel_time
 	elapsed = 0.0
 	delay = 0.0
 	target = Vector2.ZERO

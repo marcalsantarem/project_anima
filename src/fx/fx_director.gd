@@ -24,6 +24,7 @@ const BOSS_STUN_TIME := 2.0 ## BossData.stun_time
 const METEOR_FALL_HEIGHT := 360.0 ## SkillData.fall_height do skill_meteor
 const METEOR_BASE_RADIUS := 160.0 ## raio do skill_meteor: tamanho 1 da explosão
 const BOSS_DEATH_EXPLOSION_SIZE := 1.8
+const METEOR_TRAIL_TAIL := 0.15 ## cauda do rastro se desfazendo depois do impacto
 
 ## Sinal da arena → método deste nó. Conectados só se existirem.
 const SIGNALS := {
@@ -35,9 +36,10 @@ const SIGNALS := {
 	&"skill_fizzled": &"_on_skill_fizzled",
 	&"skill_used": &"_on_skill_used",
 	&"skill_ready": &"_on_skill_ready",
-	## Pedido ao AG01 (ainda não existe): início da queda do meteoro, para o rastro acompanhar a
-	## queda. Sem ele, o rastro aparece no impacto, já se desfazendo (fallback).
+	## Início da queda do meteoro (rastro acompanha a queda). Sem ele: fallback no impacto.
 	&"skill_fall_started": &"_on_skill_fall_started",
+	## Golpe do ogro acertou (antes do dano). Sem ele: fallback wind-up → queda de HP do Núcleo.
+	&"boss_attack_landed": &"_on_boss_attack_landed",
 	&"boss_telegraph_started": &"_on_boss_telegraph_started",
 	&"boss_launched": &"_on_boss_launched",
 	&"boss_defeated": &"_on_boss_defeated",
@@ -165,9 +167,13 @@ func _on_skill_cast(_slot: int, at: Vector2, radius: float) -> void:
 			trail.elapsed = trail.travel_time
 
 
-func _on_skill_fall_started(_slot: int, at: Vector2, _fall_time: float) -> void:
-	if not reduced_effects:
-		_start_meteor_trail(_to_pool(at))
+func _on_skill_fall_started(_slot: int, at: Vector2, fall_time: float) -> void:
+	if reduced_effects:
+		return
+	var trail := _start_meteor_trail(_to_pool(at))
+	if trail and fall_time > 0.0:
+		trail.travel_time = fall_time # a cabeça chega ao chão junto com o meteoro
+		trail.duration = fall_time + METEOR_TRAIL_TAIL
 
 
 func _start_meteor_trail(p: Vector2) -> FxEffect:
@@ -242,12 +248,22 @@ func _on_core_hp_changed(current: int, _max_hp: int) -> void:
 	if _last_core_hp >= 0 and current < _last_core_hp:
 		var p := _to_pool(_core_anchor())
 		_play(&"fx_core_pulse", p)
-		if _boss_strike_pending:
+		if _boss_strike_pending and not _connected.has(&"boss_attack_landed"): # fallback
 			_boss_strike_pending = false
-			_play(&"fx_boss_wave", p)
-			if not reduced_effects:
-				_play(&"fx_boss_slam", p)
+			_play_boss_strike(p)
 	_last_core_hp = current
+
+
+func _on_boss_attack_landed(at: Vector2) -> void:
+	_boss_strike_pending = false
+	_play_boss_strike(_to_pool(at))
+
+
+## Golpe do ogro no Núcleo: onda (sempre) + poeira (fora do reduzido).
+func _play_boss_strike(p: Vector2) -> void:
+	_play(&"fx_boss_wave", p)
+	if not reduced_effects:
+		_play(&"fx_boss_slam", p)
 
 
 func _on_upgrade_changed(id: StringName, level: int, _max_level: int, _next_cost: int) -> void:
