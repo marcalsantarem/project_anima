@@ -43,6 +43,8 @@ var _started := false
 var _stage: Control
 var _button: Button
 var _studio_logo: TextureRect
+## `v<versão> · <sha>` no canto inferior direito (T-165), alinhado à base do logo do estúdio.
+var version_label: Label
 ## Link "Último log" (null se não houver log salvo) e o visualizador aberto.
 var last_log_link: Button
 var viewer: LogViewer
@@ -74,6 +76,8 @@ func _ready() -> void:
 	_studio_logo.modulate.a = STUDIO_ALPHA
 	_studio_logo.mouse_filter = MOUSE_FILTER_IGNORE
 	root.add_child(_studio_logo)
+	version_label = ScreenKit.version_label()
+	root.add_child(version_label)
 	if MatchRecorder.has_last_log():
 		last_log_link = Button.new()
 		last_log_link.name = "LastLog"
@@ -186,6 +190,7 @@ func _layout() -> void:
 	var lsize := Vector2(lw, lw * tex.y / tex.x)
 	_studio_logo.size = lsize
 	_studio_logo.position = Vector2((view.x - lsize.x) / 2.0, view.y - safe.bottom - STUDIO_BOTTOM - lsize.y)
+	ScreenKit.place_corner_label(version_label, get_viewport(), STUDIO_BOTTOM)
 	if last_log_link != null:
 		last_log_link.size = LINK_SIZE
 		last_log_link.position = Vector2(view.x - safe.right - LINK_SIZE.x - UiTokens.SPACE_XS, safe.top + UiTokens.SPACE_XS)

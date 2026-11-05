@@ -83,6 +83,8 @@ jobs:
           # Manifesto e ícones do app (T-175): o export não copia extras de web/.
           bash web/copy_pwa.sh build/web
           test -s build/web/manifest.webmanifest
+          # Versão/build no log e na pausa (T-165): usa GITHUB_SHA, GITHUB_REF_NAME e GITHUB_RUN_NUMBER.
+          bash web/inject_build.sh build/web
           du -ah build/web | sort -h
 
       - uses: actions/upload-artifact@v7.0.2

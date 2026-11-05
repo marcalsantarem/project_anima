@@ -16,6 +16,8 @@ var _continue: Button
 ## Interruptor "Debug" (overlay de debug, BRF-063; estado em DebugSettings).
 var debug_toggle: Button
 var _js_visibility_cb: JavaScriptObject
+## Linha discreta `v<versão> · <sha>` (T-165).
+var version_label: Label
 
 
 func _ready() -> void:
@@ -34,8 +36,21 @@ func _ready() -> void:
 	debug_toggle.add_theme_font_size_override("font_size", UiTokens.FONT_CAPTION)
 	col.add_child(debug_toggle)
 	_refresh_debug()
+	_add_version_label()
 	_root.visible = false
 	_listen_web_visibility()
+
+
+## Versão e build em letra pequena no canto inferior direito (T-165), acima da safe area.
+func _add_version_label() -> void:
+	version_label = ScreenKit.version_label()
+	_root.add_child(version_label)
+	_place_version_label()
+
+
+## A safe area muda com a barra do Safari: reposiciona a cada abertura.
+func _place_version_label() -> void:
+	ScreenKit.place_corner_label(version_label, get_viewport())
 
 
 func bind(arena: Node) -> void:
@@ -58,6 +73,7 @@ func open() -> void:
 	get_tree().paused = true
 	_root.visible = true
 	_refresh_debug()
+	_place_version_label()
 	ScreenKit.fade_in(_root)
 
 

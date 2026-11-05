@@ -83,6 +83,7 @@ func refresh() -> void:
 		int(s.get("proj_enemy", 0)), int(s.get("fx_live", 0))])
 	lines.append("draw %d  nós %d  mem %.1f MB" % [int(s.get("draw_calls", 0)), int(s.get("nodes", 0)),
 		float(s.get("mem_static_mb", 0.0))])
+	lines.append("%s · v%s" % [BuildInfo.label(BuildInfo.current()), BuildInfo.version()])
 	lines.append(">50ms %d  erros %d" % [recorder.frames.over_50, recorder.errors.size()])
 	lines.append_array(MatchRecorder.viewport_lines(MatchRecorder.web_viewport()))
 	for e in recorder.errors.tail(3):

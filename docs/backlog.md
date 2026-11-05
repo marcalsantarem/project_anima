@@ -65,8 +65,8 @@
 | T-150 | Chefe ogro: ataque corpo a corpo, sem minions, defesa como escudo e lançamento | M1 | AG01 | feita |
 | T-151 | Arte do chefe ogro (humanoide grande e gordo) | M1 | AG08 | feita |
 | T-152 | Barra de vida grande e vermelha "Boss" no topo do HUD | M1 | AG02 | feita |
-| T-153 | Arte das pílulas do topo (ONDA e Partículas) e do botão secundário | M1 | AG08 | pronta p/ briefing |
-| T-154 | Texto "MAX" na pílula de custo dos upgrades (hoje desenhado por código) | M1 | AG08 + AG02 | pronta p/ briefing |
+| T-153 | Arte das pílulas do topo (ONDA e Partículas) e do botão secundário | M1 | AG08 | feita (arte; falta aplicar, BRF-075) |
+| T-154 | Texto "MAX" na pílula de custo dos upgrades (hoje desenhado por código) | M1 | AG08 + AG02 | feita (arte; falta aplicar, BRF-075) |
 | T-155 | "Voltar ao título" a partir da tela de Resultado | M1 | AG02 + AG07 | feita |
 | T-156 | Chão: quebrar a repetição das pedrinhas do tile | M1 | AG08 + AG01 | depende do teste no iPhone |
 | T-157 | Ajustar o escurecimento do topo (degradê do chão + do HUD) | M1 | AG02 + AG01 | depende do teste no iPhone |
@@ -77,7 +77,7 @@
 | T-162 | Arte do ícone de Moeda (moeda dourada) e do glossário na UI (para o M2) | M2 | AG08 | a fazer |
 | T-163 | Textos do jogo e docs com os nomes oficiais (Módulo, Fragmento, Núcleo, Moeda); decidir a colisão de "Núcleo" | M2 | AG00 + AG04 + AG02 | a fazer |
 | T-164 | Rótulo da vida do Anima: "NÚCLEO" vira "ENERGIA" no HUD, Resultado e docs de UI | M1 | AG02 | feita |
-| T-165 | Build e versão no cabeçalho do log (commit e data do deploy) | M1 | AG07 + AG02 | pronta p/ briefing |
+| T-165 | Build e versão no cabeçalho do log (commit e data do deploy) | M1 | AG07 + AG02 | feita |
 | T-166 | Chefe sem barra de defesa (mecânica arquivada, desligada por dados); meteoro lança e atordoa; rebalancear | M1 | AG01 | feita |
 | T-167 | Animação de passos do chefe ogro (balanço, ritmo pelo movimento; quadros de caminhada) | M1 | AG01 + AG08 | feita |
 | T-168 | Círculo rúnico do chão menor (~70%) | M1 | AG01 | feita |

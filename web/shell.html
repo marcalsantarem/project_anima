@@ -406,6 +406,8 @@ html, body {
 }
 		</style>
 		$GODOT_HEAD_INCLUDE
+		<!-- T-165: o deploy troca o marcador abaixo por window.ANIMA_BUILD = {...} (web/inject_build.sh). Inline: sem cache antigo. -->
+		<script>/*ANIMA_BUILD*/</script>
 		<!-- Depois do head include do Godot. Arquivos de web/pwa/, copiados para o build por web/copy_pwa.sh. -->
 		<link rel="manifest" href="manifest.webmanifest">
 		<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-180.png">

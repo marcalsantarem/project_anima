@@ -593,7 +593,7 @@ func build_header() -> Dictionary:
 	var vp := get_viewport()
 	var h := {
 		"game": ProjectSettings.get_setting("application/config/name", ""),
-		"version": ProjectSettings.get_setting("application/config/version", ""),
+		"version": BuildInfo.version(),
 		"godot": Engine.get_version_info().string,
 		"date": Time.get_datetime_string_from_system(false, true),
 		"unix": Time.get_unix_time_from_system(),
@@ -609,7 +609,7 @@ func build_header() -> Dictionary:
 		"cores": OS.get_processor_count(),
 		"reduced_effects": bool(_fx_pool.get(&"reduced_effects")) if _fx_pool else false,
 		"seed": _seed,
-		"build": "",
+		"build": BuildInfo.current().duplicate(),
 	}
 	if vp:
 		var ui := ScreenKit.safe_area(vp)
@@ -619,7 +619,6 @@ func build_header() -> Dictionary:
 	if OS.has_feature("web"):
 		h["web"] = MatchRecorder.web_env().duplicate()
 		h["web"]["viewport"] = MatchRecorder.web_viewport()
-		h["build"] = str(h["web"].get("build", "")) if h["web"].get("build") != null else ""
 	return h
 
 

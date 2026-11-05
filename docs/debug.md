@@ -77,3 +77,11 @@ Módulo `src/debug/` (sem autoload). O `SceneFlow` cria o gravador e o overlay n
 - **Quadro p95/p99:** a resolução é de 1 ms (limite superior do balde). O máximo é exato. Travadas isoladas aparecem no p99 e em "Maiores travadas".
 - **`apos_gravacao`:** a travada veio logo depois de uma gravação do log. Desconsidere-a ao avaliar o jogo.
 - **Memória e nós "→ (+x)":** comparação da primeira com a última amostra. Crescimento contínuo de nós ou órfãos indica vazamento.
+
+## 7. Versão e build (T-165)
+
+- O deploy (`.github/workflows/deploy-web.yml`) roda `bash web/inject_build.sh build/web` depois do export e do `copy_pwa.sh`: troca o marcador `/*ANIMA_BUILD*/` do `web/shell.html` por `window.ANIMA_BUILD = {sha, sha_full, branch, built_at, run}` **inline no `index.html`** (sem arquivo extra, sem cache antigo, sem segredos).
+- O jogo lê o objeto em `BuildInfo` (`src/debug/build_info.gd`, só na web). Sem ele (export local, editor): `"dev local"`, sem erro.
+- `version`: `application/config/version` do `project.godot`, se existir; senão `BuildInfo.DEFAULT_VERSION` (`"0.1.0-demo"`).
+- Onde aparece: cabeçalho do log (`version`, `build`), resumo em texto (`Build: <sha> (<branch>) · <data UTC> · exec #<n>`), overlay `?debug=1` (`<sha> · v<versão>`) e canto inferior direito da pausa e da tela de título (`v0.1.0-demo · <sha>`, `ScreenKit.version_label`).
+- Teste local: `GITHUB_SHA=abc1234def... GITHUB_REF_NAME=dev GITHUB_RUN_NUMBER=42 bash web/inject_build.sh build/web` (roda uma vez por export: depois o marcador some).

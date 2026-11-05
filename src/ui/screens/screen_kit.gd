@@ -3,6 +3,7 @@ class_name ScreenKit
 
 const THEME := preload("res://src/ui/theme/anima_theme.tres")
 const CARD_WIDTH := 520.0
+const VERSION_FONT := 18 ## linha de versão/build (T-165)
 
 ## Safe area simulada (px da resolução base, ex.: {"bottom": 65.0}) para renders e testes fora do iPhone.
 ## Vazio = safe area real do navegador/dispositivo.
@@ -77,6 +78,31 @@ static func label(text: String, variation: StringName, color: Color = UiTokens.T
 	if color != UiTokens.TEXT_PRIMARY:
 		l.add_theme_color_override("font_color", color)
 	return l
+
+
+## Rótulo discreto `v<versão> · <sha>` (T-165): letra pequena, claro a ~60%, sem toque.
+## Posicione com `place_corner_label`.
+static func version_label() -> Label:
+	var l := Label.new()
+	l.name = "VersionLabel"
+	l.text = BuildInfo.pause_text(BuildInfo.current(), BuildInfo.version())
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	l.add_theme_font_size_override("font_size", VERSION_FONT)
+	l.add_theme_color_override("font_color", Color(0.92, 0.9, 1.0, 0.6))
+	l.add_theme_constant_override("outline_size", 0)
+	l.add_theme_constant_override("shadow_offset_x", 0)
+	l.add_theme_constant_override("shadow_offset_y", 0)
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	return l
+
+
+## Canto inferior direito, acima da safe area; `bottom_gap` é a folga extra acima dela.
+static func place_corner_label(l: Label, vp: Viewport, bottom_gap: float = UiTokens.SPACE_XS) -> void:
+	var view := vp.get_visible_rect().size
+	var inset := safe_area(vp)
+	var sz := l.get_combined_minimum_size()
+	l.size = sz
+	l.position = Vector2(view.x - float(inset.right) - UiTokens.SPACE_S - sz.x, view.y - float(inset.bottom) - bottom_gap - sz.y)
 
 
 static func button(text: String, primary: bool, cb: Callable) -> Button:

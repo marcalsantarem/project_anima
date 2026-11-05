@@ -163,6 +163,7 @@ static func to_text(doc: Dictionary) -> String:
 	var lines := PackedStringArray()
 	lines.append("=== RESUMO DA PARTIDA ===")
 	lines.append("Data: %s  ·  Godot %s  ·  versão %s" % [h.get("date", "?"), h.get("godot", "?"), h.get("version", "")])
+	lines.append(BuildInfo.summary_line(BuildInfo.parse(h.get("build"))))
 	var web: Dictionary = h.get("web", {})
 	if not web.is_empty():
 		lines.append("Navegador: %s" % web.get("ua", "?"))
