@@ -158,6 +158,9 @@ Em `assets/splash/` (com `.gdignore`; fica fora do `.pck`): `splash_a.png` (chã
 ### 9.4 Ícones do app (BRF-071)
 Em `assets/app/` (com `.gdignore`): núcleo-Anima sobre o degradê roxo da splash B, selo rúnico discreto, sem texto nem transparência; mestre 1024, apple-touch 180, PWA 192/512 + maskable (zona segura 80%) e favicons 32/48/ICO (variante sem selo, núcleo maior). Ver `assets/app/README.md`.
 
+### 9.5 Pílulas do topo, botão secundário e texto das pílulas (BRF-073)
+Todas as peças da UI agora têm arte 9-patch em `assets/ui/` (`ui_pill_wave`, `ui_pill_particles`, `ui_button_secondary*`). Regra: a arte de pílulas e botões **não leva texto**; a UI desenha com a fonte do tema (ex.: "MAX" branco com contorno `ink`). Margens em `assets/ui/README.md`.
+
 ## 10. Pendências
 
 | Item | Com quem |

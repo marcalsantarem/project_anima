@@ -162,6 +162,32 @@ def big_btn(pressed):
             f'<rect x="12" y="{7 + dy}" width="72" height="16" rx="8" fill="#FFFFFF" opacity="{op}"/>')
 
 
+# ---------- Pílulas do topo e botão secundário (BRF-073, T-153; 9-patch) ----------
+def _grad(gid, top, bottom):
+    return (f'<defs><linearGradient id="{gid}" x1="0" y1="0" x2="0" y2="1">'
+            f'<stop offset="0" stop-color="{top}"/><stop offset="1" stop-color="{bottom}"/></linearGradient></defs>')
+
+
+# "ONDA x/y": canvas 96x48, corpo 92x40 (rx 18) em (2,2), sombra +6.
+PILL_WAVE = (_grad("gw", "#8E72EC", "#6E54C8")
+             + f'<rect x="2" y="8" width="92" height="40" rx="18" fill="{INK}"/>'
+             + f'<rect x="2" y="2" width="92" height="40" rx="18" fill="url(#gw)" stroke="{INK}" stroke-width="4"/>'
+             + '<rect x="14" y="7" width="68" height="9" rx="4.5" fill="#FFFFFF" opacity="0.28"/>')
+# Partículas: canvas 96x52, corpo 92x44 (rx 20) em (2,2), sombra +6. Branca; estrela e número desenhados pela UI.
+PILL_PARTICLES = (_grad("gp", "#FFFFFF", "#ECE7FA")
+                  + f'<rect x="2" y="8" width="92" height="44" rx="20" fill="{INK}"/>'
+                  + f'<rect x="2" y="2" width="92" height="44" rx="20" fill="url(#gp)" stroke="{INK}" stroke-width="4"/>')
+
+
+# Botão secundário: mesma geometria do big_btn (canvas 96x72; corpo 92x56), branco/lavanda claro.
+def secondary_btn(pressed):
+    dy = 4 if pressed else 0
+    top, bottom = ("#EDE8FF", "#D3C9F5") if pressed else ("#FFFFFF", "#E4DDFA")
+    return (_grad("gs", top, bottom)
+            + f'<rect x="2" y="10" width="92" height="56" rx="24" fill="{INK}"/>'
+            + f'<rect x="2" y="{2 + dy}" width="92" height="56" rx="24" fill="url(#gs)" stroke="{INK}" stroke-width="4"/>')
+
+
 # nome: (largura 1x, altura 1x, conteúdo)
 ASSETS = {f"ui_icon_upgrade_{k}": (64, 64, upgrade_icon(c, g)) for k, (c, g) in UPGRADES.items()}
 ASSETS.update({
@@ -187,6 +213,10 @@ ASSETS.update({
     "ui_panel": (96, 96, PANEL),
     "ui_button_big_normal": (96, 72, big_btn(False)),
     "ui_button_big_pressed": (96, 72, big_btn(True)),
+    "ui_pill_wave": (96, 48, PILL_WAVE),
+    "ui_pill_particles": (96, 52, PILL_PARTICLES),
+    "ui_button_secondary": (96, 72, secondary_btn(False)),
+    "ui_button_secondary_pressed": (96, 72, secondary_btn(True)),
 })
 
 
@@ -215,6 +245,33 @@ def contact_sheet():
     render(p, HERE / "contact_sheet.png", 1000, 700)
 
 
+
+def pills_check():
+    """Folha de validação do BRF-073: 9-patch esticado (CSS border-image) com texto de teste, sobre o chão creme e o roxo do HUD."""
+    def nine(name, l, t, r, b, w, h, inner, pad, jc="center"):  # margens em px do PNG 2x; na folha, 1x
+        return (f'<div style="display:inline-flex;align-items:center;justify-content:{jc};box-sizing:border-box;width:{w}px;height:{h}px;'
+                f'border-style:solid;border-width:{t // 2}px {r // 2}px {b // 2}px {l // 2}px;'
+                f'border-image:url(../{name}.png) {t} {r} {b} {l} fill stretch;margin:6px;vertical-align:middle">'
+                f'<div style="margin:{pad}">{inner}</div></div>')
+    txt = 'font:800 {s}px Outfit;color:{c};-webkit-text-stroke:{o}px #3A2A55;paint-order:stroke fill'
+    row = (nine("ui_pill_wave", 48, 40, 48, 48, 220, 48, f'<span style="{txt.format(s=26, c="#fff", o=6)}">ONDA 3/10</span>', "-6px -10px 0 -10px")
+           + nine("ui_pill_particles", 48, 44, 48, 52, 170, 52,
+                  '<span style="display:flex;align-items:center;gap:8px"><img src="../ui_icon_particles.png" style="width:32px">'
+                  f'<span style="{txt.format(s=28, c="#3A2A55", o=0)}">12</span></span>', "-6px -14px 0 -14px", "flex-start")
+           + nine("ui_button_secondary", 52, 52, 52, 68, 250, 72, f'<span style="{txt.format(s=28, c="#3A2A55", o=0)}">Voltar ao título</span>', "-8px -10px 0 -10px")
+           + nine("ui_button_secondary_pressed", 52, 52, 52, 68, 250, 72, f'<span style="{txt.format(s=28, c="#3A2A55", o=0)}">Voltar ao título</span>', "-4px -10px 0 -10px")
+           + '<span style="display:inline-block;position:relative;width:112px;height:25px;margin:6px;vertical-align:middle">'
+             '<img src="../ui_upgrade_cost_pill_max.png" style="width:112px;position:absolute">'
+             f'<span style="position:absolute;width:112px;text-align:center;line-height:23px;{txt.format(s=20, c="#fff", o=6)}">MAX</span></span>')
+    font = (HERE.parents[1] / "fonts" / "Outfit-Variable.ttf").as_uri()
+    html = (f'<html><head><style>@font-face{{font-family:Outfit;src:url({font})}}</style></head>'
+            '<body style="margin:0;font:12px sans-serif">'
+            f'<div style="background:#F3E7C9;padding:10px">{row}</div>'
+            f'<div style="background:#7C6BC9;padding:10px">{row}</div></body></html>')
+    p = HERE / "pills_check.html"
+    p.write_text(html, encoding="utf-8")
+    render(p, HERE / "pills_check.png", 1240, 200)
+
 if __name__ == "__main__":
     import sys
     only = set(sys.argv[1:])  # opcional: gera só os nomes passados (a folha de contato sempre é refeita)
@@ -226,3 +283,4 @@ if __name__ == "__main__":
         render(sp, UI / f"{name}.png", w * SCALE, h * SCALE)
         print("ok", name)
     contact_sheet()
+    pills_check()

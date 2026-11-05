@@ -30,10 +30,14 @@ Fonte: `_src/gen_ui.py` (SVG por código → Chrome headless). Para regenerar, r
 | `ui_upgrade_btn_normal.png` | 264×180 | 132×90 | Comprável: corpo roxo + anel ciano interno |
 | `ui_upgrade_btn_disabled.png` | 264×180 | 132×90 | Sem Partículas: cinza, sem anel |
 | `ui_upgrade_btn_max.png` | 264×180 | 132×90 | Nível máximo: moldura dourada |
-| `ui_upgrade_cost_pill.png` | 224×50 | 112×25 | Pílula escura do custo (estrela + número) |
-| `ui_upgrade_cost_pill_max.png` | 224×50 | 112×25 | Pílula dourada com "MAX" |
+| `ui_upgrade_cost_pill.png` | 224×50 | 112×25 | Pílula escura do custo, **sem texto nem estrela** |
+| `ui_upgrade_cost_pill_max.png` | 224×50 | 112×25 | Pílula dourada (`#F5B83D`, contorno `ink` 2 px), **sem texto** |
 
 Corpo em (2, 2) do canvas 1x, tamanho 128×80; sombra até y = 88. Layout interno (1x, relativo ao corpo): ícone Ø 40 com centro em (31, 28); "Nv X" centrado em (90, 36); pílula em (9, 52).
+
+**Texto das pílulas (T-154, BRF-073):** a arte das duas pílulas **não tem texto** (fonte do tema e localização ficam na UI). A UI desenha, a 1x, com a fonte bold do tema (Outfit 800), tamanho **20 px**:
+- **MAX** (`ui_upgrade_cost_pill_max`): centralizado na pílula (horizontal e vertical), **branco** (`text_primary`) com contorno `ink` de **6 px** (total; `draw_string_outline` antes do `draw_string`).
+- **Custo** (`ui_upgrade_cost_pill`): estrela `ui_icon_particles` de 20 px a 4 px da borda esquerda, centrada na vertical; número alinhado à direita, 8 px antes da borda, branco (ou `danger`/`text_secondary` conforme o estado). Fundo escuro: contorno opcional.
 
 ## Moldura circular das skills (Ø 144 em 1x)
 
@@ -58,6 +62,12 @@ Margens em **px do PNG (2x)**; em 1x, metade.
 | `ui_panel.png` | 192×192 | 56 / 56 / 56 / 68 | Painel com moldura roxa e miolo `bg_panel`. Conteúdo a 20 px (1x) da borda (26 embaixo) |
 | `ui_button_big_normal.png` | 192×144 | 52 / 52 / 52 / 68 | Botão principal (ciano, `accent`), texto `text_on_light` |
 | `ui_button_big_pressed.png` | 192×144 | 52 / 52 / 52 / 68 | Pressionado: corpo desce 4 px (1x) e escurece; mesmo canvas, troca direta |
+| `ui_button_secondary.png` | 192×144 | 52 / 52 / 52 / 68 | Botão secundário (BRF-073): branco → lavanda claro (`#FFFFFF`→`#E4DDFA`), contorno `ink`, sombra 6 px. Mesma geometria do botão grande; texto `text_on_light` sem contorno. Uso: "Voltar ao título", pausa |
+| `ui_button_secondary_pressed.png` | 192×144 | 52 / 52 / 52 / 68 | Pressionado: corpo desce 4 px (1x), `#EDE8FF`→`#D3C9F5`; content margins iguais às do `button_big(true)` |
+| `ui_pill_wave.png` | 192×96 | 48 / 40 / 48 / 48 | Pílula "ONDA x/y" (BRF-073): roxo `#8E72EC`→`#6E54C8`, contorno `ink`, brilho no topo, sombra 6 px. Canvas 1x 96×48, corpo 92×40 (raio 18). Altura ideal 48 (1x); estica na largura. Content margins sugeridas (1x): 20 / 6 / 20 / 12; texto `LabelHud` branco com contorno, centrado |
+| `ui_pill_particles.png` | 192×104 | 48 / 44 / 48 / 52 | Pílula de Partículas (BRF-073): branca (`#FFFFFF`→`#ECE7FA`), contorno `ink`, sombra 6 px. Canvas 1x 96×52, corpo 92×44 (raio 20). Altura ideal 52 (1x); estica na largura. Content margins sugeridas (1x): 10 / 6 / 20 / 12; estrela `ui_icon_particles` de 32 px à esquerda e número em `text_on_light` (sem contorno) à direita |
+
+Pílulas e botões têm uma faixa central de 4 px (1x) na vertical: em alturas maiores que o canvas o degradê estica, mas os cantos ficam intactos. Conferência das margens com texto de teste sobre o chão creme e o roxo do HUD: `_src/pills_check.png` (gerada pelo `gen_ui.py`).
 
 Barra: use `TextureProgressBar` com `nine_patch_stretch = true` e as mesmas margens, ou `NinePatchRect` + recorte.
 
