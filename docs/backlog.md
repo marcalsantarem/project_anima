@@ -91,7 +91,7 @@
 | T-176 | Foco manual: tocar num inimigo para o Anima focá-lo (marcador; volta ao automático) | M1 | AG01 | feita |
 | T-177 | Mira do meteoro: API de alvo manual e prévia do raio; chefe lançado dentro do alcance | M1 | AG01 | feita |
 | T-178 | Arrastar do botão do Módulo para mirar (toque/mouse), segurar 1 + clique no PC | M1 | AG02 | feita |
-| T-179 | Splash e tela de título no estilo holográfico/tecnológico (arte do Gemini como base; texto, barra e brilhos vivos) | M1 | AG02 + AG08 | aguarda o arquivo da imagem limpa |
+| T-179 | Splash e tela de título no estilo holográfico/tecnológico (arte do Gemini como base; texto, barra e brilhos vivos) | M1 | AG02 + AG08 | pronta p/ briefing |
 | T-180 | **(1ª do M2)** Guia visual "HUD holográfico" para menus + mockups do menu principal e do hangar (Módulos, Fragmentos, Núcleos) | M2 | AG08 | a fazer (início do M2) |
 | T-148 | Sinais da Arena para VFX (projectile_fired, projectile_hit, enemy_died, particles_gained, skill_cast, boss_telegraph_started, boss_phase_changed) | M1 | AG01 | feita |
 
@@ -519,7 +519,7 @@
 - **Pronto quando:** `manifest.webmanifest` (nome, `display: standalone`, retrato, cores), meta tags do iOS (`apple-mobile-web-app-capable`, status bar translúcida, título, ícone), arquivos copiados para o site no deploy (o export do Godot não copia arquivos extras de `web/`), sem service worker que cache versões antigas; no iPhone o jogo abre sem a barra do Safari.
 
 ### T-179 — Splash e título no estilo tecnológico
-- **Marco:** M1 · **Dono:** AG02 (shell e cena de título) + AG08 (recorte, camadas e elementos de HUD) · **Status:** aguarda o arquivo da imagem limpa (o dono já mostrou a versão sem texto; falta o arquivo em `assets/splash/tech/`). Referência com texto: `assets/splash/tech/tech_splash_reference_with_text.jpg` (768×1376)
+- **Marco:** M1 · **Dono:** AG02 (shell e cena de título) + AG08 (recorte, camadas e elementos de HUD) · **Status:** pronta p/ briefing. Arte limpa: `assets/splash/tech/tech_splash_clean.jpg`. Referência com texto: `assets/splash/tech/tech_splash_reference_with_text.jpg` (768×1376)
 - **Depende de:** decisão 48; imagem do dono **sem o texto e sem a barra**, em resolução maior (≥ 1080×1920, com sobra em cima e embaixo para telas altas)
 - **Arquivos:** `web/shell.html` (splash, inline/cópia no deploy), `src/ui/screens/title_screen.gd`, `assets/ui/` ou `assets/splash/`, `assets/LICENSES.md`
 - **Pronto quando:** a splash de carregamento usa a arte como fundo (WebP leve, servido pelo deploy), com "PROJECT: ANIMA", a barra e a porcentagem **vivas** (progresso real), cristal com brilho pulsando e linhas de HUD animadas por código; a tela de título usa o mesmo visual, com o botão "Toque para começar" holográfico, o logo do estúdio e a versão; o logo preto do estúdio continua antes; transição suave (fade) do título para a partida cartoon; funciona em 720×1280 a 720×1560 e no modo app do iPhone; licença registrada ("arte do dono gerada no Google Gemini").
