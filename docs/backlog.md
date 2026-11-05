@@ -22,8 +22,8 @@
 | T-106 | Tema base e componentes de UI | M1 | AG02 | feita |
 | T-107 | Overlay de debug Web (FPS, logs) | M1 | AG02 | feita (com gravador de logs e botão Logs) |
 | T-108 | Base de skills + skill de área | M1 | AG01 | feita |
-| T-109 | Skill de controle | M4 | AG01 | a fazer |
-| T-110 | Skill de defesa | M4 | AG01 | a fazer |
+| T-109 | Skill de controle | M5 | AG01 | a fazer |
+| T-110 | Skill de defesa | M5 | AG01 | a fazer |
 | T-111 | Arquétipos: tanque, atirador, enxame | M1 | AG01 | feita |
 | T-112 | HUD ligado aos sinais | M1 | AG02 | feita |
 | T-113 | Telas: toque para começar, pausa, resultado | M1 | AG02 | feita |
@@ -60,7 +60,7 @@
 | T-144 | Arena em 3/4: Y-sort, âncoras, sombras, spawn | M1 | AG01 | feita |
 | T-145 | Retema da UI no estilo cartoon (tokens, tema, fonte) | M1 | AG02 | feita |
 | T-146 | Remover mockups rejeitados e excluir referências do export Web | M1 | AG07 | feita |
-| T-147 | Anima com skin trocável (Resource de aparência) | M10 | AG01 | a fazer |
+| T-147 | Anima com skin trocável (Resource de aparência) | M12 | AG01 | a fazer |
 | T-149 | Barra de vida pequena sobre cada inimigo (verde, amarela, vermelha) | M1 | AG01 | feita |
 | T-150 | Chefe ogro: ataque corpo a corpo, sem minions, defesa como escudo e lançamento | M1 | AG01 | feita |
 | T-151 | Arte do chefe ogro (humanoide grande e gordo) | M1 | AG08 | feita |
@@ -680,6 +680,7 @@
   - fusão de módulos 3→1;
   - **árvore de talentos comprada com Gold** (decisão #30);
   - save local.
+- **Roadmap:** marcos e versões em [docs/roadmap.md](roadmap.md) (decisão 53). Tarefas de M2 em diante são quebradas quando o marco começar.
 - **[A definir] para o M2:** evolução das skills; atributos dos módulos; prêmios por nível de conta além dos slots.
 - **M3:** escolha do backend, conta guest, sincronização, economia no servidor, Remote Config.
 - **M4:** ads, loja, skins, áudio final, lojas nativas, mais fases, localização.

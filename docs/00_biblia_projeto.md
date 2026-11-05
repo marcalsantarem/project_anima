@@ -48,7 +48,8 @@ Nomes oficiais que o jogador vê. Os **identificadores de código continuam em i
 | **Módulo** | skill, poder ativo | poder ativo com cooldown (ex.: o meteoro); a conta abre os slots de Módulo nos níveis 3, 7 e 12 | M1: 1 Módulo (meteoro) |
 | **Partículas** | moeda da partida | moeda dropada pelos inimigos mortos; compra os upgrades da partida e **some no fim dela**. **Não cai no mapa por enquanto** (só aumenta o contador; pode mudar depois). Ícone: **estrela verde, como um "chipzinho"** | M1 (o ícone ainda é dourado: T-160 e T-161) |
 | **Moeda** | Gold | moeda do jogo (meta): sobe nível de Módulos, Fragmentos, Núcleos etc. Ícone: **moeda dourada** | futuro (M2+) |
-| **Fragmento** | módulo (equipamento) | equipamento do Anima, com raridade e fusão 3→1; o Anima tem **6 espaços** para equipá-los | futuro (M2+) |
+| **Componente** | Fragmento, módulo (equipamento) | equipamento do Anima (3 no M7, 6 espaços no M13), com raridade e fusão | M7 e M13 (decisão 54) |
+| **Fragmento** | — | **Fragmento de Módulo**: item usado para atualizar Módulos | M14 (decisão 54) |
 | **Núcleo** (talento) | talento, árvore de talentos | cada nó da árvore, comprado com Moeda | futuro; **atenção:** colide com o "Núcleo" que já nomeia a vida do Anima no HUD (ver nota) |
 
 > **Colisão de nome (resolvida, decisão 41):** a barra de vida do Anima no HUD passa a se chamar **"ENERGIA"**; "Núcleo" fica para os talentos.
@@ -62,8 +63,8 @@ Nomes oficiais que o jogador vê. Os **identificadores de código continuam em i
   - **[A DEFINIR]:** se a conta ganha outros prêmios por nível.
 - **Módulos (as skills):** são "poderes especiais" ativos, com cooldown. São desbloqueadas pela progressão e não são cards.
   - **[A DEFINIR]:** como cada skill evolui.
-- **Fragmentos:** são os equipamentos do Anima (**6 espaços**), melhorados com **Moeda**. Têm raridade Comum → Raro → Épico → Lendário.
-  - **Fusão:** 3 Fragmentos idênticos da mesma raridade viram 1 da raridade seguinte.
+- **Componentes** (ex-Fragmentos, decisão 54): são os equipamentos do Anima (**6 espaços** a partir do M13), melhorados com **Moeda**. Têm raridade Comum → Raro → Épico → Lendário.
+  - **Fusão:** Componentes idênticos da mesma raridade viram 1 da raridade seguinte.
 - **Upgrades da partida:** comprados durante a partida com **Partículas** e perdidos ao fim.
 - **Moedas:**
   - **Moeda:** a moeda do jogo (meta), dourada. A quantidade ganha varia a cada partida jogada.
@@ -71,27 +72,32 @@ Nomes oficiais que o jogador vê. Os **identificadores de código continuam em i
 - **Núcleos (a árvore de talentos):** continua, comprada com Moeda. O detalhe fica no AG04.
 - **[A DEFINIR]:** quais atributos os Fragmentos dão (dano, velocidade de ataque, vida, armadura, regeneração, redução de cooldown).
 
-## Roadmap (decisão 51, 2026-11-05)
+## Roadmap (decisão 53, 2026-11-05)
 
-Cada marco entrega **um ciclo jogável completo** e vira **uma versão** `0.x`, fechada com PR `dev → main` e tag. Algumas versões fechadas ficam também numa **branch própria** (decisão 52).
+Visão do dono, **não definitiva**; detalhe completo em [docs/roadmap.md](roadmap.md). Cada marco = uma versão com tag e PR `dev → main`; versões fechadas importantes ganham branch própria (decisão 52).
 
-| Marco | Versão | Objetivo | Entrega principal |
+| Marco | Versão | Tag | Foco |
 |---|---|---|---|
-| **M0 — Fundação** | — | Ambiente e exportação Web | Feito |
-| **M1 — Vertical slice** | 0.1 | Provar o combate e o visual | 1 fase, 1 chefe, meteoro, upgrades, efeitos, splash/título tecnológicos. Ao fechar, vira a **demo v1** na branch `demo` |
-| **M2 — Fundação do meta + áudio básico** | 0.2 | Ciclo "jogar → ganhar → voltar" | Menu holográfico (T-180), save local, **Moeda** e XP por partida, **nível de conta** com os slots, Resultado com recompensa; **áudio básico**: música de entrada e som do tiro básico (sem sons de menu, botões, skills nem demais efeitos) |
-| **M3 — Núcleos** | 0.3 | Progressão permanente | Árvore de talentos pequena, comprada com Moeda |
-| **M4 — Módulos** | 0.4 | Variedade de poderes | Módulos de controle e de defesa (T-109, T-110), equipar Módulos no hangar, evolução simples com Moeda |
-| **M5 — Fragmentos** | 0.5 | Progressão de equipamento | 6 espaços, raridades, upgrade com Moeda, fusão 3→1, origem dos Fragmentos |
-| **M6 — Conteúdo** | 0.6 | Duração e desafio | Fases 2 a 5, 2–3 chefes e inimigos novos, seleção de fase |
-| **M7 — Áudio completo e onboarding** | 0.7 | Primeira impressão | Sons de UI, skills e efeitos, mais músicas, tutorial do 1º minuto, configurações (volume, idioma) |
-| **M8 — Demo pública** | 0.8 | Divulgar | Polimento, balanceamento (bot + playtest), build desktop, publicação (web, itch.io, página "Em breve" na Steam) |
-| **M9 — Backend** | 0.9 | Contas e nuvem | Conta guest, save na nuvem, economia validada no servidor, Remote Config |
-| **M10 — Monetização** | 0.10 | Receita | Anúncios recompensados, loja de skins, moeda premium |
-| **M11 — Lançamento** | 1.0 | Lojas | Steam, Android e iOS nativos, marketing |
-
-- **Ordem M3 → M5** por facilidade e utilidade para testar: Núcleos, depois Módulos, depois Fragmentos (decisão 51).
-- **[A DEFINIR]:** o dono vai detalhar a quebra dos marcos seguintes.
+| M1 | v0.1.0 | Vertical slice | combate e visual (vira a demo v1, branch `demo`) |
+| M2 | v0.2.0 | **Versão Alfa** | menu holográfico, ciclo jogar → ganhar → voltar, Moeda, save local, nível de conta, XP, música de entrada e som do tiro |
+| M3 | v0.2.1 | Hangar | menu reestruturado |
+| M4 | v0.2.2 | Núcleos | árvore de 10–12 talentos |
+| M5 | v0.2.3 | Módulos | congelamento, escudo, choque; seleção; slots por nível; evolução com Moeda |
+| M6 | v0.2.4 | Recompensas | vida ou baú durante a partida |
+| M7 | v0.2.5 | Componentes | equipamentos (ex-Fragmentos), drop, inventário, upgrade |
+| M8 | v0.2.6 | Configurações e Localização | volume, sons, efeitos, idioma; inglês e espanhol |
+| M9 | v0.2.7 | Onboarding | tutoriais |
+| M10 | v0.3.0 | **Versão Beta** (demo pública) | 5 fases, inimigos, 2 chefes, progressão, polimento |
+| M11 | v0.3.1 | Desktop | build desktop |
+| M12 | v0.3.2 | Skins | skins do Anima |
+| M13 | v0.4.0 | Expansão: Componentes | 6 espaços, raridades, fusão |
+| M14 | v0.4.1 | Expansão: Módulos | mais Módulos, Fragmentos de Módulo |
+| M15 | v0.4.2 | Expansão: Núcleos | árvore maior |
+| M16 | v0.5.0 | Efeitos de áudio | sons de UI, Módulos e efeitos |
+| M17 | v0.6.0 | Expansão: fases | fase infinita, recompensas maiores |
+| M18 | v0.7.0 | Backend | nuvem, login Google/Apple, ranking |
+| M19 | v0.8.0 | Jogador | perfil |
+| — | até v1.0.0 | TBD | baús semanais, mobile, monetização, lançamento |
 
 ## Escopo atual: M1 (demo do combate)
 

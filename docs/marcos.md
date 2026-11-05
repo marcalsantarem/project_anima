@@ -2,22 +2,30 @@
 
 > Mantido pelo AG06. Tasks em [backlog.md](backlog.md). O AG06 propõe quando um marco está pronto para validação; quem fecha é o AG00, com o veredito do AG03 e o aval do usuário.
 
-| Marco | Versão | Status |
-|---|---|---|
-| M0 — Fundação | — | feito |
-| M1 — Vertical slice | 0.1 | em fechamento |
-| M2 — Fundação do meta + áudio básico | 0.2 | a quebrar |
-| M3 — Núcleos | 0.3 | a quebrar |
-| M4 — Módulos | 0.4 | a quebrar (T-109, T-110) |
-| M5 — Fragmentos | 0.5 | a quebrar |
-| M6 — Conteúdo | 0.6 | a quebrar |
-| M7 — Áudio completo e onboarding | 0.7 | a quebrar |
-| M8 — Demo pública | 0.8 | a quebrar |
-| M9 — Backend | 0.9 | a quebrar |
-| M10 — Monetização | 0.10 | a quebrar |
-| M11 — Lançamento | 1.0 | a quebrar |
+| Marco | Versão | Tag | Status |
+|---|---|---|---|
+| M0 — Fundação | — | — | feito |
+| M1 | v0.1.0 | Vertical slice | em fechamento |
+| M2 | v0.2.0 | Versão Alfa | a quebrar |
+| M3 | v0.2.1 | Hangar | a quebrar |
+| M4 | v0.2.2 | Núcleos | a quebrar |
+| M5 | v0.2.3 | Módulos | a quebrar |
+| M6 | v0.2.4 | Recompensas | a quebrar |
+| M7 | v0.2.5 | Componentes | a quebrar |
+| M8 | v0.2.6 | Configurações e Localização | a quebrar |
+| M9 | v0.2.7 | Onboarding | a quebrar |
+| M10 | v0.3.0 | Versão Beta | a quebrar |
+| M11 | v0.3.1 | Desktop | a quebrar |
+| M12 | v0.3.2 | Skins | a quebrar |
+| M13 | v0.4.0 | Expansão: Componentes | a quebrar |
+| M14 | v0.4.1 | Expansão: Módulos | a quebrar |
+| M15 | v0.4.2 | Expansão: Núcleos | a quebrar |
+| M16 | v0.5.0 | Efeitos de áudio | a quebrar |
+| M17 | v0.6.0 | Expansão: fases | a quebrar |
+| M18 | v0.7.0 | Backend | a quebrar |
+| M19 | v0.8.0 | Jogador | a quebrar |
 
-Detalhe e ordem dos marcos: Roadmap da [Bíblia](00_biblia_projeto.md) (decisão 51).
+Detalhe de cada marco: [docs/roadmap.md](roadmap.md) (decisão 53).
 
 ## M0 — Fundação
 
