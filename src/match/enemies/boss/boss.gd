@@ -27,6 +27,9 @@ var mode: Mode = Mode.ADVANCE
 var defense := 0
 ## Área visível onde o lançamento termina (posições de tela); definida pela arena. Vazia = sem limite.
 var launch_bounds := Rect2()
+## Distância máxima (no chão) do fim do voo ao Núcleo; a Arena usa 85% do alcance do Anima para o
+## chefe cair atacável (decisão 47). INF = sem limite.
+var launch_max_reach := INF
 var defense_bar: HealthBar
 
 var _attack_left := 0.0 ## s até o golpe (no fim do intervalo)
@@ -136,7 +139,7 @@ func launch() -> void:
 	state = State.ATTACK # parado para a mira/meteoro (não avança)
 	_end_windup()
 	var from := position
-	var to := launch_destination(from, target_position, boss_data.launch_distance, launch_bounds)
+	var to := launch_destination(from, target_position, boss_data.launch_distance, launch_bounds, launch_max_reach)
 	launched.emit(from, to)
 	if _tween:
 		_tween.kill()
@@ -146,13 +149,16 @@ func launch() -> void:
 	_tween.tween_callback(_stun)
 
 
-## Fim do voo: de `from`, para longe de `center`, `distance` px no chão, preso em `bounds`
-## (bounds vazio = sem limite). Encosta na borda em vez de sair da área visível.
-static func launch_destination(from: Vector2, center: Vector2, distance: float, bounds: Rect2) -> Vector2:
+## Fim do voo: de `from`, para longe de `center`, `distance` px no chão, sem passar de `max_reach`
+## px (no chão) do centro, preso em `bounds` (bounds vazio = sem limite). Encosta na borda em vez de
+## sair da área visível (com o centro dentro de bounds, o recorte só aproxima do centro).
+static func launch_destination(from: Vector2, center: Vector2, distance: float, bounds: Rect2,
+		max_reach: float = INF) -> Vector2:
 	var away := GroundPlane.to_ground(from - center)
 	if away.length_squared() < 0.0001:
 		away = Vector2.UP
-	var to := from + GroundPlane.to_screen(away.normalized() * distance)
+	var reach := minf(away.length() + distance, max_reach)
+	var to := center + GroundPlane.to_screen(away.normalized() * reach)
 	if not bounds.has_area():
 		return to
 	return to.clamp(bounds.position, bounds.end)

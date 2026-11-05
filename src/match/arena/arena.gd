@@ -30,6 +30,8 @@ signal boss_telegraph_started(pattern_id: StringName, duration: float, at: Vecto
 signal boss_defense_changed(current: int, max_defense: int)
 ## Chefe lançado (meteoro; ou defesa arquivada esgotada): de `from` até `to` (âncora no chão, tela).
 signal boss_launched(from: Vector2, to: Vector2)
+## Foco manual do ataque (T-176): o inimigo focado, ou null ao voltar ao automático.
+signal focus_changed(enemy: Node)
 
 ## Upgrades da partida, na ordem da fileira do HUD.
 const UPGRADE_IDS: Array[StringName] = [
@@ -53,6 +55,10 @@ const BOSS_SCENE := preload("res://src/match/enemies/boss/boss.tscn")
 @export var waves_enabled := true
 @export var enemy_projectile_pool_size: int = 128
 @export var enemy_projectile: ProjectileData ## tipo padrão do pool inimigo
+## Folga do toque para focar um inimigo (px do jogo), além do raio e do desenho dele (T-176).
+@export var focus_pick_radius: float = 44.0
+## O chefe lançado cai a no máximo esta fração do alcance do ataque do Anima (decisão 47).
+@export var boss_launch_reach_ratio: float = 0.85
 
 var config: MatchConfig
 ## Se nulo no _ready, é carregada de data/waves/<config.stage_id>.tres.
@@ -68,6 +74,8 @@ var upgrades: MatchUpgrades
 var active_enemies: Array[Enemy] = []
 
 var _rng := RandomNumberGenerator.new()
+var _focus_marker := FocusMarker.new()
+var _skill_aim := SkillAim.new()
 
 @onready var anima: Anima = $Anima
 @onready var projectiles: ProjectilePool = $Projectiles
@@ -108,6 +116,8 @@ func _ready() -> void:
 	skills.skill_ready.connect(func(slot: int) -> void: skill_ready.emit(slot))
 	skills.skill_cast.connect(skill_cast.emit)
 	skills.skill_fizzled.connect(skill_fizzled.emit)
+	add_child(_focus_marker)
+	add_child(_skill_aim)
 	get_viewport().size_changed.connect(_layout)
 	_layout()
 
@@ -133,9 +143,96 @@ func set_seed(value: int) -> void:
 	_rng.seed = value
 
 
-## Aciona a skill do slot (1-based). Para os botões de toque da UI.
-func use_skill(slot: int) -> bool:
-	return skills.use_skill(slot)
+## Aciona a skill do slot (1-based). Para os botões de toque da UI. `at` (coordenadas da Arena =
+## viewport): Vector2.INF = alvo automático; finito = mira manual, só dentro de can_aim_at.
+func use_skill(slot: int, at: Vector2 = Vector2.INF) -> bool:
+	if at.is_finite() and not can_aim_at(at):
+		return false
+	return skills.use_skill(slot, at)
+
+
+## Área onde se pode mirar um Módulo: a área livre entre o HUD de cima e a bandeja.
+func aim_rect() -> Rect2:
+	return free_rect()
+
+
+func can_aim_at(at: Vector2) -> bool:
+	return at.is_finite() and aim_rect().has_point(at)
+
+
+## Prévia no chão do raio do Módulo do slot em `at` (preso à área de mira). Sem alocar.
+func show_skill_aim(slot: int, at: Vector2) -> void:
+	var r := skills.aim_radius(slot)
+	if r <= 0.0 or not at.is_finite():
+		hide_skill_aim()
+		return
+	var rect := aim_rect()
+	_skill_aim.show_at(at.clamp(rect.position, rect.end), r)
+
+
+func hide_skill_aim() -> void:
+	_skill_aim.hide_aim()
+
+
+func focused_enemy() -> Enemy:
+	return anima.focus if is_instance_valid(anima.focus) else null
+
+
+## Define o foco manual (null = automático). Emite focus_changed se mudou.
+func set_focus(enemy: Enemy) -> void:
+	if enemy != null and (not is_instance_valid(enemy) or enemy.state == Enemy.State.DEAD):
+		enemy = null
+	if enemy == focused_enemy():
+		return
+	anima.focus = enemy
+	_focus_marker.follow(enemy)
+	focus_changed.emit(enemy)
+
+
+## Toque/clique na arena (eventos não consumidos pelo HUD): foca o inimigo tocado; tocar no mesmo
+## inimigo ou no chão vazio desfaz o foco.
+func _unhandled_input(event: InputEvent) -> void:
+	if is_over:
+		return
+	var at := Vector2.INF
+	if event is InputEventScreenTouch and event.pressed:
+		at = event.position
+	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		at = event.position
+	if not at.is_finite():
+		return
+	at = get_global_transform_with_canvas().affine_inverse() * at
+	if tap_at(at):
+		get_viewport().set_input_as_handled()
+
+
+## Regra do toque (T-176) em coordenadas da Arena. Devolve true se o toque foi usado.
+func tap_at(at: Vector2) -> bool:
+	var enemy := enemy_at(at, active_enemies, focus_pick_radius)
+	if enemy != null:
+		set_focus(null if enemy == focused_enemy() else enemy)
+		return true
+	if aim_rect().has_point(at) and focused_enemy() != null:
+		set_focus(null)
+		return true
+	return false
+
+
+## Inimigo vivo mais perto do toque: distância (tela) do ponto ao "pé–topo" do desenho, aceita
+## até o raio do inimigo + `pick_radius`. null se nenhum.
+static func enemy_at(at: Vector2, enemies: Array[Enemy], pick_radius: float) -> Enemy:
+	var best: Enemy = null
+	var best_d := INF
+	for e in enemies:
+		if not is_instance_valid(e) or e.state == Enemy.State.DEAD:
+			continue
+		var foot := e.position
+		var top := foot - Vector2(0.0, e.sprite_top())
+		var d := at.distance_to(Geometry2D.get_closest_point_to_segment(at, foot, top))
+		if d <= e.data.radius + pick_radius and d < best_d:
+			best = e
+			best_d = d
+	return best
 
 
 ## Compra 1 nível do upgrade se houver Partículas e não estiver no máximo. Não pausa.
@@ -170,6 +267,7 @@ func spawn(enemy_data: EnemyData, edge: WaveEntry.SpawnEdge) -> Enemy:
 
 func _bind_boss(boss: Boss) -> void:
 	boss.launch_bounds = boss_launch_bounds(boss)
+	boss.launch_max_reach = anima.data.attack_range * boss_launch_reach_ratio
 	boss.hp_changed.connect(func(c: int, m: int) -> void: boss_hp_changed.emit(c, m))
 	boss.defense_changed.connect(boss_defense_changed.emit)
 	boss.launched.connect(boss_launched.emit)
@@ -279,6 +377,8 @@ func _on_spawn_requested(enemy_data: EnemyData, edge: WaveEntry.SpawnEdge) -> vo
 
 func _on_enemy_died(enemy: Enemy, cause: Enemy.DeathCause) -> void:
 	active_enemies.erase(enemy)
+	if enemy == anima.focus:
+		set_focus(null)
 	enemy_died.emit(enemy.position, enemy.data.id, cause)
 	if cause == Enemy.DeathCause.KILLED and not is_over:
 		enemies_killed += 1

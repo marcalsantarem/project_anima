@@ -5,7 +5,8 @@ extends AreaSkill
 ## Alvo: o inimigo mais denso ao alcance (senão o mais próximo), adiantado pela distância que ele
 ## anda até o impacto. No início da queda (fim do aviso) o alvo é reavaliado com a mesma regra; se
 ## não há inimigo no raio nesse ponto, o meteoro é anulado (sinal `fizzled`, sem dano nem cratera) e
-## o controlador devolve o cooldown. Com o chefe vivo nunca é anulado. Tudo é criado no _ready; a animação só move/redesenha nós existentes.
+## o controlador devolve o cooldown. Com o chefe vivo nunca é anulado. Mira manual (T-177): cai
+## exatamente no ponto escolhido, sem previsão, reavaliação nem anulação. Tudo é criado no _ready; a animação só move/redesenha nós existentes.
 
 const TELEGRAPH_FILL := Color(1.0, 0.45, 0.15, 0.22)
 const TELEGRAPH_EDGE := Color(1.0, 0.55, 0.2, 0.85)
@@ -82,12 +83,12 @@ func fall_progress() -> float:
 	return clampf(1.0 - _windup_left / maxf(data.fall_time, 0.001), 0.0, 1.0)
 
 
-func activate() -> void:
+func activate(at: Vector2 = Vector2.INF) -> void:
 	if _crater_sprite:
 		_crater_sprite.visible = false
-	_retargeted = false
-	super()
-	if _windup_left > 0.0 and _windup_left <= data.fall_time:
+	_retargeted = at.is_finite() # mira manual (T-177): cai exatamente em `at`, sem reavaliar nem anular
+	super(at)
+	if not _retargeted and _windup_left > 0.0 and _windup_left <= data.fall_time:
 		_retarget()
 	if _windup_left > 0.0:
 		_on_windup_tick()

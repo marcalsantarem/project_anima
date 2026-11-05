@@ -163,6 +163,8 @@ Teste: `tests/unit/ui/test_hud_layout.gd` confere as constantes contra o layout 
 - Na transição `cooldown → ready` (`skill_ready`): flash `accent` + escala 1,08 → 1,0 em 200 ms.
 - **Badge da tecla:** quadradinho `badge` no canto superior direito com a tecla do Input Map (ou o número do slot), sempre visível (mockup aprovado).
 - **Toque e clique** disparam a mesma Input Action (§7). O botão não chama a skill diretamente.
+- **Arrastar para mirar (T-178, decisão 46; `drag_aim`, ligado no HUD):** com o botão `ready`, o toque só decide ao soltar: sem passar de `AIM_THRESHOLD` (24 px) = **toque simples** (`activated` ao soltar, alvo automático); passou = modo mira: anel extra `accent` (ou `danger` se o ponto é inválido) e ícone a 55%, sinais `aim_started(slot)`, `aim_moved(slot, at)` e `aim_ended(slot, at, cancelled)` com `at` em coordenadas do viewport. Soltar sobre o próprio botão, ou o botão sair de `ready` no meio (recarga, `disabled`, `locked`) = `cancelled`. Em recarga/bloqueado não há mira (recarga: aciona ao apertar e treme, como antes). O release do toque/mouse é tratado mesmo fora do círculo.
+- **HUD ↔ Arena na mira:** `aim_moved` → `can_aim_at(at)` ? `show_skill_aim(slot, at)` : `hide_skill_aim()` + anel `danger`; `aim_ended` → `hide_skill_aim()` e, se não cancelado e `can_aim_at`, `use_skill(slot, at)` (falhou = treme). Arena sem essa API: soltar fora do botão vale como toque simples.
 - Arte (T-138): molduras `ui_skill_frame_ready/cooldown/locked` (pronta tem halo fixo + halo pulsante desenhado), ícone por `icon_texture` (88 px; fallback `ui_icon_skill_pulse` no `Icon.CIRCLE`). No HUD (BRF-050, decisão 37) o ícone vem de `Hud.slot_icon_paths` (slot 1 = `ui_icon_skill_meteor.png`, o mesmo PNG de `SkillData.icon`; caminho inexistente cai no fallback) ou de `Hud.set_slot_icon(slot, tex)`, sem ler `src/match/`; cadeado `ui_icon_lock` (64 px), véu `ui_skill_cooldown_mask` como setor texturizado (buffers reaproveitados). `disabled` usa a moldura cinza e o ícone a 55%. Losango/hexágono desenhados só como fallback sem arte.
 
 ### 5.2 `Bar` (Energia / chefe)
@@ -226,6 +228,7 @@ Os sinais são emitidos pelo nó raiz `Match`.
 - Nada de teclas fixas no código: tudo via Input Actions. Alterar o Input Map exige autorização do AG00.
 - Durante a partida, `Espaço` é `skill_4`. No HUD, só os botões de upgrade aceitam `ui_accept`, e apenas por `Enter` (eventos que também são `skill_*`/`pause` são ignorados).
 - **Multitoque:** é possível tocar duas skills ao mesmo tempo (cada botão trata o próprio toque).
+- **Mira pela tecla (T-178):** com o Módulo `ready`, apertar `skill_<slot>` não dispara mais na hora: o `Hud._input` consome a action, põe o botão em "mirando" e mostra a prévia no cursor (`show_skill_aim` a cada movimento do mouse). Clique esquerdo numa área válida (`can_aim_at`) com a tecla pressionada = `use_skill(slot, cursor)` (o clique é consumido e não chega ao foco manual da arena); clique fora da área segue normal. **Soltar a tecla sem ter clicado = alvo automático** (o disparo pela tecla passou de "ao apertar" para "ao soltar"; apertar e soltar rápido continua sendo o automático). Em recarga ou bloqueado a action segue o caminho antigo (o `SkillController` recusa e o botão treme).
 
 ## 8. Fluxo de telas do M1
 

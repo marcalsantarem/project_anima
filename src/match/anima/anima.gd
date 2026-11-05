@@ -11,6 +11,11 @@ signal core_depleted
 
 var core: CoreHealth
 var target: Enemy
+## Foco manual (T-176): mirado enquanto vivo e no alcance; fora dele vale a regra automática.
+var focus: Enemy:
+	set(value):
+		focus = value
+		_scan_timer = 0.0 # reavalia o alvo no próximo passo
 ## Upgrades da partida (dano, cadência, defesa). Nulo = valores base.
 var upgrades: MatchUpgrades
 
@@ -50,7 +55,7 @@ func _physics_process(delta: float) -> void:
 	_scan_timer -= delta
 	if _scan_timer <= 0.0:
 		_scan_timer += data.target_scan_interval
-		target = Targeting.pick(position, _enemies, data.attack_range)
+		target = Targeting.pick_with_focus(position, _enemies, data.attack_range, focus)
 	_fire_timer = maxf(_fire_timer - delta, 0.0)
 	if _fire_timer > 0.0 or not _is_target_valid():
 		return

@@ -66,6 +66,10 @@ var _upgrades: Array[UpgradeButton] = []
 var _particles_shown := 0
 var _particles_tween: Tween
 var _wave_tween: Tween
+## Mira pela tecla segurada (T-178): slot cuja action `skill_<slot>` está pressionada (0 = nenhum).
+var _key_slot := 0
+var _key_fired := false
+var _match_over := false
 
 
 func _ready() -> void:
@@ -278,7 +282,10 @@ func _build_tray() -> void:
 		sb.icon = SKILL_ICONS[i]
 		sb.icon_texture = UiArt.load_icon(slot_icon_paths[i] if i < slot_icon_paths.size() else "")
 		sb.inject_action = false
+		sb.drag_aim = true
 		sb.activated.connect(_on_skill_pressed)
+		sb.aim_moved.connect(_on_aim_moved)
+		sb.aim_ended.connect(_on_aim_ended)
 		skills_row.add_child(sb)
 		_skills.append(sb)
 	_apply_slot_locks()
@@ -487,6 +494,8 @@ func _hide_boss_row() -> void:
 
 
 func _on_match_ended(_result) -> void:
+	_match_over = true
+	_end_key_aim()
 	_show_boss(false)
 	for sb in _skills:
 		sb.set_disabled(true)
@@ -508,6 +517,104 @@ func _on_skill_pressed(slot: int) -> void:
 	ui_pressed.emit(StringName("skill_%d" % slot), ok)
 	if not ok:
 		_skill(slot).reject()
+
+
+## A Arena tem a API de mira (T-177): show/hide_skill_aim e can_aim_at.
+func aim_supported() -> bool:
+	return _arena != null and _arena.has_method(&"show_skill_aim") and _arena.has_method(&"hide_skill_aim") 		and _arena.has_method(&"can_aim_at")
+
+
+func _on_aim_moved(slot: int, at: Vector2) -> void:
+	_show_aim(slot, at)
+
+
+func _on_aim_ended(slot: int, at: Vector2, cancelled: bool) -> void:
+	if not aim_supported():
+		if not cancelled:
+			_on_skill_pressed(slot) # Arena sem a API de mira: vale como toque (automático)
+		return
+	_arena.hide_skill_aim()
+	if cancelled or not _arena.can_aim_at(at):
+		return # cancelado: nada acontece
+	_fire(slot, at)
+
+
+## Prévia na arena enquanto o ponto é válido; fora da área, esconde e o anel do botão fica `danger`.
+func _show_aim(slot: int, at: Vector2) -> void:
+	if not aim_supported():
+		return
+	var valid: bool = _arena.can_aim_at(at)
+	if valid:
+		_arena.show_skill_aim(slot, at)
+	else:
+		_arena.hide_skill_aim()
+	var sb := _skill(slot)
+	if sb:
+		sb.set_aim_valid(valid)
+
+
+func _fire(slot: int, at: Vector2) -> void:
+	var ok: bool = _arena.use_skill(slot, at)
+	ui_pressed.emit(StringName("skill_%d" % slot), ok)
+	if not ok:
+		_skill(slot).reject()
+
+
+## PC (T-178): segurar `skill_<slot>` mostra a prévia no cursor; clique na arena válida lança ali;
+## soltar a tecla sem ter clicado = alvo automático (o disparo pela tecla passa a ser ao soltar).
+## Só intercepta com o Módulo pronto; em recarga a action segue para o SkillController (botão treme).
+func _input(event: InputEvent) -> void:
+	if _key_slot != 0:
+		_key_aim_input(event)
+		return
+	if _match_over or not aim_supported() or not event.is_action_type():
+		return
+	for i in _skills.size():
+		var sb := _skills[i]
+		if event.is_action_pressed(sb.action) and not event.is_echo() and sb.state == SkillButton.State.READY 				and not sb.aiming:
+			_key_slot = i + 1
+			_key_fired = false
+			sb.set_aiming(true)
+			_show_aim(_key_slot, get_viewport().get_mouse_position())
+			get_viewport().set_input_as_handled()
+			return
+
+
+func _key_aim_input(event: InputEvent) -> void:
+	var sb := _skill(_key_slot)
+	if event.is_action(sb.action):
+		get_viewport().set_input_as_handled() # inclusive repetições da tecla
+		if event.is_action_released(sb.action):
+			var slot := _key_slot
+			var fired := _key_fired
+			_end_key_aim()
+			if not fired:
+				_on_skill_pressed(slot)
+		return
+	if _key_fired:
+		return
+	if event is InputEventMouseMotion:
+		_show_aim(_key_slot, get_viewport().get_mouse_position())
+	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		var at := get_viewport().get_mouse_position()
+		if not _arena.can_aim_at(at):
+			return # clique no HUD/fora da arena segue normal
+		get_viewport().set_input_as_handled()
+		_key_fired = true
+		_arena.hide_skill_aim()
+		sb.set_aiming(false)
+		_fire(_key_slot, at)
+
+
+func _end_key_aim() -> void:
+	if _key_slot == 0:
+		return
+	var sb := _skill(_key_slot)
+	_key_slot = 0
+	if sb:
+		sb.set_aiming(false)
+	if aim_supported():
+		_arena.hide_skill_aim()
 
 
 func _on_upgrade_buy(id: StringName) -> void:

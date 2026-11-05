@@ -20,3 +20,10 @@ static func pick(origin: Vector2, enemies: Array[Enemy], attack_range: float) ->
 			best_priority = priority
 			best_dist_sq = dist_sq
 	return best
+
+
+## Foco manual (T-176): o focado, se vivo e dentro do alcance; senão a regra automática.
+static func pick_with_focus(origin: Vector2, enemies: Array[Enemy], attack_range: float, focus: Enemy) -> Enemy:
+	if is_instance_valid(focus) and focus.state != Enemy.State.DEAD 			and GroundPlane.distance_squared(origin, focus.position) <= attack_range * attack_range:
+		return focus
+	return pick(origin, enemies, attack_range)

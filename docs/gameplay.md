@@ -85,7 +85,7 @@ O comportamento fica em um script por `type` (`SkillBehavior` → `AreaSkill`, .
 - **Ao acionar:** valida o cooldown → aplica o efeito → emite `skill_used(slot)` e passa a emitir `cooldown_changed`. Acionar em cooldown não faz nada (a UI pode dar feedback de "indisponível").
 - **Sem alvo:** se não há inimigo ao alcance, a skill de área não dispara e **não gasta o cooldown**.
 - **Alvo da área e do controle:** automático, no ponto de maior densidade de inimigos dentro de `target_range` (calculado no acionamento; os centros candidatos são as posições dos inimigos).
-- **Área:** dano por distância (raio da skill + raio do inimigo), sem usar a layer `skill_areas`. **[A definir]**: mira manual por toque/clique como alternativa, a testar no playtest.
+- **Área:** dano por distância (raio da skill + raio do inimigo), sem usar a layer `skill_areas`. Mira manual: ver "Foco manual e mira dos Módulos" (decisão 46).
 - **Feedback:** antecipação curta (~0,1 s) + impacto forte; tremor leve **desligável**.
 
 ### Meteoro de fogo (T-139, decisão 37)
@@ -127,7 +127,7 @@ Arquivo de dados: `data/enemies/enemy_<id>.tres` (`EnemyData`). Campos: `id, hp,
 | Movimento | 140 px/s (T-173: era 160) até `attack_range` 100 px (no chão) do centro do Núcleo: encosta sem tocar a hurtbox (40 + raio 48) |
 | Golpe | a cada `attack_interval` 1,8 s (T-173: era 1,5); `attack_windup` 0,5 s de aviso (sprite `boss_ogre_attack.png`, cresce até +12% e puxa para vermelho) e `attack_damage` 20 (T-173: era 30) no Núcleo (passa pela defesa do upgrade) |
 | Meteoro | **sempre** causa o dano (40) na vida **e** lança o chefe (`Boss.take_skill_damage`; vale qualquer meteoro cujo raio o toque). Se o meteoro o mata, não há lançamento |
-| Lançamento | `launch_distance` 600 px no chão para longe do Núcleo, preso na área visível acima da bandeja (`Arena.boss_launch_bounds`: arena menos o raio nas laterais e na base e a altura do sprite no topo); voo `launch_time` 0,6 s (tween de física, ease-out) |
+| Lançamento | `launch_distance` 600 px no chão para longe do Núcleo, **limitado a 85% do alcance do Anima** (decisão 47: `Arena.boss_launch_reach_ratio` 0,85 × `attack_range` 600 = 510 px do Núcleo, no chão; `Boss.launch_max_reach`), preso na área visível acima da bandeja (`Arena.boss_launch_bounds`: arena menos o raio nas laterais e na base e a altura do sprite no topo); voo `launch_time` 0,6 s (tween de física, ease-out) |
 | Atordoado | `stun_time` 2 s (sprite `boss_ogre_stunned.png`), não bate; no fim anda de volta |
 | Imunidade | `relaunch_immunity` 1 s depois de acordar: o meteoro fere, mas não relança. Em voo ou atordoado também não relança. Evita prender o chefe longe com dois meteoros seguidos (o cooldown do meteoro com upgrade fica perto do ciclo voo + atordoamento + volta) |
 | Passos (T-167) | `WalkAnimator` (`src/match/enemies/walk_animator.gd`), só visual: `walk_bob` 7 px, inclinação ±`walk_tilt_deg` 5°, squash `walk_squash` 6% no apoio do pé e sombra encolhendo até 12% no alto do passo; ritmo = distância andada / `walk_step_length` 70 px (a 140 px/s = 2 passos/s). Parado, atacando, em voo ou atordoado: pose neutra. `walk_frames` (opcional, um quadro por quarto de ciclo) alterna os quadros `boss_ogre_walk_1..4` (AG08; mesma âncora do `boss_ogre`). `walk_full = true` liga a pose completa; com `false` (inimigos comuns) só o balanço. **Inimigos comuns: desligado** (`walk_bob = 0`): medido com 150 inimigos andando, só o balanço de 3 px custa +0,7 ms/quadro de física no PC (0,6 → 1,3 ms; a pose completa, +1,6 ms) |
@@ -287,6 +287,27 @@ Também na `Arena`, só em eventos (nenhum por quadro; as ligações são feitas
 
 `boss_phase_changed` **deixou de existir** (uma fase; T-150).
 
+### Foco manual e mira dos Módulos (BRF-076; decisões 45 e 46)
+
+API da `Arena` para a UI (AG02, T-178). `at` em coordenadas da Arena = as do viewport que o HUD usa (âncora no chão).
+
+| Membro | Contrato |
+|---|---|
+| `use_skill(slot: int, at: Vector2 = Vector2.INF) -> bool` | `Vector2.INF` = alvo automático (como antes). `at` finito = mira manual: só para Módulos de área; exige `can_aim_at(at)` (senão devolve `false` e não gasta o cooldown); **não** exige inimigo ao alcance. Módulo sem mira (não área) ignora `at` |
+| `show_skill_aim(slot: int, at: Vector2) -> void` | prévia **no chão** do raio do Módulo do slot (elipse 0,75, contorno claro + preenchimento translúcido, `accent` ciano do jogador), centro preso à área de mira; um nó criado no `_ready`, só move e redesenha. Slot sem Módulo de área = esconde |
+| `hide_skill_aim() -> void` | esconde a prévia |
+| `can_aim_at(at: Vector2) -> bool` | `at` dentro de `free_rect()` (entre o HUD de cima e a bandeja) |
+| `aim_rect() -> Rect2` | a área de mira (= `free_rect()`) |
+| sinal `focus_changed(enemy: Node)` | foco manual definido (o inimigo) ou desfeito (`null`: morte, toque no chão vazio ou no mesmo inimigo) |
+| `focused_enemy() -> Enemy` / `set_focus(enemy)` | foco atual (ou `null`) / define por código (testes, bot) |
+
+**Foco manual (T-176):** `Arena._unhandled_input` (toque `InputEventScreenTouch` ou clique esquerdo `InputEventMouseButton`, só eventos não consumidos pelo HUD; sem teclas) escolhe o inimigo vivo mais próximo do ponto num raio de `focus_pick_radius` (padrão 44 px) além do raio do inimigo e da altura do sprite (o toque vale do pé ao topo do desenho). Toque no mesmo inimigo ou no chão vazio (dentro da área de mira) desfaz. O Anima mira no focado enquanto ele está no alcance; fora dele, usa a regra automática e volta ao focado quando ele entra. Marcador: anel pulsante ciano no chão sob o focado (`FocusMarker`, desenhado por código, sem alocar). Vale para o chefe.
+
+**Mira do meteoro (T-177):** com `at` manual, o meteoro cai **exatamente** em `at` (sem previsão, sem a reavaliação da T-173 e **sem anular**, mesmo sem inimigo); aviso, queda, dano, cratera e lançamento do chefe iguais. Automático = igual a antes.
+
+**Bot (100 seeds) antes → depois do chefe dentro do alcance:** vitória 100% → 100%; Energia de quem vence 40% → 40%; luta 27 s → 26 s. O lançamento de 600 px já era cortado pela borda visível na maioria dos casos; vida e dano do chefe mantidos. O bot não usa foco nem mira manual.
+Testes: `tests/unit/match/test_focus_and_aim.gd`.
+
 ### Upgrades da partida (T-134)
 
 Valores e curva de custo em [meta.md](meta.md). Lógica em `src/match/upgrades/`, dados em `data/upgrades/<id>.tres` (`UpgradeData`).
@@ -339,6 +360,7 @@ O `project.godot` é do AG07. Layers sugeridas:
 | Skill de controle | pendente | T-109 |
 | Skill de defesa | pendente | T-110 |
 | Arquétipos (tanque, atirador, enxame) | protótipo | T-111 |
-| Chefe (ogro) | protótipo | T-115, T-150, T-166, T-167 |
+| Chefe (ogro) | protótipo | T-115, T-150, T-166, T-167, BRF-076 (lançamento no alcance) |
 | Barra de vida dos inimigos | protótipo | T-149 |
 | Upgrades da partida | protótipo | T-134 |
+| Foco manual do ataque, mira manual do meteoro (API) | protótipo | T-176, T-177 |

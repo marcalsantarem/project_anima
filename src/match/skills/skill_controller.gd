@@ -65,6 +65,12 @@ func _on_fizzled(at: Vector2, slot: int) -> void:
 	skill_fizzled.emit(slot, at)
 
 
+## Raio da mira do slot (px no chão) ou 0 se o slot não aceita mira.
+func aim_radius(slot: int) -> float:
+	var b := get_behavior(slot)
+	return b.data.radius if b != null and b.can_aim() else 0.0
+
+
 func slot_count() -> int:
 	return _slots.size()
 
@@ -83,15 +89,18 @@ func get_behavior(slot: int) -> SkillBehavior:
 
 
 ## Aciona a skill do slot (1-based). Usado pela entrada e pelos botões de toque da UI.
-func use_skill(slot: int) -> bool:
+## `at` finito = mira manual (ignorado se a skill não aceita mira); a Arena valida a área.
+func use_skill(slot: int, at: Vector2 = Vector2.INF) -> bool:
 	var s := get_slot(slot)
 	if not enabled or s == null or not s.is_ready():
 		return false
 	var behavior := _behaviors[slot - 1]
-	if not behavior.can_activate():
+	if not behavior.can_aim():
+		at = Vector2.INF
+	if not behavior.can_activate(at):
 		return false
 	s.start_cooldown(cooldown_scale)
-	behavior.activate()
+	behavior.activate(at)
 	skill_used.emit(slot)
 	cooldown_changed.emit(slot, s.remaining, s.total)
 	return true
