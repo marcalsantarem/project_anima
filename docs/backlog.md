@@ -93,6 +93,7 @@
 | T-178 | Arrastar do botão do Módulo para mirar (toque/mouse), segurar 1 + clique no PC | M1 | AG02 | feita |
 | T-179 | Splash e tela de título no estilo holográfico/tecnológico (arte do Gemini como base; texto, barra e brilhos vivos) | M1 | AG02 + AG08 | feita |
 | T-180 | **(1ª do M2)** Guia visual "HUD holográfico" para menus + mockups do menu principal e do hangar (Módulos, Fragmentos, Núcleos) | M2 | AG08 | a fazer (início do M2) |
+| T-181 | Ícones do app (iPhone, PWA e favicon) na nova identidade tecnológica da splash e do menu | M1 | AG08 + AG02 | pronta p/ briefing |
 | T-148 | Sinais da Arena para VFX (projectile_fired, projectile_hit, enemy_died, particles_gained, skill_cast, boss_telegraph_started, boss_phase_changed) | M1 | AG01 | feita |
 
 ## Próximas prontas p/ briefing
@@ -528,6 +529,12 @@
 - **Marco:** M2 (primeira tarefa) · **Dono:** AG08 · **Status:** a fazer (início do M2)
 - **Depende de:** decisões 48 e 49; T-179 (mesma base visual)
 - **Pronto quando:** `docs/arte.md` ganha a seção de menus holográficos (paleta, painéis, botões, molduras por raridade, tipografia, brilhos e animações baratas) e há 2 a 3 mockups em PNG (menu principal, hangar com Módulos/Fragmentos/Núcleos, tela de raridade/fusão), aprovados pelo dono; regras de desempenho no iPhone.
+
+### T-181 — Ícones do app na identidade tecnológica
+- **Marco:** M1 · **Dono:** AG08 (arte) + AG02 (deploy) · **Status:** pronta p/ briefing
+- **Depende de:** decisão 48 e T-179 (arte-base `assets/splash/tech/tech_splash_clean.png`); substitui os ícones da T-174
+- **Arquivos:** `assets/app/` (mestre, derivados e gerador), `web/pwa/` (cópia via `web/copy_pwa.sh --sync-icons`), `web/pwa/manifest.webmanifest` (só se mudar cor), `assets/LICENSES.md`
+- **Pronto quando:** ícone 1024 mestre e derivados (`apple-touch-icon` 180, 192, 512, maskable 512 e favicons 16/32/48/ico) com o **cristal holográfico ciano sobre o fundo azul-marinho** da arte do Gemini (recortado da arte ou redesenhado no mesmo estilo), legível a 48 px e no favicon; copiados para o deploy; README e licença atualizados; o dono reinstala o atalho para o iOS reler.
 
 ### T-148 — Sinais da Arena para VFX
 - **Marco:** M1 · **Dono:** AG01 · **Status:** feita
