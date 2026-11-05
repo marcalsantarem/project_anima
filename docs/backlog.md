@@ -148,6 +148,37 @@
 | T-233 | Resultado e baú mostram os Componentes ganhos (tam. P) | M7 | AG02 | a fazer |
 | T-234 | Balanceamento com Componentes (simulação do bot) (tam. P) | M7 | AG04 | a fazer |
 | T-235 | Validação e fechamento da v0.2.5 (tag) (tam. P) | M7 | AG03 + AG00 | a fazer |
+| T-236 | Mockup da tela de configurações (tam. P) | M8 | AG08 | a fazer |
+| T-237 | Configurações no save: volume de música e efeitos, sons ligados, efeitos reduzidos (sai do `debug.cfg`), idioma (tam. P) | M8 | AG05 + AG07 | a fazer |
+| T-238 | Barramentos de áudio Música e Efeitos ligados ao volume (tam. P) | M8 | AG07 | a fazer |
+| T-239 | Tela de configurações (no hangar e na pausa) (tam. M) | M8 | AG02 | a fazer |
+| T-240 | Infra de localização: tradução por chaves em todos os textos (sem texto fixo no código) (tam. G) | M8 | AG07 + AG02 | a fazer |
+| T-241 | Tradução para inglês e espanhol, com glossário dos nomes oficiais (tam. M) | M8 | AG02 | a fazer |
+| T-242 | Layout com textos longos (espanhol) e fontes com acentos; teste de corte (tam. P) | M8 | AG02 | a fazer |
+| T-243 | Idioma do navegador como padrão (tam. P) | M8 | AG02 | a fazer |
+| T-244 | Validação e fechamento da v0.2.6 (tag) (tam. P) | M8 | AG03 + AG00 | a fazer |
+| T-245 | Roteiro do onboarding: 4 tutoriais, gatilhos, pular (tam. P) | M9 | AG04 | a fazer |
+| T-246 | Sistema de tutorial: passos em dados, destaque, mão apontando, progresso salvo (tam. G) | M9 | AG02 + AG07 | a fazer |
+| T-247 | Tutorial do início de jogo (1ª partida: ataque automático, upgrades, foco) (tam. M) | M9 | AG02 + AG01 | a fazer |
+| T-248 | Tutoriais de equipar Núcleo, Módulo e Componente (tam. M) | M9 | AG02 | a fazer |
+| T-249 | Arte do tutorial: mão, balões, destaque (tam. P) | M9 | AG08 | a fazer |
+| T-250 | Textos dos tutoriais em português, inglês e espanhol (tam. P) | M9 | AG02 | a fazer |
+| T-251 | Validação com jogador novo e fechamento da v0.2.7 (tag) (tam. P) | M9 | AG03 + AG00 | a fazer |
+| T-252 | Design das 5 fases: tipos de fase, inimigos por fase, curva de dificuldade (tam. M) | M10 | AG04 + AG01 | a fazer |
+| T-253 | Novos inimigos (3 a 4 arquétipos) (tam. G) | M10 | AG01 | a fazer |
+| T-254 | Arte dos novos inimigos (tam. G) | M10 | AG08 | a fazer |
+| T-255 | Chefe 2 (tam. M) | M10 | AG01 | a fazer |
+| T-256 | Chefe 3 (tam. M) | M10 | AG01 | a fazer |
+| T-257 | Arte dos chefes 2 e 3 (tam. M) | M10 | AG08 | a fazer |
+| T-258 | Cenários das fases 2 a 5 (tam. G) | M10 | AG08 | a fazer |
+| T-259 | Ondas das 5 fases em dados (tam. M) | M10 | AG01 + AG04 | a fazer |
+| T-260 | Seleção e progressão de fases (mapa, desbloqueio, save) (tam. M) | M10 | AG02 + AG04 + AG05 | a fazer |
+| T-261 | Recompensas durante a partida nas fases novas (revisar a T-222) (tam. P) | M10 | AG04 | a fazer |
+| T-262 | VFX dos novos inimigos e chefes (tam. M) | M10 | AG09 | a fazer |
+| T-263 | Balanceamento das 5 fases (bot e playtest) (tam. M) | M10 | AG04 | a fazer |
+| T-264 | Polimento de gráficos, efeitos e gameplay (lista do playtest) (tam. G) | M10 | AG01 + AG02 + AG09 | a fazer |
+| T-265 | Desempenho no iPhone com o conteúdo novo (tam. M) | M10 | AG01 + AG02 | a fazer |
+| T-266 | Validação e fechamento da v0.3.0: tag, branch `beta` e deploy em `beta--projectanimagame.netlify.app` (tam. M) | M10 | AG03 + AG00 + AG02 + AG07 | a fazer |
 | T-148 | Sinais da Arena para VFX (projectile_fired, projectile_hit, enemy_died, particles_gained, skill_cast, boss_telegraph_started, boss_phase_changed) | M1 | AG01 | feita |
 
 ## Próximas prontas p/ briefing
@@ -780,7 +811,7 @@
 ## Depois (M3+)
 
 - **M2 quebrado** (2026-11-05): T-162, T-163, T-180, T-182 e T-184 a T-197.
-- **M3 a M7 quebrados** (2026-11-05, estimativa; o detalhe "pronto quando" é escrito no briefing): M3 T-198 a T-202 · M4 T-203 a T-210 · M5 T-109, T-110, T-211 a T-220 · M6 T-221 a T-225 · M7 T-226 a T-235. Tamanho: P = até 1 sessão de agente, M = 1 a 2, G = 3 ou mais.
+- **M3 a M7 quebrados** (2026-11-05, estimativa; o detalhe "pronto quando" é escrito no briefing): M3 T-198 a T-202 · M4 T-203 a T-210 · M5 T-109, T-110, T-211 a T-220 · M6 T-221 a T-225 · M7 T-226 a T-235 · M8 T-236 a T-244 · M9 T-245 a T-251 · M10 T-252 a T-266. Tamanho: P = até 1 sessão de agente, M = 1 a 2, G = 3 ou mais.
 - **Roadmap:** marcos e versões em [docs/roadmap.md](roadmap.md) (decisão 53). Tarefas do M3 em diante são quebradas quando o marco começar.
 
 - **Decisão 37 (meteoro de fogo):** T-139 (AG01) implementa o meteoro com raio de explosão e dano em dados, preparados para upgrades; o ícone (T-128, AG08) e o VFX (T-131, AG09) seguem o meteoro de fogo.

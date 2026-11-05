@@ -86,10 +86,14 @@ Componentes (antigos "Fragmentos", renomeados; decisão 54):
 - Criar o upgrade de Componentes com Moedas, aumentando seus adicionais.
 
 ## M8 — v0.2.6 — Configurações e Localização
+Tarefas: T-236 a T-244 no [backlog](backlog.md).
+
 - Criar tela de configurações com volume, habilitar sons, efeitos ligados/desligados e idioma.
 - Criar a localização de tudo que é escrito no jogo para inglês e espanhol.
 
 ## M9 — v0.2.7 — Onboarding
+Tarefas: T-245 a T-251 no [backlog](backlog.md).
+
 Tutoriais para os primeiros momentos do jogo:
 - Início de jogo.
 - Equipar Núcleo.
@@ -97,6 +101,8 @@ Tutoriais para os primeiros momentos do jogo:
 - Equipar Componentes.
 
 ## M10 — v0.3.0 — Versão Beta (demo pública)
+Tarefas: T-252 a T-266 no [backlog](backlog.md).
+
 Expansão de conteúdo:
 - Criar 5 fases inteiras.
 - Criar novos tipos de inimigos.
