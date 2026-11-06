@@ -1,0 +1,12 @@
+# Netlify: o jogo web é publicado pelo GitHub Actions (build/web); aqui só as funções e o redirect da API de logs.
+# Não há comando de build: o deploy usa --no-build.
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+[[redirects]]
+  from = "/api/log"
+  to = "/.netlify/functions/log"
+  status = 200
+  force = true

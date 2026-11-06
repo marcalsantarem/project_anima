@@ -179,10 +179,10 @@
 | T-264 | Polimento de gráficos, efeitos e gameplay (lista do playtest) (tam. G) | M10 | AG01 + AG02 + AG09 | a fazer |
 | T-265 | Desempenho no iPhone com o conteúdo novo (tam. M) | M10 | AG01 + AG10 | a fazer |
 | T-266 | Validação e fechamento da v0.3.0: tag, branch `beta` e deploy em `beta--projectanimagame.netlify.app` (tam. M) | M10 | AG03 + AG00 + AG10 | a fazer |
-| T-267 | Envio de logs: contrato da API, esquema da tabela (`logs`), limites e ADR (decisão 58) (tam. P) | M1 | AG05 | a fazer |
-| T-268 | Netlify Function `POST /api/log` gravando no Neon: validação, limite de tamanho, chave de cliente, limite por IP, limpeza em 30 dias; testes (tam. M) | M1 | AG05 | a fazer |
-| T-269 | Botão "Enviar log" no Resultado (só em build de teste): aviso do que é enviado, estados enviando/enviado/falhou, texto por chave de tradução (tam. P) | M1 | AG02 | a fazer |
-| T-270 | Deploy do envio: variáveis de ambiente no Netlify, CORS, flag de build de teste, `docs/` com a conta Neon (o dono cria a conta e passa a string de conexão) (tam. P) | M1 | AG10 | a fazer |
+| T-267 | Envio de logs: contrato da API, esquema da tabela (`logs`), limites e ADR (decisão 58) (tam. P) | M1 | AG05 | feita (BRF-087) |
+| T-268 | Netlify Function `POST /api/log` gravando no Neon: validação, limite de tamanho, chave de cliente, limite por IP, limpeza em 30 dias; testes (tam. M) | M1 | AG05 | feita (BRF-087) |
+| T-269 | Botão "Enviar log" no Resultado (só em build de teste): aviso do que é enviado, estados enviando/enviado/falhou, texto por chave de tradução (tam. P) | M1 | AG02 | feita (BRF-088) |
+| T-270 | Deploy do envio: variáveis de ambiente no Netlify, CORS, flag de build de teste, `docs/` com a conta Neon (o dono cria a conta e passa a string de conexão) (tam. P) | M1 | AG10 | feita (BRF-089); falta deploy |
 | T-271 | Validação do envio no PC e no iPhone (log chega na tabela; falha de rede não trava o jogo) (tam. P) | M1 | AG03 | a fazer |
 | T-148 | Sinais da Arena para VFX (projectile_fired, projectile_hit, enemy_died, particles_gained, skill_cast, boss_telegraph_started, boss_phase_changed) | M1 | AG01 | feita |
 

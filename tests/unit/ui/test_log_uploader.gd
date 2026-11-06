@@ -1,0 +1,70 @@
+extends GutTest
+## LogUploader (T-269): payload do contrato e estados (resposta HTTP simulada).
+
+const KEYS := ["version", "build", "platform", "user_agent", "result", "wave", "duration_s", "log"]
+
+
+func _result(outcome: MatchResult.Outcome) -> MatchResult:
+	var r := MatchResult.new()
+	r.outcome = outcome
+	r.wave_reached = 4
+	r.duration_s = 61.5
+	return r
+
+
+func test_payload_has_contract_keys() -> void:
+	var p := LogUploader.build_payload(_result(MatchResult.Outcome.VICTORY), {}, "ua")
+	for k in KEYS:
+		assert_true(p.has(k), k)
+	assert_eq(p.result, "victory")
+	assert_eq(p.wave, 4)
+	assert_eq(p.duration_s, 61.5)
+	assert_eq(p.user_agent, "ua")
+	assert_eq(p.log, "")
+
+
+func test_payload_defeat_and_null_result() -> void:
+	assert_eq(LogUploader.build_payload(_result(MatchResult.Outcome.DEFEAT), {}).result, "defeat")
+	var p := LogUploader.build_payload(null, {})
+	assert_null(p.result)
+	assert_eq(p.wave, 0)
+
+
+func test_state_for_response() -> void:
+	assert_eq(LogUploader.state_for(HTTPRequest.RESULT_SUCCESS, 201), LogUploader.State.SENT)
+	assert_eq(LogUploader.state_for(HTTPRequest.RESULT_SUCCESS, 429), LogUploader.State.FAILED)
+	assert_eq(LogUploader.state_for(HTTPRequest.RESULT_CANT_CONNECT, 0), LogUploader.State.FAILED)
+
+
+func test_completed_sets_state_and_signals() -> void:
+	var u: LogUploader = add_child_autofree(LogUploader.new())
+	watch_signals(u)
+	u._on_completed(HTTPRequest.RESULT_CANT_CONNECT, 0, PackedStringArray(), PackedByteArray())
+	assert_eq(u.state, LogUploader.State.FAILED)
+	u._on_completed(HTTPRequest.RESULT_SUCCESS, 201, PackedStringArray(), PackedByteArray())
+	assert_eq(u.state, LogUploader.State.SENT)
+	assert_signal_emit_count(u, "state_changed", 2)
+
+
+func test_no_resend_after_sent() -> void:
+	var u: LogUploader = add_child_autofree(LogUploader.new())
+	u.state = LogUploader.State.SENT
+	watch_signals(u)
+	u.send(null, {})
+	assert_signal_not_emitted(u, "state_changed")
+	assert_eq(u.get_child_count(), 0)
+
+
+func test_button_states_in_result_screen() -> void:
+	var s: ResultScreen = add_child_autofree(ResultScreen.new())
+	await get_tree().process_frame
+	var b: Button = s.find_child("SendLog", true, false)
+	assert_not_null(b)
+	s._on_upload_state(LogUploader.State.SENDING)
+	assert_true(b.disabled)
+	s._on_upload_state(LogUploader.State.FAILED)
+	assert_false(b.disabled)
+	assert_eq(b.text, LogUploader.TXT_FAILED)
+	s._on_upload_state(LogUploader.State.SENT)
+	assert_true(b.disabled)
+	assert_eq(b.text, LogUploader.TXT_SENT)

@@ -20,6 +20,9 @@ var _log: Dictionary = {}
 var _logs_button: Button
 ## Visualizador aberto, ou null.
 var viewer: LogViewer
+var _uploader: LogUploader
+var _send_button: Button
+var _notice: Label
 
 
 func _ready() -> void:
@@ -53,11 +56,31 @@ func _ready() -> void:
 	col.add_child(back)
 	# Teclado: foco inicial no principal; setas/Tab levam ao secundário e a action de aceitar confirma.
 	play.focus_neighbor_bottom = play.get_path_to(back)
+	var small_row := HBoxContainer.new()
+	small_row.name = "SmallRow"
+	small_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	small_row.add_theme_constant_override("separation", UiTokens.SPACE_S)
+	col.add_child(small_row)
 	_logs_button = ScreenKit.button("Logs", false, open_logs)
 	_logs_button.name = "Logs"
 	_logs_button.custom_minimum_size = LOGS_BUTTON_SIZE
 	_logs_button.add_theme_font_size_override("font_size", UiTokens.FONT_CAPTION)
-	col.add_child(_logs_button)
+	small_row.add_child(_logs_button)
+	if LogUploader.ENABLED:
+		_uploader = LogUploader.new()
+		add_child(_uploader)
+		_uploader.state_changed.connect(_on_upload_state)
+		_send_button = ScreenKit.button(LogUploader.TXT_SEND, false, send_log)
+		_send_button.name = "SendLog"
+		_send_button.custom_minimum_size = LOGS_BUTTON_SIZE
+		_send_button.add_theme_font_size_override("font_size", UiTokens.FONT_CAPTION)
+		small_row.add_child(_send_button)
+		_notice = ScreenKit.label(LogUploader.TXT_NOTICE, &"LabelCaption")
+		_notice.name = "SendNotice"
+		col.add_child(_notice)
+		_logs_button.focus_neighbor_right = _logs_button.get_path_to(_send_button)
+		_send_button.focus_neighbor_left = _send_button.get_path_to(_logs_button)
+		_send_button.focus_neighbor_top = _send_button.get_path_to(back)
 	back.focus_neighbor_top = back.get_path_to(play)
 	back.focus_neighbor_bottom = back.get_path_to(_logs_button)
 	_logs_button.focus_neighbor_top = _logs_button.get_path_to(back)
@@ -91,6 +114,32 @@ func _refresh() -> void:
 ## Log da partida (MatchRecorder) para o botão "Logs".
 func set_log(doc: Dictionary) -> void:
 	_log = doc
+
+
+## Botão "Enviar log" (T-269): envia o resultado e o log; sem reenvio depois de enviado.
+func send_log() -> void:
+	if _uploader == null:
+		return
+	var doc := _log if not _log.is_empty() else MatchRecorder.load_last()
+	_uploader.send(_result, doc)
+
+
+func _on_upload_state(s: int) -> void:
+	if _send_button == null:
+		return
+	match s:
+		LogUploader.State.SENDING:
+			_send_button.text = LogUploader.TXT_SENDING
+			_send_button.disabled = true
+		LogUploader.State.SENT:
+			_send_button.text = LogUploader.TXT_SENT
+			_send_button.disabled = true
+		LogUploader.State.FAILED:
+			_send_button.text = LogUploader.TXT_FAILED
+			_send_button.disabled = false
+		_:
+			_send_button.text = LogUploader.TXT_SEND
+			_send_button.disabled = false
 
 
 ## Abre o visualizador por cima (não pausa nem mexe nos botões; ao fechar, o foco volta ao "Logs").

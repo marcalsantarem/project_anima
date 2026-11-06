@@ -282,7 +282,7 @@ iPhone 375×812 CSS, Safari em aba (k = 1,92 px do jogo/CSS)
 
 ## 9b. Debug e logs (T-107, BRF-063)
 
-- **Resultado:** botão secundário **"Logs"** (200×64), abaixo de "Voltar ao título". Abre o `LogViewer`.
+- **Resultado:** botão secundário **"Logs"** (200×64), abaixo de "Voltar ao título". Abre o `LogViewer`. Ao lado, **"Enviar log"** (T-269, mesma geometria; `LogUploader` em `src/debug/`, contrato em `docs/logs-api.md`): estados enviando / enviado ✔ (desabilitado) / falhou (tenta de novo), com aviso curto de privacidade abaixo. `LogUploader.ENABLED` desliga tudo no build final; textos em constantes `TXT_*` (trocar por chaves na T-240).
 - **Título:** link **"Último log"** (180×64) no canto superior direito, só se houver `user://logs/last_match.json`. O toque nele não começa a partida.
 - **Pausa:** linha com dois interruptores 228×64: **"Efeitos reduzidos: sim/não"** (T-132, BRF-080) e **"Debug: ligado/desligado"**, que liga o overlay. Os dois ficam em `user://debug.cfg` (`DebugSettings`; seções `[debug] overlay` e `[fx] reduced_effects`).
 - **Efeitos reduzidos:** a pausa emite `reduced_effects_changed(on)`; o `SceneFlow` aplica na criação da partida e na hora (partida em curso) via `apply_reduced_effects(arena, director, on)`: `Arena.reduced_effects` (só se a propriedade existir) e `FxDirector.reduced_effects` (que repassa ao `FxPool`, de onde o `MatchRecorder` lê `reduced_effects` no log).
