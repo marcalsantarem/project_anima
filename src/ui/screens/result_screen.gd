@@ -9,6 +9,7 @@ signal play_again_requested
 signal title_requested
 
 ## Botão "Logs": secundário e menor que os dois principais (alvo ≥ 44 px, BRF-063).
+const BG_ART := preload("res://assets/backgrounds/result_tech_bg_dim.webp")
 const LOGS_BUTTON_SIZE := Vector2(200, 64)
 
 var _result: MatchResult
@@ -29,6 +30,16 @@ func _ready() -> void:
 	set_anchors_and_offsets_preset(PRESET_FULL_RECT)
 	var root := ScreenKit.root(self)
 	ScreenKit.set_page_color(UiTokens.BG_VOID)
+	# Fundo holográfico (T-277, decisão 60): atrás de tudo, cobrindo a tela (corta as bordas).
+	var bg := TextureRect.new()
+	bg.name = "Background"
+	bg.texture = BG_ART
+	bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	bg.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	bg.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
+	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(bg)
+	root.move_child(bg, 1)
 	var col := ScreenKit.card(root, UiTokens.SPACE_L)
 	_title = ScreenKit.label("", &"LabelDisplay")
 	col.add_child(_title)

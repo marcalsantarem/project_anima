@@ -282,6 +282,7 @@ iPhone 375×812 CSS, Safari em aba (k = 1,92 px do jogo/CSS)
 
 ## 9b. Debug e logs (T-107, BRF-063)
 
+- **Resultado, fundo (T-277, BRF-093, decisão 60):** `assets/backgrounds/result_tech_bg_dim.webp` num `TextureRect` `Background` em tela cheia (`Ignore Size` + `Keep Aspect Covered`), atrás do cartão. Só o fundo mudou; o cartão roxo e os botões seguem no estilo atual até o M2 (T-180/T-190). Capturas: `docs/img/resultado-vitoria.png`, `resultado-derrota.png`.
 - **Resultado:** botão secundário **"Logs"** (200×64), abaixo de "Voltar ao título". Abre o `LogViewer`. Ao lado, **"Enviar log"** (T-269, mesma geometria; `LogUploader` em `src/debug/`, contrato em `docs/logs-api.md`): estados enviando / enviado ✔ (desabilitado) / falhou (tenta de novo), com aviso curto de privacidade abaixo. `LogUploader.ENABLED` desliga tudo no build final; textos em constantes `TXT_*` (trocar por chaves na T-240).
 - **Título:** link **"Último log"** (180×64) no canto superior direito, só se houver `user://logs/last_match.json`. O toque nele não começa a partida.
 - **Pausa:** linha com dois interruptores 228×64: **"Efeitos reduzidos: sim/não"** (T-132, BRF-080) e **"Debug: ligado/desligado"**, que liga o overlay. Os dois ficam em `user://debug.cfg` (`DebugSettings`; seções `[debug] overlay` e `[fx] reduced_effects`).
