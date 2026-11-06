@@ -1,16 +1,19 @@
 # Build Web (Godot) + deploy no Netlify.
 # dev  → https://dev--<site>.netlify.app (alias "dev")
 # main → https://<site>.netlify.app (produção)
+# qualquer tag → https://<alias-da-tag>--<site>.netlify.app (nunca produção) + GitHub Release com o zip do build
 name: Deploy Web
 
 on:
   push:
     branches: [dev, main]
+    tags: ['**']
   workflow_dispatch:
 
-# Um deploy por branch de cada vez; um push novo cancela o anterior.
+# Um deploy por ref (branch ou tag) de cada vez; um push novo na mesma ref cancela o anterior.
+# github.ref (refs/heads/dev, refs/tags/x) evita que uma tag cancele o deploy da dev/main.
 concurrency:
-  group: deploy-web-${{ github.ref_name }}
+  group: deploy-web-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -99,9 +102,35 @@ jobs:
     needs: build
     runs-on: ubuntu-24.04
     timeout-minutes: 10
+    # contents: write só aqui, para criar a GitHub Release da tag.
+    permissions:
+      contents: write
     steps:
-      # Checkout para ter netlify.toml e netlify/functions (API de logs, T-270).
+      # Checkout (na tag, quando for tag) para ter netlify.toml e netlify/functions (API de logs, T-270).
       - uses: actions/checkout@v7.0.1
+
+      # Destino do deploy. Tag nunca vai para produção: alias derivado do nome da tag.
+      # Alias: minúsculas, fora de [a-z0-9-] vira "-", sem "-" nas pontas, máx. 37 caracteres.
+      # Nome da tag passa por env (nunca interpolado no script).
+      - name: Definir destino do deploy
+        env:
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          site="projectanimagame"
+          if [ "$REF_TYPE" = "tag" ]; then
+            alias="$(printf '%s' "$REF_NAME" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9-]/-/g' | cut -c1-37 | sed -E 's/^-+//; s/-+$//')"
+            case "$alias" in ""|dev|main) alias="tag-${alias}"; alias="${alias%-}" ;; esac
+            echo "DEPLOY_TARGET=--alias=${alias}" >> "$GITHUB_ENV"
+            echo "SITE_URL=https://${alias}--${site}.netlify.app" >> "$GITHUB_ENV"
+          elif [ "$REF_NAME" = "main" ]; then
+            echo "DEPLOY_TARGET=--prod" >> "$GITHUB_ENV"
+            echo "SITE_URL=https://${site}.netlify.app" >> "$GITHUB_ENV"
+          else
+            echo "DEPLOY_TARGET=--alias=dev" >> "$GITHUB_ENV"
+            echo "SITE_URL=https://dev--${site}.netlify.app" >> "$GITHUB_ENV"
+          fi
 
       - uses: actions/download-artifact@v8.0.2
         with:
@@ -126,7 +155,6 @@ jobs:
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-          DEPLOY_TARGET: ${{ github.ref_name == 'main' && '--prod' || '--alias=dev' }}
         run: |
           set -euo pipefail
           FUNCTIONS_ARG=""
@@ -143,8 +171,21 @@ jobs:
         if: always()
         run: |
           ls -la netlify/functions netlify/node_modules/@neondatabase 2>&1 | head -20 || true
-          site="https://${{ github.ref_name == 'main' && '' || 'dev--' }}projectanimagame.netlify.app"
+          site="$SITE_URL"
+          echo "Site: $site"
           sleep 10
           for p in /.netlify/functions/log /api/log; do
             echo "POST $site$p -> $(curl -s -o /dev/null -w '%{http_code}' -X POST "$site$p" -H 'X-Anima-Key: x' -d '{}')"
           done
+
+      # Só em tag: anexa o build (zip) a uma GitHub Release com o nome da tag.
+      - name: GitHub Release (tag)
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          zipname="anima-web-${TAG//[^A-Za-z0-9._-]/-}.zip"
+          (cd build/web && zip -qr "$GITHUB_WORKSPACE/$zipname" .)
+          gh release create "$TAG" "$zipname" --verify-tag --title "$TAG"             --notes "Build Web de ${TAG} (${GITHUB_SHA::7}). Teste: ${SITE_URL}"

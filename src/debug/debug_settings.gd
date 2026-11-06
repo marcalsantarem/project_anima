@@ -65,6 +65,19 @@ static func _load() -> void:
 		set_overlay_enabled(param == "1")
 
 
+## Teste: null = usa a URL real; true/false simula a query com/sem `debug`.
+static var query_has_debug_override = null
+
+
+## Se a UI de debug (interruptor da pausa) deve aparecer: fora da web sempre; na web só com `?debug` (qualquer valor).
+static func debug_ui_available() -> bool:
+	if query_has_debug_override != null:
+		return bool(query_has_debug_override)
+	if not OS.has_feature("web"):
+		return true
+	return bool(JavaScriptBridge.eval("(new URLSearchParams(location.search)).has('debug')", true))
+
+
 ## Valor de `debug` na query string (só na web), ou "".
 static func url_param() -> String:
 	if not OS.has_feature("web"):

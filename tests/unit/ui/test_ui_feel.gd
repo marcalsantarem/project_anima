@@ -127,3 +127,19 @@ func test_scene_flow_apply_reduced_effects() -> void:
 	assert_true(director.reduced_effects, "FxDirector recebe")
 	SceneFlow.apply_reduced_effects(plain, director, false)
 	assert_false(director.reduced_effects, "Arena sem a propriedade não quebra")
+
+
+func test_pause_debug_toggle_only_with_query_param() -> void:
+	var p: PauseScreen = PAUSE_SCENE.instantiate()
+	add_child_autofree(p)
+	DebugSettings.set_overlay_enabled(true)
+	DebugSettings.query_has_debug_override = false
+	p.open()
+	assert_false(p.debug_toggle.visible, "sem ?debug: oculto, mesmo com estado salvo")
+	assert_true(p.reduced_toggle.visible, "Efeitos reduzidos sempre visível")
+	p.close()
+	DebugSettings.query_has_debug_override = true
+	p.open()
+	assert_true(p.debug_toggle.visible, "com ?debug: visível")
+	p.close()
+	DebugSettings.query_has_debug_override = null

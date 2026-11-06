@@ -82,6 +82,6 @@ Módulo `src/debug/` (sem autoload). O `SceneFlow` cria o gravador e o overlay n
 
 - O deploy (`.github/workflows/deploy-web.yml`) roda `bash web/inject_build.sh build/web` depois do export e do `copy_pwa.sh`: troca o marcador `/*ANIMA_BUILD*/` do `web/shell.html` por `window.ANIMA_BUILD = {sha, sha_full, branch, built_at, run}` **inline no `index.html`** (sem arquivo extra, sem cache antigo, sem segredos).
 - O jogo lê o objeto em `BuildInfo` (`src/debug/build_info.gd`, só na web). Sem ele (export local, editor): `"dev local"`, sem erro.
-- `version`: `application/config/version` do `project.godot`, se existir; senão `BuildInfo.DEFAULT_VERSION` (`"0.1.0-demo"`).
-- Onde aparece: cabeçalho do log (`version`, `build`), resumo em texto (`Build: <sha> (<branch>) · <data UTC> · exec #<n>`), overlay `?debug=1` (`<sha> · v<versão>`) e canto inferior direito da pausa e da tela de título (`v0.1.0-demo · <sha>`, `ScreenKit.version_label`).
+- `version`: `application/config/version` do `project.godot`, se existir; senão `BuildInfo.DEFAULT_VERSION`. Hoje `config/version="0.1.0"` (T-285); o valor guardado e enviado no log é sem `v` (`0.1.0`), e o `v` só entra na exibição.
+- Onde aparece: cabeçalho do log (`version`, `build`), resumo em texto (`Build: <sha> (<branch>) · <data UTC> · exec #<n>`), overlay `?debug=1` (`<sha> · v<versão>`) e canto inferior direito da pausa e da tela de título (`v0.1.0 · <sha>`, ou `v0.1.0 · dev local` no build local; `ScreenKit.version_label`).
 - Teste local: `GITHUB_SHA=abc1234def... GITHUB_REF_NAME=dev GITHUB_RUN_NUMBER=42 bash web/inject_build.sh build/web` (roda uma vez por export: depois o marcador some).

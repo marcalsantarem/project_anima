@@ -29,4 +29,5 @@ Regras definidas pelo dono do projeto. Elas valem para qualquer pessoa ou agente
 ## Versões
 
 - Cada marco fecha com PR `dev → main`, **tag** `v0.x.0` na `main` e a versão aparecendo no título do jogo (`src/debug/build_info.gd`).
+- Fluxo de release: o dono pede o PR `dev → main`; depois do merge, o AG00 cria a tag na `main` (`git tag v0.x.0 && git push origin v0.x.0`). A tag dispara o build, o link `https://<tag-com-hifens>--projectanimagame.netlify.app` (ex. `v0-1-0`) e a GitHub Release com o zip do build (`docs/setup.md`, Deploy). Tag nunca publica em produção.
 - Versões fechadas importantes ganham uma branch própria a partir da tag (`alfa` = v0.2.0, `beta` = v0.3.0; a v0.1.0 fica só na tag; decisão 55), criada só quando o dono pedir.

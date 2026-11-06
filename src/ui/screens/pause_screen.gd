@@ -84,6 +84,11 @@ func open() -> void:
 	ScreenKit.fade_in(_root)
 
 
+## O "Debug" só aparece com `?debug` na URL (web); fora da web, sempre (BRF-103).
+func _apply_debug_visibility() -> void:
+	debug_toggle.visible = DebugSettings.debug_ui_available()
+
+
 func close() -> void:
 	if not is_open():
 		return
@@ -147,5 +152,6 @@ func _toggle_button(node_name: String, cb: Callable) -> Button:
 
 
 func _refresh_debug() -> void:
+	_apply_debug_visibility()
 	debug_toggle.text = "Debug: %s" % ("ligado" if DebugSettings.overlay_enabled() else "desligado")
 	reduced_toggle.text = "Efeitos reduzidos: %s" % ("sim" if DebugSettings.reduced_effects() else "não")

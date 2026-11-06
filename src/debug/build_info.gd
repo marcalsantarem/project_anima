@@ -3,8 +3,9 @@ extends RefCounted
 ## Versão e build do jogo (T-165; docs/debug.md §7). O deploy injeta `window.ANIMA_BUILD` no index.html
 ## (web/inject_build.sh); fora dele (export local, editor) não há objeto e o build vale "dev local".
 
-## Versão usada quando `application/config/version` não existe no project.godot.
-const DEFAULT_VERSION := "0.1.0-demo"
+## Versão usada quando `application/config/version` não existe no project.godot. Guardada e enviada
+## sem o `v` (ex. `0.1.0`, contrato de docs/logs-api.md); o `v` só entra na exibição (pause_text).
+const DEFAULT_VERSION := "0.1.0"
 const LOCAL_LABEL := "dev local"
 const KEYS := ["sha", "sha_full", "branch", "built_at", "run"]
 const JS_READ := "JSON.stringify(window.ANIMA_BUILD || null)"
@@ -57,6 +58,6 @@ static func summary_line(b: Dictionary) -> String:
 		b.get("run", "?")]
 
 
-## Texto da pausa: `v0.1.0-demo · <sha>`.
+## Texto da tela inicial e da pausa: `v0.1.0 · <sha>` (ou `v0.1.0 · dev local`).
 static func pause_text(b: Dictionary, ver: String) -> String:
 	return "v%s · %s" % [ver, label(b)]

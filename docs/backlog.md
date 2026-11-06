@@ -196,9 +196,9 @@
 | T-281 | Tela inicial: subtítulo vermelho **VERTICAL SLICE** (maiúsculas) entre "ANIMA" e o botão, e remover o link "Último log" (temporário na v0.1.0; tam. P) | M1 | AG02 | feita (BRF-099) |
 | T-282 | **(1ª do M2)** Remover o subtítulo "VERTICAL SLICE" da tela inicial (tam. P) | M2 | AG02 | a fazer |
 | T-283 | **(fim do M2)** Subtítulo vermelho **ALFA** na tela inicial, como o do vertical slice, até o fechamento da v0.2.0 (tam. P) | M2 | AG02 | a fazer |
-| T-284 | Deploy por tag: qualquer tag builda e publica num alias do Netlify + GitHub Release (decisão 62) (tam. M) | M1 | AG10 | a fazer |
-| T-285 | Versão exibida `v0.1.0` (tela inicial, pausa e log) e `config/version` no `project.godot` (tam. P) | M1 | AG07 | a fazer |
-| T-286 | Botão "Debug" da pausa só aparece com `?debug` na URL (tam. P) | M1 | AG02 | a fazer |
+| T-284 | Deploy por tag: qualquer tag builda e publica num alias do Netlify + GitHub Release (decisão 62) (tam. M) | M1 | AG10 | feita |
+| T-285 | Versão exibida `v0.1.0` (tela inicial, pausa e log) e `config/version` no `project.godot` (tam. P) | M1 | AG07 | feita |
+| T-286 | Botão "Debug" da pausa só aparece com `?debug` na URL (tam. P) | M1 | AG02 | feita |
 | T-148 | Sinais da Arena para VFX (projectile_fired, projectile_hit, enemy_died, particles_gained, skill_cast, boss_telegraph_started, boss_phase_changed) | M1 | AG01 | feita |
 
 ## Próximas prontas p/ briefing
