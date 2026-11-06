@@ -32,7 +32,7 @@
 | T-116 | Fase 1 completa (~10 ondas + chefe) | M1 | AG01 | feita |
 | T-117 | Game feel | M1 | AG01 + AG09 | feita |
 | T-118 | Desempenho no iPhone (150 inimigos / 300 projéteis) | M1 | AG01 | feita (BRF-086, BRF-091); iPhone 11 Pro 46,9 fps; meta revisada: média >= 45 fps no pior caso (dono, 2026-11-06) |
-| T-119 | Otimização do build Web | M1 | AG10 | a fazer |
+| T-119 | Otimização do build Web | M1 | AG10 | feita (BRF-094): brotli 8,9 MB (meta ≤ 15 MB); 1º frame < 5 s em 4G em risco na 1ª visita (.wasm), aceito no M1 |
 | T-120 | Validação do M1 | M1 | AG03 | a fazer |
 | T-121 | Tema global no `project.godot` | M1 | AG07 | feita |
 | T-122 | Ligar a arena real ao SceneFlow | M1 | AG07 | feita |

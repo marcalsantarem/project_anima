@@ -21,7 +21,7 @@ O jogo é web-first e o alvo mais exigente é o **Safari no iPhone**. Godot 4.7.
 
    A meta anterior de ≥ 50 fps no iPhone fica **substituída** por média ≥ 45 fps no iPhone 11 Pro no pior caso.
 3. **Tamanho do build:** meta **≤ ~15 MB** de download (`.wasm` + `.pck` + shell).
-   - Medido (T-119): **[a preencher pelo AG10: total, `.wasm`, `.pck`, compressão no hosting]**
+   - Medido (T-119): total cru ~40,4 MB, gzip ~11,9 MB, **brotli ~8,9 MB** (dentro da meta de ~15 MB); `.wasm` 37,7 MB cru (6,6 MB brotli), `.pck` 2,0 MB, `.js` 273 KB. Risco: o primeiro frame < 5 s em 4G na primeira visita fica apertado por causa do `.wasm` (~7 a 10 s só de download); opção futura: template Web customizado sem módulos não usados
 
 ### Aviso para testes no iPhone
 

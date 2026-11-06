@@ -30,3 +30,20 @@ Limite: o PC mediu com render por software (sem GPU), então vale como piso; o d
 - Estresse: o projétil do estresse agora atravessa inimigos (`pierce` 1000, dano 0) e tem alcance sorteado (900 a 1400 px), para manter ~M projéteis em voo (antes sumiam ao tocar um inimigo: pico 52).
 - Log: linha do tempo arredonda o tempo todo (`45.96` vira `00:46.0`); `canvas` do bloco ESTRESSE agora é [largura, altura] (largura da janela interna; o shell só informava topo/base/altura).
 - Draw calls antes/depois no PC: não medidos (sem GPU/overlay nesta sessão). Medir no iPhone com a mesma URL.
+
+## Build Web (BRF-094, T-119)
+Medido em 2026-11-06 (export release, `copy_pwa.sh` + `inject_build.sh`). Antes = depois: o preset já exclui `tests/`, `docs/`, `addons/gut/`, `_src` e mockups, e o `.pck` é pequeno; não havia o que cortar sem mexer em `src/`/`assets/`.
+
+| Arquivo | Cru | gzip -9 | brotli -q11 |
+|---|---|---|---|
+| index.wasm (motor) | 37,7 MB | 9,6 MB | 6,6 MB |
+| index.pck (jogo) | 2,0 MB | 1,9 MB | 1,9 MB |
+| index.js | 273 KB | 67 KB | 58 KB |
+| index.html (shell) | 46 KB | 27 KB | 25 KB |
+| splash (webp) + ícones/PNGs | ~0,3 MB | ~0,3 MB | ~0,3 MB |
+| **Total** | **~40,4 MB** | **~11,9 MB** | **~8,9 MB** |
+
+- Download inicial: ~8,9 MB (brotli, o que o Netlify serve ao Chrome/Safari) ou ~11,9 MB (gzip); dentro da meta de 15 MB. 4G típico (~10 Mbps): ~7 a 10 s só do download na 1ª visita; revisitas dependem do cache (ver abaixo). A meta de 1º frame < 5 s em 4G fica **em risco na 1ª visita** por causa do `.wasm`.
+- Splash (`tech_splash_bg.webp`, 73 KB) e o shell (25 KB) carregam antes do `.wasm`: o que aparece primeiro é leve.
+- Feito: `netlify.toml` `[[headers]]` (wasm com tipo correto e revalidação por ETag; `index.*` idem; PNG/WebP 1 dia). Sem cache imutável, pois os arquivos do Godot não têm hash no nome e `.wasm`/`.pck`/`.js` precisam andar juntos. Compressão brotli/gzip é automática no Netlify para wasm/js/html (o `.pck` quase não comprime). Redirect/rota `/api/log` e o deploy não foram tocados.
+- Fora do escopo / opções: (a) template Web customizado sem módulos não usados (3D, físicas 3D, navegação, XR etc.) costuma cortar o `.wasm` em 30 a 50 %; exige compilar o motor com scons + emscripten, a decidir com o AG07; (b) nomes com hash/versão para permitir cache imutável (muda `copy_pwa.sh`/shell, médio); (c) Service Worker/PWA offline para as revisitas; (d) sem ativos enormes no `.pck` a reportar.

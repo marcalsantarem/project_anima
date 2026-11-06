@@ -7,3 +7,26 @@
 
 # A rota /api/log vem do `config.path` da função (netlify/functions/log.mjs). Não crie um redirect para
 # /.netlify/functions/log: a função com path próprio não existe nessa URL e o redirect (force) vira 404.
+
+# Cabeçalhos (T-119). Arquivos do Godot não têm hash no nome, então nada de cache imutável:
+# revalida sempre (ETag) para wasm/pck/js nunca ficarem em versões diferentes. Ícones e splash podem durar 1 dia.
+[[headers]]
+  for = "/index.*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/*.wasm"
+  [headers.values]
+    Content-Type = "application/wasm"
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+[[headers]]
+  for = "/*.webp"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
