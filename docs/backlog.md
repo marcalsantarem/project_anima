@@ -190,9 +190,12 @@
 | T-275 | Botão de velocidade no HUD (toque e tecla no PC via Input Action, sem atrapalhar as skills; mostra a velocidade atual) (tam. M) | M2 | AG02 + AG07 | a fazer |
 | T-276 | Medir o x2 no iPhone com a cena de estresse (T-006/T-118) e registrar o fps (tam. P) | M2 | AG01 + AG10 | a fazer |
 | T-277 | Fundo holográfico na tela de Resultado: preparar a arte do dono (corte retrato 9:16, peso baixo, sem texto ilegível sob os botões) e aplicar no `result_screen`, com painéis e textos legíveis sobre ele (tam. M) | M1 | AG08 + AG02 | feita (BRF-092, BRF-093); falta ver no iPhone |
-| T-278 | Arte do fundo paisagem para PC: preparar as 2 artes do dono (retocar bateria e textos miúdos, peso baixo, 16:9 e telas mais largas/estreitas) (tam. P) | M1 | AG08 | feita (BRF-096) |
-| T-279 | Fundo paisagem no shell Web: CSS do `desktop_game_bg` atrás da coluna do jogo em todas as telas, só em janelas não retrato, com escurecimento radial e cópia no build (tam. P) | M1 | AG10 | a fazer |
+| T-278 | Arte do fundo paisagem para PC: preparar as 2 artes do dono (retocar bateria e textos miúdos, peso baixo, 16:9 e telas mais largas/estreitas) (tam. P) | M1 | AG08 | feita (BRF-096); artes guardadas, sem uso |
+| T-279 | ~~Fundo paisagem no shell Web~~ | M1 | — | cancelada (decisão 61; shell revertido) |
 | T-280 | ~~Jogo avisa o shell qual fundo usar~~ | M1 | — | cancelada (decisão 61: um fundo só) |
+| T-281 | Tela inicial: subtítulo vermelho **VERTICAL SLICE** (maiúsculas) entre "ANIMA" e o botão, e remover o link "Último log" (temporário na v0.1.0; tam. P) | M1 | AG02 | a fazer |
+| T-282 | **(1ª do M2)** Remover o subtítulo "VERTICAL SLICE" da tela inicial (tam. P) | M2 | AG02 | a fazer |
+| T-283 | **(fim do M2)** Subtítulo vermelho **ALFA** na tela inicial, como o do vertical slice, até o fechamento da v0.2.0 (tam. P) | M2 | AG02 | a fazer |
 | T-148 | Sinais da Arena para VFX (projectile_fired, projectile_hit, enemy_died, particles_gained, skill_cast, boss_telegraph_started, boss_phase_changed) | M1 | AG01 | feita |
 
 ## Próximas prontas p/ briefing

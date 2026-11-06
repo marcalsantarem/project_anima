@@ -20,8 +20,8 @@
 
 | Arquivo | Tamanho | Uso |
 |---|---|---|
-| `desktop_title_bg.webp` | 1376x768, ~86 KB | Tela de título (com cristal e plataforma no centro) |
-| `desktop_game_bg.webp` | 1376x768, ~84 KB | Demais telas (sem cristal) |
+| `_src/desktop_title_bg.webp` | 1376x768, ~86 KB | Tela de título (com cristal e plataforma no centro) |
+| `_src/desktop_game_bg.webp` | 1376x768, ~84 KB | Demais telas (sem cristal) |
 
 - **Origem:** arte do dono (Google Gemini, uso comercial liberado), `assets/splash/tech/desktop_*_bg_source.jpg`.
 - **Retoque:** removidos bateria, caixa "BATTERY", colunas de texto, rótulos do gráfico e blocos de texto (cantos, laterais e rodapé), como no fundo do Resultado. Anéis, grade, molduras, réguas e o gráfico mantidos. Sem escurecimento embutido.
@@ -33,3 +33,5 @@
   (raio em `vh` acompanha a largura da coluna, que é ~61vh.)
 - **Regenerar:** `godot --headless --path <projeto vazio> -s assets/backgrounds/_src/desktop_bg_retouch.gd`.
 - **Prévia:** `_preview/desktop_*_bg_contact.png` (21:9, 16:9 e 4:3, com o escurecimento sugerido e a coluna simulada).
+
+> **Guardadas, sem uso (decisão 61 cancelada em 2026-11-06):** as artes `desktop_*_bg.webp` ficam em `_src/` (fora do jogo e do `.pck`) para um futuro fundo/título em paisagem.
