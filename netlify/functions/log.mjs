@@ -1,6 +1,6 @@
 import { neon } from "@neondatabase/serverless";
 import { createHash, timingSafeEqual } from "node:crypto";
-import { validateBody, corsOrigin, MAX_BYTES } from "./validate.mjs";
+import { validateBody, corsOrigin, MAX_BYTES } from "../lib/validate.mjs";
 
 const RATE_LIMIT = 20; // envios por hora por IP
 

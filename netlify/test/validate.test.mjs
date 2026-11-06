@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { validateBody, corsOrigin } from "../functions/validate.mjs";
+import { validateBody, corsOrigin } from "../lib/validate.mjs";
 
 const ok = { version: "0.1.0", build: "abc", platform: "web", user_agent: "ua", result: "victory", wave: 3, duration_s: 12.5, log: "x" };
 

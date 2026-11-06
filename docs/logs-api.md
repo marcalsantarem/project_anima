@@ -34,7 +34,7 @@ Telemetria **só de teste**: o jogador aperta "Enviar log" no Resultado e o log 
 
 - Contrato revisado, sem mudanças de rota. Acréscimos: `405` para método não-POST; `OPTIONS` (preflight CORS) responde `204`; limites por campo: `version` 32, `build` 64, `platform` 32, `user_agent` 512 caracteres; `wave` inteiro 0–10000; `duration_s` 0–86400; `log` não vazio, até 200 KB; `content` é `NOT NULL`.
 - Variáveis: `DATABASE_URL` e `LOG_CLIENT_KEY` (obrigatórias no Netlify, escopo Functions); `LOG_IP_SALT` (opcional; sem ela, o sal é derivado da `DATABASE_URL`). O mesmo valor de `LOG_CLIENT_KEY` vai no cliente (AG02), em build de teste.
-- Código: `netlify/functions/log.mjs` (+ `validate.mjs`), `netlify/sql/001_logs.sql`, `netlify/run-sql.mjs` (aplica o SQL: `node netlify/run-sql.mjs netlify/sql/001_logs.sql`), testes em `netlify/test` (`cd netlify && npm test`; o e2e usa o `.env` da raiz e apaga a linha que insere).
+- Código: `netlify/functions/log.mjs` (+ `netlify/lib/validate.mjs`), `netlify/sql/001_logs.sql`, `netlify/run-sql.mjs` (aplica o SQL: `node netlify/run-sql.mjs netlify/sql/001_logs.sql`), testes em `netlify/test` (`cd netlify && npm test`; o e2e usa o `.env` da raiz e apaga a linha que insere).
 - O Netlify precisa rodar `npm install` em `netlify/` (o AG10 deve apontar `[functions] directory = "netlify/functions"` no `netlify.toml`; a rota `/api/log` já vem do `config.path` da função).
 
 ## ADR: por que Neon + Netlify Function

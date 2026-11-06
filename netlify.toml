@@ -5,8 +5,5 @@
   directory = "netlify/functions"
   node_bundler = "esbuild"
 
-[[redirects]]
-  from = "/api/log"
-  to = "/.netlify/functions/log"
-  status = 200
-  force = true
+# A rota /api/log vem do `config.path` da função (netlify/functions/log.mjs). Não crie um redirect para
+# /.netlify/functions/log: a função com path próprio não existe nessa URL e o redirect (force) vira 404.
