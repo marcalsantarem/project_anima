@@ -18,6 +18,7 @@ Cena de estresse: `tests/perf/stress.tscn` (sem lógica de jogo; sprites reais d
 |---|---|---|---|---|---|---|
 | 2026-11-06 | PC Windows 11 | Chrome headless, render por software (SwiftShader), 15 s | 150 / 300 | 59,9 | 52,1 | sem GPU real |
 | 2026-11-06 | PC Windows 11 | Chrome headless, SwiftShader, 12 s | 300 / 600 | 34,3 | 26,4 | dobro da meta |
-| 2026-11-06 | iPhone (Safari, aba; modelo a anotar) | Safari, build `e30ca1c` v0.1.0-demo, `?debug=1&stress=150,300` | 150 inimigos, 1 a 36 proj. em voo, fx 17 | 29,3 (34 ms; máx 55) | n/d (51 quadros > 50 ms) | **abaixo da meta de 50**. Overlay: draw 592, nós 3334, viewport 375x616 (dpr a conferir). Dono, captura de tela |
+| 2026-11-06 | iPhone (Safari, aba; modelo a anotar) | Safari, build `e30ca1c` v0.1.0-demo, `?debug=1&stress=150,300` | 150 inimigos, 1 a 36 proj. em voo, fx 17 | 29,3 (34 ms; máx 55) | n/d (51 quadros > 50 ms) | **INVÁLIDA: Modo de Pouca Energia ligado (limite de 30 fps do iOS)**; log id 8. Overlay: draw 592, nós 3334, viewport 375x616 (dpr a conferir). Dono, captura de tela |
+| 2026-11-06 | iPhone 11 Pro 256 GB (iOS 18.7, Safari), sem Modo de Pouca Energia | Safari, build `f54fc3d`, `?debug=1&stress=150,300`, 60 s | 150 inimigos, até 52 proj. em voo, fx até 44 | **44,2** (p95 27 ms; começa em ~52 e cai para ~43 conforme o draw sobe de 509 para ~690) | 40,1 (1 quadro > 50 ms) | **abaixo da meta de 50**, mas perto. dpr 3, draw 509→691, nós ~3300. O stress pedia 300 proj., só chegaram a 52 em voo. Dono, log enviado |
 
 Limite: o PC mediu com render por software (sem GPU), então vale como piso; o dado que decide a meta é o do iPhone.
