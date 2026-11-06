@@ -137,3 +137,14 @@ jobs:
             --no-build \
             $DEPLOY_TARGET \
             --message "${GITHUB_REF_NAME} ${GITHUB_SHA::7}"
+
+      # Diagnóstico da API de logs: mostra o que foi publicado e o status da rota (sem segredos).
+      - name: Verificar a função de logs
+        if: always()
+        run: |
+          ls -la netlify/functions netlify/node_modules/@neondatabase 2>&1 | head -20 || true
+          site="https://${{ github.ref_name == 'main' && '' || 'dev--' }}projectanimagame.netlify.app"
+          sleep 10
+          for p in /.netlify/functions/log /api/log; do
+            echo "POST $site$p -> $(curl -s -o /dev/null -w '%{http_code}' -X POST "$site$p" -H 'X-Anima-Key: x' -d '{}')"
+          done
