@@ -1,5 +1,5 @@
 extends GutTest
-## BRF-050: ícone do slot 1 = meteoro (decisão 37), com fallback para o skill_pulse.
+## BRF-050: ícone do slot 1 = meteoro (decisão 37); o padrão do botão também é o meteoro.
 
 const HUD_SCENE := preload("res://src/ui/hud/hud.tscn")
 
@@ -19,9 +19,9 @@ func test_slot1_uses_meteor_icon() -> void:
 	assert_eq(tex.resource_path, UiArt.SKILL_METEOR_PATH)
 
 
-func test_missing_path_falls_back_to_pulse() -> void:
+func test_missing_path_falls_back_to_meteor() -> void:
 	var hud := _hud(["res://assets/ui/nao_existe.png", "", ""])
-	assert_eq(hud._skill(1)._icon_texture(), UiArt.SKILL_PULSE)
+	assert_eq(hud._skill(1)._icon_texture().resource_path, UiArt.SKILL_METEOR_PATH)
 
 
 func test_set_slot_icon_and_reset() -> void:
@@ -30,7 +30,7 @@ func test_set_slot_icon_and_reset() -> void:
 	hud.set_slot_icon(1, tex)
 	assert_eq(hud._skill(1)._icon_texture(), tex)
 	hud.set_slot_icon(1, null)
-	assert_eq(hud._skill(1)._icon_texture(), UiArt.SKILL_PULSE)
+	assert_eq(hud._skill(1)._icon_texture().resource_path, UiArt.SKILL_METEOR_PATH)
 
 
 func test_skill_data_icon_is_the_same_png() -> void:

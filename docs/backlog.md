@@ -71,7 +71,7 @@
 | T-156 | Chão: quebrar a repetição das pedrinhas do tile | M1 | AG08 + AG01 | depende do teste no iPhone |
 | T-157 | Ajustar o escurecimento do topo (degradê do chão + do HUD) | M1 | AG02 + AG01 | depende do teste no iPhone |
 | T-158 | Teste no iPhone: splash, título, partida e chefe (ajustes saem daqui) | M1 | usuário + AG00 | feita |
-| T-159 | Remover o ícone provisório do `skill_pulse` e deixar o do meteoro como padrão | M1 | AG02 | pronta p/ briefing |
+| T-159 | Remover o ícone provisório do `skill_pulse` e deixar o do meteoro como padrão | M1 | AG02 | feita (BRF-083; sobra o PNG do pulse sem uso, limpeza com o AG08) |
 | T-160 | Arte do ícone de Partículas: estrela verde, estilo "chip" (e nova cor dos efeitos de coleta) | M1 | AG08 | feita |
 | T-161 | Aplicar o ícone verde de Partículas no HUD, Resultado, botões de upgrade e efeitos (hoje dourado) | M1 | AG02 + AG09 | feita |
 | T-162 | Arte do ícone de Moeda (moeda dourada) e do glossário na UI (para o M2) | M2 | AG08 | a fazer |
@@ -93,7 +93,7 @@
 | T-178 | Arrastar do botão do Módulo para mirar (toque/mouse), segurar 1 + clique no PC | M1 | AG02 | feita |
 | T-179 | Splash e tela de título no estilo holográfico/tecnológico (arte do Gemini como base; texto, barra e brilhos vivos) | M1 | AG02 + AG08 | feita |
 | T-180 | **(1ª do M2)** Guia visual "HUD holográfico" para menus + mockups do menu principal e do Resultado com recompensa | M2 | AG08 | a fazer (início do M2) |
-| T-181 | Ícones do app (iPhone, PWA e favicon) na nova identidade tecnológica da splash e do menu | M1 | AG08 + AG10 | pronta p/ briefing |
+| T-181 | Ícones do app (iPhone, PWA e favicon) na nova identidade tecnológica da splash e do menu | M1 | AG08 + AG10 | feita (BRF-084; falta o dono reinstalar o atalho no iOS) |
 | T-182 | Áudio básico: música de entrada (título) e som do tiro básico, com volume salvo e respeitando o 1º toque na web | M2 | AG11 | a fazer |
 | T-183 | Fechar o M1 como v0.1.0: versão `0.1.0` no jogo e tag `v0.1.0`, sem branch (decisão 55; quando o dono pedir) | M1 | AG00 + AG10 | a fazer (no fechamento) |
 | T-184 | Economia do M2: curva de XP (níveis 1 a 15), XP e Moeda por partida, dados em `.tres` e `docs/economia.md` | M2 | AG04 | a fazer |
@@ -526,7 +526,7 @@
 - **Pronto quando:** testado no iPhone: carregamento (splash em celular, incluindo o corte à direita visto na captura), título, partida, upgrades, meteoro, chefe e Resultado; lista de ajustes entregue ao AG00.
 
 ### T-159 — Ícone do meteoro como padrão no HUD
-- **Marco:** M1 · **Dono:** AG02 · **Status:** pronta p/ briefing
+- **Marco:** M1 · **Dono:** AG02 · **Status:** feita
 - **Depende de:** — · **Desbloqueia:** —
 - **Arquivos:** `src/ui/`
 - **Pronto quando:** o ícone do meteoro vem de uma fonte única (hoje por caminho no HUD, ver `Hud.slot_icon_paths`); o `ui_icon_skill_pulse.png` e o `skill_pulse` provisório deixam de aparecer no jogo e nas demos; o número de recarga continua legível sobre o ícone (que ocupa pouco do quadro de 88 px).
@@ -616,7 +616,7 @@
 - **Pronto quando:** `docs/arte.md` ganha a seção de menus holográficos (paleta, painéis, botões, molduras por raridade, tipografia, brilhos e animações baratas) e há 2 a 3 mockups em PNG (menu principal, Resultado com recompensa e subida de nível; o hangar fica para o M3), aprovados pelo dono; regras de desempenho no iPhone.
 
 ### T-181 — Ícones do app na identidade tecnológica
-- **Marco:** M1 · **Dono:** AG08 (arte) + AG02 (deploy) · **Status:** pronta p/ briefing
+- **Marco:** M1 · **Dono:** AG08 (arte) + AG02 (deploy) · **Status:** feita
 - **Depende de:** decisão 48 e T-179 (arte-base `assets/splash/tech/tech_splash_clean.png`); substitui os ícones da T-174
 - **Arquivos:** `assets/app/` (mestre, derivados e gerador), `web/pwa/` (cópia via `web/copy_pwa.sh --sync-icons`), `web/pwa/manifest.webmanifest` (só se mudar cor), `assets/LICENSES.md`
 - **Pronto quando:** ícone 1024 mestre e derivados (`apple-touch-icon` 180, 192, 512, maskable 512 e favicons 16/32/48/ico) com o **cristal holográfico ciano sobre o fundo azul-marinho** da arte do Gemini (recortado da arte ou redesenhado no mesmo estilo), legível a 48 px e no favicon; copiados para o deploy; README e licença atualizados; o dono reinstala o atalho para o iOS reler.

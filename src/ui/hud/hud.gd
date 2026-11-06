@@ -40,7 +40,7 @@ const TOP_SCRIM_ALPHA := 0.35
 const M1_UNLOCK_LEVELS: Array[int] = [0, 7, 12]
 
 ## Ícone por slot (índice 0 = slot 1), caminho do PNG = `SkillData.icon` da skill do slot (decisão 37).
-## Vazio ou inexistente = arte padrão do SkillButton (`ui_icon_skill_pulse` no slot 1). Troque em tempo
+## Vazio ou inexistente = arte padrão do SkillButton (meteoro no `Icon.CIRCLE`). Troque em tempo
 ## de execução com set_slot_icon(slot, textura) — o HUD não lê src/match/.
 @export var slot_icon_paths: Array[String] = [UiArt.SKILL_METEOR_PATH, "", ""]
 ## Nível de desbloqueio por slot (índice 0 = slot 1). 0 = liberado; > 0 = bloqueado com "NV x".

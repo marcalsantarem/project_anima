@@ -45,6 +45,7 @@ figure{{margin:0;text-align:center}} figcaption{{margin-top:6px}}
 <figure><img src="favicon-16.png"><figcaption>16</figcaption></figure>
 <figure><img src="{A}icon-512.png" width=48 height=48 style="border-radius:11px"><figcaption>512→48</figcaption></figure>
 <figure style="background:#fff;padding:8px;border-radius:8px"><img src="{A}icon-512.png" width=48 height=48 style="border-radius:11px"><figcaption style="color:#333">48 claro</figcaption></figure>
+<figure style="background:#fff;padding:8px;border-radius:8px"><img src="{A}favicon-32.png"> <img src="favicon-16.png"><figcaption style="color:#333">32/16 claro</figcaption></figure>
 </div><div class=row>
 {grid("linear-gradient(#0d1b2a,#1b263b)", "#fff", "Fundo escuro")}
 {grid("linear-gradient(#f4efe6,#dfe7f2)", "#222", "Fundo claro")}

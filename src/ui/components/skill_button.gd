@@ -4,7 +4,7 @@ extends Control
 ## Botão circular de skill. docs/ui.md §5.1.
 ## Não chama a skill: toque/clique emitem `activated(slot)` e, se `inject_action`, a Input Action `skill_<slot>`.
 ## O estado vem do gameplay: on_used() ← skill_used, set_cooldown() ← cooldown_changed, set_ready() ← skill_ready.
-## Arte da T-128 (T-138): molduras por estado, ícone (`icon_texture`; Icon.CIRCLE usa `ui_icon_skill_pulse`),
+## Arte da T-128 (T-138): molduras por estado, ícone (`icon_texture`; Icon.CIRCLE usa `UiArt.SKILL_METEOR_PATH`),
 ## cadeado e véu de recarga radial (`ui_skill_cooldown_mask`). O badge da tecla continua desenhado.
 ## `locked` (T-136): slot ainda não liberado. Cadeado + "NV x", ignora toque, clique, a action `skill_<slot>` e os sinais de gameplay.
 ## `drag_aim` (T-178, decisão 46): pronto, o toque vira "toque simples" (activated ao soltar) ou, passado
@@ -470,7 +470,7 @@ static func _make_badge_box() -> StyleBoxFlat:
 func _icon_texture() -> Texture2D:
 	if icon_texture:
 		return icon_texture
-	return UiArt.SKILL_PULSE if icon == Icon.CIRCLE else null
+	return UiArt.load_icon(UiArt.SKILL_METEOR_PATH) if icon == Icon.CIRCLE else null
 
 
 ## Cadeado (acima do centro) + "NV x" (abaixo), como no mockup aprovado.
