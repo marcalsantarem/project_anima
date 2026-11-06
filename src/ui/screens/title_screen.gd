@@ -66,16 +66,16 @@ func _ready() -> void:
 	var root := ScreenKit.root(self, BG_DEEP)
 	ScreenKit.set_page_color(BG_DEEP)
 	var reduced := DebugSettings.reduced_effects()
-	_art = _build_art(reduced)
+	_art = build_art(reduced)
 	root.add_child(_art)
 
-	_sub_title = _title_label("PROJECT:")
+	_sub_title = title_label("PROJECT:")
 	root.add_child(_sub_title)
-	_title = _title_label("ANIMA")
+	_title = title_label("ANIMA")
 	root.add_child(_title)
 
 	if TXT_BUILD_TAG != "":
-		_build_tag = _title_label(TXT_BUILD_TAG)
+		_build_tag = title_label(TXT_BUILD_TAG)
 		_build_tag.name = "BuildTag"
 		_build_tag.add_theme_color_override("font_color", TAG_COLOR)
 		_build_tag.add_theme_color_override("font_shadow_color", TAG_GLOW)
@@ -109,7 +109,7 @@ func _ready() -> void:
 
 
 ## Quadro da arte em px da arte (768×1376), escalado como o `#status-art` do shell.
-func _build_art(reduced: bool) -> Control:
+static func build_art(reduced: bool) -> Control:
 	var art := Control.new()
 	art.name = "Art"
 	art.size = ART
@@ -151,7 +151,7 @@ func _build_art(reduced: bool) -> Control:
 
 
 ## Anel tracejado achatado: o suporte achata (scale.y) e o anel gira dentro dele, como no CSS.
-func _ring(center: Vector2, radius: float, squash: float, period: float, alpha: float, reduced: bool) -> Control:
+static func _ring(center: Vector2, radius: float, squash: float, period: float, alpha: float, reduced: bool) -> Control:
 	var holder := Control.new()
 	holder.position = center
 	holder.scale = Vector2(1.0, squash)
@@ -167,13 +167,13 @@ func _ring(center: Vector2, radius: float, squash: float, period: float, alpha: 
 
 
 ## Vai e volta (alternate), como as animações CSS da splash. Sem alocação por quadro.
-func _loop(node: Node, prop: String, from: Variant, to: Variant, time: float) -> void:
+static func _loop(node: Node, prop: String, from: Variant, to: Variant, time: float) -> void:
 	var t := node.create_tween().set_loops()
 	t.tween_property(node, prop, to, time).from(from).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	t.tween_property(node, prop, from, time).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 
 
-func _glow_texture() -> GradientTexture2D:
+static func _glow_texture() -> GradientTexture2D:
 	var g := Gradient.new()
 	g.offsets = PackedFloat32Array([0.0, 0.45, 1.0])
 	g.colors = PackedColorArray([Color(0.59, 0.98, 1.0, 0.5), Color(CYAN, 0.2), Color(CYAN, 0.0)])
@@ -187,7 +187,7 @@ func _glow_texture() -> GradientTexture2D:
 	return tex
 
 
-func _title_label(text: String) -> Label:
+static func title_label(text: String) -> Label:
 	var l := Label.new()
 	l.text = text
 	l.theme_type_variation = &"LabelDisplay"

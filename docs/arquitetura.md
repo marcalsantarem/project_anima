@@ -33,17 +33,32 @@ Na web, a primeira tela é a splash do `web/shell.html` (degradê de `#8E72EC` a
 
 Efeito colateral: toda cena que não pinta o próprio fundo aparece em roxo, e não mais quase preto.
 
-## Fluxo de cenas (T-102, T-122)
+## Fluxo de cenas (T-102, T-122, T-187)
 
-Cena principal: `src/core/main.tscn` (**Boot**), que chama `SceneFlow.go_to_title()`. Auth e config entram aqui no futuro.
+Cena principal: `src/core/main.tscn` (**Boot**), que chama `SceneFlow.boot()`: carrega o perfil pelo `Backend` (falha = perfil novo) e abre o Título. Com `?debug=1&stress=N,M` (ou `--stress=N,M`), vai direto para a partida. Auth e config entram aqui no futuro.
 
-Autoload **`SceneFlow`** (`src/core/scene_flow.gd`): **Título → Partida → Resultado → Partida**.
+Autoload **`SceneFlow`** (`src/core/scene_flow.gd`):
+
+```
+Boot ──(load_profile)──> Título ──toque──> Menu ──Jogar──> Partida ──match_ended──> [settle + save] ──> Resultado
+                                            ^                ^  |                                         |  |
+                                            |                |  +-- Pausa: Recomeçar (mesma config)       |  |
+                                            |                +------------------ Jogar de novo -----------+  |
+                                            +----------------------------------- Voltar ---------------------+
+Boot (estresse) ─────────────────────────────────────────> Partida ──> Resultado (sem recompensa, sem save)
+```
 
 | Cena | Arquivo | Ligação |
 |---|---|---|
-| Título | `src/ui/screens/title_screen.tscn` | `start_requested` → `start_match()` |
-| Partida | nó `Match` = HUD + Pausa + Arena (`MatchConfig.match_scene_path`) | `match_ended` → Resultado; `PauseScreen.restart_requested` → `start_match(config)` |
-| Resultado | `src/ui/screens/result_screen.tscn` | `show_result(result)`; `play_again_requested` → `start_match(last_config)` |
+| Título | `src/ui/screens/title_screen.tscn` | `start_requested` → `go_to_menu()` |
+| Menu | `src/ui/screens/menu_screen.tscn` (T-190) | `setup(view)`; `play_pressed` → `start_match(build_match_config())`. Sem a cena, vai direto para a partida (aviso no log) |
+| Partida | nó `Match` = HUD + Pausa + Arena (`MatchConfig.match_scene_path`) | `match_ended` → recompensa → Resultado; `PauseScreen.restart_requested` → `start_match(config)`; `menu_requested`/`title_requested` da Pausa (se existir) → Menu |
+| Resultado | `src/ui/screens/result_screen.tscn` | `show_result(result)`, `set_log(log)`, `set_reward(summary)` (se existir e fora do estresse); `play_again_requested` → nova partida com o perfil atualizado; `menu_requested` (ou `title_requested`) → Menu |
+
+**`view` do Menu:** `{level, xp, xp_to_next (0 no teto), coins, is_max}` (`SceneFlow.menu_view`).
+
+**Recompensa (`settle_and_save`):** guarda nível/XP de antes, roda `MetaFlow.settle(profile, result, rewards, progression, today)` com `today = Time.get_date_string_from_system()` (data local), salva pelo `Backend` e monta o `summary`:
+`xp`, `coins`, `first_win_bonus` (bool), `levels_gained`, `slots_unlocked` (Array[int]), `level_before`, `xp_before`, `xp_to_next_before`, `level_after`, `xp_after`, `xp_to_next_after` (0 no teto), `result_outcome` (`"vitoria"`/`"derrota"`). Falha ao salvar: `push_warning` e o fluxo segue (a recompensa vale na sessão). Modo de estresse (nó `StressMode` na Arena ou `stress` no cabeçalho do log): sem `settle`, sem save, `last_summary = {}`. Dados: `data/meta/progression_m2.tres` e `rewards_m2.tres`. A partida continua sem falar com o `Backend`.
 
 API:
 - `start_match(config: MatchConfig = null)`:

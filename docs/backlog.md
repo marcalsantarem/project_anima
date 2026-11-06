@@ -99,11 +99,11 @@
 | T-184 | Economia do M2: curva de XP (níveis 1 a 30), XP e Moeda por partida (por monstros derrotados e ondas, nunca pelo tempo; decisão 59), dados em `.tres` e `docs/economia.md` | M2 | AG04 | revisão em curso (BRF-108: sem bônus fixos, derrota 70%, bônus de 1ª vitória do dia, níveis 1 a 30, semanas até o 30) |
 | T-185 | Save local: autoload `Backend` (interface) + `LocalBackend` em `user://` com versão, migração e recuperação; ADR | M2 | AG05 + AG07 | feita |
 | T-186 | Lógica pura do meta em `src/meta/`: recompensa do `MatchResult`, XP → nível, slots liberados; testes GUT | M2 | AG04 | feita |
-| T-187 | Fluxo de cenas com menu: Título → Menu → Partida → Resultado → Menu; aplica a recompensa e salva | M2 | AG07 | a fazer |
+| T-187 | Fluxo de cenas com menu: Título → Menu → Partida → Resultado → Menu; aplica a recompensa e salva | M2 | AG07 | feita |
 | T-188 | Partida monta os slots pelo nível da conta (`MatchConfig`); conta sem Módulo joga só com ataque básico | M2 | AG01 | a fazer |
 | T-189 | Arte do menu holográfico: painéis, botões, barra de XP, selo de nível, ícone de XP | M2 | AG08 | feita |
-| T-190 | Tela do menu principal: Jogar, nível e barra de XP, saldo de Moeda e ícone de configurações (engrenagem) sem ação até o M8; sem Módulos na tela | M2 | AG02 | a fazer |
-| T-191 | Resultado com recompensa: XP e Moeda animados, barra enchendo, subida de nível e aviso de slot liberado | M2 | AG02 + AG09 | a fazer |
+| T-190 | Tela do menu principal: Jogar, nível e barra de XP, saldo de Moeda e ícone de configurações (engrenagem) sem ação até o M8; sem Módulos na tela | M2 | AG02 | feita |
+| T-191 | Resultado com recompensa: XP e Moeda animados, barra enchendo, subida de nível e aviso de slot liberado | M2 | AG02 + AG09 | feita |
 | T-192 | HUD: slots bloqueados mostram o nível que os libera | M2 | AG02 | a fazer |
 | T-193 | Debug do meta: zerar save e dar XP/Moeda pelo overlay `?debug=1`; meta no log da partida | M2 | AG02 + AG05 | a fazer |
 | T-194 | Assets de áudio do M2: música de entrada e som do tiro (próprios ou CC0, licença registrada) | M2 | AG11 | a fazer |
@@ -200,6 +200,7 @@
 | T-285 | Versão exibida `v0.1.0` (tela inicial, pausa e log) e `config/version` no `project.godot` (tam. P) | M1 | AG07 | feita |
 | T-286 | Botão "Debug" da pausa só aparece com `?debug` na URL (tam. P) | M1 | AG02 | feita |
 | T-287 | `MatchResult.kills_by_type`: a Arena conta as mortes por tipo de inimigo (enxame 1 por membro, chefe, meteoro), base da recompensa por monstro (tam. P) | M2 | AG01 | feita |
+| T-288 | Pausa: botão "Voltar ao menu" (sinal `menu_requested`), que o fluxo da T-187 já escuta; hoje a pausa não tem saída para o menu (tam. P) | M2 | AG02 | a fazer |
 | T-148 | Sinais da Arena para VFX (projectile_fired, projectile_hit, enemy_died, particles_gained, skill_cast, boss_telegraph_started, boss_phase_changed) | M1 | AG01 | feita |
 
 ## Próximas prontas p/ briefing

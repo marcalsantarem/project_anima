@@ -1,6 +1,6 @@
 extends Node
-## Cena principal (Boot). Hoje só abre o título; depois, auth e config entram aqui.
+## Cena principal (Boot): carrega o perfil e abre o Título (ou a partida, no modo de estresse).
 
 
 func _ready() -> void:
-	SceneFlow.go_to_title.call_deferred()
+	SceneFlow.boot.call_deferred()

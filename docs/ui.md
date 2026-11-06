@@ -283,6 +283,7 @@ iPhone 375×812 CSS, Safari em aba (k = 1,92 px do jogo/CSS)
 ## 9b. Debug e logs (T-107, BRF-063)
 
 - **Resultado, fundo (T-277, BRF-093, decisão 60):** `assets/backgrounds/result_tech_bg_dim.webp` num `TextureRect` `Background` em tela cheia (`Ignore Size` + `Keep Aspect Covered`), atrás do cartão. Só o fundo mudou; o cartão roxo e os botões seguem no estilo atual até o M2 (T-180/T-190). Capturas: `docs/img/resultado-vitoria.png`, `resultado-derrota.png`.
+- **Resultado com recompensa (T-191, BRF-115):** holográfico (mockup `mockup_holo_result.png`; peças `ui_holo_*`). `ResultScreen.set_reward(summary)` (chaves: `xp`, `coins`, `first_win_bonus`, `levels_gained`, `slots_unlocked`, `level_before/after`, `xp_before/after`, `xp_to_next_before/after` (0 = teto → "MAX"), `result_outcome`); sem ele não há seção de recompensa. Painéis: Recompensas (XP e Moeda contam de 0 ao valor em 1 s, selo "1ª vitória do dia" se `first_win_bonus`), Nível (selo + barra de XP; com subidas a barra enche/esvazia por nível, o selo pulsa com `ui_holo_level_ring`) e um aviso dourado "Slot N liberado" por item de `slots_unlocked` (aparece ao fim). Animação = função pura do tempo (`_apply(t)`), tween em tempo real (`set_ignore_time_scale`, decisão 59); toque na área pula; `reduced_effects` mostra o estado final direto; botões nunca ficam bloqueados. Gancho de VFX: `_play_level_up_fx(level)` (vazio, AG09). Moeda: ícone provisório desenhado até a T-162. Conteúdo rola em telas baixas. Botões: "Jogar de novo" (primário), "Voltar", "Logs"/"Enviar log". Capturas: `docs/img/resultado-recompensa-{vitoria,derrota}-375x{812,616}.png`. Testes: `tests/unit/ui/test_result_reward.gd`.
 - **Resultado:** botão secundário **"Logs"** (200×64), abaixo de "Voltar ao título". Abre o `LogViewer`. Ao lado, **"Enviar log"** (T-269, mesma geometria; `LogUploader` em `src/debug/`, contrato em `docs/logs-api.md`): estados enviando / enviado ✔ (desabilitado) / falhou (tenta de novo), com aviso curto de privacidade abaixo. `LogUploader.ENABLED` desliga tudo no build final; textos em constantes `TXT_*` (trocar por chaves na T-240).
 - **Título:** sem link de log (removido, BRF-099); logs só em Resultado e pausa. Gancho de subtítulo `TitleScreen.TXT_BUILD_TAG` (vazio no M2: nada é criado nem ocupa espaço; se preenchido, aparece em vermelho `danger`, maiúsculas, entre "ANIMA" e o botão; T-283 troca por `ALFA`). Capturas: `docs/img/titulo-375x616.png` e `-375x812.png`.
 - **Pausa:** linha com dois interruptores 228×64: **"Efeitos reduzidos: sim/não"** (T-132, BRF-080) e **"Debug: ligado/desligado"**, que liga o overlay. O "Debug" (T-286, BRF-103) só existe na web com `?debug` na URL (qualquer valor; `DebugSettings.debug_ui_available()`), mesmo com o estado salvo; sem ele fica oculto e o "Efeitos reduzidos" centraliza. Fora da web, sempre visível. Os dois ficam em `user://debug.cfg` (`DebugSettings`; seções `[debug] overlay` e `[fx] reduced_effects`).
@@ -322,6 +323,15 @@ Cenas independentes em `src/ui/screens/`, com o tema na raiz (via `ScreenKit`). 
 - **Perda de foco:** `NOTIFICATION_APPLICATION_FOCUS_OUT` / `WM_WINDOW_FOCUS_OUT` e, na web, `visibilitychange` abrem a pausa. A volta não retoma sozinha.
 - **Recomeçar:** despausa e emite `restart_requested`. Quem ouve (SceneFlow) inicia uma partida nova.
 - **Teste do fluxo:** `src/ui/demo/screens_demo.tscn` (Título → Partida → Pausa → Resultado → Jogar de novo).
+
+### Menu principal (T-190, BRF-113)
+
+`src/ui/screens/menu_screen.tscn` (`MenuScreen`), fiel a `assets/mockups/mockup_holo_menu.png`. Capturas: `docs/img/menu-375x616.png` e `menu-375x812.png`.
+- **API:** `setup(view: Dictionary)` com `level`, `xp`, `xp_to_next`, `coins`, `is_max` (antes ou depois de entrar na árvore); sinal `play_pressed`. Não chama Backend nem SceneFlow (T-187 liga). Helpers estáticos: `format_number` (1.250) e `xp_ratio`.
+- **Nível 30 (`is_max`):** texto `MAX` e barra cheia. XP no limite ou acima: barra cheia (clamp).
+- **Layout:** fundo e animações da arte do título (`TitleScreen.build_art`); bloco único ancorado embaixo (logotipo, linha selo/barra/Moeda, Jogar), escala `largura / 375` (até 720) e menor em telas baixas para não cobrir o pedestal. Jogar >= 281x78 (1x). Peças `ui_holo_*` em `StyleBoxTexture` (Jogar com `expand_margin` 16 e texto 6 px abaixo ao pressionar; pílula; engrenagem) e `NinePatchRect` (barra).
+- **Engrenagem:** sem ação no M2 (nenhuma conexão em `pressed`). Sem Módulos, dicas de slot, ALFA nem versão.
+- **Moeda provisória:** `MenuScreen.COIN_ICON` (único ponto de troca; T-162).
 
 ## 11. Exportação Web
 

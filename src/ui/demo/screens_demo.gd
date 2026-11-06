@@ -1,9 +1,10 @@
 extends Node
-## Cena de teste do fluxo de telas (T-113): Título → Partida (Arena + HUD + Pausa) → Resultado → Partida.
+## Cena de teste do fluxo de telas (T-113): Título → Menu → Partida (Arena + HUD + Pausa) → Resultado → Partida.
 ## Faz o papel do SceneFlow só aqui; a ligação real é da T-122.
 
 const TITLE := preload("res://src/ui/screens/title_screen.tscn")
 const PAUSE := preload("res://src/ui/screens/pause_screen.tscn")
+const MENU := preload("res://src/ui/screens/menu_screen.tscn")
 const RESULT := preload("res://src/ui/screens/result_screen.tscn")
 const HUD := preload("res://src/ui/hud/hud.tscn")
 const ARENA := preload("res://src/match/arena/arena.tscn")
@@ -17,8 +18,15 @@ func _ready() -> void:
 
 func show_title() -> void:
 	var title: TitleScreen = TITLE.instantiate()
-	title.start_requested.connect(start_match)
+	title.start_requested.connect(show_menu)
 	_swap(title)
+
+
+func show_menu() -> void:
+	var menu: MenuScreen = MENU.instantiate()
+	menu.setup({"level": 4, "xp": 320, "xp_to_next": 500, "coins": 1250, "is_max": false})
+	menu.play_pressed.connect(start_match)
+	_swap(menu)
 
 
 func start_match() -> void:
