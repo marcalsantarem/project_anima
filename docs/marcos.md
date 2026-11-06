@@ -61,23 +61,23 @@ Detalhe de cada marco: [docs/roadmap.md](roadmap.md) (decisão 53).
 
 **Critérios de fechamento:**
 - [x] Arena em retrato com Anima fixo e ataque automático com pool (T-103, T-104)
-- [ ] 1 skill de área no slot 1 (meteoro ou onda de choque, decisão do usuário), com cooldown por toque, mouse e tecla `1` (T-108 ✔, T-125, T-139)
-- [ ] Slots 2 e 3 visíveis e bloqueados com cadeado (T-136)
-- [ ] Upgrades da partida: 5 botões de compra em tempo real acima das skills, pagos com Partículas (T-133, T-134, T-135)
-- [ ] Moeda da partida chamada Partículas nos sinais, no HUD e nos docs (T-140, T-141)
-- [ ] 4 arquétipos de inimigo e 1 chefe com fases (T-103 ✔, T-111 ✔, T-115)
-- [ ] Fase 1 com ~10 ondas + chefe, balanceada com 1 skill + upgrades, partida de 3–10 min (T-116)
+- [x] 1 skill de área no slot 1 (meteoro ou onda de choque, decisão do usuário), com cooldown por toque, mouse e tecla `1` (T-108 ✔, T-125, T-139)
+- [x] Slots 2 e 3 visíveis e bloqueados com cadeado (T-136)
+- [x] Upgrades da partida: 5 botões de compra em tempo real acima das skills, pagos com Partículas (T-133, T-134, T-135)
+- [x] Moeda da partida chamada Partículas nos sinais, no HUD e nos docs (T-140, T-141)
+- [x] 4 arquétipos de inimigo e 1 chefe com fases (T-103 ✔, T-111 ✔, T-115)
+- [x] Fase 1 com ~10 ondas + chefe, balanceada com 1 skill + upgrades, partida de 3–10 min (T-116)
 - [x] HUD completo ligado por sinais (T-112)
 - [x] Fluxo Toque para começar → Partida → Resultado → Jogar de novo, com pausa ao perder foco (T-102, T-113, T-122)
 - [x] Tema global com fonte Outfit aplicado (T-106, T-121)
-- [ ] Guia de estilo e mockup **aprovados pelo usuário** (T-126)
-- [ ] Arte final na partida e na UI, sem placeholders (T-127, T-128, T-137, T-138)
-- [ ] VFX de ataque, acertos, mortes, skill e chefe, com pool e modo de efeitos reduzidos (T-129 a T-132)
-- [ ] Game feel de demo (T-117)
+- [x] Guia de estilo e mockup **aprovados pelo usuário** (T-126)
+- [x] Arte final na partida e na UI, sem placeholders (T-127, T-128, T-137, T-138)
+- [x] VFX de ataque, acertos, mortes, skill e chefe, com pool e modo de efeitos reduzidos (T-129 a T-132)
+- [x] Game feel de demo (T-117)
 - [x] Testes GUT passando headless (T-114; seed determinística em T-123)
-- [ ] Média ≥ 45 fps no iPhone 11 Pro no pior caso (T-118 ✔, medido 46,9) e build ≤ ~15 MB (T-119)
-- [ ] Botão "Enviar log" no Resultado gravando em uma tabela online, para testes com amigos (T-267 a T-271, decisão 58)
-- [ ] Veredito "passa" do AG03, incluindo a qualidade visual de demo (T-120), e aval do usuário
+- [x] Média ≥ 45 fps no iPhone 11 Pro no pior caso (T-118 ✔, medido 46,9) e build ≤ ~15 MB (T-119)
+- [x] Botão "Enviar log" no Resultado gravando em uma tabela online, para testes com amigos (T-267 a T-271, decisão 58)
+- [x] Veredito do AG03: **passa com ressalvas** (T-120, `docs/qa/qa-M1.md`); [ ] aval do usuário pendente
 
 **Bloqueios:** T-139 aguarda a decisão do usuário entre meteoro e onda de choque (T-125). O 4º slot (`Espaço`) está fora do M1.
 

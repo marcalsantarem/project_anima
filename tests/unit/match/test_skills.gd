@@ -187,8 +187,15 @@ func test_input_action_triggers_slot() -> void:
 	ev.action = &"skill_1"
 	ev.pressed = true
 	Input.parse_input_event(ev)
-	await wait_physics_frames(2)
+	Input.flush_buffered_events() # entrega já; não depende de quantos quadros passam sob carga
+	# Espera limitada pelo efeito (sinal), não por um nº fixo de quadros; sob carga o despacho atrasa.
+	await wait_until(func(): return get_signal_emit_count(arena, "skill_used") > 0, 2.0)
 	assert_signal_emitted_with_parameters(arena, "skill_used", [1])
+	var up := InputEventAction.new() # solta a ação: não deixa skill_1 "pressionada" para outros testes
+	up.action = &"skill_1"
+	up.pressed = false
+	Input.parse_input_event(up)
+	Input.flush_buffered_events()
 
 
 # --- T-173: reavaliação do alvo no início da queda e meteoro anulado ---
