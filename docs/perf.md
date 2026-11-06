@@ -18,6 +18,6 @@ Cena de estresse: `tests/perf/stress.tscn` (sem lógica de jogo; sprites reais d
 |---|---|---|---|---|---|---|
 | 2026-11-06 | PC Windows 11 | Chrome headless, render por software (SwiftShader), 15 s | 150 / 300 | 59,9 | 52,1 | sem GPU real |
 | 2026-11-06 | PC Windows 11 | Chrome headless, SwiftShader, 12 s | 300 / 600 | 34,3 | 26,4 | dobro da meta |
-| a medir | iPhone (Safari) | Safari | 150 / 300 | | | T-005 |
+| 2026-11-06 | iPhone (Safari, aba; modelo a anotar) | Safari, build `e30ca1c` v0.1.0-demo, `?debug=1&stress=150,300` | 150 inimigos, 1 a 36 proj. em voo, fx 17 | 29,3 (34 ms; máx 55) | n/d (51 quadros > 50 ms) | **abaixo da meta de 50**. Overlay: draw 592, nós 3334, viewport 375x616 (dpr a conferir). Dono, captura de tela |
 
 Limite: o PC mediu com render por software (sem GPU), então vale como piso; o dado que decide a meta é o do iPhone.
