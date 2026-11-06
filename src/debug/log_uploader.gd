@@ -14,6 +14,9 @@ const ENABLED := true
 const CLIENT_KEY := "anima-teste"
 ## Site de teste usado em PC/editor (na web vai para a mesma origem).
 const SITE_URL := "https://projectanimagame.netlify.app"
+## Motivo da última falha (para diagnóstico; vazio se não falhou).
+var last_error := ""
+
 const ENDPOINT := "/api/log"
 const TIMEOUT_S := 8.0
 const MAX_BYTES := 200 * 1024
@@ -75,15 +78,18 @@ func send(res: MatchResult, doc: Dictionary) -> void:
 	_http.timeout = TIMEOUT_S
 	add_child(_http)
 	_http.request_completed.connect(_on_completed)
+	last_error = ""
 	var err := _http.request(url(), ["Content-Type: application/json", "X-Anima-Key: " + CLIENT_KEY],
 		HTTPClient.METHOD_POST, body)
 	if err != OK:
+		last_error = "request erro %d" % err
 		_set_state(State.FAILED)
 		return
 	_set_state(State.SENDING)
 
 
-func _on_completed(result: int, code: int, _headers: PackedStringArray, _body: PackedByteArray) -> void:
+func _on_completed(result: int, code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
+	last_error = "" if state_for(result, code) == State.SENT else "rede %d, HTTP %d %s" % [result, code, body.get_string_from_utf8().left(80)]
 	_set_state(state_for(result, code))
 	if is_instance_valid(_http):
 		_http.queue_free()

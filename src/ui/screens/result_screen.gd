@@ -136,6 +136,9 @@ func _on_upload_state(s: int) -> void:
 			_send_button.disabled = true
 		LogUploader.State.FAILED:
 			_send_button.text = LogUploader.TXT_FAILED
+			if _notice != null and _uploader != null:
+				_notice.text = LogUploader.TXT_NOTICE + "
+(" + _uploader.last_error + ")"
 			_send_button.disabled = false
 		_:
 			_send_button.text = LogUploader.TXT_SEND
