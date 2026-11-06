@@ -39,12 +39,6 @@ func test_gesture_emits_once_and_fades_from_dark() -> void:
 	assert_null(get_tree().root.get_node_or_null(NodePath(TitleScreen.FADE_NAME)), "véu se libera")
 
 
-func test_build_tag_between_title_and_button() -> void:
-	var tag := title.find_child("BuildTag", true, false) as Label
-	assert_not_null(tag)
-	assert_eq(tag.text, TitleScreen.TXT_BUILD_TAG)
-	assert_eq(tag.text, tag.text.to_upper())
-	var b := title.find_child("StartButton", true, false) as Button
-	var t := title.find_child("ANIMA", true, false)
-	assert_lt(tag.position.y, b.position.y, "acima do botão")
-	assert_lt(tag.position.y + tag.size.y * 0.5, b.position.y, "sem sobrepor o botão")
+func test_empty_build_tag_creates_nothing() -> void:
+	if TitleScreen.TXT_BUILD_TAG == "":
+		assert_null(title.find_child("BuildTag", true, false), "gancho vazio: sem nó")

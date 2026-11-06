@@ -4,7 +4,7 @@ extends Control
 ## Continuação da splash tecnológica do `web/shell.html` (T-179, decisão 48): mesma arte, título e animações
 ## nas mesmas posições; o botão holográfico ocupa o lugar da barra. Contrato: emite `start_requested` uma vez,
 ## no primeiro toque, clique ou tecla; em seguida um véu escuro some em ~0,3 s sobre a partida (sem corte seco).
-## Subtítulo temporário `TXT_BUILD_TAG` (BRF-099) entre o título e o botão.
+## Gancho `TXT_BUILD_TAG`: se não vazio, mostra o subtítulo (ex. "ALFA", T-283) entre o título e o botão; vazio = nada é criado.
 
 signal start_requested
 
@@ -35,7 +35,7 @@ const SUB_GAP := 12.0
 const BUTTON_CENTER_Y := 1211.0 ## centro da barra do shell
 const BUTTON_SIZE := Vector2(495, 110)
 const BUTTON_FONT := 36.0
-const TXT_BUILD_TAG := "VERTICAL SLICE" ## T-282 remove; T-283 troca por "ALFA"
+const TXT_BUILD_TAG := "" ## vazio = sem subtítulo; T-283 troca por "ALFA"
 const TAG_FONT := 38.0 ## entre "PROJECT:" e "ANIMA" e o rodapé
 const TAG_COLOR := Color("#FF5A6E") ## vermelho `danger` da paleta
 const TAG_GLOW := Color(1.0, 0.25, 0.35, 0.7)
@@ -74,11 +74,12 @@ func _ready() -> void:
 	_title = _title_label("ANIMA")
 	root.add_child(_title)
 
-	_build_tag = _title_label(TXT_BUILD_TAG)
-	_build_tag.name = "BuildTag"
-	_build_tag.add_theme_color_override("font_color", TAG_COLOR)
-	_build_tag.add_theme_color_override("font_shadow_color", TAG_GLOW)
-	root.add_child(_build_tag)
+	if TXT_BUILD_TAG != "":
+		_build_tag = _title_label(TXT_BUILD_TAG)
+		_build_tag.name = "BuildTag"
+		_build_tag.add_theme_color_override("font_color", TAG_COLOR)
+		_build_tag.add_theme_color_override("font_shadow_color", TAG_GLOW)
+		root.add_child(_build_tag)
 
 	_button = Button.new()
 	_button.name = "StartButton"
@@ -252,10 +253,13 @@ func _layout() -> void:
 	# Título e subtítulo sobem o necessário para caber o subtítulo entre "ANIMA" e o botão (telas baixas).
 	var gap := UiTokens.SPACE_XS
 	var title_end := (TITLE_TOP + SUB_FONT + SUB_GAP + TITLE_FONT) * s
-	var shift := minf(0.0, by - gap * 2.0 - tag_font - title_end)
+	var shift := 0.0
+	if _build_tag != null:
+		shift = minf(0.0, by - gap * 2.0 - tag_font - title_end)
 	_place_title(_sub_title, sub_font, TITLE_TOP * s + shift, view.x)
 	_place_title(_title, title_font, (TITLE_TOP + SUB_FONT + SUB_GAP) * s + shift, view.x)
-	_place_title(_build_tag, tag_font, by - gap - tag_font * 1.05, view.x)
+	if _build_tag != null:
+		_place_title(_build_tag, tag_font, by - gap - tag_font * 1.05, view.x)
 	ScreenKit.place_corner_label(version_label, get_viewport(), STUDIO_BOTTOM)
 
 
