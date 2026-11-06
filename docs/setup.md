@@ -33,4 +33,9 @@ A inspeção remota do Safari exige um Mac. No Windows, os testes são feitos po
 
 - Produção (`main`): https://projectanimagame.netlify.app
 - Desenvolvimento (`dev`): https://dev--projectanimagame.netlify.app
+- Tags (T-284, decisão 62): **qualquer tag** (`git tag v0.1.0 && git push origin v0.1.0`, feito pelo AG00 na `main`) builda o commit da tag, roda os testes e publica em `https://<alias>--projectanimagame.netlify.app`, nunca em produção. Alias = nome da tag em minúsculas, fora de `a-z0-9-` vira `-`, até 37 caracteres (`v0.1.0` → `v0-1-0`; tag chamada `dev`/`main` vira `tag-dev`/`tag-main`). O link também sai nas notas da GitHub Release da tag, que traz o `anima-web-<tag>.zip` (build pronto). Tag apagada e recriada não é prevista.
+- Rebuildar uma tag localmente: `git checkout <tag>`, `godot --headless --path . --import`, depois o export local abaixo (volte com `git checkout dev`).
 - O build roda no GitHub Actions, e o Netlify não está ligado ao Git. Os secrets de repositório são `NETLIFY_SITE_ID` e `NETLIFY_AUTH_TOKEN`.
+- Export local completo (T-175): `godot --headless --path . --export-release "Web" build/web/index.html && bash web/copy_pwa.sh build/web` (copia `web/pwa/`: manifesto e ícones). Ícones novos do AG08 em `assets/app/`: `bash web/copy_pwa.sh --sync-icons`.
+- Versão/build (T-165): o deploy injeta SHA, branch, data e execução com `bash web/inject_build.sh build/web`. Para simular localmente: `GITHUB_SHA=abc1234def... GITHUB_REF_NAME=dev GITHUB_RUN_NUMBER=42 bash web/inject_build.sh build/web`. Sem essas variáveis, o jogo mostra "dev local" (`docs/debug.md` §7).
+- App na tela de início do iPhone: depois de mudar ícone ou manifesto, remova o atalho antigo e adicione de novo pelo Safari (Compartilhar › Adicionar à Tela de Início); detalhes em `docs/ui.md` §12.

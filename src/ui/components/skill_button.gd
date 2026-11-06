@@ -4,24 +4,38 @@ extends Control
 ## Botão circular de skill. docs/ui.md §5.1.
 ## Não chama a skill: toque/clique emitem `activated(slot)` e, se `inject_action`, a Input Action `skill_<slot>`.
 ## O estado vem do gameplay: on_used() ← skill_used, set_cooldown() ← cooldown_changed, set_ready() ← skill_ready.
-## Arte da T-128 (T-138): molduras por estado, ícone (`icon_texture`; Icon.CIRCLE usa `ui_icon_skill_pulse`),
+## Arte da T-128 (T-138): molduras por estado, ícone (`icon_texture`; Icon.CIRCLE usa `UiArt.SKILL_METEOR_PATH`),
 ## cadeado e véu de recarga radial (`ui_skill_cooldown_mask`). O badge da tecla continua desenhado.
 ## `locked` (T-136): slot ainda não liberado. Cadeado + "NV x", ignora toque, clique, a action `skill_<slot>` e os sinais de gameplay.
+## `drag_aim` (T-178, decisão 46): pronto, o toque vira "toque simples" (activated ao soltar) ou, passado
+## AIM_THRESHOLD, mira (aim_started/aim_moved/aim_ended, `at` em coordenadas do viewport). Quem fala com a arena é o HUD.
 
 signal activated(slot: int)
+## Arrasto passou do limiar: modo mira.
+signal aim_started(slot: int)
+## Dedo/mouse em modo mira; `at` em coordenadas do viewport.
+signal aim_moved(slot: int, at: Vector2)
+## Fim da mira. `cancelled` = soltou sobre o próprio botão ou a mira foi abortada (recarga, bloqueio, fim).
+signal aim_ended(slot: int, at: Vector2, cancelled: bool)
 
 enum State { READY, COOLDOWN, DISABLED, LOCKED }
 enum Icon { CIRCLE, DIAMOND, HEX }
 
 const DIAMETER := float(UiTokens.SKILL_DIAMETER)
 const PRESS_SCALE := 0.92
-const READY_POP := 1.08
+## Pulso de "pronto" (T-117): 1 → READY_POP → 1 em READY_PULSE_TIME, com o anel mais claro.
+const READY_POP := 1.12
+const READY_PULSE_TIME := 0.3
+## "Afundar" curto no uso (T-117), junto com o flash do anel.
+const USE_SINK := 0.88
 const SHAKE_PX := 6.0
 const GLOW_PERIOD := 1.5
 const BADGE_SIZE := 36.0
 const ICON_SIZE := 88.0
 const LOCK_SIZE := 64.0
 const DIM_ALPHA := 0.55
+## Distância (px da resolução base) que separa toque simples de arrasto para mirar.
+const AIM_THRESHOLD := 24.0
 
 ## 1-based (1 a 3), casa com `skill_1`..`skill_3`.
 @export_range(1, 4) var slot := 1:
@@ -40,6 +54,8 @@ const DIM_ALPHA := 0.55
 		queue_redraw()
 ## Desligue quando quem ouve `activated` já aciona a skill (ex.: HUD → Arena.use_skill).
 @export var inject_action := true
+## Arrastar a partir do botão pronto para mirar (T-178). Desligado = acionamento ao apertar, como antes.
+@export var drag_aim := false
 
 var action := &"skill_1"
 ## Nível de conta que libera o slot (só exibição; quem decide é o meta-jogo).
@@ -48,6 +64,10 @@ var state := State.READY
 var _remaining := 0.0
 var _total := 0.0
 var _flash := 0.0
+## 1 → 0 durante o pulso de "pronto" (brilho extra do anel).
+var ready_glow := 0.0
+## Houve recarga desde o último "pronto" (o cooldown_changed com 0 pode chegar antes do skill_ready).
+var _cooling := false
 var _glow_t := 0.0
 var _shortcut := ""
 var _touch_index := -1
@@ -55,6 +75,14 @@ var _anim: Tween
 var _badge_box := _make_badge_box()
 var _veil_pts := PackedVector2Array()
 var _veil_uvs := PackedVector2Array()
+## Em modo mira (por arrasto ou pela tecla segurada, ver set_aiming).
+var aiming := false
+## Mira em área inválida: anel `danger` em vez de `accent`.
+var aim_valid := true
+var _pending := false # pressionado pronto, ainda sem decidir entre toque e arrasto
+var _mouse_down := false
+var _press_at := Vector2.ZERO
+var _aim_at := Vector2.ZERO
 
 
 func _init() -> void:
@@ -76,17 +104,21 @@ func set_cooldown(remaining: float, total: float) -> void:
 	_remaining = maxf(remaining, 0.0)
 	_total = maxf(total, 0.001)
 	state = State.COOLDOWN if _remaining > 0.0 else State.READY
+	if state != State.READY:
+		_cooling = true
+		cancel_aim()
 	queue_redraw()
 
 
 func set_ready() -> void:
 	if state == State.LOCKED:
 		return
-	var was_cooldown := state == State.COOLDOWN
+	var was_cooldown := _cooling or state == State.COOLDOWN
+	_cooling = false
 	state = State.READY
 	_remaining = 0.0
 	if was_cooldown:
-		_pop(READY_POP)
+		_ready_pulse()
 	queue_redraw()
 
 
@@ -94,6 +126,8 @@ func on_used() -> void:
 	if state == State.LOCKED:
 		return
 	_flash = 1.0
+	_pending = false
+	_pop(USE_SINK)
 	queue_redraw()
 
 
@@ -102,6 +136,8 @@ func set_disabled(disabled: bool) -> void:
 		return
 	if disabled:
 		state = State.DISABLED
+		cancel_aim()
+		_pending = false
 	else:
 		state = State.COOLDOWN if _remaining > 0.0 else State.READY
 	queue_redraw()
@@ -114,7 +150,11 @@ func set_locked(locked: bool, level := 0) -> void:
 		state = State.LOCKED
 		_remaining = 0.0
 		_flash = 0.0
+		_cooling = false
+		cancel_aim()
+		_pending = false
 		_touch_index = -1
+		_mouse_down = false
 		mouse_default_cursor_shape = CURSOR_FORBIDDEN
 	elif state == State.LOCKED:
 		state = State.READY
@@ -148,6 +188,9 @@ func _process(delta: float) -> void:
 	if _flash > 0.0:
 		_flash = maxf(_flash - delta / UiTokens.ANIM_UI, 0.0)
 		dirty = true
+	if ready_glow > 0.0:
+		ready_glow = maxf(ready_glow - delta / READY_PULSE_TIME, 0.0)
+		dirty = true
 	if dirty:
 		queue_redraw()
 
@@ -159,24 +202,107 @@ func _gui_input(event: InputEvent) -> void:
 			accept_event()
 		return
 	if event is InputEventScreenTouch:
-		if not _hit(event.position):
-			return
-		if event.pressed and _touch_index == -1:
+		if event.pressed:
+			if _touch_index != -1 or not _hit(event.position):
+				return
 			_touch_index = event.index
-			_press()
-		elif not event.pressed and event.index == _touch_index:
+			_down(event.position)
+		elif event.index == _touch_index:
+			# O release vem para quem recebeu o toque, mesmo fora do círculo.
 			_touch_index = -1
-			_release()
+			_up(event.position)
+		else:
+			return
 		accept_event()
+	elif event is InputEventScreenDrag:
+		if event.index == _touch_index:
+			_drag(event.position)
+			accept_event()
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		# Toque já foi tratado acima; ignora o mouse emulado.
-		if event.device == InputEvent.DEVICE_ID_EMULATION or not _hit(event.position):
+		if event.device == InputEvent.DEVICE_ID_EMULATION:
 			return
 		if event.pressed:
-			_press()
+			if not _hit(event.position):
+				return
+			_mouse_down = true
+			_down(event.position)
+		elif _mouse_down:
+			_mouse_down = false
+			_up(event.position)
 		else:
-			_release()
+			return
 		accept_event()
+	elif event is InputEventMouseMotion and _mouse_down and event.device != InputEvent.DEVICE_ID_EMULATION:
+		_drag(event.position)
+		accept_event()
+
+
+func _down(local: Vector2) -> void:
+	if drag_aim and state == State.READY:
+		_pending = true
+		_press_at = _to_viewport(local)
+		_pop(PRESS_SCALE)
+	else:
+		_press()
+
+
+func _drag(local: Vector2) -> void:
+	if not _pending:
+		return
+	var at := _to_viewport(local)
+	if not aiming:
+		if at.distance_to(_press_at) < AIM_THRESHOLD:
+			return
+		set_aiming(true)
+		aim_started.emit(slot)
+	_aim_at = at
+	aim_moved.emit(slot, at)
+
+
+func _up(local: Vector2) -> void:
+	if not _pending:
+		_release()
+		return
+	_pending = false
+	if aiming:
+		set_aiming(false)
+		aim_ended.emit(slot, _to_viewport(local), _hit(local))
+		return
+	# Toque simples: acionamento automático, como antes do arrasto existir.
+	activated.emit(slot)
+	if inject_action:
+		_send_action(true)
+		_send_action(false)
+
+
+## Estado visual "mirando" (também usado pelo HUD com a tecla segurada). Não emite sinais.
+func set_aiming(on: bool) -> void:
+	if aiming == on:
+		return
+	aiming = on
+	aim_valid = true
+	queue_redraw()
+
+
+func set_aim_valid(valid: bool) -> void:
+	if aim_valid != valid:
+		aim_valid = valid
+		queue_redraw()
+
+
+## Aborta a mira por arrasto em curso (sem acionar): emite aim_ended(..., true).
+func cancel_aim() -> void:
+	if not _pending:
+		return
+	_pending = false
+	if aiming:
+		set_aiming(false)
+		aim_ended.emit(slot, _aim_at, true)
+
+
+func _to_viewport(local: Vector2) -> Vector2:
+	return get_global_transform_with_canvas() * local
 
 
 ## Slot bloqueado: engole `skill_<slot>` (teclado ou injetada) antes do `_unhandled_input` do gameplay.
@@ -248,6 +374,18 @@ func _pop(peak: float) -> void:
 	_anim.tween_property(self, "scale", Vector2.ONE, UiTokens.ANIM_FAST).set_ease(Tween.EASE_IN)
 
 
+## Pulso ao ficar pronto (T-117): escala 1 → 1,12 → 1 e brilho do anel, ~0,3 s.
+func _ready_pulse() -> void:
+	if _anim:
+		_anim.kill()
+	scale = Vector2.ONE
+	ready_glow = 1.0
+	var half := READY_PULSE_TIME * 0.5
+	_anim = create_tween()
+	_anim.tween_property(self, "scale", Vector2.ONE * READY_POP, half).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_anim.tween_property(self, "scale", Vector2.ONE, half).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+
+
 func _shake() -> void:
 	if _anim:
 		_anim.kill()
@@ -281,8 +419,13 @@ func _draw() -> void:
 		draw_circle(c, r + 8.0, Color(UiTokens.ACCENT, 0.25 * pulse))
 	var frame := UiArt.SKILL_FRAME_LOCKED if disabled else (UiArt.SKILL_FRAME_READY if is_ready else UiArt.SKILL_FRAME_COOLDOWN)
 	draw_texture_rect(frame, Rect2(c - UiArt.SKILL_FRAME_CENTER, UiArt.SKILL_FRAME_SIZE), false)
+	if ready_glow > 0.0:
+		draw_circle(c, r + 10.0, Color(UiTokens.ACCENT, 0.45 * ready_glow))
+		draw_arc(c, r - 2.0, 0.0, TAU, 64, Color(1, 1, 1, 0.8 * ready_glow), 6.0, true)
 	if _flash > 0.0:
 		draw_arc(c, r - 8.0, 0.0, TAU, 64, Color(1, 1, 1, _flash), 8.0, true)
+	if aiming:
+		draw_arc(c, r + 6.0, 0.0, TAU, 64, UiTokens.ACCENT if aim_valid else UiTokens.DANGER, 8.0, true)
 
 	var font := get_theme_font("font_bold", "SkillButton")
 	if locked:
@@ -291,7 +434,7 @@ func _draw() -> void:
 		var tex := _icon_texture()
 		if tex:
 			var half := ICON_SIZE * 0.5
-			draw_texture_rect(tex, Rect2(c - Vector2(half, half), Vector2(ICON_SIZE, ICON_SIZE)), false, Color(1, 1, 1, DIM_ALPHA) if disabled else Color.WHITE)
+			draw_texture_rect(tex, Rect2(c - Vector2(half, half), Vector2(ICON_SIZE, ICON_SIZE)), false, Color(1, 1, 1, DIM_ALPHA) if disabled or aiming else Color.WHITE)
 		else:
 			_draw_icon(c, r * 0.4, UiTokens.TEXT_SECONDARY if disabled else UiTokens.TEXT_PRIMARY)
 
@@ -327,7 +470,7 @@ static func _make_badge_box() -> StyleBoxFlat:
 func _icon_texture() -> Texture2D:
 	if icon_texture:
 		return icon_texture
-	return UiArt.SKILL_PULSE if icon == Icon.CIRCLE else null
+	return UiArt.load_icon(UiArt.SKILL_METEOR_PATH) if icon == Icon.CIRCLE else null
 
 
 ## Cadeado (acima do centro) + "NV x" (abaixo), como no mockup aprovado.

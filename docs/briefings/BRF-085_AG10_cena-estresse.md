@@ -1,0 +1,5 @@
+# BRF-085 — AG10 — T-006 Cena de estresse
+**Leia:** `docs/agentes/AG10_plataforma.md`, backlog T-006 e T-007. **Regra:** respostas curtas; sem commit/push/branches.
+**Fazer:** cena isolada em `tests/perf/` (sem lógica de jogo, sem autoload novo): ~150 sprites móveis (sprites reais de inimigo) + ~300 projéteis em pool, movimento simples por frame sem alocação. Overlay com FPS atual/médio/mínimo e contagens; parâmetros por query string na web (`?enemies=150&projectiles=300`) com padrão 150/300. Registre a medição no PC (build Web no Chrome, headless se possível) em `docs/perf.md` (tabela: data, aparelho, navegador, contagens, fps médio/mín). Deixe pronto o passo a passo para o dono medir no iPhone (como abrir a cena: URL ou preset de export separado, sem poluir o build do jogo).
+**Arquivos permitidos:** `tests/perf/`, `docs/perf.md`, `export_presets.cfg` só se precisar de um preset extra (avise). **Proibido:** `src/match/`, `project.godot`. O AG01 mexe em `src/match/` ao mesmo tempo (T-118).
+**Entrega:** até 6 linhas: como abrir a cena, fps no PC, o que falta medir no iPhone.

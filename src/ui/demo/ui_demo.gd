@@ -21,6 +21,9 @@ var _upgrades: Array[UpgradeButton] = []
 var _levels := {}
 var _costs := {}
 var _particles_label: Label
+## Prévia simulada da mira por arrasto (T-178); na partida quem desenha é a Arena (show_skill_aim).
+var _aim_marker: Control
+var _aim_at := Vector2.ZERO
 
 
 func _ready() -> void:
@@ -123,9 +126,36 @@ func _build() -> void:
 		var sb := SkillButton.new()
 		sb.slot = i + 1
 		sb.icon = icons[i]
+		sb.drag_aim = true
+		sb.aim_moved.connect(_on_aim_moved)
+		sb.aim_ended.connect(_on_aim_ended)
 		skills_row.add_child(sb)
 		_skills.append(sb)
 	_apply_locks()
+	_aim_marker = Control.new()
+	_aim_marker.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
+	_aim_marker.mouse_filter = MOUSE_FILTER_IGNORE
+	_aim_marker.visible = false
+	_aim_marker.draw.connect(_draw_aim)
+	add_child(_aim_marker)
+
+
+func _on_aim_moved(_slot: int, at: Vector2) -> void:
+	_aim_at = at
+	_aim_marker.visible = true
+	_aim_marker.queue_redraw()
+
+
+func _on_aim_ended(slot: int, _at: Vector2, cancelled: bool) -> void:
+	_aim_marker.visible = false
+	if not cancelled:
+		_try_use(slot - 1)
+
+
+func _draw_aim() -> void:
+	_aim_marker.draw_set_transform(_aim_at, 0.0, Vector2(1.0, 0.75))
+	_aim_marker.draw_circle(Vector2.ZERO, 90.0, Color(UiTokens.ACCENT, 0.25))
+	_aim_marker.draw_arc(Vector2.ZERO, 90.0, 0.0, TAU, 48, UiTokens.ACCENT, 4.0, true)
 
 
 ## Simulado: custo × 1,5 por nível, MAX no nível 10. No jogo vem de data/upgrades/.

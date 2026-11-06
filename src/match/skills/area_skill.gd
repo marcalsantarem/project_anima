@@ -11,6 +11,10 @@ const RING_WIDTH := 4.0
 var _target := Vector2.ZERO
 var _windup_left := 0.0
 var _fx_left := 0.0
+## Inimigos atingidos no último impacto (medição: bot de balanceamento e testes).
+var last_hits := 0
+## O acionamento atual veio de mira manual (ponto fixo, sem reavaliação).
+var manual := false
 
 
 func _ready() -> void:
@@ -19,12 +23,20 @@ func _ready() -> void:
 	set_physics_process(false)
 
 
-func can_activate() -> bool:
+func can_aim() -> bool:
+	return true
+
+
+## Mira manual sempre aciona (escolha do jogador); automático exige inimigo ao alcance.
+func can_activate(at: Vector2 = Vector2.INF) -> bool:
+	if at.is_finite():
+		return true
 	return Targeting.pick(context.anima.position, context.enemies, data.target_range) != null
 
 
-func activate() -> void:
-	_target = _pick_target()
+func activate(at: Vector2 = Vector2.INF) -> void:
+	manual = at.is_finite()
+	_target = at if manual else _pick_target()
 	position = _target
 	_windup_left = _windup_time()
 	_fx_left = 0.0
@@ -73,7 +85,7 @@ func _on_finished() -> void:
 
 
 func _impact() -> void:
-	apply_damage(_target, context.enemies, data.radius, data.damage)
+	last_hits = apply_damage(_target, context.enemies, data.radius, data.damage)
 	_fx_left = _fx_time()
 	cast.emit(_target, data.radius)
 	queue_redraw()

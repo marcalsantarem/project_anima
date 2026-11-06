@@ -48,7 +48,8 @@ Nomes oficiais que o jogador vê. Os **identificadores de código continuam em i
 | **Módulo** | skill, poder ativo | poder ativo com cooldown (ex.: o meteoro); a conta abre os slots de Módulo nos níveis 3, 7 e 12 | M1: 1 Módulo (meteoro) |
 | **Partículas** | moeda da partida | moeda dropada pelos inimigos mortos; compra os upgrades da partida e **some no fim dela**. **Não cai no mapa por enquanto** (só aumenta o contador; pode mudar depois). Ícone: **estrela verde, como um "chipzinho"** | M1 (o ícone ainda é dourado: T-160 e T-161) |
 | **Moeda** | Gold | moeda do jogo (meta): sobe nível de Módulos, Fragmentos, Núcleos etc. Ícone: **moeda dourada** | futuro (M2+) |
-| **Fragmento** | módulo (equipamento) | equipamento do Anima, com raridade e fusão 3→1; o Anima tem **6 espaços** para equipá-los | futuro (M2+) |
+| **Componente** | Fragmento, módulo (equipamento) | equipamento do Anima (3 no M7, 6 espaços no M13), com raridade e fusão | M7 e M13 (decisão 54) |
+| **Fragmento** | — | **Fragmento de Módulo**: item usado para atualizar Módulos | M14 (decisão 54) |
 | **Núcleo** (talento) | talento, árvore de talentos | cada nó da árvore, comprado com Moeda | futuro; **atenção:** colide com o "Núcleo" que já nomeia a vida do Anima no HUD (ver nota) |
 
 > **Colisão de nome (resolvida, decisão 41):** a barra de vida do Anima no HUD passa a se chamar **"ENERGIA"**; "Núcleo" fica para os talentos.
@@ -62,8 +63,8 @@ Nomes oficiais que o jogador vê. Os **identificadores de código continuam em i
   - **[A DEFINIR]:** se a conta ganha outros prêmios por nível.
 - **Módulos (as skills):** são "poderes especiais" ativos, com cooldown. São desbloqueadas pela progressão e não são cards.
   - **[A DEFINIR]:** como cada skill evolui.
-- **Fragmentos:** são os equipamentos do Anima (**6 espaços**), melhorados com **Moeda**. Têm raridade Comum → Raro → Épico → Lendário.
-  - **Fusão:** 3 Fragmentos idênticos da mesma raridade viram 1 da raridade seguinte.
+- **Componentes** (ex-Fragmentos, decisão 54): são os equipamentos do Anima (**6 espaços** a partir do M13), melhorados com **Moeda**. Têm raridade Comum → Raro → Épico → Lendário.
+  - **Fusão:** Componentes idênticos da mesma raridade viram 1 da raridade seguinte.
 - **Upgrades da partida:** comprados durante a partida com **Partículas** e perdidos ao fim.
 - **Moedas:**
   - **Moeda:** a moeda do jogo (meta), dourada. A quantidade ganha varia a cada partida jogada.
@@ -71,15 +72,32 @@ Nomes oficiais que o jogador vê. Os **identificadores de código continuam em i
 - **Núcleos (a árvore de talentos):** continua, comprada com Moeda. O detalhe fica no AG04.
 - **[A DEFINIR]:** quais atributos os Fragmentos dão (dano, velocidade de ataque, vida, armadura, regeneração, redução de cooldown).
 
-## Roadmap
+## Roadmap (decisão 53, 2026-11-05)
 
-| Marco | Objetivo | Agentes |
-|---|---|---|
-| **M0 — Fundação** | Docs, ambiente, projeto Godot, exportação Web vazia rodando no PC e no iPhone | AG07, AG02, AG03 |
-| **M1 — Demo do combate** *(1º marco jogável)* | 1 fase completa, divertida e **visualmente polida, pronta para divulgar como demo** | AG01, AG02, AG03, AG08, AG09 |
-| **M2 — Meta-jogo local** | Nível de conta, slots e Módulos (controle e defesa), Fragmentos, fusão de Fragmentos, save local | AG04, AG01, AG02, AG05 (local), AG08 |
-| **M3 — Online** | Backend escolhido: conta guest, sincronização, economia no servidor, config remota | AG05, AG04 |
-| **M4 — Monetização e lançamento** | Ads, loja, skins, áudio final, lojas nativas | **[A DEFINIR]** |
+Visão do dono, **não definitiva**; detalhe completo em [docs/roadmap.md](roadmap.md). Cada marco = uma versão com tag e PR `dev → main`; versões fechadas importantes ganham branch própria (decisão 52).
+
+| Marco | Versão | Tag | Foco |
+|---|---|---|---|
+| M1 | v0.1.0 | Vertical slice | combate e visual (só tag, sem branch) |
+| M2 | v0.2.0 | **Versão Alfa** (branch `alfa`) | menu holográfico, ciclo jogar → ganhar → voltar, Moeda, save local, nível de conta, XP, música de entrada e som do tiro |
+| M3 | v0.2.1 | Hangar | menu reestruturado |
+| M4 | v0.2.2 | Núcleos | árvore de 10–12 talentos |
+| M5 | v0.2.3 | Módulos | congelamento, escudo, choque; seleção; slots por nível; evolução com Moeda |
+| M6 | v0.2.4 | Recompensas | vida ou baú durante a partida |
+| M7 | v0.2.5 | Componentes | equipamentos (ex-Fragmentos), drop, inventário, upgrade |
+| M8 | v0.2.6 | Configurações e Localização | volume, sons, efeitos, idioma; inglês e espanhol |
+| M9 | v0.2.7 | Onboarding | tutoriais |
+| M10 | v0.3.0 | **Versão Beta** (demo pública, branch `beta`) | 5 fases, inimigos, 2 chefes, progressão, polimento |
+| M11 | v0.3.1 | Desktop | build desktop |
+| M12 | v0.3.2 | Skins | skins do Anima |
+| M13 | v0.4.0 | Expansão: Componentes | 6 espaços, raridades, fusão |
+| M14 | v0.4.1 | Expansão: Módulos | mais Módulos, Fragmentos de Módulo |
+| M15 | v0.4.2 | Expansão: Núcleos | árvore maior |
+| M16 | v0.5.0 | Efeitos de áudio | sons de UI, Módulos e efeitos |
+| M17 | v0.6.0 | Expansão: fases | fase infinita, recompensas maiores |
+| M18 | v0.7.0 | Backend | nuvem, login Google/Apple, ranking |
+| M19 | v0.8.0 | Jogador | perfil |
+| — | até v1.0.0 | TBD | baús semanais, mobile, monetização, lançamento |
 
 ## Escopo atual: M1 (demo do combate)
 
@@ -113,7 +131,7 @@ Proibido usar personagens, criaturas, nomes, ícones, sons, interface ou arte de
 
 - Godot 4.7, GDScript, testes com GUT, renderer Compatibility (WebGL 2), exportação **single-threaded**.
 - Metas iniciais (a confirmar no M0):
-  - 60 fps no PC; **≥ 50 fps no iPhone** com ~150 inimigos e ~300 projéteis;
+  - 60 fps no PC; **média ≥ 45 fps no iPhone 11 Pro** no pior caso (150 inimigos vivos; meta revisada pelo dono em 2026-11-06, ver `docs/adr/0001-desempenho-e-exportacao-web.md`);
   - download inicial de **≤ ~15 MB**.
 - O áudio só toca depois do primeiro toque, por isso há a tela "toque para começar".
 - Backend **[A DEFINIR]**: Firebase é o favorito e Nakama a alternativa.
@@ -124,14 +142,17 @@ Proibido usar personagens, criaturas, nomes, ícones, sons, interface ou arte de
 |---|---|---|---|
 | AG00 | Game Dev Líder | Gerencia (não implementa): plano, Bíblia, decisões, briefings, validação, integração, commits | Sempre |
 | AG01 | Gameplay / Combate | Arena, Anima, ataque automático, skills, inimigos, ondas, chefe | M1 |
-| AG02 | UI / Plataforma Web | HUD, telas, entrada, tema, exportação Web (`export_presets.cfg`, `web/`), desempenho no Safari | M0/M1 |
+| AG02 | UI | HUD, telas, menus, entrada, tema, localização (chaves), tutoriais | M0/M1 |
 | AG03 | QA / Revisor | Testes, revisão, medições, veredito passa ou não passa | M1 |
-| AG04 | Meta-jogo / Dados | Nível de conta, Fragmentos, fusão, upgrades da partida (dados e balanceamento), economia | M1/M2 |
+| AG04 | Meta-jogo / Dados | Nível de conta, Núcleos, Módulos (evolução), Componentes, fusão, upgrades da partida (dados e balanceamento), economia | M1/M2 |
 | AG05 | Backend | Interface `Backend`, save, provedor online, segurança | M2/M3 |
-| AG06 | Backlog | Quebra dos marcos em tasks, quadro de status, andamento dos marcos e riscos | Sempre |
+| AG06 | Backlog | **Arquivado** (decisão 57): o AG00 mantém o backlog | — |
 | AG07 | Arquiteto Técnico | `project.godot` (Input Map, layers, autoloads), `src/core/`, arquitetura, contratos entre módulos, ADRs, metas de desempenho | Sempre |
 | AG08 | Diretor de Arte | Direção visual, paleta, sprites, ícones, fundo da arena, arte da UI, guia de estilo (`docs/arte.md`) | M1 em diante |
 | AG09 | VFX | Shaders, partículas, brilho, impactos, telegraphs e feedback visual, dentro do orçamento do iPhone | M1 em diante |
+| AG10 | Plataforma | Exportação Web (`export_presets.cfg`, `web/`), PWA, deploy, tamanho e desempenho do build, build desktop | M1 em diante |
+| AG11 | Áudio | Música, efeitos, mixagem, barramentos e desbloqueio de áudio na web | M2 em diante |
+| AG12 | Conteúdo / Fases | Fases, ondas, distribuição de inimigos e curva de dificuldade (em dados) | M10 em diante |
 
 Equipe: 1 usuário + agentes de IA. O prazo é por marcos, sem datas fixas.
 
@@ -143,14 +164,17 @@ Cada agente roda numa **sessão própria** do Claude Code, com o nome do agente.
 |---|---|
 | AG00_gamedev-lider (sessão principal) | [agentes/AG00_gamedev-lider.md](agentes/AG00_gamedev-lider.md) |
 | AG01_gameplay | [agentes/AG01_gameplay.md](agentes/AG01_gameplay.md) |
-| AG02_uiweb | [agentes/AG02_uiweb.md](agentes/AG02_uiweb.md) |
+| AG02 (UI) | [agentes/AG02_uiweb.md](agentes/AG02_uiweb.md) |
 | AG03_qa | [agentes/AG03_qa.md](agentes/AG03_qa.md) |
 | AG04_metajogo | [agentes/AG04_metajogo.md](agentes/AG04_metajogo.md) |
 | AG05_backend | [agentes/AG05_backend.md](agentes/AG05_backend.md) |
-| Backlog | [agentes/AG06_backlog.md](agentes/AG06_backlog.md) |
-| Arquiteto | [agentes/AG07_arquiteto.md](agentes/AG07_arquiteto.md) |
-| (a criar) | [agentes/AG08_arte.md](agentes/AG08_arte.md) |
-| (a criar) | [agentes/AG09_vfx.md](agentes/AG09_vfx.md) |
+| AG06 (Backlog, arquivado) | [agentes/AG06_backlog.md](agentes/AG06_backlog.md) |
+| AG07 (Arquiteto) | [agentes/AG07_arquiteto.md](agentes/AG07_arquiteto.md) |
+| AG08 (Arte) | [agentes/AG08_arte.md](agentes/AG08_arte.md) |
+| AG09 (VFX) | [agentes/AG09_vfx.md](agentes/AG09_vfx.md) |
+| AG10 (Plataforma) | [agentes/AG10_plataforma.md](agentes/AG10_plataforma.md) |
+| AG11 (Áudio) | [agentes/AG11_audio.md](agentes/AG11_audio.md) |
+| AG12 (Conteúdo/Fases) | [agentes/AG12_conteudo.md](agentes/AG12_conteudo.md) |
 
 Regras:
 1. **Usuário → AG00 → agentes.** O usuário fala só com o AG00, que transforma o pedido em briefing e delega.

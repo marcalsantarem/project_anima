@@ -1,0 +1,6 @@
+# BRF-084 — AG08 — T-181 Ícones do app na identidade tecnológica
+**Leia:** `docs/agentes/AG08_arte.md`, backlog T-181, `assets/app/README.md`. **Regra:** respostas curtas; sem commit/push/branch.
+**Fazer:** refazer o ícone 1024 mestre e os derivados (`apple-touch-icon-180`, `icon-192`, `icon-512`, `icon-maskable-512`, `favicon-32/48`, `favicon.ico`) com o **cristal holográfico ciano sobre fundo azul-marinho** da arte-base `assets/splash/tech/tech_splash_clean.png` (recortar dela ou redesenhar no mesmo estilo). Sem texto e sem transparência. Legível a 48 px e no favicon; maskable com símbolo na zona segura de 80%. Atualize o gerador em `assets/app/_src/`, o `assets/app/README.md` e `assets/LICENSES.md`. Depois rode `bash web/copy_pwa.sh --sync-icons` para copiar a `web/pwa/`. Só mexa em `web/pwa/manifest.webmanifest` se precisar trocar `theme_color`/`background_color` para o azul-marinho (cheque se já combina com a splash).
+**Validação:** folha de contato (`gen_preview.py`) com os tamanhos de 16 a 512 sobre claro e escuro.
+**Arquivos permitidos:** `assets/app/`, `web/pwa/`, `assets/LICENSES.md`. **Proibido:** `src/`, `project.godot`. O AG02 trabalha em `src/ui/` ao mesmo tempo.
+**Entrega:** até 6 linhas. Avise que o dono precisa reinstalar o atalho no iOS para ver o ícone novo.

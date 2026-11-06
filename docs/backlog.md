@@ -11,8 +11,8 @@
 | T-003 | `docs/ui.md` (tokens, layout, fluxo de telas) | M0 | AG02 | feita |
 | T-004 | Preset Web + HTML shell mínimo | M0 | AG02 | feita |
 | T-005 | Build vazio no Chrome PC e no iPhone | M0 | AG02 | feita |
-| T-006 | Cena de estresse para confirmar metas de desempenho | M0 | AG02 | pronta p/ briefing |
-| T-007 | ADR das metas de desempenho e da exportação single-threaded | M0 | AG07 | a fazer |
+| T-006 | Cena de estresse para confirmar metas de desempenho | M0 | AG10 | feita no PC (BRF-085); falta medir no iPhone |
+| T-007 | ADR das metas de desempenho e da exportação single-threaded | M0 | AG07 | feita (BRF-095; falta o tamanho do build, da T-119) |
 | T-008 | Deploy automático Web (GitHub Actions → Netlify) | M0 | AG02 | feita |
 | T-101 | `docs/gameplay.md` (parâmetros e sinais) | M1 | AG01 | feita |
 | T-102 | Autoload de fluxo de cenas | M1 | AG07 | feita |
@@ -20,20 +20,20 @@
 | T-104 | Ataque automático com pool | M1 | AG01 | feita |
 | T-105 | Ondas por dados, HP do Núcleo, moedas, vitória/derrota | M1 | AG01 | feita |
 | T-106 | Tema base e componentes de UI | M1 | AG02 | feita |
-| T-107 | Overlay de debug Web (FPS, logs) | M1 | AG02 | pronta p/ briefing |
+| T-107 | Overlay de debug Web (FPS, logs) | M1 | AG02 | feita (com gravador de logs e botão Logs) |
 | T-108 | Base de skills + skill de área | M1 | AG01 | feita |
-| T-109 | Skill de controle | M2 | AG01 | a fazer |
-| T-110 | Skill de defesa | M2 | AG01 | a fazer |
+| T-109 | Módulo de controle: congelamento | M5 | AG01 | a fazer |
+| T-110 | Módulo de defesa: escudo | M5 | AG01 | a fazer |
 | T-111 | Arquétipos: tanque, atirador, enxame | M1 | AG01 | feita |
 | T-112 | HUD ligado aos sinais | M1 | AG02 | feita |
 | T-113 | Telas: toque para começar, pausa, resultado | M1 | AG02 | feita |
 | T-114 | Testes GUT de ondas, dano e cooldowns | M1 | AG03 | feita |
 | T-115 | Chefe da fase 1 | M1 | AG01 | feita |
 | T-116 | Fase 1 completa (~10 ondas + chefe) | M1 | AG01 | feita |
-| T-117 | Game feel | M1 | AG01 + AG09 | a fazer |
-| T-118 | Desempenho no iPhone (150 inimigos / 300 projéteis) | M1 | AG01 | a fazer |
-| T-119 | Otimização do build Web | M1 | AG02 | a fazer |
-| T-120 | Validação do M1 | M1 | AG03 | a fazer |
+| T-117 | Game feel | M1 | AG01 + AG09 | feita |
+| T-118 | Desempenho no iPhone (150 inimigos / 300 projéteis) | M1 | AG01 | feita (BRF-086, BRF-091); iPhone 11 Pro 46,9 fps; meta revisada: média >= 45 fps no pior caso (dono, 2026-11-06) |
+| T-119 | Otimização do build Web | M1 | AG10 | feita (BRF-094): brotli 8,9 MB (meta ≤ 15 MB); 1º frame < 5 s em 4G em risco na 1ª visita (.wasm), aceito no M1 |
+| T-120 | Validação do M1 | M1 | AG03 | feita (BRF-100): passa com ressalvas, ver docs/qa/qa-M1.md |
 | T-121 | Tema global no `project.godot` | M1 | AG07 | feita |
 | T-122 | Ligar a arena real ao SceneFlow | M1 | AG07 | feita |
 | T-123 | Seed no `Arena._rng` para testes determinísticos | M1 | AG01 | feita |
@@ -44,8 +44,8 @@
 | T-128 | Ícones e arte da UI | M1 | AG08 | feita |
 | T-129 | `docs/vfx.md` + pool de efeitos | M1 | AG09 | feita |
 | T-130 | VFX do ataque, acertos e mortes | M1 | AG09 | feita |
-| T-131 | VFX da skill e do chefe | M1 | AG09 | a fazer |
-| T-132 | Modo de efeitos reduzidos | M1 | AG09 | a fazer |
+| T-131 | VFX da skill e do chefe | M1 | AG09 | feita |
+| T-132 | Modo de efeitos reduzidos | M1 | AG09 | feita |
 | T-133 | Dados e balanceamento dos upgrades da partida | M1 | AG04 | feita |
 | T-134 | Lógica dos upgrades em tempo real (5 atributos) | M1 | AG01 | feita |
 | T-135 | Fileira de 5 botões de upgrade no HUD | M1 | AG02 | feita |
@@ -60,23 +60,145 @@
 | T-144 | Arena em 3/4: Y-sort, âncoras, sombras, spawn | M1 | AG01 | feita |
 | T-145 | Retema da UI no estilo cartoon (tokens, tema, fonte) | M1 | AG02 | feita |
 | T-146 | Remover mockups rejeitados e excluir referências do export Web | M1 | AG07 | feita |
-| T-147 | Anima com skin trocável (Resource de aparência) | M2 | AG01 | a fazer |
+| T-147 | Anima com skin trocável (Resource de aparência) | M12 | AG01 | a fazer |
 | T-149 | Barra de vida pequena sobre cada inimigo (verde, amarela, vermelha) | M1 | AG01 | feita |
 | T-150 | Chefe ogro: ataque corpo a corpo, sem minions, defesa como escudo e lançamento | M1 | AG01 | feita |
 | T-151 | Arte do chefe ogro (humanoide grande e gordo) | M1 | AG08 | feita |
 | T-152 | Barra de vida grande e vermelha "Boss" no topo do HUD | M1 | AG02 | feita |
-| T-153 | Arte das pílulas do topo (ONDA e Partículas) e do botão secundário | M1 | AG08 | pronta p/ briefing |
-| T-154 | Texto "MAX" na pílula de custo dos upgrades (hoje desenhado por código) | M1 | AG08 + AG02 | pronta p/ briefing |
+| T-153 | Arte das pílulas do topo (ONDA e Partículas) e do botão secundário | M1 | AG08 | feita |
+| T-154 | Texto "MAX" na pílula de custo dos upgrades (hoje desenhado por código) | M1 | AG08 + AG02 | feita |
 | T-155 | "Voltar ao título" a partir da tela de Resultado | M1 | AG02 + AG07 | feita |
-| T-156 | Chão: quebrar a repetição das pedrinhas do tile | M1 | AG08 + AG01 | depende do teste no iPhone |
-| T-157 | Ajustar o escurecimento do topo (degradê do chão + do HUD) | M1 | AG02 + AG01 | depende do teste no iPhone |
-| T-158 | Teste no iPhone: splash, título, partida e chefe (ajustes saem daqui) | M1 | usuário + AG00 | a fazer (o dono fará o teste) |
-| T-159 | Remover o ícone provisório do `skill_pulse` e deixar o do meteoro como padrão | M1 | AG02 | pronta p/ briefing |
+| T-156 | Chão: quebrar a repetição das pedrinhas do tile | M1 | AG08 + AG01 | dispensada do M1 (dono, 2026-11-06) |
+| T-157 | Ajustar o escurecimento do topo (degradê do chão + do HUD) | M1 | AG02 + AG01 | dispensada do M1 (dono, 2026-11-06) |
+| T-158 | Teste no iPhone: splash, título, partida e chefe (ajustes saem daqui) | M1 | usuário + AG00 | feita |
+| T-159 | Remover o ícone provisório do `skill_pulse` e deixar o do meteoro como padrão | M1 | AG02 | feita (BRF-083; sobra o PNG do pulse sem uso, limpeza com o AG08) |
 | T-160 | Arte do ícone de Partículas: estrela verde, estilo "chip" (e nova cor dos efeitos de coleta) | M1 | AG08 | feita |
 | T-161 | Aplicar o ícone verde de Partículas no HUD, Resultado, botões de upgrade e efeitos (hoje dourado) | M1 | AG02 + AG09 | feita |
 | T-162 | Arte do ícone de Moeda (moeda dourada) e do glossário na UI (para o M2) | M2 | AG08 | a fazer |
-| T-163 | Textos do jogo e docs com os nomes oficiais (Módulo, Fragmento, Núcleo, Moeda); decidir a colisão de "Núcleo" | M2 | AG00 + AG04 + AG02 | a fazer |
+| T-163 | Textos do jogo e docs com os nomes oficiais (Módulo, Componente, Núcleo, Moeda); decidir a colisão de "Núcleo" | M2 | AG00 + AG04 + AG02 | a fazer |
 | T-164 | Rótulo da vida do Anima: "NÚCLEO" vira "ENERGIA" no HUD, Resultado e docs de UI | M1 | AG02 | feita |
+| T-165 | Build e versão no cabeçalho do log (commit e data do deploy) | M1 | AG07 + AG02 | feita |
+| T-166 | Chefe sem barra de defesa (mecânica arquivada, desligada por dados); meteoro lança e atordoa; rebalancear | M1 | AG01 | feita |
+| T-167 | Animação de passos do chefe ogro (balanço, ritmo pelo movimento; quadros de caminhada) | M1 | AG01 + AG08 | feita |
+| T-168 | Círculo rúnico do chão menor (~70%) | M1 | AG01 | feita |
+| T-169 | Bandeja até a borda inferior, menos espaço sob os Módulos, Anima centralizado na área livre | M1 | AG02 + AG01 | feita |
+| T-170 | Tela de logo do estúdio (preta, ~1 s) antes da splash de carregamento | M1 | AG02 | feita |
+| T-171 | Logo horizontal do estúdio na base da tela de título; remover o crédito "Criado por Marçal Santarem" | M1 | AG02 | feita |
+| T-172 | Canvas até a borda inferior no Safari do iPhone, sem faixa e sem somar a safe area duas vezes; diagnóstico no log | M1 | AG02 | feita |
+| T-173 | Meteoro: reavaliar o alvo perto do impacto (2 dos 6 lançamentos contra a horda acertaram 0 inimigos, 1 acertou 1) | M1 | AG01 | feita |
+| T-174 | Ícones do app (tela de início do iPhone, favicon, maskable) | M1 | AG08 | feita |
+| T-175 | Manifesto web (modo app, tela cheia, retrato) + meta tags do iOS + cópia no deploy | M1 | AG02 | feita |
+| T-176 | Foco manual: tocar num inimigo para o Anima focá-lo (marcador; volta ao automático) | M1 | AG01 | feita |
+| T-177 | Mira do meteoro: API de alvo manual e prévia do raio; chefe lançado dentro do alcance | M1 | AG01 | feita |
+| T-178 | Arrastar do botão do Módulo para mirar (toque/mouse), segurar 1 + clique no PC | M1 | AG02 | feita |
+| T-179 | Splash e tela de título no estilo holográfico/tecnológico (arte do Gemini como base; texto, barra e brilhos vivos) | M1 | AG02 + AG08 | feita |
+| T-180 | **(1ª do M2)** Guia visual "HUD holográfico" para menus + mockups do menu principal e do Resultado com recompensa | M2 | AG08 | a fazer (início do M2) |
+| T-181 | Ícones do app (iPhone, PWA e favicon) na nova identidade tecnológica da splash e do menu | M1 | AG08 + AG10 | feita (BRF-084; falta o dono reinstalar o atalho no iOS) |
+| T-182 | Áudio básico: música de entrada (título) e som do tiro básico, com volume salvo e respeitando o 1º toque na web | M2 | AG11 | a fazer |
+| T-183 | Fechar o M1 como v0.1.0: versão `0.1.0` no jogo e tag `v0.1.0`, sem branch (decisão 55; quando o dono pedir) | M1 | AG00 + AG10 | a fazer (no fechamento) |
+| T-184 | Economia do M2: curva de XP (níveis 1 a 15), XP e Moeda por partida (por monstros derrotados e ondas, nunca pelo tempo; decisão 59), dados em `.tres` e `docs/economia.md` | M2 | AG04 | a fazer |
+| T-185 | Save local: autoload `Backend` (interface) + `LocalBackend` em `user://` com versão, migração e recuperação; ADR | M2 | AG05 + AG07 | a fazer |
+| T-186 | Lógica pura do meta em `src/meta/`: recompensa do `MatchResult`, XP → nível, slots liberados; testes GUT | M2 | AG04 | a fazer |
+| T-187 | Fluxo de cenas com menu: Título → Menu → Partida → Resultado → Menu; aplica a recompensa e salva | M2 | AG07 | a fazer |
+| T-188 | Partida monta os slots pelo nível da conta (`MatchConfig`); conta sem Módulo joga só com ataque básico | M2 | AG01 | a fazer |
+| T-189 | Arte do menu holográfico: painéis, botões, barra de XP, selo de nível, ícone de XP | M2 | AG08 | a fazer |
+| T-190 | Tela do menu principal: Jogar, nível e barra de XP, saldo de Moeda, som liga/desliga | M2 | AG02 | a fazer |
+| T-191 | Resultado com recompensa: XP e Moeda animados, barra enchendo, subida de nível e aviso de slot liberado | M2 | AG02 + AG09 | a fazer |
+| T-192 | HUD: slots bloqueados mostram o nível que os libera | M2 | AG02 | a fazer |
+| T-193 | Debug do meta: zerar save e dar XP/Moeda pelo overlay `?debug=1`; meta no log da partida | M2 | AG02 + AG05 | a fazer |
+| T-194 | Assets de áudio do M2: música de entrada e som do tiro (próprios ou CC0, licença registrada) | M2 | AG11 | a fazer |
+| T-195 | Balanceamento da progressão: partidas até os níveis 3, 7 e 12 pela simulação do bot | M2 | AG04 | a fazer |
+| T-196 | Validação do M2 (inclui o botão de velocidade, T-272 a T-276; inclui save persistindo no iPhone, no Safari e no modo app) | M2 | AG03 | a fazer |
+| T-197 | Fechar o M2 como v0.2.0: tag `v0.2.0`, branch `alfa` e deploy em `alfa--projectanimagame.netlify.app` (quando o dono pedir) | M2 | AG00 + AG10 | a fazer (no fechamento) |
+| T-198 | Mockup do hangar: navegação entre Jogar, Núcleos, Módulos, Componentes e Configurações (abas ou barra inferior) (tam. M) | M3 | AG08 | a fazer |
+| T-199 | Arte do hangar: fundo, ícones das abas, estados ativo/bloqueado (tam. M) | M3 | AG08 | a fazer |
+| T-200 | Fluxo de cenas do hangar: telas filhas carregadas sob demanda, voltar, estado preservado (tam. P) | M3 | AG07 | a fazer |
+| T-201 | Hangar na UI: o menu vira hangar com abas; telas ainda vazias mostram "em breve" (tam. M) | M3 | AG02 | a fazer |
+| T-202 | Validação e fechamento da v0.2.1 (tag) (tam. P) | M3 | AG03 + AG00 | a fazer |
+| T-203 | Design da árvore de Núcleos: 10 a 12 talentos, efeitos, custos em Moeda, pré-requisitos; dados em `.tres` (tam. M) | M4 | AG04 | a fazer |
+| T-204 | Lógica dos Núcleos: compra, pré-requisitos, soma dos efeitos; save; testes GUT (tam. M) | M4 | AG04 + AG05 | a fazer |
+| T-205 | Partida aplica os Núcleos comprados (via `MatchConfig`) (tam. M) | M4 | AG01 | a fazer |
+| T-206 | Arte dos ícones dos Núcleos e das ligações da árvore (tam. M) | M4 | AG08 | a fazer |
+| T-207 | Tela de Núcleos: árvore, detalhe do talento, compra e saldo (tam. G) | M4 | AG02 | a fazer |
+| T-208 | VFX de compra e desbloqueio de Núcleo (tam. P) | M4 | AG09 | a fazer |
+| T-209 | Balanceamento com Núcleos (simulação do bot) (tam. P) | M4 | AG04 | a fazer |
+| T-210 | Validação e fechamento da v0.2.2 (tag) (tam. P) | M4 | AG03 + AG00 | a fazer |
+| T-211 | Design dos Módulos: congelamento, escudo e choque; níveis, efeito por nível e custos em Moeda (tam. M) | M5 | AG04 | a fazer |
+| T-212 | Módulo de ataque: choque que se espalha entre inimigos (tam. M) | M5 | AG01 | a fazer |
+| T-213 | Evolução dos Módulos com Moeda: lógica, save e testes (tam. M) | M5 | AG04 + AG05 | a fazer |
+| T-214 | Ícones dos 3 Módulos novos (tam. P) | M5 | AG08 | a fazer |
+| T-215 | VFX do congelamento, do escudo e do choque (tam. M) | M5 | AG09 | a fazer |
+| T-216 | Tela de Módulos: lista, detalhe e evolução (tam. M) | M5 | AG02 | a fazer |
+| T-217 | Seleção de Módulos por slot: equipar, salvar e levar ao `MatchConfig` (tam. M) | M5 | AG02 + AG07 | a fazer |
+| T-218 | Mira manual (arrastar) para os Módulos novos que precisarem (tam. P) | M5 | AG01 + AG02 | a fazer |
+| T-219 | Balanceamento dos 4 Módulos e bot que usa todos (tam. M) | M5 | AG04 | a fazer |
+| T-220 | Validação e fechamento da v0.2.3 (tag) (tam. P) | M5 | AG03 + AG00 | a fazer |
+| T-221 | Design das recompensas na partida: quando aparecem, cura × baú, conteúdo do baú (Moeda) (tam. P) | M6 | AG04 | a fazer |
+| T-222 | Lógica: escolha entre ondas, cura aplicada, Moeda do baú somada ao resultado (tam. M) | M6 | AG01 | a fazer |
+| T-223 | Janela de escolha na partida (pausa, 2 cartões, toque e teclado) (tam. M) | M6 | AG02 | a fazer |
+| T-224 | Arte do baú e do cartão de cura + VFX de abrir (tam. M) | M6 | AG08 + AG09 | a fazer |
+| T-225 | Validação e fechamento da v0.2.4 (tag) (tam. P) | M6 | AG03 + AG00 | a fazer |
+| T-226 | Design dos Componentes: ATK, DEF e híbrido; atributos, níveis, custos de upgrade, taxas de drop (tam. M) | M7 | AG04 | a fazer |
+| T-227 | Inventário e equipados: modelo, save e testes (tam. M) | M7 | AG04 + AG05 | a fazer |
+| T-228 | Drop de Componentes no fim da partida e no baú (T-222) (tam. M) | M7 | AG04 + AG01 | a fazer |
+| T-229 | Partida aplica os atributos dos Componentes equipados (tam. P) | M7 | AG01 | a fazer |
+| T-230 | Arte dos 3 Componentes e dos espaços de equipar no Anima (tam. M) | M7 | AG08 | a fazer |
+| T-231 | Tela de Componentes: inventário, equipar no Anima, detalhe (tam. G) | M7 | AG02 | a fazer |
+| T-232 | Upgrade de Componentes com Moeda (lógica e tela) (tam. M) | M7 | AG04 + AG02 | a fazer |
+| T-233 | Resultado e baú mostram os Componentes ganhos (tam. P) | M7 | AG02 | a fazer |
+| T-234 | Balanceamento com Componentes (simulação do bot) (tam. P) | M7 | AG04 | a fazer |
+| T-235 | Validação e fechamento da v0.2.5 (tag) (tam. P) | M7 | AG03 + AG00 | a fazer |
+| T-236 | Mockup da tela de configurações (tam. P) | M8 | AG08 | a fazer |
+| T-237 | Configurações no save: volume de música e efeitos, sons ligados, efeitos reduzidos (sai do `debug.cfg`), idioma (tam. P) | M8 | AG05 + AG07 | a fazer |
+| T-238 | Barramentos de áudio Música e Efeitos ligados ao volume (tam. P) | M8 | AG11 + AG07 | a fazer |
+| T-239 | Tela de configurações (no hangar e na pausa) (tam. M) | M8 | AG02 | a fazer |
+| T-240 | Infra de localização: tradução por chaves em todos os textos, só pt-BR por enquanto (os outros idiomas ficam na T-241, M8); toda tela nova do M3 em diante já nasce com chaves (tam. G) | M3 | AG07 + AG02 | a fazer |
+| T-241 | Tradução para inglês e espanhol, com glossário dos nomes oficiais (tam. M) | M8 | AG02 | a fazer |
+| T-242 | Layout com textos longos (espanhol) e fontes com acentos; teste de corte (tam. P) | M8 | AG02 | a fazer |
+| T-243 | Idioma do navegador como padrão (tam. P) | M8 | AG02 | a fazer |
+| T-244 | Validação e fechamento da v0.2.6 (tag) (tam. P) | M8 | AG03 + AG00 | a fazer |
+| T-245 | Roteiro do onboarding: 4 tutoriais, gatilhos, pular (tam. P) | M9 | AG04 | a fazer |
+| T-246 | Sistema de tutorial: passos em dados, destaque, mão apontando, progresso salvo (tam. G) | M9 | AG02 + AG07 | a fazer |
+| T-247 | Tutorial do início de jogo (1ª partida: ataque automático, upgrades, foco) (tam. M) | M9 | AG02 + AG01 | a fazer |
+| T-248 | Tutoriais de equipar Núcleo, Módulo e Componente (tam. M) | M9 | AG02 | a fazer |
+| T-249 | Arte do tutorial: mão, balões, destaque (tam. P) | M9 | AG08 | a fazer |
+| T-250 | Textos dos tutoriais em português, inglês e espanhol (tam. P) | M9 | AG02 | a fazer |
+| T-251 | Validação com jogador novo e fechamento da v0.2.7 (tag) (tam. P) | M9 | AG03 + AG00 | a fazer |
+| T-252 | Design das 5 fases: tipos de fase, inimigos por fase, curva de dificuldade (tam. M) | M10 | AG12 | a fazer |
+| T-253 | Novos inimigos (3 a 4 arquétipos) (tam. G) | M10 | AG01 | a fazer |
+| T-254 | Arte dos novos inimigos (tam. G) | M10 | AG08 | a fazer |
+| T-255 | Chefe 2 (tam. M) | M10 | AG01 | a fazer |
+| T-256 | Chefe 3 (tam. M) | M10 | AG01 | a fazer |
+| T-257 | Arte dos chefes 2 e 3 (tam. M) | M10 | AG08 | a fazer |
+| T-258 | Cenários das fases 2 a 5 (tam. G) | M10 | AG08 | a fazer |
+| T-259 | Ondas das 5 fases em dados (tam. M) | M10 | AG12 | a fazer |
+| T-260 | Seleção e progressão de fases (mapa, desbloqueio, save) (tam. M) | M10 | AG02 + AG04 + AG05 | a fazer |
+| T-261 | Recompensas durante a partida nas fases novas (revisar a T-222) (tam. P) | M10 | AG04 | a fazer |
+| T-262 | VFX dos novos inimigos e chefes (tam. M) | M10 | AG09 | a fazer |
+| T-263 | Balanceamento das 5 fases (bot e playtest) (tam. M) | M10 | AG12 + AG04 | a fazer |
+| T-264 | Polimento de gráficos, efeitos e gameplay (lista do playtest) (tam. G) | M10 | AG01 + AG02 + AG09 | a fazer |
+| T-265 | Desempenho no iPhone com o conteúdo novo (tam. M) | M10 | AG01 + AG10 | a fazer |
+| T-266 | Validação e fechamento da v0.3.0: tag, branch `beta` e deploy em `beta--projectanimagame.netlify.app` (tam. M) | M10 | AG03 + AG00 + AG10 | a fazer |
+| T-267 | Envio de logs: contrato da API, esquema da tabela (`logs`), limites e ADR (decisão 58) (tam. P) | M1 | AG05 | feita (BRF-087) |
+| T-268 | Netlify Function `POST /api/log` gravando no Neon: validação, limite de tamanho, chave de cliente, limite por IP, limpeza em 30 dias; testes (tam. M) | M1 | AG05 | feita (BRF-087) |
+| T-269 | Botão "Enviar log" no Resultado (só em build de teste): aviso do que é enviado, estados enviando/enviado/falhou, texto por chave de tradução (tam. P) | M1 | AG02 | feita (BRF-088) |
+| T-270 | Deploy do envio: variáveis de ambiente no Netlify, CORS, flag de build de teste, `docs/` com a conta Neon (o dono cria a conta e passa a string de conexão) (tam. P) | M1 | AG10 | feita (BRF-089); falta deploy |
+| T-271 | Validação do envio no PC e no iPhone (log chega na tabela; falha de rede não trava o jogo) (tam. P) | M1 | AG03 | feita (BRF-097, passa; relatório em docs/qa/qa-T-271.md; falta iPhone real e 429) |
+| T-272 | Design da aceleração (x1 e x2): a velocidade não é reduzida sozinha (pausa, hit-stop e Resultado respeitam a escolhida), vale em toda a sessão; definir o escopo da sessão (só a partida ou até fechar o app) e a recompensa por monstros derrotados, não por tempo; deixar o ponto de extensão para travas futuras; registrar em `docs/gameplay.md` (tam. P) | M2 | AG01 | a fazer |
+| T-273 | Controlador de velocidade (`Engine.time_scale`): alterna x1/x2, **mantém** a escolha em pausa, hit-stop (restaura para a escolhida) e Resultado; bot/headless em x1; testes GUT (tam. M) | M2 | AG01 | a fazer |
+| T-274 | Arte do botão de velocidade: estados x1 e x2 (tam. P) | M2 | AG08 | a fazer |
+| T-275 | Botão de velocidade no HUD (toque e tecla no PC via Input Action, sem atrapalhar as skills; mostra a velocidade atual) (tam. M) | M2 | AG02 + AG07 | a fazer |
+| T-276 | Medir o x2 no iPhone com a cena de estresse (T-006/T-118) e registrar o fps (tam. P) | M2 | AG01 + AG10 | a fazer |
+| T-277 | Fundo holográfico na tela de Resultado: preparar a arte do dono (corte retrato 9:16, peso baixo, sem texto ilegível sob os botões) e aplicar no `result_screen`, com painéis e textos legíveis sobre ele (tam. M) | M1 | AG08 + AG02 | feita (BRF-092, BRF-093); falta ver no iPhone |
+| T-278 | Arte do fundo paisagem para PC: preparar as 2 artes do dono (retocar bateria e textos miúdos, peso baixo, 16:9 e telas mais largas/estreitas) (tam. P) | M1 | AG08 | feita (BRF-096); artes guardadas, sem uso |
+| T-279 | ~~Fundo paisagem no shell Web~~ | M1 | — | cancelada (decisão 61; shell revertido) |
+| T-280 | ~~Jogo avisa o shell qual fundo usar~~ | M1 | — | cancelada (decisão 61: um fundo só) |
+| T-281 | Tela inicial: subtítulo vermelho **VERTICAL SLICE** (maiúsculas) entre "ANIMA" e o botão, e remover o link "Último log" (temporário na v0.1.0; tam. P) | M1 | AG02 | feita (BRF-099) |
+| T-282 | **(1ª do M2)** Remover o subtítulo "VERTICAL SLICE" da tela inicial (tam. P) | M2 | AG02 | a fazer |
+| T-283 | **(fim do M2)** Subtítulo vermelho **ALFA** na tela inicial, como o do vertical slice, até o fechamento da v0.2.0 (tam. P) | M2 | AG02 | a fazer |
+| T-284 | Deploy por tag: qualquer tag builda e publica num alias do Netlify + GitHub Release (decisão 62) (tam. M) | M1 | AG10 | feita |
+| T-285 | Versão exibida `v0.1.0` (tela inicial, pausa e log) e `config/version` no `project.godot` (tam. P) | M1 | AG07 | feita |
+| T-286 | Botão "Debug" da pausa só aparece com `?debug` na URL (tam. P) | M1 | AG02 | feita |
 | T-148 | Sinais da Arena para VFX (projectile_fired, projectile_hit, enemy_died, particles_gained, skill_cast, boss_telegraph_started, boss_phase_changed) | M1 | AG01 | feita |
 
 ## Próximas prontas p/ briefing
@@ -158,7 +280,7 @@
   - procedimento de deploy de teste documentado.
 
 ### T-006 — Cena de estresse para confirmar metas
-- **Marco:** M0 · **Dono:** AG02 · **Status:** pronta p/ briefing
+- **Marco:** M0 · **Dono:** AG02 · **Status:** feita no PC; falta medir no iPhone
 - **Depende de:** T-004 (T-005 para medir no iPhone) · **Desbloqueia:** T-007, T-118
 - **Arquivos:** `tests/perf/` (cena isolada, sem lógica de jogo)
 - **Pronto quando:** cena com ~150 sprites móveis e ~300 projéteis em pool roda no build Web; fps medido no PC e no iPhone e registrado.
@@ -221,7 +343,7 @@
 - **Decisão:** fonte Outfit.
 
 ### T-107 — Overlay de debug Web
-- **Marco:** M1 · **Dono:** AG02 · **Status:** pronta p/ briefing
+- **Marco:** M1 · **Dono:** AG02 · **Status:** feita (com gravador de logs e botão Logs, BRF-063)
 - **Depende de:** T-004 · **Desbloqueia:** T-118
 - **Arquivos:** `src/ui/debug/`
 - **Pronto quando:** FPS, contagem de nós e últimos logs visíveis na tela; liga/desliga por Input Action; fora dos builds release ou desligado por padrão.
@@ -294,10 +416,10 @@
   - sem alocação por frame; nível de demo aprovado pelo usuário.
 
 ### T-118 — Desempenho no iPhone
-- **Marco:** M1 · **Dono:** AG01 (medição com AG03) · **Status:** a fazer
+- **Marco:** M1 · **Dono:** AG01 (medição com AG03) · **Status:** pool e modo de estresse feitos; falta medir no iPhone
 - **Depende de:** T-006, T-107, T-116, T-132 · **Desbloqueia:** T-120
 - **Arquivos:** `src/match/`
-- **Pronto quando:** ≥ 50 fps no iPhone com ~150 inimigos e ~300 projéteis (ou a meta revisada em T-007); medições registradas.
+- **Pronto quando:** média ≥ 45 fps no iPhone 11 Pro com 150 inimigos vivos (meta revisada na T-007, aprovada pelo dono em 2026-11-06); medições registradas em `docs/perf.md`.
 - **Proposta (AG01):** pool de inimigos (reutilizar instâncias em vez de instanciar/liberar por spawn).
 
 ### T-119 — Otimização do build Web
@@ -407,7 +529,7 @@
 - **Pronto quando:** o Resultado oferece também "Voltar ao título" (botão secundário), o fluxo muda para a cena de título sem reiniciar o jogo e sem vazar a partida; testes de fluxo.
 
 ### T-156 — Chão sem repetição visível
-- **Marco:** M1 · **Dono:** AG08 + AG01 · **Status:** depende do teste no iPhone
+- **Marco:** M1 · **Dono:** AG08 + AG01 · **Status:** dispensada do M1 (dono, 2026-11-06)
 - **Depende de:** T-158 (se o repetir a cada 240 px incomodar) · **Desbloqueia:** —
 - **Arquivos:** `assets/backgrounds/` (AG08), `src/match/arena/arena_floor.gd` (AG01)
 - **Pronto quando:** as pedrinhas do `floor_tile` deixam de formar padrão visível (tile maior de 8×8 ou pedrinhas espalhadas por código com a semente da arena), sem custo relevante de memória.
@@ -424,7 +546,7 @@
 - **Pronto quando:** testado no iPhone: carregamento (splash em celular, incluindo o corte à direita visto na captura), título, partida, upgrades, meteoro, chefe e Resultado; lista de ajustes entregue ao AG00.
 
 ### T-159 — Ícone do meteoro como padrão no HUD
-- **Marco:** M1 · **Dono:** AG02 · **Status:** pronta p/ briefing
+- **Marco:** M1 · **Dono:** AG02 · **Status:** feita
 - **Depende de:** — · **Desbloqueia:** —
 - **Arquivos:** `src/ui/`
 - **Pronto quando:** o ícone do meteoro vem de uma fonte única (hoje por caminho no HUD, ver `Hud.slot_icon_paths`); o `ui_icon_skill_pulse.png` e o `skill_pulse` provisório deixam de aparecer no jogo e nas demos; o número de recarga continua legível sobre o ícone (que ocupa pouco do quadro de 88 px).
@@ -455,6 +577,133 @@
 - **Depende de:** decisão 41 · **Desbloqueia:** T-163
 - **Arquivos:** `src/ui/`, `docs/ui.md`, `tests/` (da UI)
 - **Pronto quando:** a barra de vida do Anima mostra "ENERGIA x / y" (e qualquer texto ao jogador que diga "Núcleo" para a vida do Anima); identificadores de código inalterados; testes e demos ajustados.
+
+### T-165 — Build no cabeçalho do log
+- **Marco:** M1 · **Dono:** AG07 + AG02 · **Status:** pronta p/ briefing
+- **Pronto quando:** o cabeçalho do log mostra a versão e o commit (SHA curto) do build, injetados no deploy (GitHub Actions) ou lidos de um arquivo gerado; localmente aparece "dev local". Hoje "versão" e "build" saem vazios.
+
+### T-166 — Chefe sem defesa
+- **Marco:** M1 · **Dono:** AG01 · **Status:** feita
+- **Depende de:** decisão 42 · **Pronto quando:** `defense_max = 0` desliga a defesa (código e testes arquivados, documentados em `gameplay.md`); sem barra de defesa sobre o chefe; o meteoro o lança e o atordoa; vida do chefe e dano recalibrados com o bot e com o log real do iPhone.
+
+### T-167 — Passos do chefe
+- **Marco:** M1 · **Dono:** AG01 + AG08 · **Status:** feita
+- **Pronto quando:** o ogro anda com balanço e passos no ritmo da velocidade (e quadros de caminhada do AG08), sombra acompanhando; não "desliza".
+
+### T-168 — Círculo rúnico menor
+- **Marco:** M1 · **Dono:** AG01 · **Status:** feita
+- **Pronto quando:** o selo do chão (`floor_ring`) fica a ~70% do tamanho atual, mais perto do totem do Anima.
+
+### T-169 — Layout da bandeja e centralização
+- **Marco:** M1 · **Dono:** AG02 + AG01 · **Status:** feita
+- **Pronto quando:** a bandeja vai até a borda inferior (sem a faixa de cor de fundo), com pouco espaço sob os Módulos e a safe area respeitada; o Anima fica centralizado entre o topo do HUD e a bandeja; sem alteração de tamanho dos botões.
+
+### T-170 — Logo do estúdio antes da splash
+- **Marco:** M1 · **Dono:** AG02 (arte recortada pelo próprio agente a partir do arquivo do dono) · **Status:** feita
+- **Pronto quando:** `web/shell.html` abre com tela preta e o logo "Anima Games" centralizado por ~1 s (sem atrasar o carregamento do jogo, que começa em paralelo), depois segue a splash atual; logo em `assets/branding/`.
+
+### T-171 — Logo na tela de título
+- **Marco:** M1 · **Dono:** AG02 · **Status:** feita
+- **Pronto quando:** a tela de título mostra o logo horizontal "Anima Games" pequeno, centralizado na parte de baixo (acima da safe area); o crédito "Criado por Marçal Santarem" foi removido.
+
+### T-172 — Canvas até a borda inferior no iPhone
+- **Marco:** M1 · **Dono:** AG02 · **Status:** pronta p/ briefing
+- **Pronto quando:** no iPhone o canvas cobre a tela até a borda inferior (sem faixa de cor atrás), a safe area inferior não é somada duas vezes (a bandeja deixa pouco espaço sob os Módulos) e o cabeçalho do log traz as medidas de viewport para confirmar.
+
+### T-173 — Meteoro acerta mais
+- **Marco:** M1 · **Dono:** AG01 · **Status:** feita
+- **Evidência (log do iPhone, partida de 3:59):** dos 6 meteoros contra a horda, **2 acertaram 0 inimigos** (1:08 e 3:22, alvo perto do Anima, onde os inimigos já morreram antes do impacto) e 1 acertou 1; os outros acertaram 3, 9 e 9.
+- **Pronto quando:** o ponto de impacto é **reavaliado no fim do aviso** (antes da queda) escolhendo o maior grupo no raio; se não houver nenhum inimigo no raio no momento do impacto, o meteoro **não gasta o cooldown** (ou reembolsa a maior parte) ou re-mira para o inimigo mais próximo; teste e bot de simulação confirmando mais acertos por lançamento.
+
+### T-174 — Ícones do app
+- **Marco:** M1 · **Dono:** AG08 · **Status:** pronta p/ briefing
+- **Pronto quando:** `apple-touch-icon` 180×180, ícones 192 e 512 (comum e maskable) e favicon 32/48, com o núcleo-Anima sobre o roxo do jogo, legíveis em tamanho pequeno.
+
+### T-175 — Manifesto e modo app
+- **Marco:** M1 · **Dono:** AG02 · **Status:** pronta p/ briefing
+- **Depende de:** T-174 e T-172 (correção do viewport)
+- **Pronto quando:** `manifest.webmanifest` (nome, `display: standalone`, retrato, cores), meta tags do iOS (`apple-mobile-web-app-capable`, status bar translúcida, título, ícone), arquivos copiados para o site no deploy (o export do Godot não copia arquivos extras de `web/`), sem service worker que cache versões antigas; no iPhone o jogo abre sem a barra do Safari.
+
+### T-179 — Splash e título no estilo tecnológico
+- **Marco:** M1 · **Dono:** AG02 (shell e cena de título) + AG08 (recorte, camadas e elementos de HUD) · **Status:** pronta p/ briefing. Arte limpa: `assets/splash/tech/tech_splash_clean.png`. Referência com texto: `assets/splash/tech/tech_splash_reference_with_text.jpg` (768×1376)
+- **Depende de:** decisão 48; imagem do dono **sem o texto e sem a barra**, em resolução maior (≥ 1080×1920, com sobra em cima e embaixo para telas altas)
+- **Arquivos:** `web/shell.html` (splash, inline/cópia no deploy), `src/ui/screens/title_screen.gd`, `assets/ui/` ou `assets/splash/`, `assets/LICENSES.md`
+- **Pronto quando:** a splash de carregamento usa a arte como fundo (WebP leve, servido pelo deploy), com "PROJECT: ANIMA", a barra e a porcentagem **vivas** (progresso real), cristal com brilho pulsando e linhas de HUD animadas por código; a tela de título usa o mesmo visual, com o botão "Toque para começar" holográfico, o logo do estúdio e a versão; o logo preto do estúdio continua antes; transição suave (fade) do título para a partida cartoon; funciona em 720×1280 a 720×1560 e no modo app do iPhone; licença registrada ("arte do dono gerada no Google Gemini").
+
+### T-180 — Guia "HUD holográfico" dos menus (1ª do M2)
+- **Marco:** M2 (primeira tarefa) · **Dono:** AG08 · **Status:** a fazer (início do M2)
+- **Depende de:** decisões 48 e 49; T-179 (mesma base visual)
+- **Pronto quando:** `docs/arte.md` ganha a seção de menus holográficos (paleta, painéis, botões, molduras por raridade, tipografia, brilhos e animações baratas) e há 2 a 3 mockups em PNG (menu principal, Resultado com recompensa e subida de nível; o hangar fica para o M3), aprovados pelo dono; regras de desempenho no iPhone.
+
+### T-181 — Ícones do app na identidade tecnológica
+- **Marco:** M1 · **Dono:** AG08 (arte) + AG02 (deploy) · **Status:** feita
+- **Depende de:** decisão 48 e T-179 (arte-base `assets/splash/tech/tech_splash_clean.png`); substitui os ícones da T-174
+- **Arquivos:** `assets/app/` (mestre, derivados e gerador), `web/pwa/` (cópia via `web/copy_pwa.sh --sync-icons`), `web/pwa/manifest.webmanifest` (só se mudar cor), `assets/LICENSES.md`
+- **Pronto quando:** ícone 1024 mestre e derivados (`apple-touch-icon` 180, 192, 512, maskable 512 e favicons 16/32/48/ico) com o **cristal holográfico ciano sobre o fundo azul-marinho** da arte do Gemini (recortado da arte ou redesenhado no mesmo estilo), legível a 48 px e no favicon; copiados para o deploy; README e licença atualizados; o dono reinstala o atalho para o iOS reler.
+
+### T-182 — Áudio básico (M2)
+- **Marco:** M2 · **Dono:** AG02 (música, volume, desbloqueio de áudio na web) + AG01 (som do tiro) · **Status:** a fazer
+- **Pronto quando:** uma música toca na entrada (título) em loop e o tiro básico tem um som curto (variação leve de tom, limite de vozes simultâneas para não saturar); áudio só começa após o 1º toque (web/iOS); volume de música e efeitos salvo; sem sons de menu, botões, skills e demais efeitos (ficam para o M16); assets da T-194; assets próprios ou CC0 com licença registrada.
+
+### T-183 — Fechar o M1 como v0.1.0
+- **Marco:** M1 · **Dono:** AG00 (PR e tag) + AG02 (deploy) + AG07 (versão) · **Status:** a fazer (no fechamento do M1, quando o dono pedir)
+- **Pronto quando:** `DEFAULT_VERSION` = `0.1.0`; PR `dev → main` com título/descrição no chat; tag `v0.1.0`; **sem branch** (decisão 55: a primeira branch fechada é a `alfa`, no M2).
+
+### T-184 — Economia do M2
+- **Marco:** M2 · **Dono:** AG04 · **Depende de:** decisões 25 e 40
+- **Pronto quando:** `docs/economia.md` com a curva de XP dos níveis 1 a 15 (slots nos níveis 3, 7 e 12), XP e Moeda por partida (vitória, derrota, onda alcançada, chefe), sem gasto de Moeda no M2 (o 1º gasto é no M4); valores em `data/meta/*.tres`, prontos para o Remote Config.
+
+### T-185 — Save local
+- **Marco:** M2 · **Dono:** AG05 + AG07 · **Depende de:** —
+- **Pronto quando:** autoload `Backend` com interface (carregar, salvar, zerar) e `LocalBackend` em `user://save.json` com campo de versão, migração e cópia de segurança se o arquivo vier corrompido; `PlayerProfile` (nível, XP, Moeda, configurações); persiste no IndexedDB da web após recarregar; ADR em `docs/`; testes GUT.
+
+### T-186 — Lógica pura do meta em `src/meta/`
+- **Marco:** M2 · **Dono:** AG04 · **Depende de:** T-184, T-185
+- **Pronto quando:** funções puras em `src/meta/` (sem cena nem rede): `MatchResult` → XP e Moeda; aplicar XP com várias subidas de nível; slots liberados por nível; testes GUT dos limites.
+
+### T-187 — Fluxo de cenas com menu
+- **Marco:** M2 · **Dono:** AG07 · **Depende de:** T-185, T-186
+- **Pronto quando:** o `SceneFlow` vai do Título ao Menu principal; "Jogar" monta o `MatchConfig` a partir do perfil; ao fim, aplica a recompensa, salva e mostra o Resultado; "Voltar" leva ao Menu; a partida continua sem falar com o backend.
+
+### T-188 — Partida monta os slots pelo nível da conta
+- **Marco:** M2 · **Dono:** AG01 · **Depende de:** T-187
+- **Pronto quando:** `MatchConfig` traz os Módulos liberados; a arena aceita 0 a 3 slots; com 0, só o ataque básico (o 1º Módulo, meteoro, entra no nível 3); testes e simulação do bot atualizados.
+
+### T-189 — Arte do menu holográfico
+- **Marco:** M2 · **Dono:** AG08 · **Depende de:** T-180
+- **Pronto quando:** sprites e 9-slices do menu na identidade holográfica, em `assets/ui/`, leves para o iPhone, com licença.
+
+### T-190 — Tela do menu principal
+- **Marco:** M2 · **Dono:** AG02 · **Depende de:** T-187, T-189, T-162
+- **Pronto quando:** menu em retrato com Jogar em destaque, nível e barra de XP, saldo de Moeda e botão de som; funciona de 720×1280 a 720×1560, toque e mouse.
+
+### T-191 — Resultado com recompensa
+- **Marco:** M2 · **Dono:** AG02 + AG09 · **Depende de:** T-186, T-187
+- **Pronto quando:** o Resultado mostra XP e Moeda ganhos contando, a barra de XP enchendo, a subida de nível com destaque e o aviso "slot liberado"; respeita os efeitos reduzidos.
+
+### T-192 — HUD: slots bloqueados com o nível
+- **Marco:** M2 · **Dono:** AG02 · **Depende de:** T-188
+- **Pronto quando:** slot bloqueado com cadeado e "Nv 3/7/12"; slot vazio não reage ao toque.
+
+### T-193 — Debug do meta
+- **Marco:** M2 · **Dono:** AG02 + AG05 · **Depende de:** T-185
+- **Pronto quando:** no overlay de debug: zerar save, +XP, +Moeda e definir nível; o log da partida registra nível, XP e Moeda antes e depois.
+
+### T-194 — Assets de áudio do M2
+- **Marco:** M2 · **Dono:** AG08 · **Depende de:** —
+- **Pronto quando:** música curta de entrada em loop e 2 a 3 variações de tiro, em `.ogg` leves, com fonte e licença em `assets/LICENSES.md`.
+
+### T-195 — Balanceamento da progressão
+- **Marco:** M2 · **Dono:** AG04 · **Depende de:** T-186, T-188
+- **Pronto quando:** relatório com as partidas necessárias para os níveis 3, 7 e 12 (alvo a definir com o dono); valores ajustados nos `.tres`.
+
+### T-196 — Validação do M2
+- **Marco:** M2 · **Dono:** AG03 · **Depende de:** todas do M2
+- **Pronto quando:** veredito do AG03: ciclo jogar → ganhar → voltar sem erro, save sobrevive a recarregar e fechar no iPhone (Safari e modo app), áudio após o 1º toque, testes passando.
+
+### T-197 — Fechar o M2 como v0.2.0
+- **Marco:** M2 · **Dono:** AG00 + AG02 + AG07 · **Depende de:** T-196 e aval do dono
+- **Pronto quando:** `DEFAULT_VERSION` = `0.2.0`; PR `dev → main` com título e texto no chat; tag `v0.2.0`; branch `alfa` criada da tag; o workflow publica a `alfa` em `alfa--projectanimagame.netlify.app`; nada mais é commitado nela.
 
 ### T-148 — Sinais da Arena para VFX
 - **Marco:** M1 · **Dono:** AG01 · **Status:** feita
@@ -579,19 +828,11 @@
 
 - **Voltar ao título a partir do Resultado:** hoje "Jogar de novo" vai direto para a partida. Exigiria um sinal novo no ResultScreen (AG02). Decisão do usuário via AG00.
 
-## Depois (M2+; só T-109 e T-110 já têm task)
+## Depois (M3+)
 
-- **M2:**
-  - nível de conta (XP das partidas);
-  - desbloqueio dos slots: slot 1 no nível 3, slot 2 no nível 7, slot 3 no nível 12 (ajustáveis; decisão #25 revisada);
-  - skills de controle e defesa (T-109, T-110);
-  - **Gold** (moeda do meta-jogo, decisão #29): calculado a partir do `MatchResult`, com ganho variável por partida;
-  - módulos: equipamentos do Anima, melhorados com Gold, com raridade;
-  - fusão de módulos 3→1;
-  - **árvore de talentos comprada com Gold** (decisão #30);
-  - save local.
-- **[A definir] para o M2:** evolução das skills; atributos dos módulos; prêmios por nível de conta além dos slots.
-- **M3:** escolha do backend, conta guest, sincronização, economia no servidor, Remote Config.
-- **M4:** ads, loja, skins, áudio final, lojas nativas, mais fases, localização.
+- **Envio de logs no M1** (2026-11-06, decisão 58): T-267 a T-271.
+- **M2 quebrado** (2026-11-05): T-162, T-163, T-180, T-182 e T-184 a T-197. **Aceleração do jogo** (2026-11-06, decisão 59): T-272 a T-276.
+- **M3 a M7 quebrados** (2026-11-05, estimativa; o detalhe "pronto quando" é escrito no briefing): M3 T-198 a T-202 e T-240 · M4 T-203 a T-210 · M5 T-109, T-110, T-211 a T-220 · M6 T-221 a T-225 · M7 T-226 a T-235 · M8 T-236 a T-244 (sem a T-240) · M9 T-245 a T-251 · M10 T-252 a T-266. Tamanho: P = até 1 sessão de agente, M = 1 a 2, G = 3 ou mais.
+- **Roadmap:** marcos e versões em [docs/roadmap.md](roadmap.md) (decisão 53). Tarefas do M3 em diante são quebradas quando o marco começar.
 
 - **Decisão 37 (meteoro de fogo):** T-139 (AG01) implementa o meteoro com raio de explosão e dano em dados, preparados para upgrades; o ícone (T-128, AG08) e o VFX (T-131, AG09) seguem o meteoro de fogo.

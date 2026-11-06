@@ -3,6 +3,8 @@ extends Area2D
 ## Inimigo genérico guiado por EnemyData: avança até o centro; com attack_range > 0, para e atira.
 
 signal died(enemy: Enemy, cause: DeathCause)
+## Dano na vida (antes de `died`). by_skill = meteoro/skill de área (números de dano, T-117).
+signal damaged(enemy: Enemy, amount: int, by_skill: bool)
 
 enum State { SPAWN, ADVANCE, ATTACK, DEAD }
 enum DeathCause { KILLED, CONTACT }
@@ -10,6 +12,11 @@ enum DeathCause { KILLED, CONTACT }
 @export var data: EnemyData
 ## Pool de projéteis inimigos (só para quem atira); definido pela arena.
 var projectile_pool: ProjectilePool
+## Pool de inimigos (T-118). Nulo (chefe, testes soltos) = morrer dá queue_free.
+var pool: EnemyPool
+
+## Ponto de estacionamento do inimigo morto reaproveitável (fora de qualquer arena).
+const PARKED_POSITION := Vector2(-100000.0, -100000.0)
 
 var state: State = State.SPAWN
 var hp: int
@@ -19,6 +26,15 @@ var _fire_timer := 0.0
 var _ring: Sprite2D
 var health_bar: HealthBar
 var _body: Sprite2D
+var _shadow: GroundShadow
+## Passos procedurais; nulo quando data.walk_bob = 0.
+var walk: WalkAnimator
+## true durante take_skill_damage (o dano vem de skill).
+var _skill_hit := false
+## Flash branco ao levar dano (T-117); a Arena define a partir do GameFeelData. 0 = desligado.
+var hit_flash_time := 0.07
+var hit_flash_color := Color(3.0, 3.0, 3.0)
+var _flash_left := 0.0
 
 @onready var _hitbox: CollisionShape2D = $Hitbox
 
@@ -36,19 +52,28 @@ func _ready() -> void:
 	shape.radius = data.radius
 	_hitbox.shape = shape
 	_hitbox.scale = GroundPlane.SHAPE_SCALE # círculo no chão
-	add_child(GroundShadow.new(data.radius))
+	_shadow = GroundShadow.new(data.radius)
+	add_child(_shadow)
 	hp = data.hp
 	state = State.ADVANCE
 	_build_art()
+	var w := WalkAnimator.new(_body, _shadow, data)
+	if w.enabled():
+		walk = w
 
 
 func _physics_process(delta: float) -> void:
 	match state:
 		State.ADVANCE:
+			var before := position
 			position = step_towards(position, target_position, data.speed, delta)
+			if walk:
+				walk.step(GroundPlane.distance(before, position))
 			if is_shooter() and GroundPlane.distance(position, target_position) <= data.attack_range:
 				state = State.ATTACK
 				_fire_timer = 1.0 / data.fire_rate
+				if walk:
+					walk.rest()
 		State.ATTACK:
 			_fire_timer -= delta
 			if _fire_timer <= 0.0:
@@ -80,15 +105,20 @@ func take_damage(amount: int) -> void:
 	if state == State.DEAD or amount <= 0:
 		return
 	hp -= amount
+	damaged.emit(self, amount, _skill_hit)
+	flash()
 	if health_bar:
 		health_bar.set_ratio(float(hp) / data.hp)
+		health_bar.visible = hp < data.hp ## só aparece depois do primeiro dano (menos draw calls)
 	if hp <= 0:
 		die(DeathCause.KILLED)
 
 
 ## Dano de skill de área (meteoro). Igual ao dano comum; o chefe trata à parte (lançamento).
 func take_skill_damage(amount: int) -> void:
+	_skill_hit = true
 	take_damage(amount)
+	_skill_hit = false
 
 
 func die(cause: DeathCause) -> void:
@@ -97,7 +127,39 @@ func die(cause: DeathCause) -> void:
 	state = State.DEAD
 	set_deferred("monitorable", false)
 	died.emit(self, cause)
-	queue_free()
+	if pool == null:
+		queue_free()
+		return
+	park()
+	pool.release(self)
+
+
+## Estaciona o inimigo (morto, reaproveitável): invisível, sem processamento, fora da arena.
+func park() -> void:
+	visible = false
+	set_physics_process(false)
+	set_process(false)
+	position = PARKED_POSITION
+
+
+## Reaproveita a instância como um inimigo novo do mesmo tipo (estado de spawn limpo).
+func recycle(spawn_position: Vector2, target: Vector2) -> void:
+	setup(data, spawn_position, target)
+	state = State.ADVANCE
+	_fire_timer = 0.0
+	_skill_hit = false
+	_flash_left = 0.0
+	if _body:
+		_body.self_modulate = Color.WHITE
+	if health_bar:
+		health_bar.set_ratio(1.0)
+		health_bar.visible = false
+	if walk:
+		walk.rest()
+	visible = true
+	set_physics_process(true)
+	set_process(_spins())
+	set_deferred("monitorable", true)
 
 
 ## Âncora na base: o sprite fica em pé sobre o ponto de contato. Anel opcional (chefe) atrás do corpo.
@@ -111,8 +173,9 @@ func _build_art() -> void:
 	if data.show_health_bar:
 		health_bar = HealthBar.new()
 		health_bar.configure(data.radius, sprite_top())
+		health_bar.visible = false # vida cheia: sem desenhar até o primeiro dano
 		add_child(health_bar)
-	set_process(_ring != null and data.ring_spin_speed != 0.0)
+	set_process(_spins())
 
 
 ## px (1x) do topo do sprite acima da âncora (sem sprite: o diâmetro).
@@ -122,5 +185,29 @@ func sprite_top() -> float:
 	return data.sprite_anchor.y * SpriteArt.SCALE.y
 
 
+func _spins() -> bool:
+	return _ring != null and data.ring_spin_speed != 0.0
+
+
+## Flash de acerto: corpo em hit_flash_color por hit_flash_time s (sem alocar).
+func flash() -> void:
+	if hit_flash_time <= 0.0 or _body == null or state == State.DEAD:
+		return
+	_flash_left = hit_flash_time
+	_body.self_modulate = hit_flash_color
+	set_process(true)
+
+
+func is_flashing() -> bool:
+	return _flash_left > 0.0
+
+
 func _process(delta: float) -> void:
-	_ring.rotation += data.ring_spin_speed * delta
+	if _spins():
+		_ring.rotation += data.ring_spin_speed * delta
+	if _flash_left > 0.0:
+		_flash_left -= delta
+		if _flash_left <= 0.0:
+			_flash_left = 0.0
+			_body.self_modulate = Color.WHITE
+			set_process(_spins())

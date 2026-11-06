@@ -26,6 +26,9 @@ enum Delivery { INSTANT, METEOR }
 @export var fall_time: float = 0.35 ## s finais do telegraph em que o meteoro cai (<= telegraph_time)
 @export var fall_height: float = 360.0 ## px de tela acima do alvo onde a queda começa
 @export var crater_time: float = 0.5 ## s que a cratera/anel de impacto fica visível
+## Meteoro anulado (sem inimigo no raio ao reavaliar o alvo no início da queda): o cooldown restante
+## cai para esta fração do total (0 = reembolso total).
+@export var fizzle_cooldown_ratio: float = 0.2
 ## Texturas opcionais (PNG 2x, escala 0,5, âncora em px do PNG). Nulas = desenho provisório por código.
 @export var meteor_texture: Texture2D
 @export var meteor_anchor: Vector2

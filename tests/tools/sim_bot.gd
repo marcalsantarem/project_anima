@@ -22,6 +22,10 @@ var result: MatchResult
 var match_ended_count := 0
 ## Dano bruto no Núcleo por origem (id do arquétipo por contato; &"bolt_hits" = nº de tiros que acertaram).
 var damage_by_source := {}
+## Meteoros contra a horda (sem chefe vivo): lançados, com 0 acertos e anulados (skill_fizzled).
+var horde_casts := 0
+var horde_zero_hits := 0
+var fizzles := 0
 
 var _next := 0
 
@@ -32,6 +36,9 @@ func attach(p_arena: Arena) -> void:
 	arena.particles_gained.connect(func(_at: Vector2, amount: int) -> void: particles_earned += amount)
 	arena.enemy_died.connect(_on_enemy_died)
 	arena.projectile_hit.connect(_on_projectile_hit)
+	arena.skill_cast.connect(_on_skill_cast)
+	if arena.has_signal(&"skill_fizzled"):
+		arena.connect(&"skill_fizzled", func(_slot: int, _at: Vector2) -> void: fizzles += 1)
 	arena.match_ended.connect(func(r: MatchResult) -> void:
 		result = r
 		match_ended_count += 1)
@@ -65,6 +72,17 @@ func _on_boss_spawned(_id: StringName) -> void:
 	reached_boss = true
 	boss_at = arena.elapsed
 	boss_core_pct = float(arena.anima.core.current) / arena.anima.core.max_hp
+
+
+func _on_skill_cast(slot: int, _at: Vector2, _radius: float) -> void:
+	if reached_boss:
+		return
+	var b := arena.skills.get_behavior(slot) as AreaSkill
+	if b == null:
+		return
+	horde_casts += 1
+	if b.last_hits == 0:
+		horde_zero_hits += 1
 
 
 func _on_enemy_died(_at: Vector2, archetype_id: StringName, cause: int) -> void:

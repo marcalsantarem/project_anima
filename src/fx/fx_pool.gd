@@ -17,9 +17,24 @@ const DEFAULT_TYPES := {
 	&"fx_skill_cast": [preload("res://src/fx/fx_skill_cast.tscn"), 2],
 	&"fx_telegraph": [preload("res://src/fx/fx_telegraph.tscn"), 6],
 	&"fx_core_pulse": [preload("res://src/fx/fx_core_pulse.tscn"), 3],
+	# T-131: meteoro e chefe (poucos ao mesmo tempo)
+	&"fx_meteor_explosion": [preload("res://src/fx/fx_meteor_explosion.tscn"), 2],
+	&"fx_meteor_trail": [preload("res://src/fx/fx_meteor_trail.tscn"), 2],
+	&"fx_crater_smoke": [preload("res://src/fx/fx_crater_smoke.tscn"), 2],
+	&"fx_fizzle": [preload("res://src/fx/fx_fizzle.tscn"), 2],
+	&"fx_boss_windup": [preload("res://src/fx/fx_boss_windup.tscn"), 1],
+	&"fx_boss_slam": [preload("res://src/fx/fx_boss_slam.tscn"), 2],
+	&"fx_boss_wave": [preload("res://src/fx/fx_boss_wave.tscn"), 2],
+	&"fx_boss_launch": [preload("res://src/fx/fx_boss_launch.tscn"), 1],
+	&"fx_boss_land": [preload("res://src/fx/fx_boss_land.tscn"), 1],
+	&"fx_boss_stun": [preload("res://src/fx/fx_boss_stun.tscn"), 1],
+	# T-117: Módulo pronto / usado (no Anima)
+	&"fx_module_ready": [preload("res://src/fx/fx_module_ready.tscn"), 2],
+	&"fx_module_used": [preload("res://src/fx/fx_module_used.tscn"), 2],
 }
 
-## Modo de efeitos reduzidos (T-132): metade das gotas e sem flash.
+## Modo de efeitos reduzidos (T-132): metade das gotas, sem flash, sem brasas/fumaça na explosão.
+## O que não toca no reduzido (rastros, fumaça, brilhos) é decidido no FxDirector.
 var reduced_effects := false
 
 var _pools := {} # StringName → Array[FxEffect]

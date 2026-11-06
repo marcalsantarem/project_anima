@@ -1,12 +1,14 @@
 class_name ArenaFloor
 extends Node2D
 ## Fundo da arena em tela cheia (BRF-040/041): chão repetido cobrindo a tela, selo rúnico no
-## Anima, degradê no topo e 4 pilares nos cantos da arena_rect (Y-sort com as entidades).
+## Anima, degradê no topo e 4 pilares nos cantos da área livre (Y-sort com as entidades).
 ## Peças do AG08 em assets/backgrounds/ (PNG 2x, âncoras no README de assets/sprites/).
 ## Os nós são criados uma vez; layout() só reposiciona (chamado quando o viewport muda).
 
 const FLOOR_Z_INDEX := -10 ## atrás de tudo (sombras e decalques usam z -1)
 const PILLAR_SHADOW_RADIUS := 26.0 ## sombra ~60 px de largura (1x)
+## Escala do selo rúnico no nó (decisão 43: ~70% do tamanho anterior, que era SpriteArt.SCALE 0,5).
+const RING_SCALE := 0.35
 
 @export var tile_texture: Texture2D
 @export var ring_texture: Texture2D
@@ -14,10 +16,10 @@ const PILLAR_SHADOW_RADIUS := 26.0 ## sombra ~60 px de largura (1x)
 @export var pillar_texture: Texture2D
 @export var pillar_anchor: Vector2 = Vector2(64.0, 192.0)
 @export var top_shade_texture: Texture2D ## opcional (nulo = sem degradê)
-## Distância dos pilares às bordas da arena_rect (x: laterais; y: topo e base), em px 1x.
-## O topo fica abaixo do HUD de cima.
+## Distância dos pilares às bordas da área livre (x: laterais; y: topo e base), em px 1x.
+## A área livre começa abaixo do HUD de cima (Arena.free_rect).
 @export var pillar_inset_x: float = 56.0
-@export var pillar_inset_top: float = 260.0
+@export var pillar_inset_top: float = 96.0
 @export var pillar_inset_bottom: float = 24.0
 
 var _tile: Sprite2D
@@ -37,6 +39,7 @@ func _ready() -> void:
 	_shade.z_index = FLOOR_Z_INDEX
 	add_child(_shade)
 	_ring = SpriteArt.make(ring_texture, ring_anchor)
+	_ring.scale = Vector2(RING_SCALE, RING_SCALE)
 	_ring.z_index = FLOOR_Z_INDEX
 	add_child(_ring)
 	for i in 4:
@@ -47,7 +50,8 @@ func _ready() -> void:
 		_pillars.append(p)
 
 
-## screen: tamanho do viewport; arena: região jogável; center: posição do Anima.
+## screen: tamanho do viewport; arena: área livre entre o HUD de cima e a bandeja (pilares);
+## center: posição do Anima (selo).
 func layout(screen: Vector2, arena: Rect2, center: Vector2) -> void:
 	# Região em px do PNG (2x): o tile repete até cobrir a tela inteira.
 	_tile.region_rect = Rect2(Vector2.ZERO, screen / SpriteArt.SCALE)

@@ -9,10 +9,10 @@
 [![Godot 4](https://img.shields.io/badge/Godot-4.x-478CBF?logo=godotengine&logoColor=white)](https://godotengine.org)
 [![GDScript](https://img.shields.io/badge/GDScript-100%25-7B5CE0)](https://docs.godotengine.org/en/stable/tutorials/scripting/gdscript/)
 [![Plataforma](https://img.shields.io/badge/Plataforma-Web%20%7C%20iPhone-2FE6D2)](#-como-jogar)
-[![Testes](https://img.shields.io/badge/testes%20GUT-164%20passando-3FD27F)](#-testes)
-[![Fase](https://img.shields.io/badge/fase-demo%20M1-FFC93D)](docs/marcos.md)
+[![Testes](https://img.shields.io/badge/testes%20GUT-279%20passando-3FD27F)](#-testes)
+[![Fase](https://img.shields.io/badge/vers%C3%A3o-0.1.0%20Vertical%20slice-FFC93D)](docs/marcos.md)
 
-[**▶ Jogar a demo**](https://projectanimagame.netlify.app) · [Versão de desenvolvimento](https://dev--projectanimagame.netlify.app) · [Bíblia do projeto](docs/00_biblia_projeto.md)
+[**▶ Jogar a demo**](https://projectanimagame.netlify.app) · [Versão de desenvolvimento](https://dev--projectanimagame.netlify.app) · [Bíblia do projeto](docs/00_biblia_projeto.md) · [Roadmap](docs/roadmap.md)
 
 </div>
 
@@ -31,8 +31,8 @@ Você é o **Anima**, um cristal flutuando sobre um pedestal, **parado no centro
 ### Como funciona uma partida
 
 - **10 ondas** de dificuldade crescente, com um novo tipo de inimigo a cada duas ondas, e o **chefe** na última. Uma partida dura de 3 a 10 minutos (~4 min jogando bem).
-- O **ataque básico é automático** e mira no inimigo mais próximo.
-- O **Módulo** é o seu poder ativo, com cooldown: o **meteoro de fogo** cai na maior concentração de inimigos e explode em área. Os outros dois slots abrem conforme o nível da conta (nos níveis 7 e 12).
+- O **ataque básico é automático** e mira no inimigo mais próximo. **Toque num inimigo** para o Anima focar nele.
+- O **Módulo** é o seu poder ativo, com cooldown: o **meteoro de fogo** cai na maior concentração de inimigos e explode em área. Para escolher o ponto, **arraste a partir do botão** do Módulo e solte onde quiser. Os outros dois slots abrem conforme o nível da conta (nos níveis 7 e 12).
 - Cada inimigo morto dá **Partículas** (a moeda da partida). Elas pagam **5 upgrades em tempo real**, sem pausar o jogo: **Atk power, Atk spd, Defesa, Vida máxima e Cooldown**. Os upgrades valem só para a partida.
 - A partida acaba se a **Energia** do Anima chegar a zero, ou quando você derrota o chefe.
 
@@ -44,7 +44,7 @@ Você é o **Anima**, um cristal flutuando sobre um pedestal, **parado no centro
 | **Enxame** | muitos, pequenos e em grupo |
 | **Tanque** | lento e resistente, com a vida contada na barrinha sobre ele |
 | **Atirador** | fica longe e atira no Anima |
-| **Chefe ogro** | grande, só ataca de perto e tem uma barra de **defesa** (veja abaixo) |
+| **Chefe ogro** | grande e pesado, só ataca de perto (veja abaixo) |
 
 Todo inimigo comum tem uma **barra de vida** pequena sobre ele: **verde**, **amarela** abaixo de 60% e **vermelha** com 30% ou menos.
 
@@ -54,7 +54,7 @@ Todo inimigo comum tem uma **barra de vida** pequena sobre ele: **verde**, **ama
 <img src="docs/img/chefe-ogro.png" alt="Chefe ogro: pose normal, golpe e atordoado" width="560">
 </div>
 
-O ogro tem uma **barra de defesa** que funciona como escudo na frente da vida. Enquanto ela existir, os tiros só tiram defesa. Quando ela se esgota, ele é **lançado para trás, em direção à borda do mapa**, fica atordoado e só então a vida sofre dano. O **meteoro lança o ogro na hora**. A vida dele aparece numa barra vermelha grande no topo da tela, com o rótulo **"Boss"**.
+O ogro avança a passos pesados e golpeia o Anima de perto. O **meteoro o lança para trás** (sem sair do alcance do Anima) e o deixa **atordoado por 2 segundos**: é a janela para causar dano sem apanhar. A vida dele aparece numa barra vermelha grande no topo da tela, com o rótulo **"Boss"**.
 
 ---
 
@@ -72,25 +72,29 @@ O guia completo de arte está em [`docs/arte.md`](docs/arte.md), e os efeitos vi
 
 ## 🧭 O que vem por aí
 
-| Marco | O que traz | Situação |
-|---|---|---|
-| **M1: Demo do combate** | 1 fase completa, visualmente polida, pronta para divulgar | em fechamento |
-| **M2: Meta-jogo local** | nível de conta, mais Módulos, **Fragmentos** (equipamentos com fusão 3→1), save local | planejado |
-| **M3: Backend** | conta, sincronização e economia validada no servidor | planejado |
-| **M4: Monetização e lançamento** | rewarded ads, skins, loja e builds nativos | planejado |
+Cada marco vira uma versão com tag. O roadmap completo, com o que entra em cada uma, está em [`docs/roadmap.md`](docs/roadmap.md) (é uma visão, não um compromisso).
 
-**Vocabulário do jogo:** **Partículas** (moeda da partida, estrela verde), **Moeda** (moeda do meta-jogo, dourada), **Módulos** (os poderes ativos), **Fragmentos** (os equipamentos, 6 espaços) e **Núcleos** (os talentos). Os três últimos chegam no M2 em diante. Detalhes na [Bíblia do projeto](docs/00_biblia_projeto.md).
+| Marco | Versão | O que traz | Situação |
+|---|---|---|---|
+| **M1** | v0.1.0 Vertical slice | 1 fase completa e polida, chefe, meteoro, upgrades em tempo real | em fechamento |
+| **M2** | v0.2.0 **Versão Alfa** | menu holográfico, nível de conta, Moeda e XP, save local, música e som do tiro | planejado |
+| **M3–M9** | v0.2.1 a v0.2.7 | Hangar e localização, Núcleos, Módulos, recompensas na partida, Componentes, configurações e idiomas, tutoriais | planejado |
+| **M10** | v0.3.0 **Versão Beta** | 5 fases, novos inimigos, 2 chefes novos (demo pública) | planejado |
+| **M11–M19** | v0.3.1 a v0.8.0 | desktop, skins, expansões, áudio completo, fase infinita, backend e perfil | planejado |
+| — | até v1.0.0 | lojas mobile, monetização e lançamento | a definir |
+
+**Vocabulário do jogo:** **Partículas** (moeda da partida, estrela verde), **Moeda** (moeda do meta-jogo, dourada), **Módulos** (os poderes ativos), **Núcleos** (os talentos), **Componentes** (os equipamentos) e **Fragmentos de Módulo** (para evoluir Módulos). A Moeda chega no M2; os demais, do M4 em diante. Detalhes na [Bíblia do projeto](docs/00_biblia_projeto.md).
 
 ---
 
 ## 🎮 Como jogar
 
-Abra a [demo no navegador](https://projectanimagame.netlify.app). Funciona no PC e no celular, **de preferência em retrato**.
+Abra a [demo no navegador](https://projectanimagame.netlify.app). Funciona no PC e no celular, **de preferência em retrato**. No iPhone, use **Compartilhar → Adicionar à Tela de Início** para jogar em tela cheia, como um app.
 
 | Plataforma | Controles |
 |---|---|
-| **Celular** | toque nos botões de Módulo e de upgrade |
-| **PC** | clique, ou as teclas `1` `2` `3` para os Módulos; `Tab`, setas e `Enter` nos upgrades; `Esc` pausa |
+| **Celular** | toque nos botões de Módulo e de upgrade; toque num inimigo para focar; arraste do botão do Módulo para mirar |
+| **PC** | clique, ou as teclas `1` `2` `3` para os Módulos (segure `1` e clique para mirar); clique num inimigo para focar; `Tab`, setas e `Enter` nos upgrades; `Esc` pausa |
 
 ---
 
@@ -102,7 +106,7 @@ Abra a [demo no navegador](https://projectanimagame.netlify.app). Funciona no PC
 | Linguagem | **GDScript** (C# não exporta para a web) |
 | Exportação | **Web, single-threaded**, sem SharedArrayBuffer; roda em qualquer hospedagem estática |
 | Testes | **GUT** |
-| Deploy | GitHub Actions → Netlify (`dev` publica a versão de teste; `main`, a oficial) |
+| Deploy | GitHub Actions → Netlify (`dev` publica a versão de teste; `main`, a oficial; versões fechadas como `alfa` e `beta` ganham link próprio) |
 
 ```bash
 # Abrir o editor
@@ -112,7 +116,7 @@ godot --editor --path .
 godot --headless --path . -s addons/gut/gut_cmdln.gd -gexit
 
 # Exportar para Web
-godot --headless --path . --export-release "Web" build/web/index.html
+godot --headless --path . --export-release "Web" build/web/index.html && bash web/copy_pwa.sh build/web
 ```
 
 > `godot` é o executável da versão 4.7.2, que não está no PATH nesta máquina. O guia de instalação está em [`docs/setup.md`](docs/setup.md).
@@ -125,9 +129,10 @@ src/
   match/      arena, Anima, inimigos, chefe, ondas, Módulos e upgrades
   fx/         efeitos visuais com pool (só reagem a sinais)
   ui/         HUD, telas, tema e componentes
+  debug/      overlay (?debug=1), gravador e visualizador de logs, versão e build
 data/         dados em Resources (.tres): inimigos, ondas, upgrades, Módulos
 assets/       sprites, interface, fundos e fontes (com licenças registradas)
-web/          shell HTML da exportação (splash e erro)
+web/          shell HTML (splash, tela cheia no iPhone), manifesto e ícones do app
 tests/        testes GUT e ferramentas de simulação
 docs/         Bíblia, GDD, decisões, backlog, guias de arte, UI e VFX
 ```
@@ -140,7 +145,7 @@ As regras de dependência entre as pastas estão em [`docs/estrutura.md`](docs/e
 
 ### 🧪 Testes
 
-São **164 testes GUT** (unidade e integração) cobrindo ondas, dano, cooldowns, upgrades, chefe, barras de vida, efeitos, HUD e o fluxo de telas. Há também um **bot de simulação** que joga a fase inteira de forma acelerada para medir o balanceamento (hoje: chega ao chefe em 100% das partidas e vence em ~60%):
+São **279 testes GUT** (unidade e integração) cobrindo ondas, dano, cooldowns, upgrades, chefe, mira e foco, barras de vida, efeitos, HUD, logs e o fluxo de telas. Há também um **bot de simulação** que joga a fase inteira de forma acelerada para medir o balanceamento (hoje: vence 100% das partidas, terminando com ~40% da Energia):
 
 ```bash
 godot --headless --path . --fixed-fps 60 -s tests/tools/run_sim.gd -- --seeds=20
@@ -155,7 +160,7 @@ godot --headless --path . --fixed-fps 60 -s tests/tools/run_sim.gd -- --seeds=20
 | [`docs/00_biblia_projeto.md`](docs/00_biblia_projeto.md) | pitch, escopo, roadmap, glossário e time. **Comece por aqui** |
 | [`docs/gdd.md`](docs/gdd.md) | GDD original |
 | [`docs/decisoes.md`](docs/decisoes.md) | registro de decisões |
-| [`docs/marcos.md`](docs/marcos.md) · [`docs/backlog.md`](docs/backlog.md) | marcos e tarefas |
+| [`docs/roadmap.md`](docs/roadmap.md) · [`docs/marcos.md`](docs/marcos.md) · [`docs/backlog.md`](docs/backlog.md) | versões, marcos e tarefas |
 | [`docs/gameplay.md`](docs/gameplay.md) · [`docs/meta.md`](docs/meta.md) | regras e números da partida e dos upgrades |
 | [`docs/ui.md`](docs/ui.md) · [`docs/arte.md`](docs/arte.md) · [`docs/vfx.md`](docs/vfx.md) | interface, arte e efeitos |
 | [`docs/arquitetura.md`](docs/arquitetura.md) · [`docs/estrutura.md`](docs/estrutura.md) | arquitetura e pastas |
@@ -165,7 +170,7 @@ godot --headless --path . --fixed-fps 60 -s tests/tools/run_sim.gd -- --seeds=20
 
 ## 🤝 Como o projeto é feito
 
-O Project: Anima é desenvolvido por uma **equipe de agentes de IA coordenados por um líder de projeto**, sob a direção do dono do projeto: gameplay, UI/web, arte, VFX, meta-jogo, arquitetura e QA. O fluxo de trabalho e os papéis estão na [Bíblia](docs/00_biblia_projeto.md) e em [`docs/agentes/`](docs/agentes/).
+O Project: Anima é desenvolvido por uma **equipe de agentes de IA coordenados por um líder de projeto**, sob a direção do dono do projeto: gameplay, UI, plataforma web, arte, VFX, áudio, conteúdo de fases, meta-jogo, backend, arquitetura e QA. O fluxo de trabalho e os papéis estão na [Bíblia](docs/00_biblia_projeto.md) e em [`docs/agentes/`](docs/agentes/).
 
 - Todo o desenvolvimento acontece na branch **`dev`**; a **`main`** é protegida e só recebe mudanças por **Pull Request**.
 - Documentação, commits e conversa em **português (pt-BR)**; identificadores de código em inglês.

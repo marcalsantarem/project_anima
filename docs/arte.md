@@ -70,7 +70,7 @@ Pedestal cilíndrico neutro (`vessel`) com aro ciano + **cristal losango ciano f
 | **Tanque** | cúpula grande carmim, chifres, placa frontal, pezinhos, barra de HP | pesado, blindado | 28 | ~72 | ~95 | 128×128 |
 | **Atirador** | gota magenta pontuda com garras laterais e **orbe** acima | angular; o orbe anuncia o tiro | 18 | ~48 | ~90 | 128×128 |
 | **Enxame** | bolinha violeta de um olho com asinhas, em bando | pequeno, numeroso | 10 | ~23 | ~37 | 64×64 |
-| **Chefe** | **ogro** barrigudo, pele oliva quente, cabeça pequena, presas, colete e clava curta (decisão 39, BRF-057: `boss_ogre*`, poses parado/wind-up/atordoado; substitui a massa violeta com anel) | domina a tela; só corpo a corpo, sem anel | [A definir] | ~145 | ~200 | 256×256 |
+| **Chefe** | **ogro** barrigudo, pele oliva quente, cabeça pequena, presas, colete e clava curta (decisão 39, BRF-057: `boss_ogre*`, poses parado/wind-up/atordoado e caminhada em 4 quadros `boss_ogre_walk_1..4` (BRF-065); substitui a massa violeta com anel) | domina a tela; só corpo a corpo, sem anel | [A definir] | ~145 | ~200 | 256×256 |
 | Projétil do jogador | cápsula ciano com núcleo branco e rastro | lado "amigo" | 6 | — | 26×14 | 32×16 |
 | Projétil inimigo | losango magenta com núcleo rosado e halo | lê como ameaça | [AG01] | — | 26×18 | 32×32 |
 | Partícula (moeda) | estrela de 4 pontas **verde "chip"** (decisão 40, BRF-061: `ui_icon_particles.png`, paleta no `assets/ui/README.md`); o `pickup_particle` dourado ainda não foi trocado | não confundir com projétil | — | ~16 | 22 | 32×32 |
@@ -154,6 +154,12 @@ Pedestal cilíndrico neutro (`vessel`) com aro ciano + **cristal losango ciano f
 
 ### 9.3 Splash de carregamento (BRF-052, proposta)
 Em `assets/splash/` (com `.gdignore`; fica fora do `.pck`): `splash_a.png` (chão creme + selo + pilares, logotipo no topo) e `splash_b.png` (roxo da UI + selo suave, núcleo sobre disco de xadrez, logotipo abaixo). Para o shell: fundo em SVG/CSS (`splash_bg_a.svg` 1,7 KB, `splash_bg_b.svg` 3,2 KB; esticam de 1280 a 1560 px) e só o `splash_logo_core.webp` (22 KB, alfa) como imagem; brilho do cristal e sombra em CSS. Barra: pílula `#5B4A7A` com contorno `#3A2A55` e preenchimento dourado (sem ciano). Gerar: `python assets/splash/_src/gen_splash.py`.
+
+### 9.4 Ícones do app (BRF-071)
+Em `assets/app/` (com `.gdignore`): núcleo-Anima sobre o degradê roxo da splash B, selo rúnico discreto, sem texto nem transparência; mestre 1024, apple-touch 180, PWA 192/512 + maskable (zona segura 80%) e favicons 32/48/ICO (variante sem selo, núcleo maior). Ver `assets/app/README.md`.
+
+### 9.5 Pílulas do topo, botão secundário e texto das pílulas (BRF-073)
+Todas as peças da UI agora têm arte 9-patch em `assets/ui/` (`ui_pill_wave`, `ui_pill_particles`, `ui_button_secondary*`). Regra: a arte de pílulas e botões **não leva texto**; a UI desenha com a fonte do tema (ex.: "MAX" branco com contorno `ink`). Margens em `assets/ui/README.md`.
 
 ## 10. Pendências
 

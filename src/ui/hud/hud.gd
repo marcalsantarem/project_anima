@@ -7,19 +7,27 @@ extends CanvasLayer
 
 ## Pedido de pausa (botão). O botão também injeta a action `pause`; a tela de pausa (T-113) ouve um dos dois.
 signal pause_requested
+## Toque num botão do HUD, para o gravador de debug (docs/debug.md): `skill_N`, id do upgrade ou `pause`;
+## `ok` = a ação foi aceita (skill disparada, upgrade comprado). Sem posição do toque.
+signal ui_pressed(button: StringName, ok: bool)
 
+## Pulso da pílula de Partículas (T-117).
+const PILL_PULSE_GAIN := 1.06
+const PILL_PULSE_AFFORDABLE := 1.12
 const THEME := preload("res://src/ui/theme/anima_theme.tres")
 const SKILL_COUNT := 3
 const SKILL_ICONS := [SkillButton.Icon.CIRCLE, SkillButton.Icon.DIAMOND, SkillButton.Icon.HEX]
-const PARTICLES_ICON_SIZE := 36
+const PARTICLES_ICON_SIZE := 32 ## estrela da pílula de Partículas (assets/ui/README.md)
 const PAUSE_ICON_SIZE := 64
 const CORE_ICON_SIZE := Vector2(36, 44)
-const UPGRADE_BAND_PAD := 10
+const UPGRADE_BAND_PAD := 6
 ## Altura da bandeja inferior (upgrades + skills) sem safe area, em px da resolução base (docs/ui.md §4.4).
-const TRAY_HEIGHT := 282
+const TRAY_HEIGHT := 266
 ## Altura do HUD de cima (pausa/ONDA/Partículas + barra de Energia) sem safe area e sem a barra do chefe.
 ## O fundo da arena passa por trás do topo; o gameplay usa isto para não pôr alvos sob o HUD (docs/ui.md §4.4).
 const TOP_INSET := 164
+## Respiro entre a faixa de upgrades e os slots; embaixo dos slots, max(SPACE_XS, inset da UI) (T-172).
+const SKILLS_TOP_PAD := UiTokens.SPACE_XS
 ## Altura extra do topo com a barra "Boss" visível (gap 16 + barra 36). top_inset() já soma quando ela aparece.
 const BOSS_BAR_INSET := 52
 ## Trilho da barra "Boss": ~89% do trilho da Energia (36), decisão 39.
@@ -32,7 +40,7 @@ const TOP_SCRIM_ALPHA := 0.35
 const M1_UNLOCK_LEVELS: Array[int] = [0, 7, 12]
 
 ## Ícone por slot (índice 0 = slot 1), caminho do PNG = `SkillData.icon` da skill do slot (decisão 37).
-## Vazio ou inexistente = arte padrão do SkillButton (`ui_icon_skill_pulse` no slot 1). Troque em tempo
+## Vazio ou inexistente = arte padrão do SkillButton (meteoro no `Icon.CIRCLE`). Troque em tempo
 ## de execução com set_slot_icon(slot, textura) — o HUD não lê src/match/.
 @export var slot_icon_paths: Array[String] = [UiArt.SKILL_METEOR_PATH, "", ""]
 ## Nível de desbloqueio por slot (índice 0 = slot 1). 0 = liberado; > 0 = bloqueado com "NV x".
@@ -60,12 +68,23 @@ var _skills: Array[SkillButton] = []
 var _upgrades: Array[UpgradeButton] = []
 var _particles_shown := 0
 var _particles_tween: Tween
+## Pílula de Partículas e seu pulso (T-117): ao ganhar e quando um upgrade fica comprável pela 1ª vez.
+var particles_pill: PanelContainer
+var _particles_total := 0
+var _pill_tween: Tween
+## Quantos pulsos a pílula já deu (para testes).
+var pill_pulses := 0
 var _wave_tween: Tween
+## Mira pela tecla segurada (T-178): slot cuja action `skill_<slot>` está pressionada (0 = nenhum).
+var _key_slot := 0
+var _key_fired := false
+var _match_over := false
 
 
 func _ready() -> void:
 	layer = 10
 	_build()
+	ScreenKit.set_page_color(UiTokens.BG_PANEL_ALT)
 	get_viewport().size_changed.connect(apply_safe_area)
 	apply_safe_area()
 
@@ -176,7 +195,7 @@ func _build_top() -> void:
 	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	right.alignment = BoxContainer.ALIGNMENT_END
 	row1.add_child(right)
-	var particles_pill := _panel(&"PanelPillLight")
+	particles_pill = _panel(&"PanelPillLight")
 	particles_pill.name = "ParticlesPill"
 	particles_pill.accessibility_name = "Partículas"
 	particles_pill.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -186,9 +205,9 @@ func _build_top() -> void:
 	particles_row.add_child(StarIcon.new(PARTICLES_ICON_SIZE))
 	_particles_label = _label(&"LabelHud")
 	_particles_label.text = "0"
-	_particles_label.add_theme_color_override("font_color", UiTokens.PARTICLES)
-	_particles_label.add_theme_color_override("font_outline_color", UiTokens.INK)
-	_particles_label.add_theme_constant_override("outline_size", UiTokens.TEXT_OUTLINE)
+	# Pílula branca (T-153): número escuro, sem contorno.
+	_particles_label.add_theme_color_override("font_color", UiTokens.TEXT_ON_LIGHT)
+	_particles_label.add_theme_constant_override("outline_size", 0)
 	_particles_label.custom_minimum_size.x = 72
 	_particles_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	particles_row.add_child(_particles_label)
@@ -257,6 +276,7 @@ func _build_tray() -> void:
 		ub.upgrade_id = id
 		ub.name = String(id)
 		ub.buy_requested.connect(_on_upgrade_buy)
+		ub.first_affordable.connect(func(_id: StringName) -> void: _pulse_pill(PILL_PULSE_AFFORDABLE))
 		upgrade_row.add_child(ub)
 		_upgrades.append(ub)
 
@@ -272,7 +292,10 @@ func _build_tray() -> void:
 		sb.icon = SKILL_ICONS[i]
 		sb.icon_texture = UiArt.load_icon(slot_icon_paths[i] if i < slot_icon_paths.size() else "")
 		sb.inject_action = false
+		sb.drag_aim = true
 		sb.activated.connect(_on_skill_pressed)
+		sb.aim_moved.connect(_on_aim_moved)
+		sb.aim_ended.connect(_on_aim_ended)
 		skills_row.add_child(sb)
 		_skills.append(sb)
 	_apply_slot_locks()
@@ -365,8 +388,8 @@ func apply_safe_area() -> void:
 	_top.add_theme_constant_override("margin_top", m + int(s.top))
 	_upgrade_margin.add_theme_constant_override("margin_top", UPGRADE_BAND_PAD)
 	_upgrade_margin.add_theme_constant_override("margin_bottom", UPGRADE_BAND_PAD)
-	_skills_margin.add_theme_constant_override("margin_top", m)
-	_skills_margin.add_theme_constant_override("margin_bottom", UiTokens.SPACE_XS + int(s.bottom))
+	_skills_margin.add_theme_constant_override("margin_top", SKILLS_TOP_PAD)
+	_skills_margin.add_theme_constant_override("margin_bottom", int(_bottom_pad(s)))
 	_top_scrim.offset_bottom = top_inset()
 
 
@@ -378,7 +401,13 @@ func top_inset() -> float:
 
 ## Altura ocupada pela bandeja inferior, com a safe area (px da resolução base).
 func tray_height() -> float:
-	return TRAY_HEIGHT + safe_insets().bottom
+	return TRAY_HEIGHT - UiTokens.SPACE_XS + _bottom_pad(safe_insets())
+
+
+## Folga entre a base dos slots e a borda inferior (T-172): SPACE_XS sem safe area; com ela, a inset da UI
+## (ScreenKit.ui_bottom_inset, já reduzida), sem somar as duas. O fundo da bandeja segue até a borda.
+func _bottom_pad(s: Dictionary) -> float:
+	return maxf(UiTokens.SPACE_XS, roundf(float(s.bottom)))
 
 
 # --- Sinais da Arena ---
@@ -398,7 +427,10 @@ func _on_wave_changed(current: int, total: int) -> void:
 
 
 func _on_particles_changed(total: int) -> void:
-	# total é o acumulado da partida.
+	# total é o saldo da partida; só pulsa quando sobe (gasto não pulsa).
+	if total > _particles_total:
+		_pulse_pill(PILL_PULSE_GAIN)
+	_particles_total = total
 	if _particles_tween:
 		_particles_tween.kill()
 	_particles_tween = create_tween()
@@ -411,6 +443,21 @@ func _on_upgrade_changed(id: StringName, level: int, max_level: int, next_cost: 
 	var ub := upgrade_button(id)
 	if ub:
 		ub.set_upgrade(level, max_level, next_cost)
+
+
+## Pulso discreto da pílula de Partículas (escala a partir do centro, ~0,2 s).
+func _pulse_pill(peak: float) -> void:
+	if particles_pill == null or not particles_pill.is_inside_tree():
+		return
+	pill_pulses += 1
+	if _pill_tween and _pill_tween.is_running():
+		if peak <= PILL_PULSE_GAIN:
+			return # não reinicia a cada partícula: um pulso por vez
+		_pill_tween.kill() # o de "comprável" tem prioridade
+	particles_pill.pivot_offset = particles_pill.size * 0.5
+	_pill_tween = create_tween()
+	_pill_tween.tween_property(particles_pill, "scale", Vector2.ONE * peak, UiTokens.ANIM_FAST).set_ease(Tween.EASE_OUT)
+	_pill_tween.tween_property(particles_pill, "scale", Vector2.ONE, UiTokens.ANIM_FAST).set_ease(Tween.EASE_IN)
 
 
 func _set_particles_shown(v: int) -> void:
@@ -475,6 +522,8 @@ func _hide_boss_row() -> void:
 
 
 func _on_match_ended(_result) -> void:
+	_match_over = true
+	_end_key_aim()
 	_show_boss(false)
 	for sb in _skills:
 		sb.set_disabled(true)
@@ -488,23 +537,127 @@ func _on_match_ended(_result) -> void:
 func _on_skill_pressed(slot: int) -> void:
 	var sb := _skill(slot)
 	if sb and sb.is_locked():
+		ui_pressed.emit(StringName("skill_%d" % slot), false)
 		return
 	if _arena == null or not _arena.has_method(&"use_skill"):
 		return
-	if not _arena.use_skill(slot):
+	var ok: bool = _arena.use_skill(slot)
+	ui_pressed.emit(StringName("skill_%d" % slot), ok)
+	if not ok:
 		_skill(slot).reject()
+
+
+## A Arena tem a API de mira (T-177): show/hide_skill_aim e can_aim_at.
+func aim_supported() -> bool:
+	return _arena != null and _arena.has_method(&"show_skill_aim") and _arena.has_method(&"hide_skill_aim") 		and _arena.has_method(&"can_aim_at")
+
+
+func _on_aim_moved(slot: int, at: Vector2) -> void:
+	_show_aim(slot, at)
+
+
+func _on_aim_ended(slot: int, at: Vector2, cancelled: bool) -> void:
+	if not aim_supported():
+		if not cancelled:
+			_on_skill_pressed(slot) # Arena sem a API de mira: vale como toque (automático)
+		return
+	_arena.hide_skill_aim()
+	if cancelled or not _arena.can_aim_at(at):
+		return # cancelado: nada acontece
+	_fire(slot, at)
+
+
+## Prévia na arena enquanto o ponto é válido; fora da área, esconde e o anel do botão fica `danger`.
+func _show_aim(slot: int, at: Vector2) -> void:
+	if not aim_supported():
+		return
+	var valid: bool = _arena.can_aim_at(at)
+	if valid:
+		_arena.show_skill_aim(slot, at)
+	else:
+		_arena.hide_skill_aim()
+	var sb := _skill(slot)
+	if sb:
+		sb.set_aim_valid(valid)
+
+
+func _fire(slot: int, at: Vector2) -> void:
+	var ok: bool = _arena.use_skill(slot, at)
+	ui_pressed.emit(StringName("skill_%d" % slot), ok)
+	if not ok:
+		_skill(slot).reject()
+
+
+## PC (T-178): segurar `skill_<slot>` mostra a prévia no cursor; clique na arena válida lança ali;
+## soltar a tecla sem ter clicado = alvo automático (o disparo pela tecla passa a ser ao soltar).
+## Só intercepta com o Módulo pronto; em recarga a action segue para o SkillController (botão treme).
+func _input(event: InputEvent) -> void:
+	if _key_slot != 0:
+		_key_aim_input(event)
+		return
+	if _match_over or not aim_supported() or not event.is_action_type():
+		return
+	for i in _skills.size():
+		var sb := _skills[i]
+		if event.is_action_pressed(sb.action) and not event.is_echo() and sb.state == SkillButton.State.READY 				and not sb.aiming:
+			_key_slot = i + 1
+			_key_fired = false
+			sb.set_aiming(true)
+			_show_aim(_key_slot, get_viewport().get_mouse_position())
+			get_viewport().set_input_as_handled()
+			return
+
+
+func _key_aim_input(event: InputEvent) -> void:
+	var sb := _skill(_key_slot)
+	if event.is_action(sb.action):
+		get_viewport().set_input_as_handled() # inclusive repetições da tecla
+		if event.is_action_released(sb.action):
+			var slot := _key_slot
+			var fired := _key_fired
+			_end_key_aim()
+			if not fired:
+				_on_skill_pressed(slot)
+		return
+	if _key_fired:
+		return
+	if event is InputEventMouseMotion:
+		_show_aim(_key_slot, get_viewport().get_mouse_position())
+	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		var at := get_viewport().get_mouse_position()
+		if not _arena.can_aim_at(at):
+			return # clique no HUD/fora da arena segue normal
+		get_viewport().set_input_as_handled()
+		_key_fired = true
+		_arena.hide_skill_aim()
+		sb.set_aiming(false)
+		_fire(_key_slot, at)
+
+
+func _end_key_aim() -> void:
+	if _key_slot == 0:
+		return
+	var sb := _skill(_key_slot)
+	_key_slot = 0
+	if sb:
+		sb.set_aiming(false)
+	if aim_supported():
+		_arena.hide_skill_aim()
 
 
 func _on_upgrade_buy(id: StringName) -> void:
 	if _arena == null or not _arena.has_method(&"buy_upgrade"):
 		return
-	if not _arena.buy_upgrade(id):
+	var ok: bool = _arena.buy_upgrade(id)
+	ui_pressed.emit(id, ok)
+	if not ok:
 		var ub := upgrade_button(id)
 		if ub:
 			ub.reject()
 
 
 func _on_pause_pressed() -> void:
+	ui_pressed.emit(&"pause", true)
 	pause_requested.emit()
 	var ev := InputEventAction.new()
 	ev.action = &"pause"

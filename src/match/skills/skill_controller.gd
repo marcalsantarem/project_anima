@@ -7,6 +7,11 @@ signal cooldown_changed(slot: int, remaining: float, total: float)
 signal skill_ready(slot: int)
 ## Efeito aplicado no chão (impacto do meteoro): posição de tela (âncora no chão), raio no chão.
 signal skill_cast(slot: int, at: Vector2, radius: float)
+## Skill acionada mas anulada antes do efeito (meteoro sem inimigo no raio): sem skill_cast; o
+## cooldown cai para `fizzle_cooldown_ratio` do total. `at` = ponto onde cairia (tela).
+signal skill_fizzled(slot: int, at: Vector2)
+## Início da queda do meteoro: ponto de impacto (tela, chão) e s até o impacto.
+signal skill_fall_started(slot: int, at: Vector2, fall_time: float)
 
 const ACTIONS: Array[StringName] = [&"skill_1", &"skill_2", &"skill_3"]
 const COOLDOWN_EMIT_INTERVAL := 0.1 ## s; no máximo ~10 emissões/s por slot
@@ -31,6 +36,9 @@ func setup(context: SkillContext) -> void:
 		if behavior:
 			behavior.setup(data, context)
 			behavior.cast.connect(_on_cast.bind(_slots.size()))
+			behavior.fizzled.connect(_on_fizzled.bind(_slots.size()))
+			if behavior.has_signal(&"fall_started"):
+				behavior.connect(&"fall_started", _on_fall_started.bind(_slots.size()))
 			add_child(behavior)
 
 
@@ -52,6 +60,25 @@ func _on_cast(at: Vector2, radius: float, slot: int) -> void:
 	skill_cast.emit(slot, at, radius)
 
 
+func _on_fall_started(at: Vector2, fall_time: float, slot: int) -> void:
+	skill_fall_started.emit(slot, at, fall_time)
+
+
+func _on_fizzled(at: Vector2, slot: int) -> void:
+	var s := get_slot(slot)
+	s.refund(s.data.fizzle_cooldown_ratio)
+	cooldown_changed.emit(slot, s.remaining, s.total)
+	if s.is_ready():
+		skill_ready.emit(slot)
+	skill_fizzled.emit(slot, at)
+
+
+## Raio da mira do slot (px no chão) ou 0 se o slot não aceita mira.
+func aim_radius(slot: int) -> float:
+	var b := get_behavior(slot)
+	return b.data.radius if b != null and b.can_aim() else 0.0
+
+
 func slot_count() -> int:
 	return _slots.size()
 
@@ -62,16 +89,26 @@ func get_slot(slot: int) -> SkillSlot:
 	return _slots[slot - 1]
 
 
+## Comportamento do slot (1-based); null se vazio.
+func get_behavior(slot: int) -> SkillBehavior:
+	if slot < 1 or slot > _behaviors.size():
+		return null
+	return _behaviors[slot - 1]
+
+
 ## Aciona a skill do slot (1-based). Usado pela entrada e pelos botões de toque da UI.
-func use_skill(slot: int) -> bool:
+## `at` finito = mira manual (ignorado se a skill não aceita mira); a Arena valida a área.
+func use_skill(slot: int, at: Vector2 = Vector2.INF) -> bool:
 	var s := get_slot(slot)
 	if not enabled or s == null or not s.is_ready():
 		return false
 	var behavior := _behaviors[slot - 1]
-	if not behavior.can_activate():
+	if not behavior.can_aim():
+		at = Vector2.INF
+	if not behavior.can_activate(at):
 		return false
 	s.start_cooldown(cooldown_scale)
-	behavior.activate()
+	behavior.activate(at)
 	skill_used.emit(slot)
 	cooldown_changed.emit(slot, s.remaining, s.total)
 	return true

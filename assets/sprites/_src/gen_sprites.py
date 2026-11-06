@@ -144,12 +144,46 @@ def star(x, y, r=7):
             f'Q{x - q} {y - q} {x} {y - r} Z" fill="#FFC93D" stroke="#725A1B" stroke-width="2" stroke-linejoin="round"/>')
 
 
-def ogre(pose):
-    """pose: idle | attack (wind-up, clava no alto) | stunned (curvado, olhos em espiral, clava no chão)."""
-    s = (limb(104, 196, 100, 224, 30) + limb(152, 196, 156, 224, 30)
-         + f'<ellipse cx="96" cy="230" rx="22" ry="8" fill="{O_SH}" stroke="{O_OL}" stroke-width="3.5"/>'
-         + f'<ellipse cx="160" cy="230" rx="22" ry="8" fill="{O_SH}" stroke="{O_OL}" stroke-width="3.5"/>')
-    if pose == "stunned":  # clava largada no chão, braços caídos
+# Caminhada (BRF-065): por quadro, tronco (dx, dy, inclinação°), atraso da barriga (dx, dy),
+# deslocamento dos pés esquerdo/direito e balanço dos punhos esquerdo/direito (oposto aos pés).
+# 1 = pé esquerdo à frente (contato), 2 = passagem baixa (peso no esquerdo), 3 = pé direito à frente, 4 = passagem baixa.
+OGRE_WALK = {
+    1: ((-2, -1, -2), (1, 1), (-2, 3), (2, -6), (2, -10), (-4, 8)),
+    2: ((-4, 4, -3), (2, -2), (0, 1), (-4, -11), (0, -3), (-2, 3)),
+    3: ((2, -1, 2), (-1, 1), (-2, -6), (2, 3), (4, 8), (-2, -10)),
+    4: ((4, 4, 3), (-2, -2), (4, -11), (0, 1), (2, 3), (0, -3)),
+}
+
+
+def _ogre_pt(x, y, t):
+    """Aplica a inclinação (em torno do quadril, 128 200) e o deslocamento do tronco a um ponto."""
+    import math
+    a = math.radians(t[2])
+    x, y = x - 128, y - 200
+    return (round(128 + x * math.cos(a) - y * math.sin(a) + t[0], 1),
+            round(200 + x * math.sin(a) + y * math.cos(a) + t[1], 1))
+
+
+def ogre(pose, step=None):
+    """pose: idle | attack (wind-up, clava no alto) | stunned (curvado, olhos em espiral, clava no chão)
+    | walk (step 1..4, ver OGRE_WALK)."""
+    w = OGRE_WALK[step] if pose == "walk" else None
+    if w:
+        t, _, fl, fr = w[0], w[1], w[2], w[3]
+        (hlx, hly), (hrx, hry) = _ogre_pt(104, 196, t), _ogre_pt(152, 196, t)
+        ft = [(96 + fl[0], 230 + fl[1]), (160 + fr[0], 230 + fr[1])]
+        legs = [limb(hlx, hly, ft[0][0] + 4, ft[0][1] - 6, 30), limb(hrx, hry, ft[1][0] - 4, ft[1][1] - 6, 30)]
+        feet = [f'<ellipse cx="{x}" cy="{y}" rx="22" ry="8" fill="{O_SH}" stroke="{O_OL}" stroke-width="3.5"/>' for x, y in ft]
+        back = 0 if fl[1] < fr[1] else 1  # pé erguido (atrás) primeiro
+        s = legs[back] + feet[back] + legs[1 - back] + feet[1 - back]
+        s += f'<g transform="translate({t[0]} {t[1]}) rotate({t[2]} 128 200)">'
+    else:
+        s = (limb(104, 196, 100, 224, 30) + limb(152, 196, 156, 224, 30)
+             + f'<ellipse cx="96" cy="230" rx="22" ry="8" fill="{O_SH}" stroke="{O_OL}" stroke-width="3.5"/>'
+             + f'<ellipse cx="160" cy="230" rx="22" ry="8" fill="{O_SH}" stroke="{O_OL}" stroke-width="3.5"/>')
+    if w:
+        lf, rf = (50 + w[4][0], 196 + w[4][1]), (206 + w[5][0], 196 + w[5][1])
+    elif pose == "stunned":  # clava largada no chão, braços caídos
         s += club(170, 228, 208, 228, 230, 222, 0)
         lf, rf = (60, 206), (194, 206)
     elif pose == "attack":
@@ -160,8 +194,9 @@ def ogre(pose):
     dy = 10 if pose == "stunned" else 0  # curvado: tronco e cabeça descem
     s += f'<g transform="translate(0 {dy})">'
     s += body("ob", 128, 160, 74, 64, O_SK, O_SH, O_OL, sw=4)
-    s += (f'<ellipse cx="128" cy="178" rx="44" ry="36" fill="{O_BELLY}" opacity="0.85"/>'
-          f'<path d="M124 178 q4 4 8 0" fill="none" stroke="{O_SH}" stroke-width="2.5" stroke-linecap="round"/>'
+    bx, by = w[1] if w else (0, 0)  # barriga com leve atraso na caminhada
+    s += (f'<ellipse cx="{128 + bx}" cy="{178 + by}" rx="44" ry="36" fill="{O_BELLY}" opacity="0.85"/>'
+          f'<path d="M{124 + bx} {178 + by} q4 4 8 0" fill="none" stroke="{O_SH}" stroke-width="2.5" stroke-linecap="round"/>'
           f'<path d="M66 128 Q78 104 104 100 L100 150 Q84 156 70 150 Z" fill="{O_LEA}" stroke="{O_OL}" stroke-width="3" stroke-linejoin="round"/>'
           f'<path d="M190 128 Q178 104 152 100 L156 150 Q172 156 186 150 Z" fill="{O_LEA}" stroke="{O_OL}" stroke-width="3" stroke-linejoin="round"/>'
           f'<path d="M74 196 Q128 214 182 196 L180 206 Q128 224 76 206 Z" fill="{O_LEA_D}" stroke="{O_OL}" stroke-width="3" stroke-linejoin="round"/>'
@@ -189,9 +224,10 @@ def ogre(pose):
         s += star(96, 42) + star(128, 32, 8) + star(162, 44)
     if pose == "attack":
         s += club(198, 50, 184, 28, 176, 22, -35)
-    elif pose == "idle":
-        s += club(206, 196, 222, 206, 232, 214, 35)
-    return s + fist(*lf) + fist(*rf)
+    elif pose in ("idle", "walk"):
+        cx, cy = rf[0] - 206, rf[1] - 196  # clava acompanha o punho direito
+        s += club(206 + cx, 196 + cy, 222 + cx, 206 + cy, 232 + cx, 214 + cy, 35)
+    return s + fist(*lf) + fist(*rf) + ('</g>' if w else '')
 
 
 # ---------- Projéteis, coleta e sombra ----------
@@ -260,6 +296,10 @@ SPRITES = {
     "boss_ogre": (256, 256, ogre("idle")),
     "boss_ogre_attack": (256, 256, ogre("attack")),
     "boss_ogre_stunned": (256, 256, ogre("stunned")),
+    "boss_ogre_walk_1": (256, 256, ogre("walk", 1)),
+    "boss_ogre_walk_2": (256, 256, ogre("walk", 2)),
+    "boss_ogre_walk_3": (256, 256, ogre("walk", 3)),
+    "boss_ogre_walk_4": (256, 256, ogre("walk", 4)),
     "skill_meteor": (64, 112, METEOR),
     "skill_meteor_crater": (128, 96, CRATER),
 }

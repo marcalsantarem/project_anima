@@ -46,7 +46,9 @@ func test_floor_covers_screen_ring_on_anima_and_pillars_in_corners() -> void:
 	var ring := sprites[2]
 	assert_lt(ring.z_index, -1)
 	assert_eq(ring.position, arena.anima.position)
-	var rect := arena.arena_rect()
+	assert_eq(ring.scale, Vector2(ArenaFloor.RING_SCALE, ArenaFloor.RING_SCALE), "selo menor (decisão 43)")
+	assert_almost_eq(ArenaFloor.RING_SCALE, SpriteArt.SCALE.x * 0.7, 0.001, "~70% do tamanho anterior")
+	var rect := arena.free_rect()
 	var pillars := floor_node.get_children().filter(func(c: Node) -> bool: return c.get_child_count() == 2)
 	assert_eq(pillars.size(), 4)
 	for p: Node2D in pillars:
@@ -59,8 +61,20 @@ func test_layout_follows_tray_inset() -> void:
 	var arena := _arena()
 	arena.set_bottom_inset(400.0)
 	assert_eq(arena.arena_rect().end.y, arena.arena_size().y - 400.0)
-	assert_eq(arena.anima.position, arena.arena_rect().get_center())
+	var center_y := (arena.arena_top_inset + arena.arena_rect().end.y) / 2.0
+	assert_eq(arena.anima.position, Vector2(arena.arena_size().x / 2.0, center_y), "centro da área livre")
 	assert_eq((arena.get_node("Floor").get_child(2) as Sprite2D).position, arena.anima.position)
+
+
+## T-169: Anima no centro da área livre entre o topo do HUD (fixo) e a bandeja.
+func test_free_rect_between_top_hud_and_tray() -> void:
+	assert_eq(Arena.free_rect_for(Vector2(720, 1280), 164.0, 282.0), Rect2(0, 164, 720, 834))
+	assert_eq(Arena.free_rect_for(Vector2(720, 1474), 164.0, 282.0).get_center(), Vector2(360, 678))
+	var arena := _arena()
+	assert_eq(arena.arena_top_inset, 164.0, "= Hud.TOP_INSET, fixo")
+	var e := arena.spawn(load("res://data/enemies/enemy_tank.tres"), WaveEntry.SpawnEdge.TOP)
+	arena.set_bottom_inset(200.0)
+	assert_eq(e.target_position, arena.anima.position, "inimigos em campo seguem o novo centro")
 
 
 func test_anima_has_base_crystal_and_orbit_nodes() -> void:

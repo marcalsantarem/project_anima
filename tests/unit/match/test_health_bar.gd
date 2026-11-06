@@ -64,4 +64,14 @@ func test_no_per_frame_work_with_150_enemies() -> void:
 	assert_eq(after, before, "sem redesenho sem mudança de vida")
 	bars[0].get_parent().take_damage(5)
 	await wait_process_frames(2)
-	assert_eq(bars[0].draw_count, 2, "redesenha só quando a vida muda")
+	assert_eq(bars[0].draw_count, 1, "escondida não desenha; 1º desenho ao primeiro dano")
+
+
+func test_bar_hidden_at_full_hp_and_shown_after_damage() -> void:
+	var arena := _arena()
+	var e := arena.spawn(TANK, WaveEntry.SpawnEdge.TOP)
+	assert_false(e.health_bar.visible, "vida cheia: não desenha")
+	e.take_damage(1)
+	assert_true(e.health_bar.visible)
+	e.recycle(Vector2.ZERO, Vector2.ZERO)
+	assert_false(e.health_bar.visible, "reciclado volta a esconder")

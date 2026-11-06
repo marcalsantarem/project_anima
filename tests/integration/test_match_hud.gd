@@ -209,3 +209,36 @@ func test_match_end_disables_upgrades() -> void:
 func _runners_to_defeat() -> int:
 	var anima: AnimaData = load("res://data/anima/anima_default.tres")
 	return ceili(float(anima.core_hp_max) / RUNNER.contact_damage) + 5
+
+
+## T-178: arrastar do botão do slot 1 até a arena lança o meteoro no ponto (Arena real, API da T-177).
+func test_drag_from_skill_button_launches_at_point() -> void:
+	_start(null, false)
+	await wait_physics_frames(1)
+	var sb := hud._skill(1)
+	var center := Vector2(sb.size.x * 0.5, SkillButton.DIAMETER * 0.5)
+	var to_vp := sb.get_global_transform_with_canvas()
+	var target_vp := arena.aim_rect().get_center()
+	var target := to_vp.affine_inverse() * target_vp
+	var touch := InputEventScreenTouch.new()
+	touch.pressed = true
+	touch.position = center
+	sb._gui_input(touch)
+	var drag := InputEventScreenDrag.new()
+	drag.position = target
+	sb._gui_input(drag)
+	assert_true(sb.aiming)
+	touch = touch.duplicate()
+	touch.pressed = false
+	touch.position = target
+	sb._gui_input(touch)
+	assert_signal_emitted_with_parameters(arena, "skill_used", [1])
+	assert_eq(sb.state, SkillButton.State.COOLDOWN)
+	# Em recarga: arrastar não mira nem dispara de novo.
+	touch = touch.duplicate()
+	touch.pressed = true
+	touch.position = center
+	sb._gui_input(touch)
+	sb._gui_input(drag)
+	assert_false(sb.aiming)
+	assert_signal_emit_count(arena, "skill_used", 1)

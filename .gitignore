@@ -16,3 +16,7 @@ node_modules/
 Thumbs.db
 .vscode/*
 !.vscode/extensions.json
+
+# Segredos locais (nunca commitar)
+.env
+.env.*

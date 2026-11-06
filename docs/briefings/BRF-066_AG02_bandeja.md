@@ -1,0 +1,10 @@
+# BRF-066 — AG02 — T-169 (parte AG02) Bandeja até a borda e menos espaço vazio
+**Contexto:** teste do dono no iPhone (viewport 720×1474, safe area inferior ~65 px do jogo, 34 px CSS). Na captura, abaixo dos botões de Módulo há **muito espaço vazio** e, **abaixo da bandeja, uma faixa de ~80 px na cor de fundo do Godot** (roxo `#8E72EC`): a bandeja termina antes da borda da tela e os botões de skill ficam longe do rodapé. O dono acha o jogo "não centralizado, com muito espaço embaixo". A fileira dos 5 upgrades e os 3 slots (Ø 144) já estão bons; só o aproveitamento do espaço.
+**Fazer:**
+- A **bandeja (fundo roxo) deve ir até a borda inferior da tela**, cobrindo também a safe area (o fundo continua sob o indicador de início do iPhone; os botões ficam acima da safe area). Nada de faixa de cor de fundo do Godot visível.
+- **Reduza o espaço vazio**: distância do fim dos botões de Módulo até o fim da área segura de ~24–32 px (hoje bem maior); reduza também os respiros entre a fileira de upgrades, a linha de Módulos e o topo da bandeja, **sem diminuir os botões** (upgrade 128×80, Módulo Ø 144, alvo de toque ≥ 44 px). Resultado esperado: `Hud.TRAY_HEIGHT` (hoje 282) cai para ~230–250 + safe area, e a arena ganha esses pixels.
+- `Hud.tray_height()` continua somando a safe area e é o valor que o `SceneFlow` passa à Arena (`set_bottom_inset`); mantenha `TOP_INSET` (164) e a regra da barra "Boss". Atualize `docs/ui.md` (medidas, diagrama, tabela) e os testes de layout.
+- Renderize `hud_demo` em **720×1280, 720×1474 (viewport do iPhone do dono, com safe area inferior de 65 px simulada) e 720×1560** e confira: bandeja até a borda, sem faixa vazia, botões e fileira de upgrades legíveis.
+**Arquivos permitidos:** `src/ui/`, `docs/ui.md`, `tests/` (da UI). **Proibido:** `src/match/`, `src/core/`, `assets/`, `project.godot`.
+**Validação:** `--import` e GUT completo passando; imagens renderizadas conferidas.
+**Entrega:** no máximo 8 linhas (entregue · validação · medidas novas · suposições · não testado).

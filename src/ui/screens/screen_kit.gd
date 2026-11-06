@@ -3,6 +3,11 @@ class_name ScreenKit
 
 const THEME := preload("res://src/ui/theme/anima_theme.tres")
 const CARD_WIDTH := 520.0
+const VERSION_FONT := 18 ## linha de versão/build (T-165)
+
+## Safe area simulada (px da resolução base, ex.: {"bottom": 65.0}) para renders e testes fora do iPhone.
+## Vazio = safe area real do navegador/dispositivo.
+static var simulated_safe_area: Dictionary = {}
 
 
 ## Raiz em tela cheia com o tema aplicado (até o tema global, T-121).
@@ -75,6 +80,31 @@ static func label(text: String, variation: StringName, color: Color = UiTokens.T
 	return l
 
 
+## Rótulo discreto `v<versão> · <sha>` (T-165): letra pequena, claro a ~60%, sem toque.
+## Posicione com `place_corner_label`.
+static func version_label() -> Label:
+	var l := Label.new()
+	l.name = "VersionLabel"
+	l.text = BuildInfo.pause_text(BuildInfo.current(), BuildInfo.version())
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	l.add_theme_font_size_override("font_size", VERSION_FONT)
+	l.add_theme_color_override("font_color", Color(0.92, 0.9, 1.0, 0.6))
+	l.add_theme_constant_override("outline_size", 0)
+	l.add_theme_constant_override("shadow_offset_x", 0)
+	l.add_theme_constant_override("shadow_offset_y", 0)
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	return l
+
+
+## Canto inferior direito, acima da safe area; `bottom_gap` é a folga extra acima dela.
+static func place_corner_label(l: Label, vp: Viewport, bottom_gap: float = UiTokens.SPACE_XS) -> void:
+	var view := vp.get_visible_rect().size
+	var inset := safe_area(vp)
+	var sz := l.get_combined_minimum_size()
+	l.size = sz
+	l.position = Vector2(view.x - float(inset.right) - UiTokens.SPACE_S - sz.x, view.y - float(inset.bottom) - bottom_gap - sz.y)
+
+
 static func button(text: String, primary: bool, cb: Callable) -> Button:
 	var b := Button.new()
 	b.text = text
@@ -95,10 +125,42 @@ static func format_time(seconds: float) -> String:
 	return "%02d:%02d" % [s / 60, s % 60]
 
 
+## Cor da página do shell e do theme-color (T-172, docs/ui.md §9.1): o Safari pinta com ela a faixa
+## abaixo do web view. Cada etapa passa a cor da sua base (título, bandeja da partida, resultado).
+static var last_page_color := Color.BLACK
+
+
+static func set_page_color(c: Color) -> void:
+	last_page_color = c
+	if OS.has_feature("web"):
+		JavaScriptBridge.eval("window.animaSetPageColor && animaSetPageColor('#%s')" % c.to_html(false), true)
+
+
+## Inset inferior usado pela UI quando o canvas cobre a borda (T-172, docs/ui.md §9.1): o indicador de
+## início é uma linha fina, então basta max(SAFE_BOTTOM_MIN, SAFE_BOTTOM_FACTOR × inset).
+const SAFE_BOTTOM_MIN := 12.0
+const SAFE_BOTTOM_FACTOR := 0.5
+
+
+## Regra da inset inferior (px da resolução base): 0 sem inset; 0 se o canvas termina acima da borda da tela
+## (caso normal do Safari em aba: o web view acaba antes do indicador de início); senão (tela cheia/standalone)
+## max(12, 0,5 × inset). A HUD mantém sempre a folga mínima de 8 px sob os slots.
+static func ui_bottom_inset(raw: float, covers_bottom: bool) -> float:
+	if raw <= 0.0 or not covers_bottom:
+		return 0.0
+	return maxf(SAFE_BOTTOM_MIN, SAFE_BOTTOM_FACTOR * raw)
+
+
 ## Safe area (docs/ui.md §9). Insets em px da resolução base: {top, bottom, left, right}, mais
 ## `css_k` (px da resolução base por px CSS; fora da web, por px da janela) para medir como o shell.
+## `bottom` já é o valor para a UI (ui_bottom_inset); `bottom_raw` é a inset informada e `covers_bottom`
+## diz se o canvas chega à borda inferior. A simulação recebe a inset bruta em "bottom" (e, opcional,
+## "covers_bottom", padrão true).
 static func safe_area(vp: Viewport) -> Dictionary:
-	var out := {"top": 0.0, "bottom": 0.0, "left": 0.0, "right": 0.0, "css_k": 1.0}
+	var out := {"top": 0.0, "bottom": 0.0, "left": 0.0, "right": 0.0, "css_k": 1.0, "covers_bottom": true}
+	if not simulated_safe_area.is_empty():
+		out.merge(simulated_safe_area, true)
+		return _finish_bottom(out)
 	var visible_size := vp.get_visible_rect().size
 	var win := Vector2(DisplayServer.window_get_size())
 	if win.y > 0.0:
@@ -111,6 +173,7 @@ static func safe_area(vp: Viewport) -> Dictionary:
 			out.css_k = k
 			for side in ["top", "bottom", "left", "right"]:
 				out[side] = float(data.get(side, 0.0)) * k
+			out.covers_bottom = bool(data.get("covers_bottom", true))
 	elif OS.has_feature("mobile"):
 		var screen := Rect2(Vector2.ZERO, DisplayServer.screen_get_size())
 		var safe := Rect2(DisplayServer.get_display_safe_area())
@@ -119,4 +182,10 @@ static func safe_area(vp: Viewport) -> Dictionary:
 		out.bottom = (screen.end.y - safe.end.y) * k
 		out.left = safe.position.x * k
 		out.right = (screen.end.x - safe.end.x) * k
+	return _finish_bottom(out)
+
+
+static func _finish_bottom(out: Dictionary) -> Dictionary:
+	out.bottom_raw = float(out.bottom)
+	out.bottom = ui_bottom_inset(out.bottom_raw, bool(out.covers_bottom))
 	return out

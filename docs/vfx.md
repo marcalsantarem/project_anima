@@ -1,19 +1,19 @@
 # VFX — Project: Anima
 
-> Dono: AG09. Estado: **T-130** (pool + `FxDirector` ligado aos sinais da Arena, testado com emissor falso; falta a ligação na partida, ver §1.1). Skill/chefe: T-131. Modo reduzido completo: T-132.
+> Dono: AG09. Estado: **T-130** (pool + `FxDirector`, ligado na partida pelo `SceneFlow`), **T-131** (meteoro e chefe ogro), **T-132** (modo reduzido) e **T-117 parte AG09** (flash de acerto, Módulo pronto/usado).
 > Estilo: 2D cartoon casual (docs/arte.md, variação A): formas sólidas com contorno (tom da cor −55%), cores vivas, **poucas gotas grandes** em vez de muitas partículas. Ciano (`#2FE6D2`) só no que é do jogador.
 
 ## 1. Pool de efeitos (`src/fx/`)
 
-- `FxEffect` (`fx_effect.gd`): efeito desenhado por código (`_draw`), sem arquivo de textura, sem alocar por quadro. Gotas e anéis são retângulos de um **atlas branco único** gerado uma vez (`FxEffect.prepare_textures()`, chamado pelo `FxPool.register`) e tingidos pela cor: assim caem no mesmo lote (`draw_circle`/`draw_arc` custavam 1 draw call cada no Compatibility). Exports de cor: `default_color`, `outline_color` (fixo da paleta quando usada a cor padrão; alfa 0 = cor −55%) e `highlight_color` (faísca do `SPARKLE`). Estilos: `BURST` (flash + anel + gotas, acima da âncora), `GROUND_RING` (decalque elíptico 0,75 no chão, `z_index = -1`; com `fill` = telegraph), `SPARKLE` (gotas subindo), `STREAK` (traço curto em `direction`: rastro do disparo).
+- `FxEffect` (`fx_effect.gd`): efeito desenhado por código (`_draw`), sem arquivo de textura, sem alocar por quadro. Gotas e anéis são retângulos de um **atlas branco único** gerado uma vez (`FxEffect.prepare_textures()`, chamado pelo `FxPool.register`) e tingidos pela cor: assim caem no mesmo lote (`draw_circle`/`draw_arc` custavam 1 draw call cada no Compatibility). Exports de cor: `default_color`, `outline_color` (fixo da paleta quando usada a cor padrão; alfa 0 = cor −55%) e `highlight_color` (faísca do `SPARKLE`). Estilos: `BURST` (flash + anel + gotas, acima da âncora; `flash_scale`/`flash_window`), `GROUND_RING` (decalque elíptico 0,75 no chão, `z_index = -1`; com `fill` = telegraph), `SPARKLE` (gotas subindo), `STREAK` (traço curto em `direction`: rastro do disparo), `EXPLOSION` (miolo `secondary_color` → `color`, chamas, brasas `highlight_color` e fumaça curta; brasas e fumaça só fora do reduzido), `PUFF` (poeira/fumaça espalhando no chão e subindo), `TRAVEL` (rastro de 0 até `target` em `travel_time`, com `arc`, `accelerate`, `stars`; depois a cauda some), `ORBIT` (estrelas girando acima da âncora), `GLOW` (halo pulsando até o fim + flash). `TRAVEL`/`ORBIT`/`GLOW` têm `z_index = 1` (acima dos corpos). Por uso, quem chama pode definir após o `play()`: `direction`, `target`, `delay` (invisível até lá; a duração conta depois) e `duration`.
 - Cenas `fx_*.tscn` = `FxEffect` com os parâmetros do tipo (duração, raio, gotas, altura, cor padrão).
 - `FxPool` (`fx_pool.gd`): `setup_default()` ou `register(tipo, cena, n)` **pré-criam** as instâncias (fora da partida). `play(tipo, âncora, cor = padrão, tamanho = 1.0) -> FxEffect` religa uma livre; cheio, **recicla a mais antiga** (limite nunca passa). `reduced_effects`, `capacity()`, `active_count()`, `stop_all()`.
 - **Âncora** = ponto de contato com o chão, em coordenadas de tela (mesma regra de `GroundPlane`). O pool tem `y_sort_enabled`: como filho da `Arena` (Y-sort), os efeitos se ordenam com as entidades; decalques ficam abaixo dos corpos (z −1) e acima do piso (z −10).
 - `fx/` não depende de `match/` (o `Y_SCALE = 0,75` é repetido em `FxEffect`). Quem aciona é `match/` ou `ui/`, chamando `play()` ao receber um sinal.
 - `FxDirector` (`fx_director.gd`): `bind(arena)` conecta, **só se existirem** (`has_signal`), os sinais de `FxDirector.SIGNALS` aos efeitos do catálogo (§2); `unbind()`; `reduced_effects` repassa ao pool e corta o rastro. Converte posições do espaço da arena para o do pool. Âncora do Núcleo = filho `Anima` da arena (senão `core_anchor`). Não depende de `match/`.
-- Demo: `src/fx/demo/fx_demo.tscn`: o próprio nó é uma arena falsa e emite os sinais (disparo → impacto → morte → coleta, dano no Núcleo, skill, telegraph, fase do chefe); clique alterna o modo reduzido; `-- --fx-bench [--fx-reduced]` mede (§3). Testes: `tests/unit/fx/test_fx_pool.gd`, `tests/unit/fx/test_fx_director.gd`.
+- Demo: `src/fx/demo/fx_demo.tscn`: o próprio nó é uma arena falsa e emite os sinais (disparo → impacto → morte → coleta, dano no Núcleo, Módulo usado/pronto, queda e impacto do meteoro, anulação, wind-up e golpe do chefe, lançamento, morte do chefe); clique alterna o modo reduzido; `-- --fx-bench [--fx-reduced] [--fx-boss]` mede (§3). Testes: `tests/unit/fx/test_fx_pool.gd`, `tests/unit/fx/test_fx_director.gd`.
 
-### 1.1 Como ligar na partida (pedido ao AG00: arquivos fora do escopo do AG09)
+### 1.1 Como ligar na partida (feito no `SceneFlow._link_fx`)
 
 Na `arena.tscn` (ou no `SceneFlow`), sem tocar na lógica:
 1. Um `FxPool` como **filho direto da `Arena`** (Y-sort; posições sem conversão) e `pool.setup_default()` no `_ready` (fora da partida: ~80 instâncias + atlas).
@@ -39,6 +39,29 @@ Custo = gotas desenhadas no pico (cada gota = 2 círculos) + arcos. "Sinal exist
 | `fx_death` (`size` 3) + flash | troca de fase / morte do chefe | `boss_phase_changed(phase)` na Arena; `boss_defeated` | T-148; `boss_defeated` existe (no último ponto do chefe) | 0,4 s | `boss` | r 126 | (pool de morte) | 6 gotas |
 | `fx_core_pulse` | pulso de dano no Núcleo | `core_hp_changed` com `current` menor | existe | 0,35 s | `#E8344E` | r 110 | 3 | 2 arcos |
 
+**T-131 / T-117 (meteoro, chefe ogro, Módulos).** "Reduzido" = o que o `FxDirector` faz com `reduced_effects`.
+
+| Tipo | Efeito | Sinal | Duração | Cor | Inst. | Pico | Reduzido |
+|---|---|---|---|---|---|---|---|
+| `fx_meteor_trail` (TRAVEL) | rastro de fogo da queda (360 px, acelerando) | `skill_fall_started(slot, at, fall_time)` (percurso = `fall_time`; fallback sem o sinal: no `skill_cast`, só a cauda) | `fall_time` + 0,15 s | `#FF8A3D`, cabeça `#FFE066` | 2 | 7 gotas | cortado |
+| `fx_skill_cast` (GROUND_RING) | anel de choque do impacto (agora quente) | `skill_cast` | 0,45 s | `#FF9A3D` | 2 | 2 arcos | mantido |
+| `fx_meteor_explosion` (EXPLOSION) | flash + bola de fogo + chamas + brasas + fumaça curta | `skill_cast` (`size` = raio / 160) | 0,55 s | `#FF8A3D`/`#FFE066`, brasas `#FFF3B0` | 2 | 6 chamas + miolo + 6 brasas + 3 fumaças | sem flash, brasas e fumaça; 3 chamas |
+| `fx_crater_smoke` (PUFF) | cratera fumegando | `skill_cast` (atraso 0,12 s) | 0,9 s | `#8A7F8C` | 2 | 5 gotas | cortado |
+| `fx_fizzle` (PUFF) | "puf" discreto do meteoro anulado | `skill_fizzled` | 0,35 s | `#B8B0BC` | 2 | 4 gotas | 2 gotas |
+| `fx_telegraph` (GROUND_RING fill) | aviso do golpe do ogro, **vermelho** | `boss_telegraph_started` | `duration` | `#E8344E` | 6 | 1 elipse + 2 arcos | **mantido** |
+| `fx_boss_windup` (GLOW) | brilho vermelho pulsando no corpo do ogro + flash no fim | `boss_telegraph_started` (some no lançamento/morte) | `duration` | `#E8344E` | 1 | 4 gotas | cortado |
+| `fx_boss_wave` (GROUND_RING) | onda do golpe no Núcleo | `boss_attack_landed(at)` (fallback sem o sinal: queda de `core_hp_changed` com wind-up pendente, sem `boss_launched` entre eles) | 0,4 s | poeira `#D9B98C` | 2 | 2 arcos | mantido |
+| `fx_boss_slam` (PUFF) | poeira do golpe no Núcleo | idem | 0,45 s | `#D9B98C` | 2 | 6 gotas | cortado |
+| `fx_boss_launch` (TRAVEL) | voo: rastro de poeira + 3 estrelas na cabeça | `boss_launched(from, to)` | 0,6 + 0,2 s | `#D9B98C`, estrelas `#FFE066` | 1 | 7 gotas + 3 | cortado |
+| `fx_boss_land` (PUFF) | poeira do pouso | `boss_launched` (atraso 0,6 s = `launch_time`) | 0,45 s | `#D9B98C` | 1 | 6 gotas | cortado |
+| `fx_boss_stun` (ORBIT) | estrelas girando sobre a cabeça (235 px) | `boss_launched` (atraso 0,6 s; dura 2 s = `stun_time`; some na morte) | 2 s | `#FFE066` | 1 | 4 estrelas | 2 estrelas |
+| `fx_death` `size` 3 + `fx_meteor_explosion` `size` 1,8 | morte do chefe (explosão maior) | `boss_defeated` | 0,55 s | `boss` + fogo | (pools) | ~20 gotas | sem flash, brasas e fumaça |
+| `fx_hit` (flash maior) | flash branco de acerto (T-117): `flash_scale` 0,9 nos primeiros 35% (~0,08 s) | `projectile_hit` | 0,22 s | branco | 24 | +0 (mesma gota) | sem flash |
+| `fx_module_used` (BURST) | flash no Anima ao usar o Módulo | `skill_used(slot)` | 0,25 s | `accent` | 2 | flash + 2 arcos | só o anel |
+| `fx_module_ready` (SPARKLE) | brilho subindo no Anima quando o Módulo fica pronto | `skill_ready(slot)` | 0,5 s | `accent` | 2 | 6 gotas | 3 gotas |
+
+Tempos repetidos no `FxDirector` (fx/ não lê data/): `BOSS_LAUNCH_TIME` 0,6, `BOSS_STUN_TIME` 2, `METEOR_FALL_HEIGHT` 360, `METEOR_BASE_RADIUS` 160; se os dados mudarem, atualizar. `boss_phase_changed` saiu (não existe mais). O aviso no chão e a cratera do meteoro continuam desenhados pelo `match/` (`meteor_skill.gd`).
+
 Os sinais marcados T-148 estão sendo criados pelo AG01; o `FxDirector` só conecta os que existirem.
 
 ## 3. Orçamento por quadro (iPhone, WebGL 2)
@@ -53,16 +76,28 @@ Os sinais marcados T-148 estão sendo criados pelo AG01; o `FxDirector` só cone
 | normal | 8,9 ms | 12,1 ms | +3,2 ms | 66 | 454 → 471 | 0,34 ms |
 | reduzido | 8,9 ms | 10,5 ms | +1,7 ms | 58 | 454 → 455 | 0,27 ms |
 
+  **T-131/T-132 (mesma máquina, outra sessão; compare só o Δ):** `--fx-boss` soma, a cada 20 quadros, um ciclo inteiro de meteoro e chefe (queda, impacto, anulação, wind-up, golpe, lançamento, atordoamento, morte e Módulos), muito acima do real (1 meteoro a cada ~8 s).
+
+| Cenário | Sem efeitos | Com efeitos | Δ | Vivos | Draw calls | Sinais (CPU) |
+|---|---|---|---|---|---|---|
+| normal (T-130 + flash maior) | 5,7 ms | 8,4 ms | +2,7 ms | 66 | 454 → 471 | 0,25 ms |
+| reduzido | 5,2 ms | 7,7 ms | +2,5 ms | 58 | 454 → 455 | 0,20 ms |
+| normal + `--fx-boss` | 5,4 ms | 8,7 ms | +3,3 ms | 95 | 454 → 472 | 0,25 ms |
+| reduzido + `--fx-boss` | 5,8 ms | 8,3 ms | +2,4 ms | 79 | 454 → 456 | 0,23 ms |
+
+  Os efeitos novos custam ~+0,6 ms no pior caso (normal) e o reduzido corta ~0,9 ms desse cenário; +1 draw call (mesmo atlas). Ruído entre execuções: ~±0,5 ms.
+
   Antes do atlas (`draw_circle`/`draw_arc`), o normal custava +15 ms e 1153 draw calls: o atlas é obrigatório. O resto do Δ é o `_draw` em GDScript (~1 nó redesenhado por efeito vivo). **Falta medir no build Web e no iPhone.**
 
 ## 4. Modo de efeitos reduzidos (T-132)
 
 - `FxPool.reduced_effects = true` (já implementado): metade das gotas (arredonda para cima) e **sem flash** branco.
-- Regras a completar na T-132: sem tremor de câmera; telegraphs **sempre** mantidos (são leitura de gameplay); pulso do Núcleo mantido; pool de `fx_hit` cai para 12; sem rastro do projétil; opção salva nas configurações (AG02/AG04).
+- **T-132 (no `FxDirector`):** sem rastros (tiro, meteoro, voo do chefe), sem fumaça da cratera, sem brilho do wind-up, sem poeiras (golpe, pouso); explosão sem flash, brasas e fumaça. **Sempre mantidos** (leitura): aviso do golpe no chão, onda do golpe, pulso do Núcleo, anel e explosão do meteoro, estrelas do atordoamento (metade), "puf" da anulação. O aviso do meteoro é do `match/`. Tremor e hit-stop: AG01 (`Arena.reduced_effects`). A opção vem da pausa (AG02) pelo `SceneFlow`.
 
 ## 5. Pendências
 
 - Medir o custo no build Web e no iPhone (o `--fx-bench` só roda no desktop).
 - Ligação na partida (§1.1), pelo AG00/AG01.
-- Substituir o `BossTelegraph` de `match/` pelo `fx_telegraph` quando o sinal com área existir (T-131).
+- `skill_fall_started` e `boss_attack_landed` existem (AG01); os fallbacks ficam só para arenas sem eles.
+- Flash branco **no sprite** do inimigo atingido (70 ms) é feito pelo `match/` (AG01); o `fx_hit` soma um flash maior sobre o ponto do acerto.
 - Brilho contínuo do próprio projétil (no sprite, AG08/AG01); o `fx_trail` cobre só o rastro do disparo.

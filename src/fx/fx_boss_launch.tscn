@@ -1,0 +1,17 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/fx/fx_effect.gd" id="1"]
+
+[node name="fx_boss_launch" type="Node2D"]
+script = ExtResource("1")
+style = 6
+duration = 0.8
+radius = 14.0
+dot_count = 6
+height = 110.0
+default_color = Color(0.851, 0.7255, 0.549, 1)
+highlight_color = Color(0.949, 0.8667, 0.7294, 1)
+secondary_color = Color(1, 0.8784, 0.4, 1)
+travel_time = 0.6
+arc = 40.0
+stars = 3

@@ -17,12 +17,16 @@ const MATCH_ROOT_NAME := &"Match"
 const ARENA_NODE_NAME := &"Arena"
 const FX_POOL_NODE_NAME := &"FxPool"
 const FX_DIRECTOR_NODE_NAME := &"FxDirector"
+const RECORDER_NODE_NAME := &"MatchRecorder"
 
 ## Último resultado recebido.
 var last_result: MatchResult
 ## Config da partida atual, reutilizada em "Recomeçar" e "Jogar de novo".
 var last_config: MatchConfig
+## Log da última partida (MatchRecorder, docs/debug.md), entregue ao Resultado.
+var last_log: Dictionary = {}
 var _changing := false
+var _recorder: MatchRecorder
 
 
 func go_to_title() -> void:
@@ -54,15 +58,17 @@ func start_match(config: MatchConfig = null) -> void:
 	pause.restart_requested.connect(func() -> void: start_match(config), CONNECT_ONE_SHOT)
 	arena.match_ended.connect(_on_match_ended, CONNECT_ONE_SHOT)
 	_link_bottom_inset(arena, hud)
-	_link_fx(arena, match_root)
+	var director := _link_fx(arena, match_root)
+	_link_reduced_effects(arena, director, pause)
+	_link_debug(arena, hud, pause, match_root)
 	match_root.add_child(arena)
 	_swap(match_root, config.match_scene_path)
 
 
 ## Efeitos (docs/vfx.md §1.1): pool como filho direto da Arena (Y-sort com as entidades; decalques
 ## em z −1 acima do piso em z −10) e director no nó da partida, ligado depois do `_ready` da Arena.
-## Instâncias pré-criadas aqui, fora da partida. Sem opção de efeitos reduzidos ainda (T-132).
-func _link_fx(arena: Arena, match_root: Node) -> void:
+## Instâncias pré-criadas aqui, fora da partida. Efeitos reduzidos: ver `_link_reduced_effects`.
+func _link_fx(arena: Arena, match_root: Node) -> FxDirector:
 	var pool := FxPool.new()
 	pool.name = FX_POOL_NODE_NAME
 	pool.setup_default()
@@ -70,9 +76,40 @@ func _link_fx(arena: Arena, match_root: Node) -> void:
 	var director := FxDirector.new()
 	director.name = FX_DIRECTOR_NODE_NAME
 	director.pool = pool
-	director.reduced_effects = false
 	match_root.add_child(director)
 	arena.ready.connect(func() -> void: director.bind(arena), CONNECT_ONE_SHOT)
+	return director
+
+
+## "Efeitos reduzidos" (T-132, BRF-080): valor salvo em DebugSettings aplicado ao criar a partida e
+## de novo quando o interruptor da pausa muda (vale já na partida em curso).
+func _link_reduced_effects(arena: Node, director: FxDirector, pause: PauseScreen) -> void:
+	apply_reduced_effects(arena, director, DebugSettings.reduced_effects())
+	pause.reduced_effects_changed.connect(func(on: bool) -> void: apply_reduced_effects(arena, director, on))
+
+
+## Repassa para a Arena (AG01; só se ela já tiver a propriedade) e para o FxDirector (AG09, que repassa
+## ao FxPool, de onde o MatchRecorder lê `reduced_effects`).
+static func apply_reduced_effects(arena: Node, director: FxDirector, on: bool) -> void:
+	if is_instance_valid(arena) and &"reduced_effects" in arena:
+		arena.set(&"reduced_effects", on)
+	if is_instance_valid(director):
+		director.reduced_effects = on
+
+
+## Debug (docs/debug.md): gravador sempre ligado e overlay (desligado por padrão), no nó da partida e
+## antes da Arena entrar na árvore. A seed sorteada aqui fica no log (reproduzir com Arena.set_seed).
+func _link_debug(arena: Node, hud: Hud, pause: PauseScreen, match_root: Node) -> void:
+	var match_seed := randi()
+	if arena.has_method(&"set_seed"):
+		arena.set_seed(match_seed)
+	_recorder = MatchRecorder.new()
+	_recorder.name = RECORDER_NODE_NAME
+	_recorder.attach(arena, hud, pause, match_seed)
+	match_root.add_child(_recorder)
+	var overlay := DebugOverlay.new()
+	overlay.setup(_recorder, hud)
+	match_root.add_child(overlay)
 
 
 ## Liga a base da Arena à altura da bandeja do HUD (com a safe area), também ao redimensionar.
@@ -100,6 +137,10 @@ func _on_match_ended(result: MatchResult) -> void:
 	last_result = result
 	var screen: ResultScreen = _instantiate(RESULT_SCENE)
 	screen.show_result(result)
+	if _recorder != null and is_instance_valid(_recorder):
+		_recorder.finish(result)
+		last_log = _recorder.log_data
+	screen.set_log(last_log)
 	screen.play_again_requested.connect(func() -> void: start_match(last_config), CONNECT_ONE_SHOT)
 	screen.title_requested.connect(go_to_title, CONNECT_ONE_SHOT)
 	_swap(screen, RESULT_SCENE)

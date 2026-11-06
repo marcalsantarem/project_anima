@@ -6,6 +6,8 @@ extends Control
 ## Arte da T-128 (T-138): moldura por estado, ícone do upgrade (UiArt.UPGRADE_ICONS ou `icon_texture`), pílula de custo.
 
 signal buy_requested(id: StringName)
+## Primeira vez na partida em que o botão fica `affordable` (T-117: pulso discreto no HUD).
+signal first_affordable(id: StringName)
 
 enum State { AFFORDABLE, POOR, MAX, DISABLED }
 
@@ -33,8 +35,10 @@ const PILL := Rect2(9, 52, 112, 25)
 const PILL_STAR := 20.0
 const LEVEL_SIZE := 26
 const COST_SIZE := 20
+const MAX_OUTLINE := 6 ## contorno total do "MAX" (assets/ui/README.md)
 const PLUS_RISE := 28.0
 const SHAKE_PX := 5.0
+const AFFORDABLE_POP := 1.06
 const PRESS_SCALE := 0.94
 
 @export var upgrade_id: StringName = &"upgrade_atk_power":
@@ -54,6 +58,7 @@ var next_cost := -1
 var particles := 0
 var state := State.DISABLED
 var _known := false ## recebeu ao menos um set_upgrade
+var _was_affordable := false ## já ficou `affordable` alguma vez (pulso só na primeira)
 var _disabled := false
 var _plus := 0.0 ## 0..1: progresso do "+1" (0 = invisível)
 var _touch_index := -1
@@ -135,6 +140,10 @@ func _refresh_state() -> void:
 	if s != state:
 		state = s
 		mouse_default_cursor_shape = CURSOR_POINTING_HAND if s == State.AFFORDABLE else CURSOR_ARROW
+		if s == State.AFFORDABLE and not _was_affordable:
+			_was_affordable = true
+			_affordable_pop()
+			first_affordable.emit(upgrade_id)
 	_update_accessibility()
 	queue_redraw()
 
@@ -206,6 +215,18 @@ func _press_pop() -> void:
 	_anim.tween_property(self, "scale", Vector2.ONE, UiTokens.ANIM_FAST)
 
 
+## Pop discreto na primeira vez que fica comprável (T-117).
+func _affordable_pop() -> void:
+	if not is_inside_tree():
+		return
+	if _anim:
+		_anim.kill()
+	scale = Vector2.ONE
+	_anim = create_tween()
+	_anim.tween_property(self, "scale", Vector2.ONE * AFFORDABLE_POP, UiTokens.ANIM_FAST)
+	_anim.tween_property(self, "scale", Vector2.ONE, UiTokens.ANIM_FAST)
+
+
 ## "+1" sobe (ANIM_UI) e some (ANIM_UI) acima do canto do botão.
 func _show_plus_one() -> void:
 	if _plus_tween:
@@ -250,7 +271,10 @@ func _draw() -> void:
 	var cy := PILL.get_center().y + (font.get_ascent(COST_SIZE) - font.get_descent(COST_SIZE)) * 0.5
 	if state == State.MAX:
 		draw_texture_rect(UiArt.UPGRADE_COST_PILL_MAX, PILL, false)
-		draw_string(font, Vector2(PILL.position.x, cy), "MAX", HORIZONTAL_ALIGNMENT_CENTER, PILL.size.x, COST_SIZE, UiTokens.INK)
+		# Branco com contorno ink de 6 px (T-154; a arte não tem texto).
+		draw_string_outline(font, Vector2(PILL.position.x, cy), "MAX", HORIZONTAL_ALIGNMENT_CENTER, PILL.size.x, COST_SIZE,
+			MAX_OUTLINE, UiTokens.INK)
+		draw_string(font, Vector2(PILL.position.x, cy), "MAX", HORIZONTAL_ALIGNMENT_CENTER, PILL.size.x, COST_SIZE, UiTokens.TEXT_PRIMARY)
 	else:
 		draw_texture_rect(UiArt.UPGRADE_COST_PILL, PILL, false)
 		var star := Rect2(PILL.position + Vector2(4.0, (PILL.size.y - PILL_STAR) * 0.5), Vector2(PILL_STAR, PILL_STAR))

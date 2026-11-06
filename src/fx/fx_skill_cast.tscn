@@ -9,5 +9,5 @@ duration = 0.45
 radius = 160.0
 dot_count = 0
 height = 0.0
-default_color = Color(0.1843, 0.902, 0.8235, 1)
+default_color = Color(1, 0.6039, 0.2392, 1)
 outline_width = 6.0

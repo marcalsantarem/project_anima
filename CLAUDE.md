@@ -55,7 +55,7 @@ O Claude principal é o **game dev líder** do projeto e o **único interlocutor
 - **Progressão** (detalhe na seção "Progressão" da Bíblia; substitui os cards do GDD):
   - **Nível da conta:** desbloqueia os slots de skill (slot 1 no nível 3, slot 2 no 7 e slot 3 no 12). A conta começa sem skills.
   - **Moedas:** **Moeda** (dourada) é a do jogo (meta), com ganho variável por partida; futuro. **Partículas** (estrela verde, "chip") é a da partida: começa em zero, é zerada a cada partida e não cai no mapa por enquanto.
-  - **Fragmentos:** são os equipamentos do Anima (6 espaços), melhorados com Moeda, com raridade e **fusão** (3 iguais viram 1 da raridade seguinte); futuro.
+  - **Componentes** (ex-Fragmentos): são os equipamentos do Anima (3 no M7, 6 espaços no M13), melhorados com Moeda, com raridade e **fusão**. **Fragmentos** agora são os Fragmentos de Módulo (atualizam Módulos, M14). Roadmap de versões em `docs/roadmap.md`.
   - **Módulos** são as skills (poderes ativos, ex.: o meteoro). **Núcleos** são os talentos. Glossário completo na Bíblia; identificadores de código seguem em inglês.
   - **Upgrades da partida:** 5 botões em tempo real acima das skills (Atk power, Atk spd, Defesa, Vida máxima, Cooldown), pagos com Partículas; valem só para a partida.
   - **Núcleos (árvore de talentos):** comprados com Moeda; futuro.
@@ -111,7 +111,7 @@ godot --headless --path . -s addons/gut/gut_cmdln.gd -gexit
 godot --headless --path . -s addons/gut/gut_cmdln.gd -gtest=res://tests/unit/test_smoke.gd -gexit
 
 # Exportar para Web (precisa de um preset "Web" em export_presets.cfg e dos export templates)
-godot --headless --path . --export-release "Web" build/web/index.html
+godot --headless --path . --export-release "Web" build/web/index.html && bash web/copy_pwa.sh build/web  # + manifesto e ícones (T-175)
 
 ```
 

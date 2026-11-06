@@ -18,6 +18,7 @@ Fonte: `_src/gen_sprites.py` (SVG por código → Chrome headless). Para regener
 | `boss_ogre.png` | 512×512 | 256×256 | (256, 472) chão | Chefe da fase 1: ogro, pose parada com clava (decisão 39, BRF-057). Substitui o `boss_warden*` (mantido até o AG01 trocar) |
 | `boss_ogre_attack.png` | 512×512 | 256×256 | (256, 472) chão | Wind-up do golpe: clava no alto, boca aberta. Mesmo canvas e âncora; trocar a textura no anúncio do ataque |
 | `boss_ogre_stunned.png` | 512×512 | 256×256 | (256, 472) chão | Atordoado: curvado, olhos em espiral, estrelas, clava no chão. Mesmo canvas e âncora |
+| `boss_ogre_walk_1.png` … `boss_ogre_walk_4.png` | 512×512 | 256×256 | (256, 472) chão | Ciclo de caminhada pesada (BRF-065): 1 = pé esquerdo à frente, 2 = passagem baixa, 3 = pé direito à frente, 4 = passagem baixa. Braços e clava em oposição aos pés, barriga com atraso, tronco ±8 px e inclinação ±3°. Sem sombra. Ritmo: trocar de quadro a cada meio passo (1→2→3→4→1), sincronizado com o balanço por código do AG01 |
 | `projectile_player.png` | 64×32 | 32×16 | (32, 16) centro | Projétil do jogador (ciano). Aponta para +X: `rotation = direção.angle()` |
 | `projectile_enemy.png` | 64×64 | 32×32 | (32, 32) centro | Projétil inimigo (magenta, sem ciano). Aponta para +X |
 | `pickup_particle.png` | 64×64 | 32×32 | (32, 56) chão | Partícula dropada (moeda da partida) |
