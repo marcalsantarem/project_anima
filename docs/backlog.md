@@ -12,7 +12,7 @@
 | T-004 | Preset Web + HTML shell mínimo | M0 | AG02 | feita |
 | T-005 | Build vazio no Chrome PC e no iPhone | M0 | AG02 | feita |
 | T-006 | Cena de estresse para confirmar metas de desempenho | M0 | AG10 | feita no PC (BRF-085); falta medir no iPhone |
-| T-007 | ADR das metas de desempenho e da exportação single-threaded | M0 | AG07 | a fazer |
+| T-007 | ADR das metas de desempenho e da exportação single-threaded | M0 | AG07 | feita (BRF-095; falta o tamanho do build, da T-119) |
 | T-008 | Deploy automático Web (GitHub Actions → Netlify) | M0 | AG02 | feita |
 | T-101 | `docs/gameplay.md` (parâmetros e sinais) | M1 | AG01 | feita |
 | T-102 | Autoload de fluxo de cenas | M1 | AG07 | feita |
@@ -31,7 +31,7 @@
 | T-115 | Chefe da fase 1 | M1 | AG01 | feita |
 | T-116 | Fase 1 completa (~10 ondas + chefe) | M1 | AG01 | feita |
 | T-117 | Game feel | M1 | AG01 + AG09 | feita |
-| T-118 | Desempenho no iPhone (150 inimigos / 300 projéteis) | M1 | AG01 | pool e modo de estresse feitos; iPhone 11 Pro mediu 44 fps (meta 50); rodada 2 em curso (BRF-091) |
+| T-118 | Desempenho no iPhone (150 inimigos / 300 projéteis) | M1 | AG01 | feita (BRF-086, BRF-091); iPhone 11 Pro 46,9 fps; meta revisada: média >= 45 fps no pior caso (dono, 2026-11-06) |
 | T-119 | Otimização do build Web | M1 | AG10 | a fazer |
 | T-120 | Validação do M1 | M1 | AG03 | a fazer |
 | T-121 | Tema global no `project.godot` | M1 | AG07 | feita |
@@ -410,7 +410,7 @@
 - **Marco:** M1 · **Dono:** AG01 (medição com AG03) · **Status:** pool e modo de estresse feitos; falta medir no iPhone
 - **Depende de:** T-006, T-107, T-116, T-132 · **Desbloqueia:** T-120
 - **Arquivos:** `src/match/`
-- **Pronto quando:** ≥ 50 fps no iPhone com ~150 inimigos e ~300 projéteis (ou a meta revisada em T-007); medições registradas.
+- **Pronto quando:** média ≥ 45 fps no iPhone 11 Pro com 150 inimigos vivos (meta revisada na T-007, aprovada pelo dono em 2026-11-06); medições registradas em `docs/perf.md`.
 - **Proposta (AG01):** pool de inimigos (reutilizar instâncias em vez de instanciar/liberar por spawn).
 
 ### T-119 — Otimização do build Web

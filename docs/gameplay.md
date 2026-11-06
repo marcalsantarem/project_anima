@@ -357,7 +357,7 @@ O `project.godot` é do AG07. Layers sugeridas:
 
 ## Limites de desempenho
 
-- Metas: 60 fps no PC; ≥ 50 fps no iPhone com ~150 inimigos e ~300 projéteis (a confirmar no M0).
+- Metas: 60 fps no PC; **média ≥ 45 fps no iPhone 11 Pro** com 150 inimigos vivos (revisada em 2026-11-06; medido 46,9 fps; 300 projéteis simultâneos não foram medidos). Ver `docs/adr/0001-desempenho-e-exportacao-web.md` e `docs/perf.md`.
 - Pools para projéteis e inimigos (T-118, feito); nada de alocação por frame.
 - Busca de alvo e de densidade por intervalo (0,1 s), não por frame.
 - `CPUParticles2D` curtas; nada de partículas por projétil.

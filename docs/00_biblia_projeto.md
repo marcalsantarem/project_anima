@@ -131,7 +131,7 @@ Proibido usar personagens, criaturas, nomes, ícones, sons, interface ou arte de
 
 - Godot 4.7, GDScript, testes com GUT, renderer Compatibility (WebGL 2), exportação **single-threaded**.
 - Metas iniciais (a confirmar no M0):
-  - 60 fps no PC; **≥ 50 fps no iPhone** com ~150 inimigos e ~300 projéteis;
+  - 60 fps no PC; **média ≥ 45 fps no iPhone 11 Pro** no pior caso (150 inimigos vivos; meta revisada pelo dono em 2026-11-06, ver `docs/adr/0001-desempenho-e-exportacao-web.md`);
   - download inicial de **≤ ~15 MB**.
 - O áudio só toca depois do primeiro toque, por isso há a tela "toque para começar".
 - Backend **[A DEFINIR]**: Firebase é o favorito e Nakama a alternativa.

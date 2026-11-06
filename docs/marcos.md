@@ -75,7 +75,7 @@ Detalhe de cada marco: [docs/roadmap.md](roadmap.md) (decisão 53).
 - [ ] VFX de ataque, acertos, mortes, skill e chefe, com pool e modo de efeitos reduzidos (T-129 a T-132)
 - [ ] Game feel de demo (T-117)
 - [x] Testes GUT passando headless (T-114; seed determinística em T-123)
-- [ ] ≥ 50 fps no iPhone na carga-alvo, com VFX, e build ≤ ~15 MB (T-118, T-119)
+- [ ] Média ≥ 45 fps no iPhone 11 Pro no pior caso (T-118 ✔, medido 46,9) e build ≤ ~15 MB (T-119)
 - [ ] Botão "Enviar log" no Resultado gravando em uma tabela online, para testes com amigos (T-267 a T-271, decisão 58)
 - [ ] Veredito "passa" do AG03, incluindo a qualidade visual de demo (T-120), e aval do usuário
 

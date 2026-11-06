@@ -13,7 +13,7 @@ Ao mudar uma decisão, atualize esta tabela e, se for o caso, o `CLAUDE.md`.
 | 1 | Plataforma | Decidido | Web-first (Chrome no PC, Safari no iPhone); nativo no futuro | Teste instantâneo por link (GDD) |
 | 2 | Engine | Decidido | Godot 4.x, exportação Web, renderer Compatibility | GDD; o WebGL 2 é o que roda em todos os navegadores-alvo |
 | 3 | Linguagem | Decidido | GDScript | O Godot 4 com C#/.NET não exporta para Web |
-| 4 | Exportação Web | Proposta | Single-threaded (sem SharedArrayBuffer) | Evita os headers COOP/COEP e problemas no Safari do iOS |
+| 4 | Exportação Web | Decidido | Single-threaded (sem SharedArrayBuffer) | Evita os headers COOP/COEP e problemas no Safari do iOS. Confirmado pelas medições no iPhone 11 Pro; ver `docs/adr/0001-desempenho-e-exportacao-web.md` (2026-11-06) |
 | 5 | Backend | A definir | Favorito: Firebase. Alternativa: Nakama. Protótipo com save local | O Firebase não tem SDK para Godot e não traz recursos de jogo; o Nakama tem SDK para Godot e economia pronta, mas exige hospedar o servidor |
 | 6 | Economia | Proposta | Autoridade no servidor (fusão, moedas, caixas) | O cliente web é manipulável |
 | 7 | Testes | Decidido | GUT | Aprovado pelo dono do projeto em 2026-11-03 |
