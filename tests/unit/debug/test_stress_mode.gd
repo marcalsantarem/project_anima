@@ -59,3 +59,22 @@ func test_summary_has_stress_block_only_when_stressed() -> void:
 	for k in ["fps_medio", "fps_min", "quadro_ms_p95", "quadros_50ms", "draw_calls", "nos", "inimigos", "projeteis", "dpr", "canvas"]:
 		assert_true(e.has(k), k)
 	assert_string_contains(LogReport.to_text(rec2.log_data), "ESTRESSE stress=150,300")
+
+
+func test_stress_projectile_pierces_without_changing_base() -> void:
+	var base := ProjectileData.new()
+	var d := StressMode.stress_projectile(base)
+	assert_eq(d.pierce, StressMode.PIERCE)
+	assert_eq(base.pierce, 0)
+
+
+func test_log_time_rounds_whole_value() -> void:
+	assert_eq(LogReport._time(45.96), "00:46.0")
+	assert_eq(LogReport._time(45.9), "00:45.9")
+	assert_eq(LogReport._time(125.04), "02:05.0")
+
+
+func test_canvas_size_has_width() -> void:
+	var vp := {"canvas": [0.0, 616.0, 616.0], "inner": [390, 664]}
+	assert_eq(LogReport._canvas_size(vp, {}), [390.0, 616.0])
+	assert_eq(LogReport._canvas_size({}, {"window": [1, 2]}), [1, 2])

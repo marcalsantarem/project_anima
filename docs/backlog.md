@@ -31,7 +31,7 @@
 | T-115 | Chefe da fase 1 | M1 | AG01 | feita |
 | T-116 | Fase 1 completa (~10 ondas + chefe) | M1 | AG01 | feita |
 | T-117 | Game feel | M1 | AG01 + AG09 | feita |
-| T-118 | Desempenho no iPhone (150 inimigos / 300 projéteis) | M1 | AG01 | pool e modo de estresse feitos (BRF-086); falta medir no iPhone |
+| T-118 | Desempenho no iPhone (150 inimigos / 300 projéteis) | M1 | AG01 | pool e modo de estresse feitos; iPhone 11 Pro mediu 44 fps (meta 50); rodada 2 em curso (BRF-091) |
 | T-119 | Otimização do build Web | M1 | AG10 | a fazer |
 | T-120 | Validação do M1 | M1 | AG03 | a fazer |
 | T-121 | Tema global no `project.godot` | M1 | AG07 | feita |
@@ -68,8 +68,8 @@
 | T-153 | Arte das pílulas do topo (ONDA e Partículas) e do botão secundário | M1 | AG08 | feita |
 | T-154 | Texto "MAX" na pílula de custo dos upgrades (hoje desenhado por código) | M1 | AG08 + AG02 | feita |
 | T-155 | "Voltar ao título" a partir da tela de Resultado | M1 | AG02 + AG07 | feita |
-| T-156 | Chão: quebrar a repetição das pedrinhas do tile | M1 | AG08 + AG01 | depende do teste no iPhone |
-| T-157 | Ajustar o escurecimento do topo (degradê do chão + do HUD) | M1 | AG02 + AG01 | depende do teste no iPhone |
+| T-156 | Chão: quebrar a repetição das pedrinhas do tile | M1 | AG08 + AG01 | dispensada do M1 (dono, 2026-11-06) |
+| T-157 | Ajustar o escurecimento do topo (degradê do chão + do HUD) | M1 | AG02 + AG01 | dispensada do M1 (dono, 2026-11-06) |
 | T-158 | Teste no iPhone: splash, título, partida e chefe (ajustes saem daqui) | M1 | usuário + AG00 | feita |
 | T-159 | Remover o ícone provisório do `skill_pulse` e deixar o do meteoro como padrão | M1 | AG02 | feita (BRF-083; sobra o PNG do pulse sem uso, limpeza com o AG08) |
 | T-160 | Arte do ícone de Partículas: estrela verde, estilo "chip" (e nova cor dos efeitos de coleta) | M1 | AG08 | feita |
@@ -519,7 +519,7 @@
 - **Pronto quando:** o Resultado oferece também "Voltar ao título" (botão secundário), o fluxo muda para a cena de título sem reiniciar o jogo e sem vazar a partida; testes de fluxo.
 
 ### T-156 — Chão sem repetição visível
-- **Marco:** M1 · **Dono:** AG08 + AG01 · **Status:** depende do teste no iPhone
+- **Marco:** M1 · **Dono:** AG08 + AG01 · **Status:** dispensada do M1 (dono, 2026-11-06)
 - **Depende de:** T-158 (se o repetir a cada 240 px incomodar) · **Desbloqueia:** —
 - **Arquivos:** `assets/backgrounds/` (AG08), `src/match/arena/arena_floor.gd` (AG01)
 - **Pronto quando:** as pedrinhas do `floor_tile` deixam de formar padrão visível (tile maior de 8×8 ou pedrinhas espalhadas por código com a semente da arena), sem custo relevante de memória.

@@ -109,6 +109,7 @@ func take_damage(amount: int) -> void:
 	flash()
 	if health_bar:
 		health_bar.set_ratio(float(hp) / data.hp)
+		health_bar.visible = hp < data.hp ## só aparece depois do primeiro dano (menos draw calls)
 	if hp <= 0:
 		die(DeathCause.KILLED)
 
@@ -152,6 +153,7 @@ func recycle(spawn_position: Vector2, target: Vector2) -> void:
 		_body.self_modulate = Color.WHITE
 	if health_bar:
 		health_bar.set_ratio(1.0)
+		health_bar.visible = false
 	if walk:
 		walk.rest()
 	visible = true
@@ -171,6 +173,7 @@ func _build_art() -> void:
 	if data.show_health_bar:
 		health_bar = HealthBar.new()
 		health_bar.configure(data.radius, sprite_top())
+		health_bar.visible = false # vida cheia: sem desenhar até o primeiro dano
 		add_child(health_bar)
 	set_process(_spins())
 

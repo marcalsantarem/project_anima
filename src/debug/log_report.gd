@@ -178,8 +178,18 @@ static func _stress_summary(doc: Dictionary, params: Array, proj: Array, fps: Ar
 		"inimigos": [snappedf(_avg(enemies), 0.1), int(_max(enemies))],
 		"projeteis": [snappedf(_avg(proj), 0.1), int(_max(proj))],
 		"dpr": web.get("dpr", null),
-		"canvas": vp.get("canvas", h.get("window", [])),
+		"canvas": _canvas_size(vp, h),
 	}
+
+
+## [largura, altura] do canvas. O shell só informa [topo, base, altura]; a largura vem da janela.
+static func _canvas_size(vp: Dictionary, h: Dictionary) -> Array:
+	var c = vp.get("canvas")
+	var inner = vp.get("inner")
+	if c is Array and c.size() >= 3 and inner is Array and inner.size() >= 1 and float(inner[0]) > 0.0:
+		return [float(inner[0]), float(c[2])]
+	var w = h.get("window", [])
+	return w if w is Array else []
 
 
 ## Texto legível: RESUMO, linha do tempo e tabela compacta de amostras.
@@ -303,9 +313,9 @@ static func _event_line(e: Dictionary) -> String:
 
 
 static func _time(seconds: float) -> String:
-	var ms := int(round(seconds * 10.0)) % 10
-	var s := int(seconds)
-	return "%02d:%02d.%d" % [s / 60, s % 60, ms]
+	var tenths := int(round(seconds * 10.0)) ## arredonda o tempo todo (45.96 -> 46.0, não 45.0)
+	var s := tenths / 10
+	return "%02d:%02d.%d" % [s / 60, s % 60, tenths % 10]
 
 
 ## Nome base do arquivo: anima_log_AAAAMMDD_HHMMSS.

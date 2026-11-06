@@ -10,7 +10,9 @@ const ENEMY_PATHS: Array[String] = [
 	"res://data/enemies/enemy_tank.tres", "res://data/enemies/enemy_shooter.tres",
 ]
 const PER_FRAME := 20 ## no máximo de inimigos/projéteis repostos por quadro
-const SHOT_RANGE := 1400.0
+const SHOT_RANGE_MIN := 900.0 ## alcance sorteado, para os tiros não expirarem todos juntos
+const SHOT_RANGE_MAX := 1400.0
+const PIERCE := 1000 ## atravessa os inimigos: o projétil só some ao fim do alcance (mantém M vivos)
 const CORE_BOOST := 1000000000
 const DURATION_S := 60.0 ## tempo real de partida (sem pausa) até encerrar e abrir o Resultado
 
@@ -42,6 +44,13 @@ static func requested() -> Vector2i:
 	return Vector2i(maxi(int(parts[0]), 0), maxi(int(parts[1]), 0))
 
 
+## Cópia do projétil do Anima que atravessa tudo (dano 0 vem do fire). Não altera o recurso original.
+static func stress_projectile(base: ProjectileData) -> ProjectileData:
+	var d := base.duplicate() as ProjectileData
+	d.pierce = PIERCE
+	return d
+
+
 static func attach(p_arena: Arena, enemies: int, projectiles: int) -> StressMode:
 	var s := StressMode.new()
 	s.arena = p_arena
@@ -61,7 +70,7 @@ func _ready() -> void:
 		_datas.append(load(path))
 	arena.anima.core.raise_max(CORE_BOOST)
 	arena.add_child(_pool)
-	_pool.build(projectile_target, arena.anima.data.projectile)
+	_pool.build(projectile_target, stress_projectile(arena.anima.data.projectile))
 
 
 func _physics_process(_delta: float) -> void:
@@ -74,7 +83,7 @@ func _physics_process(_delta: float) -> void:
 		var p := _pool.acquire()
 		if p == null:
 			break
-		p.fire(arena.anima.position, Vector2.from_angle(_rng.randf() * TAU), SHOT_RANGE, null, 0)
+		p.fire(arena.anima.position, Vector2.from_angle(_rng.randf() * TAU), _rng.randf_range(SHOT_RANGE_MIN, SHOT_RANGE_MAX), null, 0)
 		n += 1
 
 

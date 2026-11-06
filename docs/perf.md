@@ -22,3 +22,10 @@ Cena de estresse: `tests/perf/stress.tscn` (sem lógica de jogo; sprites reais d
 | 2026-11-06 | iPhone 11 Pro 256 GB (iOS 18.7, Safari), sem Modo de Pouca Energia | Safari, build `f54fc3d`, `?debug=1&stress=150,300`, 60 s | 150 inimigos, até 52 proj. em voo, fx até 44 | **44,2** (p95 27 ms; começa em ~52 e cai para ~43 conforme o draw sobe de 509 para ~690) | 40,1 (1 quadro > 50 ms) | **abaixo da meta de 50**, mas perto. dpr 3, draw 509→691, nós ~3300. O stress pedia 300 proj., só chegaram a 52 em voo. Dono, log enviado |
 
 Limite: o PC mediu com render por software (sem GPU), então vale como piso; o dado que decide a meta é o do iPhone.
+
+## Rodada 2 (BRF-091, T-118)
+- Barra de vida dos inimigos comuns fica escondida (sem desenhar) com vida cheia; aparece ao primeiro dano e some ao reciclar. Esperado: -1 draw call por inimigo intacto (~150 no pico do estresse). Chefe inalterado.
+- Sombra + corpo: mantidos separados (a sombra é `draw_circle` com z -1, já agrupada entre todos os inimigos; fundir exigiria atlas novo). Sem outros ganhos justificados sem perfil de GPU.
+- Estresse: o projétil do estresse agora atravessa inimigos (`pierce` 1000, dano 0) e tem alcance sorteado (900 a 1400 px), para manter ~M projéteis em voo (antes sumiam ao tocar um inimigo: pico 52).
+- Log: linha do tempo arredonda o tempo todo (`45.96` vira `00:46.0`); `canvas` do bloco ESTRESSE agora é [largura, altura] (largura da janela interna; o shell só informava topo/base/altura).
+- Draw calls antes/depois no PC: não medidos (sem GPU/overlay nesta sessão). Medir no iPhone com a mesma URL.
