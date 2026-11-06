@@ -62,7 +62,12 @@ static func user_agent() -> String:
 
 
 static func url() -> String:
-	return ENDPOINT if OS.has_feature("web") else SITE_URL + ENDPOINT
+	# O HTTPRequest não aceita URL relativa: na web usa a origem da própria página (mesmo domínio, sem CORS).
+	if OS.has_feature("web"):
+		var origin := str(JavaScriptBridge.eval("window.location.origin", true))
+		if origin.begins_with("http"):
+			return origin + ENDPOINT
+	return SITE_URL + ENDPOINT
 
 
 ## Mapeia a resposta HTTP para o estado final (201 = ok).
