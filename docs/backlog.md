@@ -108,7 +108,7 @@
 | T-193 | Debug do meta: zerar save e dar XP/Moeda pelo overlay `?debug=1`; meta no log da partida | M2 | AG02 + AG05 | a fazer |
 | T-194 | Assets de áudio do M2: música de entrada e som do tiro (próprios ou CC0, licença registrada) | M2 | AG11 | a fazer |
 | T-195 | Balanceamento da progressão: partidas até os níveis 3, 7 e 12 pela simulação do bot | M2 | AG04 | a fazer |
-| T-196 | Validação do M2 (inclui save persistindo no iPhone, no Safari e no modo app) | M2 | AG03 | a fazer |
+| T-196 | Validação do M2 (inclui o botão de velocidade, T-272 a T-276; inclui save persistindo no iPhone, no Safari e no modo app) | M2 | AG03 | a fazer |
 | T-197 | Fechar o M2 como v0.2.0: tag `v0.2.0`, branch `alfa` e deploy em `alfa--projectanimagame.netlify.app` (quando o dono pedir) | M2 | AG00 + AG10 | a fazer (no fechamento) |
 | T-198 | Mockup do hangar: navegação entre Jogar, Núcleos, Módulos, Componentes e Configurações (abas ou barra inferior) (tam. M) | M3 | AG08 | a fazer |
 | T-199 | Arte do hangar: fundo, ícones das abas, estados ativo/bloqueado (tam. M) | M3 | AG08 | a fazer |
@@ -184,6 +184,11 @@
 | T-269 | Botão "Enviar log" no Resultado (só em build de teste): aviso do que é enviado, estados enviando/enviado/falhou, texto por chave de tradução (tam. P) | M1 | AG02 | feita (BRF-088) |
 | T-270 | Deploy do envio: variáveis de ambiente no Netlify, CORS, flag de build de teste, `docs/` com a conta Neon (o dono cria a conta e passa a string de conexão) (tam. P) | M1 | AG10 | feita (BRF-089); falta deploy |
 | T-271 | Validação do envio no PC e no iPhone (log chega na tabela; falha de rede não trava o jogo) (tam. P) | M1 | AG03 | a fazer |
+| T-272 | Design da aceleração: velocidades (x1, x2, x4 opcional), só na partida, regras de pausa, hit-stop, recarga, Resultado/XP (tempo real × de jogo), se a escolha é salva; registrar em `docs/gameplay.md` (tam. P) | M2 | AG01 | a fazer |
+| T-273 | Controlador de velocidade (`Engine.time_scale`): ciclo de velocidades, volta a x1 em pausa/Resultado/saída, compatível com o hit-stop e com o bot/headless; testes GUT (tam. M) | M2 | AG01 | a fazer |
+| T-274 | Arte do botão de velocidade: estados x1, x2 e x4 (tam. P) | M2 | AG08 | a fazer |
+| T-275 | Botão de velocidade no HUD (toque e tecla no PC via Input Action, sem atrapalhar os botões de skill; mostra a velocidade atual) (tam. M) | M2 | AG02 + AG07 | a fazer |
+| T-276 | Medir x2 e x4 no iPhone com a cena de estresse (T-006/T-118) e decidir se o x4 entra (tam. P) | M2 | AG01 + AG10 | a fazer |
 | T-148 | Sinais da Arena para VFX (projectile_fired, projectile_hit, enemy_died, particles_gained, skill_cast, boss_telegraph_started, boss_phase_changed) | M1 | AG01 | feita |
 
 ## Próximas prontas p/ briefing
@@ -816,7 +821,7 @@
 ## Depois (M3+)
 
 - **Envio de logs no M1** (2026-11-06, decisão 58): T-267 a T-271.
-- **M2 quebrado** (2026-11-05): T-162, T-163, T-180, T-182 e T-184 a T-197.
+- **M2 quebrado** (2026-11-05): T-162, T-163, T-180, T-182 e T-184 a T-197. **Aceleração do jogo** (2026-11-06, decisão 59): T-272 a T-276.
 - **M3 a M7 quebrados** (2026-11-05, estimativa; o detalhe "pronto quando" é escrito no briefing): M3 T-198 a T-202 e T-240 · M4 T-203 a T-210 · M5 T-109, T-110, T-211 a T-220 · M6 T-221 a T-225 · M7 T-226 a T-235 · M8 T-236 a T-244 (sem a T-240) · M9 T-245 a T-251 · M10 T-252 a T-266. Tamanho: P = até 1 sessão de agente, M = 1 a 2, G = 3 ou mais.
 - **Roadmap:** marcos e versões em [docs/roadmap.md](roadmap.md) (decisão 53). Tarefas do M3 em diante são quebradas quando o marco começar.
 
