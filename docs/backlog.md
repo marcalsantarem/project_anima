@@ -96,7 +96,7 @@
 | T-181 | Ícones do app (iPhone, PWA e favicon) na nova identidade tecnológica da splash e do menu | M1 | AG08 + AG10 | feita (BRF-084; falta o dono reinstalar o atalho no iOS) |
 | T-182 | Áudio básico: música de entrada (título) e som do tiro básico, com volume salvo e respeitando o 1º toque na web | M2 | AG11 | a fazer |
 | T-183 | Fechar o M1 como v0.1.0: versão `0.1.0` no jogo e tag `v0.1.0`, sem branch (decisão 55; quando o dono pedir) | M1 | AG00 + AG10 | a fazer (no fechamento) |
-| T-184 | Economia do M2: curva de XP (níveis 1 a 15), XP e Moeda por partida, dados em `.tres` e `docs/economia.md` | M2 | AG04 | a fazer |
+| T-184 | Economia do M2: curva de XP (níveis 1 a 15), XP e Moeda por partida (por monstros derrotados e ondas, nunca pelo tempo; decisão 59), dados em `.tres` e `docs/economia.md` | M2 | AG04 | a fazer |
 | T-185 | Save local: autoload `Backend` (interface) + `LocalBackend` em `user://` com versão, migração e recuperação; ADR | M2 | AG05 + AG07 | a fazer |
 | T-186 | Lógica pura do meta em `src/meta/`: recompensa do `MatchResult`, XP → nível, slots liberados; testes GUT | M2 | AG04 | a fazer |
 | T-187 | Fluxo de cenas com menu: Título → Menu → Partida → Resultado → Menu; aplica a recompensa e salva | M2 | AG07 | a fazer |
@@ -184,11 +184,11 @@
 | T-269 | Botão "Enviar log" no Resultado (só em build de teste): aviso do que é enviado, estados enviando/enviado/falhou, texto por chave de tradução (tam. P) | M1 | AG02 | feita (BRF-088) |
 | T-270 | Deploy do envio: variáveis de ambiente no Netlify, CORS, flag de build de teste, `docs/` com a conta Neon (o dono cria a conta e passa a string de conexão) (tam. P) | M1 | AG10 | feita (BRF-089); falta deploy |
 | T-271 | Validação do envio no PC e no iPhone (log chega na tabela; falha de rede não trava o jogo) (tam. P) | M1 | AG03 | a fazer |
-| T-272 | Design da aceleração: velocidades (x1, x2, x4 opcional), só na partida, regras de pausa, hit-stop, recarga, Resultado/XP (tempo real × de jogo), se a escolha é salva; registrar em `docs/gameplay.md` (tam. P) | M2 | AG01 | a fazer |
-| T-273 | Controlador de velocidade (`Engine.time_scale`): ciclo de velocidades, volta a x1 em pausa/Resultado/saída, compatível com o hit-stop e com o bot/headless; testes GUT (tam. M) | M2 | AG01 | a fazer |
-| T-274 | Arte do botão de velocidade: estados x1, x2 e x4 (tam. P) | M2 | AG08 | a fazer |
-| T-275 | Botão de velocidade no HUD (toque e tecla no PC via Input Action, sem atrapalhar os botões de skill; mostra a velocidade atual) (tam. M) | M2 | AG02 + AG07 | a fazer |
-| T-276 | Medir x2 e x4 no iPhone com a cena de estresse (T-006/T-118) e decidir se o x4 entra (tam. P) | M2 | AG01 + AG10 | a fazer |
+| T-272 | Design da aceleração (x1 e x2): a velocidade não é reduzida sozinha (pausa, hit-stop e Resultado respeitam a escolhida), vale em toda a sessão; definir o escopo da sessão (só a partida ou até fechar o app) e a recompensa por monstros derrotados, não por tempo; deixar o ponto de extensão para travas futuras; registrar em `docs/gameplay.md` (tam. P) | M2 | AG01 | a fazer |
+| T-273 | Controlador de velocidade (`Engine.time_scale`): alterna x1/x2, **mantém** a escolha em pausa, hit-stop (restaura para a escolhida) e Resultado; bot/headless em x1; testes GUT (tam. M) | M2 | AG01 | a fazer |
+| T-274 | Arte do botão de velocidade: estados x1 e x2 (tam. P) | M2 | AG08 | a fazer |
+| T-275 | Botão de velocidade no HUD (toque e tecla no PC via Input Action, sem atrapalhar as skills; mostra a velocidade atual) (tam. M) | M2 | AG02 + AG07 | a fazer |
+| T-276 | Medir o x2 no iPhone com a cena de estresse (T-006/T-118) e registrar o fps (tam. P) | M2 | AG01 + AG10 | a fazer |
 | T-148 | Sinais da Arena para VFX (projectile_fired, projectile_hit, enemy_died, particles_gained, skill_cast, boss_telegraph_started, boss_phase_changed) | M1 | AG01 | feita |
 
 ## Próximas prontas p/ briefing
