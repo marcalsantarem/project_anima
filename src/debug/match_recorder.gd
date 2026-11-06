@@ -214,6 +214,8 @@ func step(ms: float, paused: bool = false) -> void:
 			_win_50 += 1
 			_hitch(ms)
 	_saved_this_frame = false
+	if not header.has("stress"):
+		_detect_stress()
 	_kills_left -= dt
 	if _kills_left <= 0.0:
 		_kills_left = maxf(_kills_left + 1.0, 0.0)
@@ -511,11 +513,13 @@ static func _is_godot_line(msg: String) -> bool:
 func finish(result = null) -> void:
 	if finished_ok:
 		return
+	_detect_stress()
 	_flush_kills()
 	_sample()
 	if result != null:
 		_result = {
-			"resultado": "vitoria" if result.outcome == MatchResult.Outcome.VICTORY else "derrota",
+			"resultado": "estresse" if header.has("stress") else (
+				"vitoria" if result.outcome == MatchResult.Outcome.VICTORY else "derrota"),
 			"onda": result.wave_reached, "ondas": result.waves_total, "particulas": result.particles,
 			"inimigos": result.enemies_killed, "duracao_s": snappedf(result.duration_s, 0.01),
 		}
@@ -529,6 +533,15 @@ func finish(result = null) -> void:
 		_write(log_data)
 	_remove_error_hooks()
 	finished.emit(log_data)
+
+
+## Modo de estresse ativo (nó StressMode na Arena): guarda `stress=N,M` no cabeçalho (BRF-090).
+func _detect_stress() -> void:
+	if header.has("stress") or _arena == null:
+		return
+	var node := _arena.get_node_or_null(^"StressMode")
+	if node != null:
+		header["stress"] = [int(node.get("enemy_target")), int(node.get("projectile_target"))]
 
 
 func build_log(with_summary: bool) -> Dictionary:

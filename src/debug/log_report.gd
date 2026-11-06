@@ -115,7 +115,7 @@ static func summarize(doc: Dictionary) -> Dictionary:
 	if duration <= 0.0 and not samples.is_empty() and t_i >= 0:
 		duration = float(samples[-1][t_i])
 
-	return {
+	var out := {
 		"duracao_s": snappedf(duration, 0.1),
 		"resultado": str(result.get("resultado", "?")),
 		"onda": int(result.get("onda", 0)),
@@ -151,6 +151,34 @@ static func summarize(doc: Dictionary) -> Dictionary:
 		"erros_primeiros": errors.slice(0, 5).map(func(e) -> String: return "%s: %s" % [e.get("tipo", ""), e.get("msg", "")]),
 		"maiores_travadas": top,
 		"truncado": doc.get("truncated", {}),
+	}
+	var stress = doc.get("header", {}).get("stress")
+	if stress is Array:
+		out["estresse"] = _stress_summary(doc, stress, proj, fps, hist, count, frames)
+	return out
+
+
+## Métricas do período do modo de estresse (BRF-090). `params` = [inimigos, projéteis] pedidos.
+static func _stress_summary(doc: Dictionary, params: Array, proj: Array, fps: Array, hist: Array,
+		count: int, frames: Dictionary) -> Dictionary:
+	var h: Dictionary = doc.get("header", {})
+	var web: Dictionary = h.get("web", {})
+	var vp: Dictionary = web.get("viewport", {})
+	var draw := column(doc, "draw_calls", false)
+	var nodes := column(doc, "nodes", false)
+	var enemies := column(doc, "enemies", false)
+	return {
+		"parametros": "stress=%d,%d" % [int(params[0]), int(params[1])],
+		"fps_medio": snappedf(_avg(fps), 0.1),
+		"fps_min": snappedf(percentile(fps, 0.0), 0.1),
+		"quadro_ms_p95": FrameStats.hist_percentile(hist, count, 95.0),
+		"quadros_50ms": int(frames.get("over_50", 0)),
+		"draw_calls": [snappedf(_avg(draw), 0.1), int(_max(draw))],
+		"nos": [snappedf(_avg(nodes), 0.1), int(_max(nodes))],
+		"inimigos": [snappedf(_avg(enemies), 0.1), int(_max(enemies))],
+		"projeteis": [snappedf(_avg(proj), 0.1), int(_max(proj))],
+		"dpr": web.get("dpr", null),
+		"canvas": vp.get("canvas", h.get("window", [])),
 	}
 
 
@@ -188,6 +216,11 @@ static func to_text(doc: Dictionary) -> String:
 		s.memoria_mb[2], s.memoria_video_mb[0], s.memoria_video_mb[1], s.memoria_video_mb[2]])
 	lines.append("Nós: %d → %d (%+d)  ·  órfãos %d → %d (%+d)" % [s.nos[0], s.nos[1], s.nos[2], s.orfaos[0],
 		s.orfaos[1], s.orfaos[2]])
+	if s.has("estresse"):
+		var e: Dictionary = s.estresse
+		lines.append("ESTRESSE %s: fps médio %s · mín %s · p95 %s ms · quadros >50 ms %d · draw [méd,máx] %s · nós %s · inimigos %s · proj %s · dpr %s · canvas %s" % [
+			e.parametros, e.fps_medio, e.fps_min, e.quadro_ms_p95, e.quadros_50ms, e.draw_calls, e.nos,
+			e.inimigos, e.projeteis, e.dpr, e.canvas])
 	lines.append("Dano recebido: %d em %d golpes  ·  por fonte: %s" % [s.dano_total, s.danos, JSON.stringify(s.dano_por_fonte)])
 	lines.append("Upgrades: %s  ·  negados: %d" % [", ".join(s.upgrades) if not (s.upgrades as Array).is_empty() else "nenhum", s.upgrades_negados])
 	lines.append("Erros capturados: %d" % s.erros)

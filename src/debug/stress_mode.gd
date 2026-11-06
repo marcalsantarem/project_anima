@@ -12,11 +12,16 @@ const ENEMY_PATHS: Array[String] = [
 const PER_FRAME := 20 ## no máximo de inimigos/projéteis repostos por quadro
 const SHOT_RANGE := 1400.0
 const CORE_BOOST := 1000000000
+const DURATION_S := 60.0 ## tempo real de partida (sem pausa) até encerrar e abrir o Resultado
+
+signal time_up
 
 var arena: Arena
 var enemy_target := 150
 var projectile_target := 300
 
+var time_left := DURATION_S
+var _done := false
 var _datas: Array[EnemyData] = []
 var _pool := ProjectilePool.new()
 var _rng := RandomNumberGenerator.new()
@@ -43,12 +48,15 @@ static func attach(p_arena: Arena, enemies: int, projectiles: int) -> StressMode
 	s.enemy_target = enemies
 	s.projectile_target = projectiles
 	p_arena.waves_enabled = false
+	s.time_up.connect(p_arena.end_by_timeout)
 	p_arena.add_child(s)
 	return s
 
 
 func _ready() -> void:
 	name = "StressMode"
+	if arena == null: # só testes do temporizador
+		return
 	for path in ENEMY_PATHS:
 		_datas.append(load(path))
 	arena.anima.core.raise_max(CORE_BOOST)
@@ -68,3 +76,17 @@ func _physics_process(_delta: float) -> void:
 			break
 		p.fire(arena.anima.position, Vector2.from_angle(_rng.randf() * TAU), SHOT_RANGE, null, 0)
 		n += 1
+
+
+func _process(delta: float) -> void:
+	tick(delta / maxf(Engine.time_scale, 0.01))
+
+
+## Avança o relógio do estresse (tempo real, só com a partida rodando). Ao zerar, encerra a partida.
+func tick(real_delta: float) -> void:
+	if _done or get_tree().paused:
+		return
+	time_left -= real_delta
+	if time_left <= 0.0:
+		_done = true
+		time_up.emit()

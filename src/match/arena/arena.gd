@@ -447,6 +447,11 @@ func _on_enemy_died(enemy: Enemy, cause: Enemy.DeathCause) -> void:
 			_end(MatchResult.Outcome.VICTORY)
 
 
+## Encerra a partida por tempo (modo de estresse, BRF-090): mesmo caminho do fim normal.
+func end_by_timeout() -> void:
+	_end(MatchResult.Outcome.DEFEAT)
+
+
 func _end(outcome: MatchResult.Outcome) -> void:
 	if is_over:
 		return
