@@ -4,7 +4,7 @@ extends Control
 ## Continuação da splash tecnológica do `web/shell.html` (T-179, decisão 48): mesma arte, título e animações
 ## nas mesmas posições; o botão holográfico ocupa o lugar da barra. Contrato: emite `start_requested` uma vez,
 ## no primeiro toque, clique ou tecla; em seguida um véu escuro some em ~0,3 s sobre a partida (sem corte seco).
-## Link pequeno "Último log" no canto (BRF-063), só se existir log salvo: abre o LogViewer sem começar a partida.
+## Subtítulo temporário `TXT_BUILD_TAG` (BRF-099) entre o título e o botão.
 
 signal start_requested
 
@@ -35,7 +35,10 @@ const SUB_GAP := 12.0
 const BUTTON_CENTER_Y := 1211.0 ## centro da barra do shell
 const BUTTON_SIZE := Vector2(495, 110)
 const BUTTON_FONT := 36.0
-const LINK_SIZE := Vector2(180, 64) ## "Último log": alvo ≥ 44 px (BRF-063)
+const TXT_BUILD_TAG := "VERTICAL SLICE" ## T-282 remove; T-283 troca por "ALFA"
+const TAG_FONT := 38.0 ## entre "PROJECT:" e "ANIMA" e o rodapé
+const TAG_COLOR := Color("#FF5A6E") ## vermelho `danger` da paleta
+const TAG_GLOW := Color(1.0, 0.25, 0.35, 0.7)
 const STUDIO_W := 0.30 ## largura do logo do estúdio / largura da tela
 const STUDIO_W_MAX := 240.0
 const STUDIO_BOTTOM := 32.0 ## folga acima da safe area inferior
@@ -55,9 +58,7 @@ var _button: Button
 var _studio_logo: TextureRect
 ## `v<versão> · <sha>` no canto inferior direito (T-165), alinhado à base do logo do estúdio.
 var version_label: Label
-## Link "Último log" (null se não houver log salvo) e o visualizador aberto.
-var last_log_link: Button
-var viewer: LogViewer
+var _build_tag: Label
 
 
 func _ready() -> void:
@@ -72,6 +73,12 @@ func _ready() -> void:
 	root.add_child(_sub_title)
 	_title = _title_label("ANIMA")
 	root.add_child(_title)
+
+	_build_tag = _title_label(TXT_BUILD_TAG)
+	_build_tag.name = "BuildTag"
+	_build_tag.add_theme_color_override("font_color", TAG_COLOR)
+	_build_tag.add_theme_color_override("font_shadow_color", TAG_GLOW)
+	root.add_child(_build_tag)
 
 	_button = Button.new()
 	_button.name = "StartButton"
@@ -92,19 +99,6 @@ func _ready() -> void:
 	version_label = ScreenKit.version_label()
 	version_label.add_theme_color_override("font_color", Color(0.75, 0.95, 1.0, 0.6))
 	root.add_child(version_label)
-	if MatchRecorder.has_last_log():
-		last_log_link = Button.new()
-		last_log_link.name = "LastLog"
-		last_log_link.text = "Último log"
-		last_log_link.flat = true
-		last_log_link.focus_mode = FOCUS_NONE
-		last_log_link.custom_minimum_size = LINK_SIZE
-		last_log_link.add_theme_font_size_override("font_size", UiTokens.FONT_CAPTION)
-		for state in ["font_color", "font_hover_color", "font_pressed_color"]:
-			last_log_link.add_theme_color_override(state, Color(0.62, 0.96, 1.0, 0.85))
-		last_log_link.pressed.connect(open_last_log)
-		root.add_child(last_log_link)
-
 	_layout()
 	get_viewport().size_changed.connect(_layout)
 
@@ -241,8 +235,7 @@ func _layout() -> void:
 
 	var sub_font := roundi(SUB_FONT * s)
 	var title_font := roundi(TITLE_FONT * s)
-	_place_title(_sub_title, sub_font, TITLE_TOP * s, view.x)
-	_place_title(_title, title_font, (TITLE_TOP + SUB_FONT + SUB_GAP) * s, view.x)
+	var tag_font := maxi(UiTokens.FONT_CAPTION, roundi(TAG_FONT * s))
 
 	var tex := STUDIO_LOGO.get_size()
 	var lw := minf(view.x * STUDIO_W, STUDIO_W_MAX)
@@ -256,11 +249,14 @@ func _layout() -> void:
 	_button.position = Vector2((view.x - bsize.x) / 2.0, by)
 	_button.pivot_offset = bsize / 2.0
 	_button.add_theme_font_size_override("font_size", maxi(UiTokens.FONT_BODY, roundi(BUTTON_FONT * s)))
+	# Título e subtítulo sobem o necessário para caber o subtítulo entre "ANIMA" e o botão (telas baixas).
+	var gap := UiTokens.SPACE_XS
+	var title_end := (TITLE_TOP + SUB_FONT + SUB_GAP + TITLE_FONT) * s
+	var shift := minf(0.0, by - gap * 2.0 - tag_font - title_end)
+	_place_title(_sub_title, sub_font, TITLE_TOP * s + shift, view.x)
+	_place_title(_title, title_font, (TITLE_TOP + SUB_FONT + SUB_GAP) * s + shift, view.x)
+	_place_title(_build_tag, tag_font, by - gap - tag_font * 1.05, view.x)
 	ScreenKit.place_corner_label(version_label, get_viewport(), STUDIO_BOTTOM)
-	if last_log_link != null:
-		last_log_link.size = LINK_SIZE
-		# Canto inferior esquerdo, espelhando a versão: o topo direito tem a bateria desenhada na arte.
-		last_log_link.position = Vector2(safe.left + UiTokens.SPACE_XS, view.y - safe.bottom - STUDIO_BOTTOM - LINK_SIZE.y + UiTokens.SPACE_XS)
 
 
 ## Label de largura total, topo em `top`; o brilho é a sombra sem deslocamento (proporcional à fonte).
@@ -274,9 +270,6 @@ func _place_title(l: Label, font: int, top: float, width: float) -> void:
 # _input: o gesto precisa ser tratado no mesmo evento do navegador para destravar o áudio.
 func _input(event: InputEvent) -> void:
 	if _started or not is_visible_in_tree():
-		return
-	# O visualizador e o link "Último log" ficam com o toque (não começam a partida).
-	if viewer != null or _over_link(event):
 		return
 	var is_gesture: bool = (event is InputEventScreenTouch and event.pressed) \
 		or (event is InputEventMouseButton and event.pressed and event.device != InputEvent.DEVICE_ID_EMULATION) \
@@ -363,17 +356,3 @@ class Spark extends Control:
 		draw_circle(Vector2.ZERO, 9.0, Color(CYAN, 0.18))
 		draw_circle(Vector2.ZERO, 5.5, Color(CYAN, 0.35))
 		draw_circle(Vector2.ZERO, 3.5, Color("#BFFBFF"))
-
-
-func _over_link(event: InputEvent) -> bool:
-	if last_log_link == null or not (event is InputEventScreenTouch or event is InputEventMouseButton):
-		return false
-	return last_log_link.get_global_rect().has_point(event.position)
-
-
-## Abre o log salvo da última partida por cima do título.
-func open_last_log() -> void:
-	if viewer != null:
-		return
-	viewer = LogViewer.open(self, MatchRecorder.load_last())
-	viewer.closed.connect(func() -> void: viewer = null)

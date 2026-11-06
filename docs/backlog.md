@@ -193,7 +193,7 @@
 | T-278 | Arte do fundo paisagem para PC: preparar as 2 artes do dono (retocar bateria e textos miúdos, peso baixo, 16:9 e telas mais largas/estreitas) (tam. P) | M1 | AG08 | feita (BRF-096); artes guardadas, sem uso |
 | T-279 | ~~Fundo paisagem no shell Web~~ | M1 | — | cancelada (decisão 61; shell revertido) |
 | T-280 | ~~Jogo avisa o shell qual fundo usar~~ | M1 | — | cancelada (decisão 61: um fundo só) |
-| T-281 | Tela inicial: subtítulo vermelho **VERTICAL SLICE** (maiúsculas) entre "ANIMA" e o botão, e remover o link "Último log" (temporário na v0.1.0; tam. P) | M1 | AG02 | a fazer |
+| T-281 | Tela inicial: subtítulo vermelho **VERTICAL SLICE** (maiúsculas) entre "ANIMA" e o botão, e remover o link "Último log" (temporário na v0.1.0; tam. P) | M1 | AG02 | feita (BRF-099) |
 | T-282 | **(1ª do M2)** Remover o subtítulo "VERTICAL SLICE" da tela inicial (tam. P) | M2 | AG02 | a fazer |
 | T-283 | **(fim do M2)** Subtítulo vermelho **ALFA** na tela inicial, como o do vertical slice, até o fechamento da v0.2.0 (tam. P) | M2 | AG02 | a fazer |
 | T-148 | Sinais da Arena para VFX (projectile_fired, projectile_hit, enemy_died, particles_gained, skill_cast, boss_telegraph_started, boss_phase_changed) | M1 | AG01 | feita |

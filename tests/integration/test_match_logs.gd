@@ -95,30 +95,3 @@ func test_result_logs_button_opens_viewer_and_keeps_buttons() -> void:
 	(screen.find_child("BackToTitle", true, false) as Button).pressed.emit()
 	assert_signal_emitted(screen, "play_again_requested")
 	assert_signal_emitted(screen, "title_requested")
-
-
-func test_title_shows_last_log_link_only_with_file() -> void:
-	var title: TitleScreen = load(SceneFlow.TITLE_SCENE).instantiate()
-	add_child_autofree(title)
-	assert_null(title.last_log_link, "sem log salvo, sem link")
-	var rec := MatchRecorder.new()
-	rec.auto_process = false
-	add_child(rec)
-	rec.step(16.0)
-	rec.finish(null)
-	rec.free()
-	var title2: TitleScreen = load(SceneFlow.TITLE_SCENE).instantiate()
-	add_child_autofree(title2)
-	await wait_process_frames(1)
-	assert_not_null(title2.last_log_link, "link aparece com last_match.json")
-	watch_signals(title2)
-	title2.open_last_log()
-	assert_not_null(title2.viewer)
-	var ev := InputEventMouseButton.new()
-	ev.button_index = MOUSE_BUTTON_LEFT
-	ev.pressed = true
-	title2._input(ev)
-	assert_signal_not_emitted(title2, "start_requested", "com o log aberto, o toque não começa a partida")
-	title2.viewer.close()
-	await wait_process_frames(1)
-	assert_null(title2.viewer)

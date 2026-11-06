@@ -284,7 +284,7 @@ iPhone 375×812 CSS, Safari em aba (k = 1,92 px do jogo/CSS)
 
 - **Resultado, fundo (T-277, BRF-093, decisão 60):** `assets/backgrounds/result_tech_bg_dim.webp` num `TextureRect` `Background` em tela cheia (`Ignore Size` + `Keep Aspect Covered`), atrás do cartão. Só o fundo mudou; o cartão roxo e os botões seguem no estilo atual até o M2 (T-180/T-190). Capturas: `docs/img/resultado-vitoria.png`, `resultado-derrota.png`.
 - **Resultado:** botão secundário **"Logs"** (200×64), abaixo de "Voltar ao título". Abre o `LogViewer`. Ao lado, **"Enviar log"** (T-269, mesma geometria; `LogUploader` em `src/debug/`, contrato em `docs/logs-api.md`): estados enviando / enviado ✔ (desabilitado) / falhou (tenta de novo), com aviso curto de privacidade abaixo. `LogUploader.ENABLED` desliga tudo no build final; textos em constantes `TXT_*` (trocar por chaves na T-240).
-- **Título:** link **"Último log"** (180×64) no canto superior direito, só se houver `user://logs/last_match.json`. O toque nele não começa a partida.
+- **Título:** sem link de log (removido, BRF-099); logs só em Resultado e pausa. Subtítulo temporário **`VERTICAL SLICE`** (`TitleScreen.TXT_BUILD_TAG`, vermelho `danger`, entre "ANIMA" e o botão; T-282 remove, T-283 troca por `ALFA`). Capturas: `docs/img/titulo-vs-375x616.png` e `-375x812.png`.
 - **Pausa:** linha com dois interruptores 228×64: **"Efeitos reduzidos: sim/não"** (T-132, BRF-080) e **"Debug: ligado/desligado"**, que liga o overlay. Os dois ficam em `user://debug.cfg` (`DebugSettings`; seções `[debug] overlay` e `[fx] reduced_effects`).
 - **Efeitos reduzidos:** a pausa emite `reduced_effects_changed(on)`; o `SceneFlow` aplica na criação da partida e na hora (partida em curso) via `apply_reduced_effects(arena, director, on)`: `Arena.reduced_effects` (só se a propriedade existir) e `FxDirector.reduced_effects` (que repassa ao `FxPool`, de onde o `MatchRecorder` lê `reduced_effects` no log).
 - **HUD:** sinal `ui_pressed(button, ok)` para o gravador.
@@ -347,7 +347,7 @@ Cenas independentes em `src/ui/screens/`, com o tema na raiz (via `ScreenKit`). 
 - "PROJECT:"/"ANIMA" em `LabelDisplay` com fonte proporcional à escala (74 u e 132 u), cor `#E6FFFF` e brilho pela sombra ciano sem deslocamento;
 - animações em tweens (sem alocação por quadro): brilho do cristal (`GradientTexture2D` radial) pulsando, anéis tracejados (desenhados uma vez, só giram) e partículas piscando; com efeitos reduzidos (`DebugSettings.reduced_effects()`), anéis e partículas ficam parados;
 - botão **"Toque para começar" holográfico** (StyleBoxFlat: fundo escuro translúcido, contorno ciano 3 px, sombra ciano; pressionado acende) no lugar da barra, 495×110 u (mín. 88 px), pulso de escala (0,8 s); em telas baixas sobe para não encostar no logo do estúdio;
-- logo horizontal do estúdio (branco, 88%) na base, versão em ciano-claro no canto e link "Último log" (quando houver) no canto inferior esquerdo (o topo direito tem a bateria da arte);
+- logo horizontal do estúdio (branco, 88%) na base, versão em ciano-claro no canto (o topo direito tem a bateria da arte);
 - contrato mantido: qualquer toque, clique ou tecla emite `start_requested` uma vez e libera o áudio. No mesmo gesto, `TitleScreen.fade_from_dark()` põe um véu `#021423` (CanvasLayer 128 na raiz, ignora toque) que some em 0,3 s sobre a partida: sem corte seco do escuro para o cartoon claro;
 - se a splash mudar no `web/shell.html`, ajuste as constantes do topo do script (px da arte).
 
