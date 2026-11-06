@@ -384,9 +384,15 @@ func _style_texture_all(c: Control, tex: Texture2D, margin: float, expand: float
 func _style_play(b: Button) -> void:
 	var normal := _tex_box(BTN_PRIMARY, 48.0, 56.0, 16.0)
 	var pressed := _tex_box(BTN_PRIMARY_PRESSED, 48.0, 56.0, 16.0)
-	normal.content_margin_bottom = 12.0 # a base escura do corpo não entra no centro do texto
-	pressed.content_margin_bottom = 12.0
-	pressed.content_margin_top = 6.0
+	# Margens de conteúdo explícitas: o padrão (-1) usa a margem da textura (56) em cima e em baixo; só mexer
+	# em uma delas descentraliza o texto. Centro da face = centro do retângulo menos 6 px (base de 12 px).
+	for sb: StyleBoxTexture in [normal, pressed]:
+		sb.content_margin_left = 0.0
+		sb.content_margin_right = 0.0
+	normal.content_margin_top = 0.0
+	normal.content_margin_bottom = 12.0
+	pressed.content_margin_top = 6.0 # a face desce 6 px e a base some: texto desce junto
+	pressed.content_margin_bottom = 6.0
 	b.add_theme_stylebox_override("normal", normal)
 	b.add_theme_stylebox_override("hover", normal)
 	b.add_theme_stylebox_override("pressed", pressed)

@@ -92,3 +92,28 @@ func test_play_target_size() -> void:
 		assert_gte(m.play_button.size.x, 281.0)
 		assert_gte(m.play_button.size.y, 78.0)
 		m.queue_free()
+
+
+## BRF-116: o texto de Jogar fica no centro da FACE (retângulo menos a base escura de 12 px), em qualquer janela.
+func _face_offset(b: Button, state: String) -> float:
+	var sb: StyleBoxTexture = b.get_theme_stylebox(state)
+	var content_center := (sb.content_margin_top + (b.size.y - sb.content_margin_bottom)) / 2.0
+	var base := 12.0 if state == "normal" else 6.0 # a base escura encolhe 12 → 6 no pressionado (corpo desce 6)
+	var face_center := (0.0 + (b.size.y - base) + (6.0 if state == "pressed" else 0.0)) / 2.0
+	return content_center - face_center
+
+
+func test_play_text_centered_on_face_in_two_viewports() -> void:
+	var win := get_tree().root
+	var old := win.size
+	for sz in [Vector2i(375, 812), Vector2i(1280, 720)]:
+		win.size = sz
+		var m := await _menu({"level": 3, "xp": 10, "xp_to_next": 100, "coins": 5, "is_max": false})
+		await wait_process_frames(2)
+		assert_lt(absf(_face_offset(m.play_button, "normal")), 2.0, "normal %s" % [sz])
+		assert_lt(absf(_face_offset(m.play_button, "pressed")), 2.0, "pressed %s" % [sz])
+		var n: StyleBoxTexture = m.play_button.get_theme_stylebox("normal")
+		var p: StyleBoxTexture = m.play_button.get_theme_stylebox("pressed")
+		assert_almost_eq(p.content_margin_top - n.content_margin_top, 6.0, 0.5, "texto desce 6 px")
+		assert_eq(n.content_margin_left, n.content_margin_right)
+	win.size = old
