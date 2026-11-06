@@ -179,6 +179,11 @@
 | T-264 | Polimento de gráficos, efeitos e gameplay (lista do playtest) (tam. G) | M10 | AG01 + AG02 + AG09 | a fazer |
 | T-265 | Desempenho no iPhone com o conteúdo novo (tam. M) | M10 | AG01 + AG10 | a fazer |
 | T-266 | Validação e fechamento da v0.3.0: tag, branch `beta` e deploy em `beta--projectanimagame.netlify.app` (tam. M) | M10 | AG03 + AG00 + AG10 | a fazer |
+| T-267 | Envio de logs: contrato da API, esquema da tabela (`logs`), limites e ADR (decisão 58) (tam. P) | M1 | AG05 | a fazer |
+| T-268 | Netlify Function `POST /api/log` gravando no Neon: validação, limite de tamanho, chave de cliente, limite por IP, limpeza em 30 dias; testes (tam. M) | M1 | AG05 | a fazer |
+| T-269 | Botão "Enviar log" no Resultado (só em build de teste): aviso do que é enviado, estados enviando/enviado/falhou, texto por chave de tradução (tam. P) | M1 | AG02 | a fazer |
+| T-270 | Deploy do envio: variáveis de ambiente no Netlify, CORS, flag de build de teste, `docs/` com a conta Neon (o dono cria a conta e passa a string de conexão) (tam. P) | M1 | AG10 | a fazer |
+| T-271 | Validação do envio no PC e no iPhone (log chega na tabela; falha de rede não trava o jogo) (tam. P) | M1 | AG03 | a fazer |
 | T-148 | Sinais da Arena para VFX (projectile_fired, projectile_hit, enemy_died, particles_gained, skill_cast, boss_telegraph_started, boss_phase_changed) | M1 | AG01 | feita |
 
 ## Próximas prontas p/ briefing
@@ -810,6 +815,7 @@
 
 ## Depois (M3+)
 
+- **Envio de logs no M1** (2026-11-06, decisão 58): T-267 a T-271.
 - **M2 quebrado** (2026-11-05): T-162, T-163, T-180, T-182 e T-184 a T-197.
 - **M3 a M7 quebrados** (2026-11-05, estimativa; o detalhe "pronto quando" é escrito no briefing): M3 T-198 a T-202 e T-240 · M4 T-203 a T-210 · M5 T-109, T-110, T-211 a T-220 · M6 T-221 a T-225 · M7 T-226 a T-235 · M8 T-236 a T-244 (sem a T-240) · M9 T-245 a T-251 · M10 T-252 a T-266. Tamanho: P = até 1 sessão de agente, M = 1 a 2, G = 3 ou mais.
 - **Roadmap:** marcos e versões em [docs/roadmap.md](roadmap.md) (decisão 53). Tarefas do M3 em diante são quebradas quando o marco começar.
