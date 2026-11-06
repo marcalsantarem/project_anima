@@ -1,61 +1,91 @@
-# Economia do M2: XP, Moeda e níveis (AG04, BRF-106)
+# Economia do M2: XP, Moeda e níveis (AG04, BRF-106 e BRF-108)
 
-> Dados em `data/meta/progression_m2.tres` e `data/meta/rewards_m2.tres` (Resources `ProgressionData` e `RewardData`, em `src/meta/`). Lógica de cálculo: T-186. **Nada depende do tempo** (decisão 59): só monstros derrotados, ondas e resultado. Partículas não entram no meta. Sem gasto de Moeda no M2 (1º gasto no M4).
+> Dados em `data/meta/progression_m2.tres` e `data/meta/rewards_m2.tres` (Resources `ProgressionData` e `RewardData`, em `src/meta/`). Lógica de cálculo: T-186. **Nada depende do tempo** (decisão 59). Partículas não entram no meta. Sem gasto de Moeda no M2 (1º gasto no M4).
 
 ## Recompensas por partida
 
-`total = Σ(kills × valor do tipo) + ondas concluídas × bônus de onda (+ bônus de vitória)`; na **derrota** o total é multiplicado por `defeat_multiplier` = 0,8 (paga menos, mas paga). Arredondar para inteiro.
+**XP e Moeda vêm só dos monstros derrotados** (chefe incluso). Sem bônus por onda nem de vitória.
+`total = round(Σ kills × valor do tipo)`; na **derrota** o total é multiplicado por `defeat_multiplier` = **0,7**. Arredondar só no total (valores por monstro podem ser fracionários).
 
-| Fonte | XP | Moeda |
+| Monstro | XP | Moeda |
 |---|---|---|
-| runner | 2 | 1 |
-| swarm (por membro) | 1 | 1 |
-| shooter | 4 | 3 |
-| tank | 6 | 4 |
-| chefe (boss_warden) | 60 | 40 |
-| onda concluída | 5 | 3 |
-| bônus de vitória | 40 | 50 |
+| runner | 1 | 1 |
+| swarm (por membro) | 0,5 | 0,5 |
+| shooter | 2 | 3 |
+| tank | 2 | 3 |
+| chefe (boss_warden) | 20 | 40 |
 
-A "variação por partida" da Moeda vem do desempenho (quantos monstros e ondas), sem sorteio.
+Fase 1 inteira (92 runners, ~98 membros de swarm, 7 shooters, 10 tanks, 1 chefe): **~195 XP / ~232 Moeda**.
 
-## Curva de XP (nível N para N+1)
-
-| N→N+1 | 1→2 | 2→3 | 3→4 | 4→5 | 5→6 | 6→7 | 7→8 | 8→9 | 9→10 | 10→11 | 11→12 | 12→13 | 13→14 | 14→15 |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| XP | 40 | 60 | 120 | 190 | 300 | 520 | 700 | 850 | 1000 | 1100 | 1250 | 1400 | 1550 | 1700 |
-| Acumulado | 40 | 100 | 220 | 410 | 710 | 1230 | 1930 | 2780 | 3780 | 4880 | 6130 | 7530 | 9080 | 10780 |
-
-Slots: nível 3, 7 e 12 (`slot_unlock_levels`). Nível máximo no M2: 15.
-
-## O que uma partida rende (fase 1, calculado de `stage_01.tres`)
-
-Fase 1 inteira: 92 runners, ~98 membros de swarm (15 grupos × 6,5), 7 shooters, 10 tanks, 1 chefe.
-
-| Partida | XP | Moeda |
+| Partida (fase 1) | XP | Moeda |
 |---|---|---|
-| Derrota na onda 3 (ondas 1 e 2 concluídas, onda 3 toda morta) | ~52 | ~29 |
-| Derrota na onda 6 (~metade do XP da fase) | ~190 | ~120 |
-| Vitória (10 ondas + chefe) | ~520 | ~371 |
+| Derrota na onda 3 (ondas 1 a 3 mortas: 27 / 27 bruto) | ~19 | ~19 |
+| Derrota na onda 6 (ondas 1 a 6 mortas: 83 / 86 bruto) | ~58 | ~60 |
+| Vitória (10 ondas + chefe) | ~195 | ~232 |
+| Vitória com bônus do dia | ~295 | ~347 |
 
-Vitória: kills 430 XP / 291 Moeda + ondas 50 / 30 + bônus 40 / 50.
+## Bônus da primeira vitória do dia
+
+- **Valor:** +100 XP e +115 Moeda (~50% da recompensa de uma vitória completa). Pago só em **vitória** (chefe derrotado), uma vez por dia, somado ao total (não sofre multiplicador).
+- **Dia:** data **local** do aparelho em `YYYY-MM-DD`. Vira à meia-noite local.
+- **Campo:** `PlayerProfile.last_first_win_date: String`, vazio = nunca. Paga se `hoje != last_first_win_date`; depois grava `hoje`. Entra na T-186 (campo e lógica).
+- **Risco (sem defesa agora):** o save e o relógio são manipuláveis. Adiantar/atrasar o relógio ou editar o save repete o bônus (ganho limitado a +100 XP e +115 Moeda por repetição). Relógio atrasado para uma data anterior ao `last_first_win_date` não deve pagar (regra: pagar só se `hoje > last_first_win_date`). Defesa real exige data do servidor (backend, depois).
+
+## Curva de XP (nível N para N+1, teto 30)
+
+Custo por nível crescente, sem degraus (passo de +30 a +60 por nível).
+
+| N→N+1 | XP para subir | Acumulado |
+|---|---|---|
+| 1→2 | 50 | 50 |
+| 2→3 | 100 | 150 |
+| 3→4 | 130 | 280 |
+| 4→5 | 170 | 450 |
+| 5→6 | 220 | 670 |
+| 6→7 | 280 | 950 |
+| 7→8 | 320 | 1270 |
+| 8→9 | 360 | 1630 |
+| 9→10 | 410 | 2040 |
+| 10→11 | 460 | 2500 |
+| 11→12 | 500 | 3000 |
+| 12→13 | 560 | 3560 |
+| 13→14 | 600 | 4160 |
+| 14→15 | 640 | 4800 |
+| 15→16 | 680 | 5480 |
+| 16→17 | 720 | 6200 |
+| 17→18 | 760 | 6960 |
+| 18→19 | 800 | 7760 |
+| 19→20 | 840 | 8600 |
+| 20→21 | 900 | 9500 |
+| 21→22 | 950 | 10450 |
+| 22→23 | 1000 | 11450 |
+| 23→24 | 1040 | 12490 |
+| 24→25 | 1090 | 13580 |
+| 25→26 | 1140 | 14720 |
+| 26→27 | 1190 | 15910 |
+| 27→28 | 1240 | 17150 |
+| 28→29 | 1290 | 18440 |
+| 29→30 | 1340 | 19780 |
+
+Slots: nível 3, 7 e 12 (`slot_unlock_levels`).
 
 ## Metas de partidas por nível
 
-Premissa de jogador: partidas 1–2 caem na onda ~3; 3–8 chegam à onda 6–9 (média ~200 XP); da 9 em diante ~70% de vitórias (média ~450 XP).
+Modelo de XP médio por partida: P1 a P4 = derrotas nas ondas 3, 4, 6 e 7 (19, 31, 58, 75; acumulado 183); P5 a P20 ~120 (derrotas nas ondas 8 e 9 e as primeiras vitórias, com bônus do dia); P21 em diante ~160 (~55% de vitórias de 195, resto derrotas ~100, mais o bônus diário diluído).
 
 | Marco | Acumulado | Partidas |
 |---|---|---|
-| Nível 3 (slot 1) | 100 | ~2 |
-| Nível 7 (slot 2) | 1230 | ~8 (104 + 6×200 = 1304) |
-| Nível 12 (slot 3) | 6130 | ~19–20 (1304 + 11×450 ≈ 6250) |
-| Nível 15 | 10780 | ~30 |
+| Nível 3 (slot 1) | 150 | **4** (3 derrotas somam 108, a 4ª passa de 150; com a 1ª vitória na 4ª também) |
+| Nível 7 (slot 2) | 950 | ~11 |
+| Nível 12 (slot 3) | 3000 | ~26 |
+| Nível 20 | 8600 | ~61 |
+| Nível 30 | 19780 | ~131 |
 
-Justificativa: a proposta do briefing (2, 8, 20) se manteve; o slot 1 chega rápido para o jogador ter a primeira skill ainda na primeira sessão, e o ritmo desacelera conforme a vitória se torna comum. O dono pode mexer só nos números do `.tres`.
+**Justificativa do nível 30:** 131 partidas a 3 a 5 por dia = 26 a 44 dias (~4 a 6 semanas, 4/dia ≈ 33 dias). Slot 1 na primeira sessão de ~4 partidas; slot 2 em 2 a 3 dias; slot 3 em ~1 semana; depois o ritmo desacelera. Só os números do `.tres` precisam mudar para reajustar.
 
 ## Perguntas em aberto para o dono
 
-1. Bônus de primeira vitória de cada fase (XP/Moeda extra)? Sugestão: +100 XP, +100 Moeda.
-2. Multiplicador de anúncio (rewarded ad dobra a Moeda): fica para o M12+; confirmar x2 e se vale para XP.
-3. A derrota deve pagar 80% ou outro percentual? E o chefe derrotado numa derrota (não ocorre hoje) conta?
-4. Fases futuras: escalar os valores por fase ou manter o mesmo peso por tipo de monstro?
-5. Aceita a progressão de nível passar de ~30 partidas até o 15 no M2, ou prefere teto menor?
+1. Fases futuras: escalar os valores por fase ou manter o mesmo peso por tipo de monstro?
+2. O bônus diário deve valer também em fases já vencidas, ou só em qualquer vitória (como está)?
+
+> Multiplicador de anúncio (rewarded ad): fora do escopo agora; nota M12+.

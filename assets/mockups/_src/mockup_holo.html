@@ -64,7 +64,7 @@ html,body{width:375px;height:812px;overflow:hidden;background:var(--bg);font-fam
     <symbol id="hex" viewBox="0 0 52 58"><polygon points="26,1.5 50.5,15.5 50.5,42.5 26,56.5 1.5,42.5 1.5,15.5" fill="url(#gHex)" stroke="#3FE8F5" stroke-width="2.5"/><polygon points="26,7 45.5,18.5 45.5,39.5 26,51 6.5,39.5 6.5,18.5" fill="none" stroke="#8A6CFF" stroke-width="1.5" opacity=".9"/></symbol>
     <symbol id="coin" viewBox="0 0 32 32"><circle cx="16" cy="17" r="13.5" fill="#9A5F0C"/><circle cx="16" cy="15.5" r="13.5" fill="url(#gCoin)" stroke="#9A5F0C" stroke-width="1.5"/><circle cx="16" cy="15.5" r="9.5" fill="none" stroke="#FFF1B8" stroke-width="1.4" opacity=".8"/><path d="M16 8.5 L21 15.5 L16 22.5 L11 15.5Z" fill="#FFF6D6" stroke="#B87410" stroke-width="1"/></symbol>
     <symbol id="xp" viewBox="0 0 32 32"><polygon points="16,2 28.5,9 28.5,23 16,30 3.5,23 3.5,9" fill="url(#gXp)" stroke="#B9A5FF" stroke-width="1.6"/><path d="M16 7 L21.5 16 L16 25 L10.5 16Z" fill="#3FE8F5"/><path d="M16 7 L16 25 L10.5 16Z" fill="#E6FFFF" opacity=".85"/></symbol>
-    <symbol id="spk" viewBox="0 0 24 24"><path d="M3 9h4l5-4v14l-5-4H3z" fill="#9FF6FF"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="#9FF6FF" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="gear" viewBox="0 0 24 24"><path d="M10.3 2h3.4l.5 2.6 1.6.7 2.2-1.5 2.4 2.4-1.5 2.2.7 1.6 2.6.5v3.4l-2.6.5-.7 1.6 1.5 2.2-2.4 2.4-2.2-1.5-1.6.7-.5 2.6h-3.4l-.5-2.6-1.6-.7-2.2 1.5-2.4-2.4 1.5-2.2-.7-1.6L2 13.7v-3.4l2.6-.5.7-1.6-1.5-2.2 2.4-2.4 2.2 1.5 1.6-.7z" fill="#9FF6FF"/><circle cx="12" cy="12" r="3.6" fill="#06223A" stroke="#9FF6FF" stroke-width="1"/></symbol>
     <symbol id="lock" viewBox="0 0 24 24"><path d="M7.5 11V8a4.5 4.5 0 0 1 9 0v3" fill="none" stroke="#7FA3B8" stroke-width="2.2"/><rect x="5" y="11" width="14" height="10" rx="2" fill="#2A4258" stroke="#7FA3B8" stroke-width="1.6"/><circle cx="12" cy="16" r="1.6" fill="#7FA3B8"/></symbol>
     <symbol id="unlock" viewBox="0 0 24 24"><path d="M7.5 11V7a4.5 4.5 0 0 1 9 0" fill="none" stroke="#3FE8F5" stroke-width="2.2"/><rect x="5" y="11" width="14" height="10" rx="2" fill="#0B4A5E" stroke="#3FE8F5" stroke-width="1.6"/><circle cx="12" cy="16" r="1.6" fill="#E6FFFF"/></symbol>
   </defs>
@@ -73,63 +73,41 @@ html,body{width:375px;height:812px;overflow:hidden;background:var(--bg);font-fam
 <!-- ============ MENU PRINCIPAL (conta nível 4) ============ -->
 <div class="screen" id="menu">
   <div class="bg" style="background-image:url(../../ui/title_bg_tech.webp)"></div>
-  <!-- topo: selo + XP | Moeda | som -->
-  
-  <svg class="abs" style="left:16px;top:48px" width="52" height="58"><use href="#hex"/></svg>
-  <div class="abs num" style="left:16px;top:58px;width:52px;text-align:center;font-weight:800;font-size:26px">4</div>
-  <div class="abs" style="left:78px;top:54px;font-weight:700;font-size:13px;letter-spacing:2px;color:var(--text2)">NÍVEL 4</div>
-  <div class="bar" style="left:78px;top:73px;width:124px"><div class="trk"></div><div class="fil" style="width:74px"></div></div>
-  <div class="abs small num" style="left:78px;top:89px">320 / 500 XP</div>
-  <div class="panel ch glow" style="left:212px;top:56px;width:92px;height:38px;--c:9px"><div class="fill ch" style="--c:8px"></div></div>
-  <svg class="abs" style="left:219px;top:62px" width="26" height="26"><use href="#coin"/></svg>
-  <div class="abs num" style="left:248px;top:64px;width:50px;text-align:right;font-weight:800;font-size:18px">1.250</div>
+  <!-- topo: só a engrenagem (sem ação no M2) -->
   <div class="panel ch" style="left:315px;top:53px;width:44px;height:44px;--c:9px"><div class="fill ch" style="--c:8px"></div></div>
-  <svg class="abs" style="left:325px;top:63px" width="24" height="24"><use href="#spk"/></svg>
-  <!-- logotipo -->
-  <div class="abs txt-glow" style="left:0;right:0;top:414px;text-align:center;font-weight:700;font-size:22px;letter-spacing:4px">PROJECT:</div>
-  <div class="abs txt-glow" style="left:0;right:0;top:436px;text-align:center;font-weight:800;font-size:58px;letter-spacing:6px;line-height:1">ANIMA</div>
-  <div class="abs" style="left:0;right:0;top:500px;text-align:center;font-weight:600;font-size:12px;letter-spacing:8px;color:var(--text2);opacity:.85">ALFA</div>
-  <!-- painel de Módulos -->
-  <div class="panel ch" style="left:37px;top:532px;width:301px;height:112px"><div class="fill ch"></div><div class="brk"></div><div class="scan" style="top:38px"></div>
-    <div class="hdr" style="top:12px">MÓDULOS</div></div>
-  <div class="slot" style="left:68px;top:560px"><div class="panel ch glow" style="inset:0;--c:10px"><div class="fill ch" style="--c:9px;background:rgba(10,60,84,.9)"></div></div>
-    <img src="../../ui/ui_icon_skill_meteor.png" class="abs" style="left:8px;top:8px;width:44px;height:44px"></div>
-  <div class="slot" style="left:158px;top:560px"><div class="panel ch" style="inset:0;--c:10px;background:var(--dis-line)"><div class="fill ch" style="--c:9px;background:var(--dis-fill)"></div></div>
-    <svg class="abs" style="left:18px;top:14px" width="24" height="24"><use href="#lock"/></svg><div class="abs num" style="left:0;right:0;top:38px;text-align:center;font-size:11px;font-weight:700;color:var(--muted)">NV 7</div></div>
-  <div class="slot" style="left:248px;top:560px"><div class="panel ch" style="inset:0;--c:10px;background:var(--dis-line)"><div class="fill ch" style="--c:9px;background:var(--dis-fill)"></div></div>
-    <svg class="abs" style="left:18px;top:14px" width="24" height="24"><use href="#lock"/></svg><div class="abs num" style="left:0;right:0;top:38px;text-align:center;font-size:11px;font-weight:700;color:var(--muted)">NV 12</div></div>
-  <!-- JOGAR -->
-  <div class="glow" style="position:absolute;left:47px;top:672px;width:281px;height:78px"><div class="btn primary ch" style="inset:0;--c:16px">JOGAR</div></div>
-  <div class="abs small num" style="right:16px;bottom:18px">v0.2.0</div>
+  <svg class="abs" style="left:325px;top:63px" width="24" height="24"><use href="#gear"/></svg>
+  <!-- bloco central no terço inferior: logotipo, nível/XP + Moeda, Jogar (sem Módulos, dica de slot, ALFA nem versão) -->
+  <div class="abs txt-glow" style="left:0;right:0;top:440px;text-align:center;font-weight:700;font-size:22px;letter-spacing:4px">PROJECT:</div>
+  <div class="abs txt-glow" style="left:0;right:0;top:462px;text-align:center;font-weight:800;font-size:58px;letter-spacing:6px;line-height:1">ANIMA</div>
+  <svg class="abs" style="left:44px;top:548px" width="52" height="58"><use href="#hex"/></svg>
+  <div class="abs num" style="left:44px;top:558px;width:52px;text-align:center;font-weight:800;font-size:26px">4</div>
+  <div class="abs" style="left:106px;top:553px;font-weight:700;font-size:13px;letter-spacing:2px;color:var(--text2)">NÍVEL 4</div>
+  <div class="bar" style="left:106px;top:572px;width:124px"><div class="trk"></div><div class="fil" style="width:74px"></div></div>
+  <div class="abs small num" style="left:106px;top:588px">320 / 500 XP</div>
+  <div class="panel ch glow" style="left:240px;top:558px;width:92px;height:38px;--c:9px"><div class="fill ch" style="--c:8px"></div></div>
+  <svg class="abs" style="left:247px;top:564px" width="26" height="26"><use href="#coin"/></svg>
+  <div class="abs num" style="left:276px;top:566px;width:50px;text-align:right;font-weight:800;font-size:18px">1.250</div>
+  <div class="glow" style="position:absolute;left:47px;top:636px;width:281px;height:78px"><div class="btn primary ch" style="inset:0;--c:16px">JOGAR</div></div>
 </div>
 
-<!-- ============ MENU PRINCIPAL (conta nível 1, sem Módulo) ============ -->
+<!-- ============ MENU PRINCIPAL (conta nível 1) ============ -->
 <div class="screen" id="menu_lvl1">
   <div class="bg" style="background-image:url(../../ui/title_bg_tech.webp)"></div>
-  <svg class="abs" style="left:16px;top:48px" width="52" height="58"><use href="#hex"/></svg>
-  <div class="abs num" style="left:16px;top:58px;width:52px;text-align:center;font-weight:800;font-size:26px">1</div>
-  <div class="abs" style="left:78px;top:54px;font-weight:700;font-size:13px;letter-spacing:2px;color:var(--text2)">NÍVEL 1</div>
-  <div class="bar" style="left:78px;top:73px;width:124px"><div class="trk"></div><div class="fil" style="width:6px"></div></div>
-  <div class="abs small num" style="left:78px;top:89px">0 / 100 XP</div>
-  <div class="panel ch glow" style="left:212px;top:56px;width:92px;height:38px;--c:9px"><div class="fill ch" style="--c:8px"></div></div>
-  <svg class="abs" style="left:219px;top:62px" width="26" height="26"><use href="#coin"/></svg>
-  <div class="abs num" style="left:248px;top:64px;width:50px;text-align:right;font-weight:800;font-size:18px">0</div>
+  <!-- topo: só a engrenagem (sem ação no M2) -->
   <div class="panel ch" style="left:315px;top:53px;width:44px;height:44px;--c:9px"><div class="fill ch" style="--c:8px"></div></div>
-  <svg class="abs" style="left:325px;top:63px" width="24" height="24"><use href="#spk"/></svg>
-  <div class="abs txt-glow" style="left:0;right:0;top:414px;text-align:center;font-weight:700;font-size:22px;letter-spacing:4px">PROJECT:</div>
-  <div class="abs txt-glow" style="left:0;right:0;top:436px;text-align:center;font-weight:800;font-size:58px;letter-spacing:6px;line-height:1">ANIMA</div>
-  <div class="abs" style="left:0;right:0;top:500px;text-align:center;font-weight:600;font-size:12px;letter-spacing:8px;color:var(--text2);opacity:.85">ALFA</div>
-  <div class="panel ch" style="left:37px;top:532px;width:301px;height:112px"><div class="fill ch"></div><div class="brk"></div><div class="scan" style="top:38px"></div>
-    <div class="hdr" style="top:12px">MÓDULOS</div></div>
-  <div class="slot" style="left:68px;top:560px"><div class="panel ch" style="inset:0;--c:10px;background:var(--line-dim)"><div class="fill ch" style="--c:9px;background:var(--dis-fill)"></div></div>
-    <svg class="abs" style="left:18px;top:14px" width="24" height="24"><use href="#lock"/></svg><div class="abs num" style="left:0;right:0;top:38px;text-align:center;font-size:11px;font-weight:700;color:var(--text2)">NV 3</div></div>
-  <div class="slot" style="left:158px;top:560px"><div class="panel ch" style="inset:0;--c:10px;background:var(--dis-line)"><div class="fill ch" style="--c:9px;background:var(--dis-fill)"></div></div>
-    <svg class="abs" style="left:18px;top:14px" width="24" height="24"><use href="#lock"/></svg><div class="abs num" style="left:0;right:0;top:38px;text-align:center;font-size:11px;font-weight:700;color:var(--muted)">NV 7</div></div>
-  <div class="slot" style="left:248px;top:560px"><div class="panel ch" style="inset:0;--c:10px;background:var(--dis-line)"><div class="fill ch" style="--c:9px;background:var(--dis-fill)"></div></div>
-    <svg class="abs" style="left:18px;top:14px" width="24" height="24"><use href="#lock"/></svg><div class="abs num" style="left:0;right:0;top:38px;text-align:center;font-size:11px;font-weight:700;color:var(--muted)">NV 12</div></div>
-  <div class="abs" style="left:37px;right:37px;top:646px;text-align:center;font-size:12px;font-weight:600;color:var(--text2)">Chegue ao nível 3 para liberar o 1º Módulo</div>
-  <div class="glow" style="position:absolute;left:47px;top:672px;width:281px;height:78px"><div class="btn primary ch" style="inset:0;--c:16px">JOGAR</div></div>
-  <div class="abs small num" style="right:16px;bottom:18px">v0.2.0</div>
+  <svg class="abs" style="left:325px;top:63px" width="24" height="24"><use href="#gear"/></svg>
+  <!-- bloco central no terço inferior: logotipo, nível/XP + Moeda, Jogar (sem Módulos, dica de slot, ALFA nem versão) -->
+  <div class="abs txt-glow" style="left:0;right:0;top:440px;text-align:center;font-weight:700;font-size:22px;letter-spacing:4px">PROJECT:</div>
+  <div class="abs txt-glow" style="left:0;right:0;top:462px;text-align:center;font-weight:800;font-size:58px;letter-spacing:6px;line-height:1">ANIMA</div>
+  <svg class="abs" style="left:44px;top:548px" width="52" height="58"><use href="#hex"/></svg>
+  <div class="abs num" style="left:44px;top:558px;width:52px;text-align:center;font-weight:800;font-size:26px">1</div>
+  <div class="abs" style="left:106px;top:553px;font-weight:700;font-size:13px;letter-spacing:2px;color:var(--text2)">NÍVEL 1</div>
+  <div class="bar" style="left:106px;top:572px;width:124px"><div class="trk"></div><div class="fil" style="width:6px"></div></div>
+  <div class="abs small num" style="left:106px;top:588px">0 / 100 XP</div>
+  <div class="panel ch glow" style="left:240px;top:558px;width:92px;height:38px;--c:9px"><div class="fill ch" style="--c:8px"></div></div>
+  <svg class="abs" style="left:247px;top:564px" width="26" height="26"><use href="#coin"/></svg>
+  <div class="abs num" style="left:276px;top:566px;width:50px;text-align:right;font-weight:800;font-size:18px">0</div>
+  <div class="glow" style="position:absolute;left:47px;top:636px;width:281px;height:78px"><div class="btn primary ch" style="inset:0;--c:16px">JOGAR</div></div>
 </div>
 
 <!-- ============ RESULTADO (vitória + subida de nível + slot 1) ============ -->

@@ -5,21 +5,19 @@
 [resource]
 script = ExtResource("1")
 kill_xp = {
-&"enemy_runner": 2,
-&"enemy_swarm": 1,
-&"enemy_shooter": 4,
-&"enemy_tank": 6,
-&"boss_warden": 60
+&"enemy_runner": 1.0,
+&"enemy_swarm": 0.5,
+&"enemy_shooter": 2.0,
+&"enemy_tank": 2.0,
+&"boss_warden": 20.0
 }
 kill_coins = {
-&"enemy_runner": 1,
-&"enemy_swarm": 1,
-&"enemy_shooter": 3,
-&"enemy_tank": 4,
-&"boss_warden": 40
+&"enemy_runner": 1.0,
+&"enemy_swarm": 0.5,
+&"enemy_shooter": 3.0,
+&"enemy_tank": 3.0,
+&"boss_warden": 40.0
 }
-wave_xp = 5
-wave_coins = 3
-win_bonus_xp = 40
-win_bonus_coins = 50
-defeat_multiplier = 0.8
+defeat_multiplier = 0.7
+first_win_bonus_xp = 100
+first_win_bonus_coins = 115

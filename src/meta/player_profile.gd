@@ -3,7 +3,7 @@ extends RefCounted
 ## Modelo de dados do perfil do jogador (T-185). Sem cena e sem logica de XP (T-186).
 ## Campos novos devem ser opcionais com padrao, para nao quebrar saves antigos.
 
-const MAX_LEVEL := 100  # provisorio; o teto real vem da T-186 (AG04)
+const MAX_LEVEL := 30  # teto da conta (BRF-108)
 const MAX_AMOUNT := 2000000000
 
 var level := 1

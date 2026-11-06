@@ -4,6 +4,6 @@
 
 [resource]
 script = ExtResource("1")
-max_level = 15
-xp_to_next = PackedInt32Array(40, 60, 120, 190, 300, 520, 700, 850, 1000, 1100, 1250, 1400, 1550, 1700)
+max_level = 30
+xp_to_next = PackedInt32Array(50, 100, 130, 170, 220, 280, 320, 360, 410, 460, 500, 560, 600, 640, 680, 720, 760, 800, 840, 900, 950, 1000, 1040, 1090, 1140, 1190, 1240, 1290, 1340)
 slot_unlock_levels = PackedInt32Array(3, 7, 12)

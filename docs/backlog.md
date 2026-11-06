@@ -92,17 +92,17 @@
 | T-177 | Mira do meteoro: API de alvo manual e prévia do raio; chefe lançado dentro do alcance | M1 | AG01 | feita |
 | T-178 | Arrastar do botão do Módulo para mirar (toque/mouse), segurar 1 + clique no PC | M1 | AG02 | feita |
 | T-179 | Splash e tela de título no estilo holográfico/tecnológico (arte do Gemini como base; texto, barra e brilhos vivos) | M1 | AG02 + AG08 | feita |
-| T-180 | **(1ª do M2)** Guia visual "HUD holográfico" para menus + mockups do menu principal e do Resultado com recompensa | M2 | AG08 | feita (aguarda aprovação dos mockups) |
+| T-180 | **(1ª do M2)** Guia visual "HUD holográfico" para menus + mockups do menu principal e do Resultado com recompensa | M2 | AG08 | feita (aprovada pelo dono em 2026-11-06) |
 | T-181 | Ícones do app (iPhone, PWA e favicon) na nova identidade tecnológica da splash e do menu | M1 | AG08 + AG10 | feita (BRF-084; falta o dono reinstalar o atalho no iOS) |
 | T-182 | Áudio básico: música de entrada (título) e som do tiro básico, com volume salvo e respeitando o 1º toque na web | M2 | AG11 | a fazer |
 | T-183 | Fechar o M1 como v0.1.0: versão `0.1.0` no jogo e tag `v0.1.0`, sem branch (decisão 55; quando o dono pedir) | M1 | AG00 + AG10 | feita (tag v0.1.0 em bc638a3, 2026-11-06) |
-| T-184 | Economia do M2: curva de XP (níveis 1 a 15), XP e Moeda por partida (por monstros derrotados e ondas, nunca pelo tempo; decisão 59), dados em `.tres` e `docs/economia.md` | M2 | AG04 | feita |
+| T-184 | Economia do M2: curva de XP (níveis 1 a 30), XP e Moeda por partida (por monstros derrotados e ondas, nunca pelo tempo; decisão 59), dados em `.tres` e `docs/economia.md` | M2 | AG04 | revisão em curso (BRF-108: sem bônus fixos, derrota 70%, bônus de 1ª vitória do dia, níveis 1 a 30, semanas até o 30) |
 | T-185 | Save local: autoload `Backend` (interface) + `LocalBackend` em `user://` com versão, migração e recuperação; ADR | M2 | AG05 + AG07 | feita |
 | T-186 | Lógica pura do meta em `src/meta/`: recompensa do `MatchResult`, XP → nível, slots liberados; testes GUT | M2 | AG04 | a fazer |
 | T-187 | Fluxo de cenas com menu: Título → Menu → Partida → Resultado → Menu; aplica a recompensa e salva | M2 | AG07 | a fazer |
 | T-188 | Partida monta os slots pelo nível da conta (`MatchConfig`); conta sem Módulo joga só com ataque básico | M2 | AG01 | a fazer |
-| T-189 | Arte do menu holográfico: painéis, botões, barra de XP, selo de nível, ícone de XP | M2 | AG08 | a fazer |
-| T-190 | Tela do menu principal: Jogar, nível e barra de XP, saldo de Moeda, som liga/desliga | M2 | AG02 | a fazer |
+| T-189 | Arte do menu holográfico: painéis, botões, barra de XP, selo de nível, ícone de XP | M2 | AG08 | em andamento (BRF-110) |
+| T-190 | Tela do menu principal: Jogar, nível e barra de XP, saldo de Moeda e ícone de configurações (engrenagem) sem ação até o M8; sem Módulos na tela | M2 | AG02 | a fazer |
 | T-191 | Resultado com recompensa: XP e Moeda animados, barra enchendo, subida de nível e aviso de slot liberado | M2 | AG02 + AG09 | a fazer |
 | T-192 | HUD: slots bloqueados mostram o nível que os libera | M2 | AG02 | a fazer |
 | T-193 | Debug do meta: zerar save e dar XP/Moeda pelo overlay `?debug=1`; meta no log da partida | M2 | AG02 + AG05 | a fazer |
@@ -651,7 +651,7 @@
 
 ### T-184 — Economia do M2
 - **Marco:** M2 · **Dono:** AG04 · **Depende de:** decisões 25 e 40
-- **Pronto quando:** `docs/economia.md` com a curva de XP dos níveis 1 a 15 (slots nos níveis 3, 7 e 12), XP e Moeda por partida (vitória, derrota, onda alcançada, chefe), sem gasto de Moeda no M2 (o 1º gasto é no M4); valores em `data/meta/*.tres`, prontos para o Remote Config.
+- **Pronto quando:** `docs/economia.md` com a curva de XP dos níveis 1 a 30 (slots nos níveis 3, 7 e 12), XP e Moeda por partida (vitória, derrota, onda alcançada, chefe), sem gasto de Moeda no M2 (o 1º gasto é no M4); valores em `data/meta/*.tres`, prontos para o Remote Config.
 
 ### T-185 — Save local
 - **Marco:** M2 · **Dono:** AG05 + AG07 · **Depende de:** —
