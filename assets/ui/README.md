@@ -82,3 +82,33 @@ Verde-limão/esmeralda, sem ciano e distinto do verde das barras de vida (`#3FD2
 | Médio-escuro | `#3CC23A` | faceta sombreada, rastro |
 | Escuro | `#1F8A3B` | borda, fim do rastro |
 | Contorno | `#124F24` | contorno do ícone |
+
+## Menus holográficos (T-189, BRF-110)
+
+Menu principal e Resultado do M2 (`docs/arte.md` §11, mockups `assets/mockups/mockup_holo_*.png`). Fonte: `_src/gen_ui_holo.py` (mesmo pipeline; não toca nas peças acima). Regenerar: `python assets/ui/_src/gen_ui_holo.py`. Validação: `_src/holo_compare.png` (mockup | peças a 2x | peças a 1x) e `_src/holo_check_*.png` (375×812).
+**Escala:** o PNG é 2x do mockup de 375 px; no viewport de 720, **1 px do PNG ≈ 1 px de tela** (×0,96). Por isso as margens abaixo valem direto em `texture_margin_*` do `StyleBoxTexture` (ou `patch_margin_*` do `NinePatchRect`), sem `scale`. Total: 20 PNG, **~65 KB**. RGBA (alfa suave dos brilhos; paleta indexada piorava as bordas e o ganho seria de poucos KB). Use o filtro linear padrão (não o "nearest").
+
+| Arquivo | PNG | Margens 9-patch E/D/C/B (px do PNG) | Uso / o que o AG02 faz |
+|---|---|---|---|
+| `ui_holo_panel.png` | 192×192 | 72/72/72/72 | Painel chanfrado (moldura `holo_line_dim`, miolo `holo_panel` 78%, colchetes ciano nos cantos sup. esq./inf. dir.). Sem brilho: corpo = canvas, `expand_margin` 0. Título e varredura por cima |
+| `ui_holo_panel_gold.png` | 192×192 | 72/72/72/72 | Aviso de desbloqueio (moldura dourada, miolo `#1E1A14` 88%, brilho dourado pintado). Corpo a 16 px da borda: **`expand_margin` 16** nos 4 lados |
+| `ui_holo_pill.png` | 96×64 | 20/20/20/20 | Pílula da Moeda e fundo do botão da engrenagem (44×44 no mockup ≈ 84 px). Sem brilho; o brilho da pílula da Moeda é opcional com `ui_holo_glow` atrás |
+| `ui_holo_btn_primary_normal.png` | 192×160 | **48/48/56/56** | Jogar/Continuar. Brilho ciano pintado: **`expand_margin` 16** nos 4 lados (o retângulo do botão = corpo). Inclui filete branco e base escura de 12 px. Texto `holo_ink` |
+| `ui_holo_btn_primary_pressed.png` | 192×160 | **48/48/56/56** | Pressionado: degradê mais escuro, corpo 6 px mais baixo, brilho menor. Mesmo canvas: troca direta. Mover o texto 6 px (content margin topo +6) |
+| `ui_holo_btn_secondary_normal.png` | 128×96 | 24/24/24/24 | Secundário: moldura ciano 4 px + miolo `holo_panel` 90%. Corpo ocupa 92 px de altura; 4 px livres embaixo (espaço do pressionado). Texto `holo_text` |
+| `ui_holo_btn_secondary_pressed.png` | 128×96 | 24/24/24/24 | Moldura `holo_text2`, miolo `#0E5A70`, corpo 4 px mais baixo |
+| `ui_holo_btn_secondary_disabled.png` | 128×96 | 24/24/24/24 | Tokens `holo_dis_*`; texto `holo_dis_text` |
+| `ui_holo_bar_track.png` | 64×32 | 8/8/8/8 | Trilho da barra de XP (moldura `holo_line_dim` 2 px, fundo `#071A2B`). Altura 24 px no menu, 28 no Resultado |
+| `ui_holo_bar_fill.png` | 64×24 | 6/6/6/6 | Enchimento violeta → ciano (o degradê acompanha a largura). Recuo de 4 px dentro do trilho. `TextureProgressBar` com `nine_patch_stretch` ou `NinePatchRect` com largura = progresso |
+| `ui_holo_bar_tip.png` | 16×40 | — | Ponta clara com brilho; centro horizontal na borda direita do enchimento, centrada na vertical. Marcas de 25% no Resultado: `ColorRect` 2 px `#021423` 70% |
+| `ui_holo_level_badge.png` | 128×144 | — | Selo hexagonal sem número (hexágono em y 2–142). Resultado: tamanho nativo; menu: escala 0,8125 (52×58 do mockup). Número `holo_text` 800 por cima |
+| `ui_holo_level_ring.png` | 192×192 | — | Anel tracejado da subida de nível, centrado no selo (diâmetro 164 px do anel). Girar (`rotation`) e sumir (`modulate.a`) por `Tween` |
+| `ui_holo_slot_ready.png` | 128×128 | — | Slot liberado do aviso (corpo 120×120 + 4 px de brilho). Ícone `ui_icon_unlock_holo` a 64 px centrado por cima |
+| `ui_icon_xp.png` | 64×64 | — | Ícone de XP (88 px no Resultado: escala 1,375 aceitável; ou 64 nativo) |
+| `ui_icon_settings.png` | 48×48 | — | Engrenagem `holo_text2`, centrada na pílula 84×84. Sem ação no M2 |
+| `ui_icon_lock_holo.png` / `ui_icon_unlock_holo.png` | 64×64 | — | Cadeado fechado (`holo_muted`) / aberto (ciano) |
+| `ui_holo_scanline.png` | 256×4 | 64/64/0/0 | Linha de varredura (ciano 55%, pontas que somem). Estica na largura do painel; `modulate.a` 0,5 na animação |
+| `ui_holo_glow.png` | 128×128 | — | Brilho radial **branco**: tingir com `modulate` (`holo_line` ou `gold`) e `CanvasItemMaterial` com `blend_mode = Add`. Pode esticar (ex.: elipse atrás da pílula da Moeda, ou o pulsar do Jogar, já que o brilho do botão é pintado) |
+
+- **Draw calls:** todas as peças estão em PNG separados; para o batching do Compatibility, o AG07/AG02 pode montar o atlas `atlas_ui_holo` (cabem num 512×512) se o profiler pedir.
+- **Não incluídos:** Moeda (`ui_icon_coin`, T-162; as folhas usam um provisório), peças do hangar (slots bloqueado/próximo, molduras por raridade, M3). O brilho do painel "Subida de nível" do mockup é opcional (`ui_holo_glow` esticado atrás, `modulate.a` ~0,3).

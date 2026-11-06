@@ -9,7 +9,7 @@ func test_progression_curve() -> void:
 	var p: ProgressionData = load(PROG)
 	assert_not_null(p)
 	assert_eq(p.max_level, 30)
-	assert_eq(p.xp_to_next.size(), 14, "15 níveis = 14 degraus")
+	assert_eq(p.xp_to_next.size(), 29, "30 níveis = 29 degraus")
 	assert_eq(p.validate().size(), 0)
 	for i in range(1, p.xp_to_next.size()):
 		assert_gte(p.xp_to_next[i], p.xp_to_next[i - 1], "curva monotônica no degrau %d" % i)
@@ -40,8 +40,8 @@ func test_curve_milestones() -> void:
 	for i in 29:
 		cum += p.xp_to_next[i]
 		if i == 1:
-			assert_eq(cum, 150, "n�vel 3")
-	assert_eq(cum, 19780, "n�vel 30")
+			assert_eq(cum, 150, "nível 3")
+	assert_eq(cum, 19780, "nível 30")
 
 
 func test_validate_rejects_bad_data() -> void:

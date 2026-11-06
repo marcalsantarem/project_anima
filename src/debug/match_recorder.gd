@@ -521,7 +521,7 @@ func finish(result = null) -> void:
 			"resultado": "estresse" if header.has("stress") else (
 				"vitoria" if result.outcome == MatchResult.Outcome.VICTORY else "derrota"),
 			"onda": result.wave_reached, "ondas": result.waves_total, "particulas": result.particles,
-			"inimigos": result.enemies_killed, "duracao_s": snappedf(result.duration_s, 0.01),
+			"inimigos": result.enemies_killed, "mortes_por_tipo": result.kills_by_type, "duracao_s": snappedf(result.duration_s, 0.01),
 		}
 	else:
 		_result = {"resultado": "interrompida", "onda": _wave, "ondas": _waves_total,

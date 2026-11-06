@@ -267,4 +267,6 @@ Sem contorno escuro grosso (é do cartoon); o brilho só em títulos e números 
 | `ui_holo_scanline.png` | 256×4 | 64/64/0/0 | varredura |
 | `ui_holo_glow.png` | 128×128 | — | brilho radial aditivo |
 
+**Status (BRF-110):** as 20 peças foram geradas (`assets/ui/_src/gen_ui_holo.py`, ~65 KB no total); detalhes e uso no `assets/ui/README.md`. Ajuste: o botão primário usa margens **48/48/56/56** (as 40/40/40/48 não cabiam o chanfro de 16 + brilho + o deslocamento do pressionado).
+
 A Moeda (`ui_icon_coin`) vem da T-162; as molduras por raridade (`ui_frame_<raridade>`) ficam para o M3.

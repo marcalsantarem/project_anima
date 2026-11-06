@@ -84,6 +84,7 @@ var waves: WaveRunner
 var is_over := false
 var particles := 0 ## moeda da partida: começa em 0 e zera a cada partida
 var enemies_killed := 0
+var kills_by_type := {} ## id do inimigo → mortes (soma = enemies_killed)
 var elapsed := 0.0
 ## Níveis dos upgrades desta partida (novo a cada partida).
 var upgrades: MatchUpgrades
@@ -436,6 +437,7 @@ func _on_enemy_died(enemy: Enemy, cause: Enemy.DeathCause) -> void:
 	enemy_died.emit(enemy.position, enemy.data.id, cause)
 	if cause == Enemy.DeathCause.KILLED and not is_over:
 		enemies_killed += 1
+		kills_by_type[enemy.data.id] = int(kills_by_type.get(enemy.data.id, 0)) + 1
 		particles += enemy.data.particle_drop
 		_emit_particles()
 		if enemy.data.particle_drop > 0:
@@ -467,6 +469,7 @@ func _end(outcome: MatchResult.Outcome) -> void:
 	result.waves_total = waves.total_waves()
 	result.particles = particles
 	result.enemies_killed = enemies_killed
+	result.kills_by_type = kills_by_type.duplicate()
 	result.duration_s = elapsed
 	match_ended.emit(result)
 
