@@ -177,7 +177,7 @@ WaveEntry: enemy (EnemyData), count, interval (s), spawn_edge, start_delay (s)
 | 9 | 14 corredores + 3 enxames + 3 tanques + 3 atiradores | ~39,5 | ~51,5 | **~243** | ~27 s |
 | 10 | **chefe ogro sozinho** | 1 | 50 do chefe | — | ~50 s |
 
-- **Partículas antes do chefe:** ~243 depois do BRF-051 (antes ~255; faixa ~222–264 conforme o tamanho dos enxames), alinhado aos ~250 de `docs/meta.md`. Nenhum `particle_drop` mudou.
+- **Partículas antes do chefe:** ~450 (média) depois de +1 em todo `particle_drop` (antes ~243; os ~250 de `docs/meta.md` ficaram defasados). Drops atuais: corredor 2, enxame 2, atirador 3, tanque 5, chefe 51.
 - **Duração estimada (antes do BRF-051):** ~235 s de ondas + 27 s de respiros ≈ **4,5 min** jogando bem (alvo ~5 min; limite 3–10 min). Sem skill nem upgrades, a simulação do teste de integração perde na onda 4–5 (~80 s), como esperado.
 - Teste: `tests/unit/match/test_stage_01_curve.gd` percorre as ondas pelos dados (chefe só na última, Partículas ~250 ± 15 %, ondas crescentes, todos os spawns emitidos).
 

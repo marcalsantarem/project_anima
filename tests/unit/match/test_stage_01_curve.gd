@@ -2,7 +2,7 @@ extends GutTest
 ## T-116: curva da fase 1 percorrida só pelos dados (sem combate).
 
 const BOSS := preload("res://data/enemies/boss_warden.tres")
-const PARTICLES_TARGET := 250.0 ## docs/meta.md: acumulado antes do chefe
+const PARTICLES_TARGET := 450.0 ## acumulado antes do chefe (drops +1 em 06/11; era ~250 em docs/meta.md)
 const PARTICLES_TOLERANCE := 0.15
 
 var stage: StageData

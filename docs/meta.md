@@ -56,7 +56,7 @@ Hoje `stage_01` tem 3 ondas de teste, que dão ~5, ~10 e ~16 Partículas (corred
 | Partículas na onda | 5 | 10 | 16 | 22 | 28 | 34 | 40 | 46 | 52 | 50 ao matar |
 | Acumulado | 5 | 15 | 31 | 53 | 81 | 115 | 155 | 201 | 253 | — |
 
-- Os 50 do chefe só chegam no fim, então o gasto útil é **~250 Partículas** (o chefe ogro da T-150 não invoca minions). T-166: o chefe ficou sem defesa; T-173: mais fácil (HP 1100, 140 px/s, golpe 20 a cada 1,8 s; era 1200, 160 px/s, 30 a cada 1,5 s); as Partículas não mudaram (simulação em `docs/gameplay.md`).
+- Os 51 do chefe só chegam no fim, então o gasto útil é **~250 Partículas** (o chefe ogro da T-150 não invoca minions). T-166: o chefe ficou sem defesa; T-173: mais fácil (HP 1100, 140 px/s, golpe 20 a cada 1,8 s; era 1200, 160 px/s, 30 a cada 1,5 s); as Partículas não mudaram (simulação em `docs/gameplay.md`).
 - **Distribuído:** ~24 níveis (Nv 5 em todos = 225). Ex.: dano 15, cadência 2,8/s → DPS ~42 (base 20, +110%). Na simulação do BRF-051 o bot compra ~25–28 níveis na partida (inclui os 50 do chefe).
 - **Focado:** um upgrade chega ao Nv 9–10 (201–284) e sobra pouco para o resto.
 - **MAX** em um upgrade custa 284 (mais que a fase 1 antes do chefe); os 5 no MAX custam 1420. O MAX é meta de fases mais longas, não da fase 1.
