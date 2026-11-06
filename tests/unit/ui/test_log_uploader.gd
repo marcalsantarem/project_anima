@@ -68,3 +68,47 @@ func test_button_states_in_result_screen() -> void:
 	s._on_upload_state(LogUploader.State.SENT)
 	assert_true(b.disabled)
 	assert_eq(b.text, LogUploader.TXT_SENT)
+
+
+func test_state_for_status_matrix() -> void:
+	for code in [400, 401, 413, 429, 500, 200]:
+		assert_eq(LogUploader.state_for(HTTPRequest.RESULT_SUCCESS, code), LogUploader.State.FAILED, str(code))
+	assert_eq(LogUploader.state_for(HTTPRequest.RESULT_TIMEOUT, 0), LogUploader.State.FAILED)
+	assert_eq(LogUploader.state_for(HTTPRequest.RESULT_SUCCESS, 201), LogUploader.State.SENT)
+
+
+func test_timeout_is_8s_and_failure_keeps_reason() -> void:
+	assert_eq(LogUploader.TIMEOUT_S, 8.0)
+	var u: LogUploader = add_child_autofree(LogUploader.new())
+	u._on_completed(HTTPRequest.RESULT_TIMEOUT, 0, PackedStringArray(), PackedByteArray())
+	assert_eq(u.state, LogUploader.State.FAILED)
+	assert_ne(u.last_error, "")
+	u._on_completed(HTTPRequest.RESULT_SUCCESS, 429, PackedStringArray(), "limite".to_utf8_buffer())
+	assert_eq(u.state, LogUploader.State.FAILED)
+	assert_true(u.last_error.contains("429"))
+
+
+func test_no_resend_while_sending() -> void:
+	var u: LogUploader = add_child_autofree(LogUploader.new())
+	u.state = LogUploader.State.SENDING
+	watch_signals(u)
+	u.send(null, {})
+	assert_signal_not_emitted(u, "state_changed")
+
+
+func test_payload_log_capped() -> void:
+	var p := LogUploader.build_payload(null, {})
+	assert_lte(str(p.log).length(), LogUploader.MAX_BYTES - 2048)
+
+
+func test_failure_keeps_result_screen_usable() -> void:
+	var s: ResultScreen = add_child_autofree(ResultScreen.new())
+	await get_tree().process_frame
+	var b: Button = s.find_child("SendLog", true, false)
+	s._uploader._on_completed(HTTPRequest.RESULT_CANT_CONNECT, 0, PackedStringArray(), PackedByteArray())
+	assert_eq(b.text, LogUploader.TXT_FAILED)
+	assert_false(b.disabled)
+	for n in ["Logs"]:
+		assert_false((s.find_child(n, true, false) as Button).disabled)
+	# nova tentativa permitida após falha
+	assert_ne(s._uploader.state, LogUploader.State.SENT)
