@@ -95,7 +95,7 @@
 | T-180 | **(1ª do M2)** Guia visual "HUD holográfico" para menus + mockups do menu principal e do Resultado com recompensa | M2 | AG08 | a fazer (início do M2) |
 | T-181 | Ícones do app (iPhone, PWA e favicon) na nova identidade tecnológica da splash e do menu | M1 | AG08 + AG10 | feita (BRF-084; falta o dono reinstalar o atalho no iOS) |
 | T-182 | Áudio básico: música de entrada (título) e som do tiro básico, com volume salvo e respeitando o 1º toque na web | M2 | AG11 | a fazer |
-| T-183 | Fechar o M1 como v0.1.0: versão `0.1.0` no jogo e tag `v0.1.0`, sem branch (decisão 55; quando o dono pedir) | M1 | AG00 + AG10 | a fazer (no fechamento) |
+| T-183 | Fechar o M1 como v0.1.0: versão `0.1.0` no jogo e tag `v0.1.0`, sem branch (decisão 55; quando o dono pedir) | M1 | AG00 + AG10 | feita (tag v0.1.0 em bc638a3, 2026-11-06) |
 | T-184 | Economia do M2: curva de XP (níveis 1 a 15), XP e Moeda por partida (por monstros derrotados e ondas, nunca pelo tempo; decisão 59), dados em `.tres` e `docs/economia.md` | M2 | AG04 | a fazer |
 | T-185 | Save local: autoload `Backend` (interface) + `LocalBackend` em `user://` com versão, migração e recuperação; ADR | M2 | AG05 + AG07 | a fazer |
 | T-186 | Lógica pura do meta em `src/meta/`: recompensa do `MatchResult`, XP → nível, slots liberados; testes GUT | M2 | AG04 | a fazer |
