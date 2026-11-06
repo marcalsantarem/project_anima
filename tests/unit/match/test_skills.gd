@@ -151,7 +151,7 @@ func test_use_skill_kills_cluster_and_starts_cooldown() -> void:
 	assert_false(arena.use_skill(1), "em cooldown")
 	await wait_seconds(METEOR.telegraph_time + 0.1)
 	for e in enemies:
-		assert_false(is_instance_valid(e), "morto pela área")
+		assert_eq(e.state, Enemy.State.DEAD, "morto pela área")
 	assert_eq(arena.particles, 3 * RUNNER.particle_drop)
 
 

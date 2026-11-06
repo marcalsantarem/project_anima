@@ -1,0 +1,70 @@
+class_name StressMode
+extends Node
+## Modo de estresse da partida (T-118, BRF-086): mantém N inimigos vivos e M projéteis em voo para
+## medir desempenho (iPhone). Só liga com o debug ligado (`?debug=1`) e `stress=150,300` na URL
+## (ou `--stress=150,300` na linha de comando no PC). Núcleo imortal; sem ondas; sem chefe.
+## Os projéteis do estresse têm dano 0 (colidem de verdade, mas não matam: o giro vem do contato).
+
+const ENEMY_PATHS: Array[String] = [
+	"res://data/enemies/enemy_runner.tres", "res://data/enemies/enemy_swarm.tres",
+	"res://data/enemies/enemy_tank.tres", "res://data/enemies/enemy_shooter.tres",
+]
+const PER_FRAME := 20 ## no máximo de inimigos/projéteis repostos por quadro
+const SHOT_RANGE := 1400.0
+const CORE_BOOST := 1000000000
+
+var arena: Arena
+var enemy_target := 150
+var projectile_target := 300
+
+var _datas: Array[EnemyData] = []
+var _pool := ProjectilePool.new()
+var _rng := RandomNumberGenerator.new()
+
+
+## (inimigos, projéteis) pedidos, ou Vector2i.ZERO. Exige o debug ligado.
+static func requested() -> Vector2i:
+	var raw := ""
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--stress="):
+			raw = arg.trim_prefix("--stress=")
+	if raw == "" and OS.has_feature("web") and DebugSettings.overlay_enabled():
+		var v = JavaScriptBridge.eval("(new URLSearchParams(location.search)).get('stress') || ''", true)
+		raw = str(v) if v != null else ""
+	var parts := raw.split(",")
+	if parts.size() != 2 or not parts[0].is_valid_int() or not parts[1].is_valid_int():
+		return Vector2i.ZERO
+	return Vector2i(maxi(int(parts[0]), 0), maxi(int(parts[1]), 0))
+
+
+static func attach(p_arena: Arena, enemies: int, projectiles: int) -> StressMode:
+	var s := StressMode.new()
+	s.arena = p_arena
+	s.enemy_target = enemies
+	s.projectile_target = projectiles
+	p_arena.waves_enabled = false
+	p_arena.add_child(s)
+	return s
+
+
+func _ready() -> void:
+	name = "StressMode"
+	for path in ENEMY_PATHS:
+		_datas.append(load(path))
+	arena.anima.core.raise_max(CORE_BOOST)
+	arena.add_child(_pool)
+	_pool.build(projectile_target, arena.anima.data.projectile)
+
+
+func _physics_process(_delta: float) -> void:
+	var n := 0
+	while arena.active_enemies.size() < enemy_target and n < PER_FRAME:
+		arena.spawn(_datas[_rng.randi() % _datas.size()], WaveEntry.SpawnEdge.RANDOM)
+		n += 1
+	n = 0
+	while n < PER_FRAME:
+		var p := _pool.acquire()
+		if p == null:
+			break
+		p.fire(arena.anima.position, Vector2.from_angle(_rng.randf() * TAU), SHOT_RANGE, null, 0)
+		n += 1

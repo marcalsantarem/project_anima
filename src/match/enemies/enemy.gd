@@ -12,6 +12,11 @@ enum DeathCause { KILLED, CONTACT }
 @export var data: EnemyData
 ## Pool de projéteis inimigos (só para quem atira); definido pela arena.
 var projectile_pool: ProjectilePool
+## Pool de inimigos (T-118). Nulo (chefe, testes soltos) = morrer dá queue_free.
+var pool: EnemyPool
+
+## Ponto de estacionamento do inimigo morto reaproveitável (fora de qualquer arena).
+const PARKED_POSITION := Vector2(-100000.0, -100000.0)
 
 var state: State = State.SPAWN
 var hp: int
@@ -121,7 +126,38 @@ func die(cause: DeathCause) -> void:
 	state = State.DEAD
 	set_deferred("monitorable", false)
 	died.emit(self, cause)
-	queue_free()
+	if pool == null:
+		queue_free()
+		return
+	park()
+	pool.release(self)
+
+
+## Estaciona o inimigo (morto, reaproveitável): invisível, sem processamento, fora da arena.
+func park() -> void:
+	visible = false
+	set_physics_process(false)
+	set_process(false)
+	position = PARKED_POSITION
+
+
+## Reaproveita a instância como um inimigo novo do mesmo tipo (estado de spawn limpo).
+func recycle(spawn_position: Vector2, target: Vector2) -> void:
+	setup(data, spawn_position, target)
+	state = State.ADVANCE
+	_fire_timer = 0.0
+	_skill_hit = false
+	_flash_left = 0.0
+	if _body:
+		_body.self_modulate = Color.WHITE
+	if health_bar:
+		health_bar.set_ratio(1.0)
+	if walk:
+		walk.rest()
+	visible = true
+	set_physics_process(true)
+	set_process(_spins())
+	set_deferred("monitorable", true)
 
 
 ## Âncora na base: o sprite fica em pé sobre o ponto de contato. Anel opcional (chefe) atrás do corpo.

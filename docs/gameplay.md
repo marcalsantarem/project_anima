@@ -358,9 +358,17 @@ O `project.godot` é do AG07. Layers sugeridas:
 ## Limites de desempenho
 
 - Metas: 60 fps no PC; ≥ 50 fps no iPhone com ~150 inimigos e ~300 projéteis (a confirmar no M0).
-- Pools para projéteis (feito) e inimigos (T-118, depois dos arquétipos da T-111 e de medir); nada de alocação por frame.
+- Pools para projéteis e inimigos (T-118, feito); nada de alocação por frame.
 - Busca de alvo e de densidade por intervalo (0,1 s), não por frame.
 - `CPUParticles2D` curtas; nada de partículas por projétil.
+
+### Pool de inimigos e medição (T-118, BRF-086)
+
+- **`EnemyPool`** (`src/match/enemies/enemy_pool.gd`, em `Arena.enemy_pool`): inimigo comum morto não faz `queue_free`; fica estacionado (invisível, sem `_process`/`_physics_process`, `monitorable` off, fora da arena) e volta em `Arena.spawn` via `Enemy.recycle` (hp, estado, flash, barra e passos zerados). Um pool por `EnemyData`, cresce sob demanda. Sinais e arte são montados uma vez. O chefe não usa o pool (`queue_free`). Ao morrer, a Arena limpa `anima.target` (a instância pode voltar antes da varredura de 0,1 s).
+- Efeito colateral aceito: um projétil perfurante em voo que já acertou um inimigo, se este for reaproveitado no meio do voo, ignora o novo acerto nele (mesmo `instance_id`). Raro e inofensivo.
+- **Modo de estresse** (`src/debug/stress_mode.gd`): mantém N inimigos vivos (corredor, enxame, tanque, atirador; respawn contínuo) e M projéteis em voo (dano 0, colidem de verdade), Núcleo imortal, sem ondas e sem chefe. **Como medir no iPhone:** abra o jogo com `?debug=1&stress=150,300` na URL (debug ligado) e leia FPS/ms/draw/nós no overlay (F3/`?debug=1`). No PC: `godot --path . -- --stress=150,300`. Sem o parâmetro, nada muda.
+- **Medidas no PC (headless, Godot 4.7.2)**, microbench de spawn de 150 corredores: **~60 µs/spawn instanciando -> ~6 µs reaproveitando (~10x)**. Estresse 150/300, 120 quadros: física ~48-61 ms/quadro medidos pelo monitor do headless (inclui o servidor de física 2D sem renderizar; variação entre rodadas; antes e depois equivalentes, pois o ganho do pool está no spawn/free e não no passo). Nós estáveis (2758 -> ~2770), sem órfãos.
+- **Não medido:** FPS real no iPhone/Safari (renderização, draw calls). Gargalo provável lá: desenho de ~450 sprites + colisão Area2D (150 inimigos x 300 projéteis), não a lógica. Se < 50 fps, próximos candidatos: reduzir projéteis do estresse por tipo, desligar `monitorable` de projéteis inimigos sem alvo ou passar a colisão projétil-inimigo para grade espacial.
 
 ## Status dos sistemas
 

@@ -49,16 +49,16 @@ Mesma curva para os 5 upgrades, independente por upgrade:
 
 ### Estimativa na fase 1 (10 ondas)
 
-Hoje `stage_01` tem 3 ondas de teste, que dão ~5, ~10 e ~16 Partículas (corredor 1, enxame 1 × 5–8, atirador 2, tanque 4). A curva de 10 ondas é da T-116; **suposição** para calibrar: crescimento de ~6 por onda.
+Calculada de `data/waves/stage_01.tres` com o drop atual (runner 2, swarm 2 por membro, shooter 3, tank 5, chefe 51). O enxame vem em grupo de 5–8 (média 6,5), cada membro dropa 2. A onda 10 é só o chefe.
 
 | Onda | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 (chefe) |
 |---|---|---|---|---|---|---|---|---|---|---|
-| Partículas na onda | 5 | 10 | 16 | 22 | 28 | 34 | 40 | 46 | 52 | 50 ao matar |
-| Acumulado | 5 | 15 | 31 | 53 | 81 | 115 | 155 | 201 | 253 | — |
+| Partículas na onda | 10 | 20 | 31 | 46 | 51 | 56 | 62 | 83 | 91 | 51 ao matar |
+| Acumulado | 10 | 30 | 61 | 107 | 158 | 214 | 276 | 359 | 450 | 501 |
 
-- Os 51 do chefe só chegam no fim, então o gasto útil é **~250 Partículas** (o chefe ogro da T-150 não invoca minions). T-166: o chefe ficou sem defesa; T-173: mais fácil (HP 1100, 140 px/s, golpe 20 a cada 1,8 s; era 1200, 160 px/s, 30 a cada 1,5 s); as Partículas não mudaram (simulação em `docs/gameplay.md`).
-- **Distribuído:** ~24 níveis (Nv 5 em todos = 225). Ex.: dano 15, cadência 2,8/s → DPS ~42 (base 20, +110%). Na simulação do BRF-051 o bot compra ~25–28 níveis na partida (inclui os 50 do chefe).
-- **Focado:** um upgrade chega ao Nv 9–10 (201–284) e sobra pouco para o resto.
-- **MAX** em um upgrade custa 284 (mais que a fase 1 antes do chefe); os 5 no MAX custam 1420. O MAX é meta de fases mais longas, não da fase 1.
-- Ritmo: a 1ª compra sai já na onda 1; depois ~1 compra a cada 10–15 s de partida.
-- **Validação pendente:** se a T-116 der muito mais ou muito menos que ~250 Partículas antes do chefe, ajustar só o multiplicador (hoje 4) da curva de custo, mantendo a razão 1,4.
+- Os 51 do chefe só chegam no fim, então o gasto útil é **~450 Partículas** (antes ~250; o chefe ogro não invoca minions). T-166: o chefe ficou sem defesa; T-173: mais fácil (HP 1100, 140 px/s, golpe 20 a cada 1,8 s); a simulação está em `docs/gameplay.md`.
+- **Distribuído:** ~34 níveis (Nv 6 em todos = 5 × 67 = 335; sobram ~115 para levar 2–3 upgrades ao Nv 7–8).
+- **Focado:** 1 upgrade no MAX (284) e ~165 restantes dão outro upgrade até o Nv 8–9 (141–201) ou dois até o Nv 5–6.
+- **MAX** em um upgrade custa 284 (agora cabe antes do chefe); os 5 no MAX custam 1420 (~2,8x o total da fase 1). O MAX em todos continua sendo meta de fases mais longas.
+- Ritmo: a 1ª compra sai já na onda 1 (10 Partículas); depois ~1 compra a cada 8–12 s de partida.
+- **Recomendação (sem mudança aplicada):** o total subiu ~80%. Se a fase 1 ficar fácil demais com upgrades, subir o multiplicador da curva (4 → 6, MAX ~426) ou reduzir o teto por upgrade para manter ~1 upgrade maximizável por partida; validar em simulação (BRF-051) antes de mexer nos `.tres`.

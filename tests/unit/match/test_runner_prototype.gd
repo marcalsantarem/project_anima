@@ -71,4 +71,4 @@ func test_runner_reaches_core_and_deals_contact_damage() -> void:
 	var dist := GroundPlane.distance(enemy.position, arena.anima.position)
 	await wait_seconds(dist / RUNNER.speed + 0.5)
 	assert_eq(arena.anima.core.current, arena.anima.core.max_hp - RUNNER.contact_damage)
-	assert_false(is_instance_valid(enemy))
+	assert_eq(enemy.state, Enemy.State.DEAD) # morto e estacionado no pool (T-118)

@@ -90,6 +90,9 @@ var upgrades: MatchUpgrades
 ## Inimigos vivos; compartilhado com a mira do Anima.
 var active_enemies: Array[Enemy] = []
 
+## Inimigos comuns reaproveitados em vez de instanciados a cada spawn (T-118).
+var enemy_pool := EnemyPool.new()
+
 var _rng := RandomNumberGenerator.new()
 var _focus_marker := FocusMarker.new()
 var _skill_aim := SkillAim.new()
@@ -154,6 +157,9 @@ func _ready() -> void:
 	_emit_particles()
 	for id in UPGRADE_IDS:
 		_emit_upgrade(id)
+	var stress := StressMode.requested() # T-118: só com debug ligado
+	if stress != Vector2i.ZERO:
+		StressMode.attach(self, stress.x, stress.y)
 	if waves_enabled:
 		waves.start()
 
@@ -284,15 +290,24 @@ func buy_upgrade(id: StringName) -> bool:
 func spawn(enemy_data: EnemyData, edge: WaveEntry.SpawnEdge) -> Enemy:
 	if edge == WaveEntry.SpawnEdge.RANDOM:
 		edge = _rng.randi_range(WaveEntry.SpawnEdge.TOP, WaveEntry.SpawnEdge.RIGHT) as WaveEntry.SpawnEdge
-	var enemy: Enemy = (BOSS_SCENE if enemy_data is BossData else ENEMY_SCENE).instantiate()
 	var margin := spawn_margin_for(enemy_data, spawn_margin, edge)
-	enemy.setup(enemy_data, edge_point(edge, screen_rect(), margin, _rng.randf()), anima.position)
-	enemy.projectile_pool = enemy_projectiles
-	enemy.died.connect(_on_enemy_died)
-	enemy.damaged.connect(_on_enemy_damaged)
-	enemy.hit_flash_time = feel.hit_flash_time
-	enemy.hit_flash_color = feel.hit_flash_color
-	_enemies.add_child(enemy)
+	var at := edge_point(edge, screen_rect(), margin, _rng.randf())
+	var is_boss := enemy_data is BossData
+	var enemy: Enemy = null if is_boss else enemy_pool.take(enemy_data)
+	if enemy != null: # reaproveitado (T-118): já tem sinais, arte e pai
+		enemy.recycle(at, anima.position)
+	else:
+		enemy = (BOSS_SCENE if is_boss else ENEMY_SCENE).instantiate()
+		enemy.setup(enemy_data, at, anima.position)
+		enemy.projectile_pool = enemy_projectiles
+		if not is_boss:
+			enemy.pool = enemy_pool
+			enemy_pool.created += 1
+		enemy.died.connect(_on_enemy_died)
+		enemy.damaged.connect(_on_enemy_damaged)
+		enemy.hit_flash_time = feel.hit_flash_time
+		enemy.hit_flash_color = feel.hit_flash_color
+		_enemies.add_child(enemy)
 	active_enemies.append(enemy)
 	if enemy is Boss:
 		_bind_boss(enemy as Boss)
@@ -416,6 +431,8 @@ func _on_enemy_died(enemy: Enemy, cause: Enemy.DeathCause) -> void:
 	active_enemies.erase(enemy)
 	if enemy == anima.focus:
 		set_focus(null)
+	if enemy == anima.target: # a instância pode ser reaproveitada antes da próxima varredura
+		anima.target = null
 	enemy_died.emit(enemy.position, enemy.data.id, cause)
 	if cause == Enemy.DeathCause.KILLED and not is_over:
 		enemies_killed += 1
