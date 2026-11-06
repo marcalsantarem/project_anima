@@ -20,6 +20,7 @@ boot_splash/bg_color=Color(0.556863, 0.447059, 0.92549, 1)
 [autoload]
 
 SceneFlow="*res://src/core/scene_flow.gd"
+Backend="*res://src/backend/backend.gd"
 
 [display]
 

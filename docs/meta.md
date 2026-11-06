@@ -1,6 +1,8 @@
 # Meta-jogo e economia (AG04)
 
 > Documento do AG04. Modelo geral em "Progressão" da [Bíblia](00_biblia_projeto.md). Por enquanto só tem os upgrades da partida (M1); Fragmentos, nível de conta, Núcleos (talentos) e economia de Moeda entram no M2.
+>
+> **Economia do M2 (XP, Moeda, níveis):** ver [economia.md](economia.md).
 
 ## Upgrades da partida
 

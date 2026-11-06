@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ProgressionData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/meta/progression_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+max_level = 15
+xp_to_next = PackedInt32Array(40, 60, 120, 190, 300, 520, 700, 850, 1000, 1100, 1250, 1400, 1550, 1700)
+slot_unlock_levels = PackedInt32Array(3, 7, 12)
