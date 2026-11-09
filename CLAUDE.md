@@ -53,7 +53,7 @@ O Claude principal é o **game dev líder** do projeto e o **único interlocutor
 - O jogador age por **Skills Ativas com cooldown**: área, controle de grupo e defensiva. No mobile são botões de toque; no PC, clique ou as teclas `1`, `2`, `3` e `Espaço`.
 - A partida avança por ondas (`Wave X/Y`) até o chefe e termina se o HP do Núcleo chegar a zero. Cada sessão dura de 3 a 10 minutos.
 - **Progressão** (detalhe na seção "Progressão" da Bíblia; substitui os cards do GDD):
-  - **Nível da conta:** desbloqueia os slots de skill (slot 1 no nível 3, slot 2 no 7 e slot 3 no 12). A conta começa sem skills.
+  - **Nível da conta:** desbloqueia os slots de skill (slot 1 no nível 2, slot 2 no 5 e slot 3 no 8; Núcleos no 3, Componentes no 4, x2 no 6 (hoje livre) e fusão no 7; decisão 63). A conta começa sem skills.
   - **Moedas:** **Moeda** (dourada) é a do jogo (meta), com ganho variável por partida; futuro. **Partículas** (estrela verde, "chip") é a da partida: começa em zero, é zerada a cada partida e não cai no mapa por enquanto.
   - **Componentes** (ex-Fragmentos): são os equipamentos do Anima (3 no M7, 6 espaços no M13), melhorados com Moeda, com raridade e **fusão**. **Fragmentos** agora são os Fragmentos de Módulo (atualizam Módulos, M14). Roadmap de versões em `docs/roadmap.md`.
   - **Módulos** são as skills (poderes ativos, ex.: o meteoro). **Núcleos** são os talentos. Glossário completo na Bíblia; identificadores de código seguem em inglês.
