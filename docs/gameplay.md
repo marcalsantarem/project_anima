@@ -370,7 +370,7 @@ O `project.godot` é do AG07. Layers sugeridas:
 - **Medidas no PC (headless, Godot 4.7.2)**, microbench de spawn de 150 corredores: **~60 µs/spawn instanciando -> ~6 µs reaproveitando (~10x)**. Estresse 150/300, 120 quadros: física ~48-61 ms/quadro medidos pelo monitor do headless (inclui o servidor de física 2D sem renderizar; variação entre rodadas; antes e depois equivalentes, pois o ganho do pool está no spawn/free e não no passo). Nós estáveis (2758 -> ~2770), sem órfãos.
 - **Não medido:** FPS real no iPhone/Safari (renderização, draw calls). Gargalo provável lá: desenho de ~450 sprites + colisão Area2D (150 inimigos x 300 projéteis), não a lógica. Se < 50 fps, próximos candidatos: reduzir projéteis do estresse por tipo, desligar `monitorable` de projéteis inimigos sem alvo ou passar a colisão projétil-inimigo para grade espacial.
 
-## Aceleração x1/x2 (T-272, BRF-118; decisão 59) [Proposta: aguarda o dono nos itens 2 e 4]
+## Aceleração x1/x2 (T-272, BRF-118; decisão 59) [Decidido pelo dono em 2026-11-09: salvar, x2 livre, botão só na partida]
 
 Botão de velocidade no HUD da partida (T-275). Implementação em T-273; nada disso está codificado.
 
@@ -379,7 +379,8 @@ Botão de velocidade no HUD da partida (T-275). Implementação em T-273; nada d
    - **Hit-stop:** hoje restaura "o `time_scale` anterior". Passa a restaurar `SpeedController.chosen` (não o valor lido ao iniciar), então um toque no botão durante os 30–80 ms só muda `chosen` e vale ao fim. Continua sem empilhar e em tempo real.
    - **Resultado e telas de fim:** a partida terminada mantém `chosen` (animações do Resultado e da recompensa rodam na velocidade escolhida; tweens de UI que não devem acelerar usam `ignore_time_scale`). Menu e Título também respeitam `chosen`; o botão só aparece na partida.
    - **Câmera lenta do F3 (0,25x):** é debug; ao sair volta a `chosen`.
-2. **Escopo da sessão. Recomendado: "até fechar o app", só em memória, sem salvar.**
+2. **Escopo da sessão. DECIDIDO (2026-11-09): a escolha é SALVA entre aberturas** em `user://settings.cfg` (chave `speed`, fora de `src/meta/`), lida no boot e validada por `can_use_speed`; vale em toda a sessão. As linhas abaixo que dizem "sem salvar" e "começa em x1" foram a recomendação inicial e **não valem**; o bot e o headless continuam sempre em x1.
+   - Recomendação inicial (superada):
    - Vale entre partidas (Partida → Resultado → Menu → Partida) enquanto o app estiver aberto; ao abrir o app, começa em x1.
    - Por quê: quem escolhe x2 não precisa tocar de novo a cada partida; e nunca começa acelerado por surpresa depois de dias (a primeira partida do dia é a de aprender/ler). "Só a partida" irritaria quem joga em x2; salvar no disco cria estado persistente, migração e risco com a futura trava (item 4, que poderia deixar salvo um x2 não liberado).
    - UI: o botão mostra a velocidade atual (x1/x2) e a partida seguinte já abre com o estado do botão correspondente. Menu: nada (opcionalmente um indicador discreto, decisão do AG02).
@@ -393,7 +394,7 @@ Botão de velocidade no HUD da partida (T-275). Implementação em T-273; nada d
    - Túnel de projéteis: a 900 px/s por 2 passos de ~15 ms, o deslocamento por passo é o mesmo (passo fixo); sem risco novo.
    - Áudio: `time_scale` altera o tom/andamento de sons; decidir com o AG11 se SFX seguem o `time_scale` (padrão do Godot: não altera o pitch, só o tempo de disparo).
    - Tremor, números de dano e flash usam `delta` e acelerarão junto; aceito.
-7. **Dúvidas para o dono:** (a) confirmar "até fechar o app, sem salvar" (ou lembrar entre aberturas); (b) x2 livre no M2 ou já nascer com trava (nível/anúncio); (c) mostrar o botão também no Menu ou só na partida.
+7. **Respostas do dono (2026-11-09):** (a) **salvar** a escolha; (b) **x2 livre** no M2 (sem trava; `can_use_speed` segue como ponto de extensão e retorna sempre verdadeiro); (c) botão **só na partida**, sem indicador no Menu. Dúvidas originais: (a) confirmar "até fechar o app, sem salvar" (ou lembrar entre aberturas); (b) x2 livre no M2 ou já nascer com trava (nível/anúncio); (c) mostrar o botão também no Menu ou só na partida.
 
 ## Status dos sistemas
 
