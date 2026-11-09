@@ -64,6 +64,7 @@ var _boss_hiding := false
 var _wave_label: Label
 var _particles_label: Label
 var _pause_button: Button
+var _speed_button: TextureButton
 var _skills: Array[SkillButton] = []
 var _upgrades: Array[UpgradeButton] = []
 var _particles_shown := 0
@@ -182,6 +183,7 @@ func _build_top() -> void:
 	_pause_button.focus_mode = Control.FOCUS_NONE
 	_pause_button.pressed.connect(_on_pause_pressed)
 	left.add_child(_pause_button)
+	_build_speed_button(left)
 
 	var wave_pill := _panel(&"PanelPill")
 	wave_pill.custom_minimum_size.x = 220
@@ -243,6 +245,54 @@ func _build_top() -> void:
 	_boss_bar.custom_minimum_size.y = BOSS_BAR_HEIGHT
 	_boss_bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row3.add_child(_boss_bar)
+
+
+## Botão x1/x2 (T-275, decisão 59): à direita da pausa; mostra o estado de `SpeedController.chosen`.
+func _build_speed_button(parent: Control) -> void:
+	_speed_button = TextureButton.new()
+	_speed_button.name = "Speed"
+	_speed_button.accessibility_name = "Velocidade"
+	_speed_button.ignore_texture_size = true
+	_speed_button.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
+	_speed_button.custom_minimum_size = Vector2(UiTokens.TOUCH_MIN, UiTokens.TOUCH_MIN)
+	_speed_button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_speed_button.focus_mode = Control.FOCUS_NONE
+	_speed_button.pressed.connect(_on_speed_pressed)
+	parent.add_child(_speed_button)
+	SpeedController.speed_changed.connect(_on_speed_changed)
+	SpeedController.speed_lock_changed.connect(_on_speed_lock_changed)
+	_refresh_speed()
+
+
+func _on_speed_changed(_speed: float) -> void:
+	_refresh_speed()
+
+
+func _on_speed_lock_changed(_speed: float, _unlocked: bool) -> void:
+	_refresh_speed()
+
+
+func _refresh_speed() -> void:
+	var x2 := is_equal_approx(SpeedController.chosen, SpeedController.SPEED_X2)
+	_speed_button.texture_normal = UiArt.SPEED_X2 if x2 else UiArt.SPEED_X1
+	_speed_button.texture_pressed = UiArt.SPEED_X2_PRESSED if x2 else UiArt.SPEED_X1_PRESSED
+	var target := SpeedController.SPEED_X1 if x2 else SpeedController.SPEED_X2
+	_speed_button.disabled = _match_over or not SpeedController.can_use_speed(target)
+
+
+## Alterna x1 <-> x2 (toque ou action `toggle_speed`). Sem efeito em pausa ou após o fim da partida.
+func toggle_speed() -> bool:
+	if _match_over or (is_inside_tree() and get_tree().paused):
+		return false
+	var target := SpeedController.SPEED_X1 if is_equal_approx(SpeedController.chosen, SpeedController.SPEED_X2) else SpeedController.SPEED_X2
+	var ok := SpeedController.set_speed(target)
+	ui_pressed.emit(&"speed", ok)
+	_refresh_speed()
+	return ok
+
+
+func _on_speed_pressed() -> void:
+	toggle_speed()
 
 
 func _build_tray() -> void:
@@ -528,6 +578,7 @@ func _on_match_ended(_result) -> void:
 	for sb in _skills:
 		sb.set_disabled(true)
 	_pause_button.disabled = true
+	_refresh_speed()
 	for ub in _upgrades:
 		ub.set_disabled(true)
 
@@ -592,6 +643,9 @@ func _fire(slot: int, at: Vector2) -> void:
 ## soltar a tecla sem ter clicado = alvo automático (o disparo pela tecla passa a ser ao soltar).
 ## Só intercepta com o Módulo pronto; em recarga a action segue para o SkillController (botão treme).
 func _input(event: InputEvent) -> void:
+	if event.is_action_pressed(&"toggle_speed") and not event.is_echo():
+		toggle_speed()
+		return
 	if _key_slot != 0:
 		_key_aim_input(event)
 		return

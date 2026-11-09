@@ -112,6 +112,7 @@ y=1280 └───────────────────────�
 | Elemento | Posição | Tamanho | Notas |
 |---|---|---|---|
 | Pausa | linha 1, à esquerda | **88×88**, botão claro | "II"; também `Esc` |
+| Velocidade | linha 1, à direita da pausa | **88×88** (arte 96, corpo 68), `TextureButton` | x1/x2 (T-275, decisão 59): mostra `SpeedController.chosen`, toque ou tecla `F` (`toggle_speed`) alterna; só na partida; sem efeito em pausa ou após `match_ended` |
 | "ONDA X/Y" | linha 1, centro | pílula `bg_panel`, `font_hud` | pulso de escala (200 ms) ao trocar de onda |
 | Partículas | linha 1, à direita | pílula `surface`, ícone verde `ui_icon_particles` (`StarIcon`) + número `particles` com contorno `ink` | total de Partículas da partida, com milhar |
 | Energia (vida do Anima) | linha 2, largura total | altura 40 px, cristal `accent` à esquerda | texto "ENERGIA atual / máx" (decisão 41), cor por faixa, flash `danger` e barra fantasma |
@@ -225,6 +226,7 @@ Os sinais são emitidos pelo nó raiz `Match`.
 | `skill_1`..`skill_3` | botão de skill | `1` `2` `3` |
 | `skill_4` | Depois (fora do M1) | `Espaço` |
 | `pause` | botão ⏸ | `Esc` |
+| `toggle_speed` | botão x1/x2 | `F` |
 | `ui_accept` (telas) | botão | `Enter` / `Espaço` |
 
 - Nada de teclas fixas no código: tudo via Input Actions. Alterar o Input Map exige autorização do AG00.

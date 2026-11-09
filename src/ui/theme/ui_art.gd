@@ -3,7 +3,12 @@ class_name UiArt
 ## Todos os PNG estão em 2x: desenhe na metade do tamanho (os tamanhos abaixo já estão em 1x).
 
 const PAUSE := preload("res://assets/ui/ui_icon_pause.png")
-const LOCK := preload("res://assets/ui/ui_icon_lock.png")
+## Botão de velocidade (T-275): 96x96, corpo 68x68. O estado é o da velocidade ativa.
+const SPEED_X1 := preload("res://assets/ui/ui_speed_x1.png")
+const SPEED_X1_PRESSED := preload("res://assets/ui/ui_speed_x1_pressed.png")
+const SPEED_X2 := preload("res://assets/ui/ui_speed_x2.png")
+const SPEED_X2_PRESSED := preload("res://assets/ui/ui_speed_x2_pressed.png")
+const LOCK :=preload("res://assets/ui/ui_icon_lock.png")
 ## Partículas (T-160/T-161). O `ui_icon_particle.png` dourado é obsoleto (reservado à Moeda do M2).
 const PARTICLE := preload("res://assets/ui/ui_icon_particles.png")
 const PARTICLE_OFF := preload("res://assets/ui/ui_icon_particles_off.png")
