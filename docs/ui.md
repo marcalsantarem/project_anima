@@ -365,6 +365,11 @@ Cenas independentes em `src/ui/screens/`, com o tema na raiz (via `ScreenKit`). 
 - contrato mantido: qualquer toque, clique ou tecla emite `start_requested` uma vez e libera o áudio. No mesmo gesto, `TitleScreen.fade_from_dark()` põe um véu `#021423` (CanvasLayer 128 na raiz, ignora toque) que some em 0,3 s sobre a partida: sem corte seco do escuro para o cartoon claro;
 - se a splash mudar no `web/shell.html`, ajuste as constantes do topo do script (px da arte).
 
+## 11b. Áudio básico (T-182, BRF-123)
+- Autoload `Audio` (`src/audio/audio_manager.gd`); barramentos `Music` e `SFX` em `default_bus_layout.tres`. Nada toca antes do 1º gesto: `TitleScreen` chama `Audio.unlock()`.
+- Música (`mus_entrada.ogg`, loop) no Título e no Menu, com fade; para ao entrar na partida e no Resultado, volta ao Menu. Tiro do Anima: `Audio.play_shot()` (pool de 6 vozes, tom ±6%).
+- Volumes 0-1 em `user://settings.cfg`, seção `audio` (`music`, `sfx`); `Audio.set_music_volume/set_sfx_volume`. Sem UI ainda. Fontes dos áudios: `assets/audio/_src/gen_audio.py`.
+
 ## 12. App na tela de início (T-175)
 
 - **Arquivos:** `web/pwa/manifest.webmanifest` e ícones (cópia de `assets/app/`, AG08; atualizar com `bash web/copy_pwa.sh --sync-icons`). O export do Godot não copia extras: `bash web/copy_pwa.sh build/web` roda depois do `--export-release` (local e no workflow `deploy-web.yml`) e também sobrescreve `index.apple-touch-icon.png`/`index.icon.png`, que o preset (`html/export_icon`) injeta com o ícone do projeto. `web/pwa/.gdignore` mantém os PNGs fora do `.pck`.

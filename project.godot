@@ -22,6 +22,7 @@ boot_splash/bg_color=Color(0.556863, 0.447059, 0.92549, 1)
 SceneFlow="*res://src/core/scene_flow.gd"
 Backend="*res://src/backend/backend.gd"
 SpeedController="*res://src/core/speed_controller.gd"
+Audio="*res://src/audio/audio_manager.gd"
 
 [display]
 

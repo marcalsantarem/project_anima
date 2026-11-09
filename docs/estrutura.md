@@ -14,6 +14,7 @@ src/
   match/         A partida: arena, Anima, ataque automático, skills, inimigos, ondas, projéteis.
   meta/          Lógica pura fora da partida: cards, fusão, atributos, talentos, economia.
   ui/            HUD, menus, hangar e componentes visuais reutilizáveis.
+  audio/         Autoload `Audio` (música, SFX com pool de vozes, volumes salvos). Não depende de `meta/` nem `backend/`.
   fx/            Efeitos visuais: cenas `fx_*.tscn`, shaders `.gdshader` e o pool de efeitos.
   debug/         Gravador da partida, logs, visualizador e overlay de debug (docs/debug.md).
 tests/

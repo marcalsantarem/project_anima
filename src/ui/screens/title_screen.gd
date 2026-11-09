@@ -295,9 +295,12 @@ func _show_pressed() -> void:
 	_button.scale = Vector2.ONE
 
 
-## O Godot retoma o AudioContext no gesto do usuário. Aqui só garantimos que o bus principal não ficou mudo.
+## O Godot retoma o AudioContext no gesto do usuário. Aqui liberamos o `Audio` (música e SFX só tocam depois disto).
 func _unlock_audio() -> void:
 	AudioServer.set_bus_mute(0, false)
+	var audio := get_node_or_null(^"/root/Audio")
+	if audio != null:
+		audio.unlock()
 
 
 ## Véu na cor da base por cima de tudo, que some em FADE_TIME: a troca para a partida (cartoon claro) não corta

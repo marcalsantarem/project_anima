@@ -63,7 +63,15 @@ func _physics_process(delta: float) -> void:
 	if projectile == null:
 		return
 	projectile.fire(position, target.position - position, data.attack_range, null, shot_damage())
+	_play_shot_sound()
 	_fire_timer = 1.0 / fire_rate()
+
+
+## Som do tiro (autoload `Audio`, T-182). Busca em runtime: ausente em sims `-s` e testes isolados.
+func _play_shot_sound() -> void:
+	var audio := get_node_or_null(^"/root/Audio")
+	if audio != null:
+		audio.play_shot()
 
 
 ## Dano de cada tiro do ataque automático, com upgrades.
