@@ -185,8 +185,8 @@
 | T-270 | Deploy do envio: variáveis de ambiente no Netlify, CORS, flag de build de teste, `docs/` com a conta Neon (o dono cria a conta e passa a string de conexão) (tam. P) | M1 | AG10 | feita (BRF-089); falta deploy |
 | T-271 | Validação do envio no PC e no iPhone (log chega na tabela; falha de rede não trava o jogo) (tam. P) | M1 | AG03 | feita (BRF-097, passa; relatório em docs/qa/qa-T-271.md; falta iPhone real e 429) |
 | T-272 | Design da aceleração (x1 e x2): a velocidade não é reduzida sozinha (pausa, hit-stop e Resultado respeitam a escolhida), vale em toda a sessão; definir o escopo da sessão (só a partida ou até fechar o app) e a recompensa por monstros derrotados, não por tempo; deixar o ponto de extensão para travas futuras; registrar em `docs/gameplay.md` (tam. P) | M2 | AG01 | feita (BRF-118; decidido pelo dono em 09/11: salvar a escolha, x2 livre, botão só na partida) |
-| T-273 | Controlador de velocidade (`Engine.time_scale`): alterna x1/x2, **mantém** a escolha em pausa, hit-stop (restaura para a escolhida) e Resultado; bot/headless em x1; testes GUT (tam. M) | M2 | AG01 | a fazer |
-| T-274 | Arte do botão de velocidade: estados x1 e x2 (tam. P) | M2 | AG08 | a fazer |
+| T-273 | Controlador de velocidade (`Engine.time_scale`): alterna x1/x2, **mantém** a escolha em pausa, hit-stop (restaura para a escolhida) e Resultado; bot/headless em x1; testes GUT (tam. M) | M2 | AG01 | feita |
+| T-274 | Arte do botão de velocidade: estados x1 e x2 (tam. P) | M2 | AG08 | feita |
 | T-275 | Botão de velocidade no HUD (toque e tecla no PC via Input Action, sem atrapalhar as skills; mostra a velocidade atual) (tam. M) | M2 | AG02 + AG07 | a fazer |
 | T-276 | Medir o x2 no iPhone com a cena de estresse (T-006/T-118) e registrar o fps (tam. P) | M2 | AG01 + AG10 | a fazer |
 | T-277 | Fundo holográfico na tela de Resultado: preparar a arte do dono (corte retrato 9:16, peso baixo, sem texto ilegível sob os botões) e aplicar no `result_screen`, com painéis e textos legíveis sobre ele (tam. M) | M1 | AG08 + AG02 | feita (BRF-092, BRF-093); falta ver no iPhone |
@@ -200,7 +200,7 @@
 | T-285 | Versão exibida `v0.1.0` (tela inicial, pausa e log) e `config/version` no `project.godot` (tam. P) | M1 | AG07 | feita |
 | T-286 | Botão "Debug" da pausa só aparece com `?debug` na URL (tam. P) | M1 | AG02 | feita |
 | T-287 | `MatchResult.kills_by_type`: a Arena conta as mortes por tipo de inimigo (enxame 1 por membro, chefe, meteoro), base da recompensa por monstro (tam. P) | M2 | AG01 | feita |
-| T-288 | Pausa: botão "Voltar ao menu" (sinal `menu_requested`), que o fluxo da T-187 já escuta; hoje a pausa não tem saída para o menu (tam. P) | M2 | AG02 | a fazer |
+| T-288 | Pausa: botão "Voltar ao menu" (sinal `menu_requested`), que o fluxo da T-187 já escuta; hoje a pausa não tem saída para o menu (tam. P) | M2 | AG02 | feita |
 | T-148 | Sinais da Arena para VFX (projectile_fired, projectile_hit, enemy_died, particles_gained, skill_cast, boss_telegraph_started, boss_phase_changed) | M1 | AG01 | feita |
 
 ## Próximas prontas p/ briefing
