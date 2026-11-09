@@ -8,6 +8,8 @@ extends CanvasLayer
 
 signal resumed
 signal restart_requested
+## "Voltar ao menu": o SceneFlow troca a cena (abandono, sem recompensa).
+signal menu_requested
 signal reduced_effects_changed(on: bool)
 
 const DEBUG_BUTTON_SIZE := Vector2(228, 64)
@@ -15,6 +17,7 @@ const DEBUG_BUTTON_SIZE := Vector2(228, 64)
 var enabled := true
 var _root: Control
 var _continue: Button
+var menu_button: Button
 ## Interruptor "Debug" (overlay de debug, BRF-063; estado em DebugSettings).
 var debug_toggle: Button
 ## Interruptor "Efeitos reduzidos" (T-132, BRF-080), ao lado do "Debug".
@@ -34,6 +37,9 @@ func _ready() -> void:
 	_continue = ScreenKit.button("Continuar", true, close)
 	col.add_child(_continue)
 	col.add_child(ScreenKit.button("Recomeçar", false, _on_restart))
+	menu_button = ScreenKit.button("Voltar ao menu", false, _on_menu)
+	menu_button.name = "MenuButton"
+	col.add_child(menu_button)
 	var toggles := HBoxContainer.new()
 	toggles.alignment = BoxContainer.ALIGNMENT_CENTER
 	toggles.add_theme_constant_override("separation", UiTokens.SPACE_XS)
@@ -101,6 +107,12 @@ func _on_restart() -> void:
 	_root.visible = false
 	get_tree().paused = false
 	restart_requested.emit()
+
+
+func _on_menu() -> void:
+	_root.visible = false
+	get_tree().paused = false
+	menu_requested.emit()
 
 
 func _unhandled_input(event: InputEvent) -> void:

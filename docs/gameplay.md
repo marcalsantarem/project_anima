@@ -372,7 +372,10 @@ O `project.godot` é do AG07. Layers sugeridas:
 
 ## Aceleração x1/x2 (T-272, BRF-118; decisão 59) [Decidido pelo dono em 2026-11-09: salvar, x2 livre, botão só na partida]
 
-Botão de velocidade no HUD da partida (T-275). Implementação em T-273; nada disso está codificado.
+Botão de velocidade no HUD da partida (T-275). Controlador implementado na T-273 (`src/core/speed_controller.gd`, autoload `SpeedController`); botão na T-275.
+
+**API (T-273):** `chosen` (1.0/2.0), `set_speed(s) -> bool` (recusa valor inválido, trava ou headless/bot; salva em `user://settings.cfg`, seção `game`, chave `speed`), `can_use_speed(s) -> bool` (hoje sempre verdadeiro para x1/x2), `rest_scale()`, `restore()` (volta `Engine.time_scale` a `chosen`; use ao sair de câmera lenta de debug), `notify_lock(s, unlocked)`, sinais `speed_changed(s)` e `speed_lock_changed(s, unlocked)`. `locked_to_x1` é true no headless (testes e simulações ficam em x1). O hit-stop marca `held` e ao terminar chama `restore()`; um `set_speed` durante ele só muda `chosen`. O HitStop acessa o autoload por nome de nó (scripts `-s`, como `run_sim`, compilam antes dos autoloads). Obs.: não há câmera lenta F3 no código hoje (F3 só alterna o overlay); se surgir, deve chamar `restore()`.
+**Medido (Godot 4.7.2):** `Engine.time_scale = 2` mantém 60 ticks de física/s reais e **dobra o `delta`** (passos de 2/60 s), não dobra o número de passos. Corrige a suposição do item 6 ("2 passos por quadro"): o risco no iPhone é de passos maiores (projétil a 900 px/s anda ~30 px/passo; colisão/tunelamento a revisar na T-276), não de mais custo por quadro. Teste de equivalência: mesma seed e mesmo tempo de jogo (900 ticks em x1, 450 em x2) dão as mesmas mortes, Partículas, XP e Moeda.
 
 1. **A velocidade escolhida nunca é reduzida sozinha.** Um único dono (`SpeedController`, autoload ou nó do `SceneFlow`, a definir pelo AG07) guarda `chosen` (1.0 ou 2.0) e é o único que escreve o valor "de repouso" de `Engine.time_scale`.
    - **Pausa:** usa `get_tree().paused`; não toca em `time_scale`. Ao despausar vale `chosen`.

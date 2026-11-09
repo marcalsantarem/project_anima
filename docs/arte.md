@@ -269,4 +269,6 @@ Sem contorno escuro grosso (é do cartoon); o brilho só em títulos e números 
 
 **Status (BRF-110):** as 20 peças foram geradas (`assets/ui/_src/gen_ui_holo.py`, ~65 KB no total); detalhes e uso no `assets/ui/README.md`. Ajuste: o botão primário usa margens **48/48/56/56** (as 40/40/40/48 não cabiam o chanfro de 16 + brilho + o deslocamento do pressionado).
 
+**Botão de velocidade (T-274, BRF-121):** exceção holográfica no HUD cartoon da partida, `ui_speed_x1` / `ui_speed_x2` (+ `_pressed`), 96×96, corpo chanfrado 68×68. x1 = painel escuro com moldura ciano; x2 = ciano cheio com brilho forte. Setas e "x1"/"x2" vêm na arte. Sugestão: no topo, ao lado da pausa. Prévia: [`docs/img/botao-velocidade.png`](img/botao-velocidade.png). Detalhes no `assets/ui/README.md`.
+
 A Moeda (`ui_icon_coin`) vem da T-162; as molduras por raridade (`ui_frame_<raridade>`) ficam para o M3.

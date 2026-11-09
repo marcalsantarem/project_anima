@@ -110,5 +110,20 @@ Menu principal e Resultado do M2 (`docs/arte.md` §11, mockups `assets/mockups/m
 | `ui_holo_scanline.png` | 256×4 | 64/64/0/0 | Linha de varredura (ciano 55%, pontas que somem). Estica na largura do painel; `modulate.a` 0,5 na animação |
 | `ui_holo_glow.png` | 128×128 | — | Brilho radial **branco**: tingir com `modulate` (`holo_line` ou `gold`) e `CanvasItemMaterial` com `blend_mode = Add`. Pode esticar (ex.: elipse atrás da pílula da Moeda, ou o pulsar do Jogar, já que o brilho do botão é pintado) |
 
+## Botão de velocidade x1/x2 (T-274, BRF-121)
+
+HUD da partida, estilo `ui_holo_*` (mesma escala: **1 px do PNG ≈ 1 px de tela**, sem `scale`). Fonte: `_src/gen_ui_speed.py` (importa os helpers do `gen_ui_holo.py`); regenerar: `python assets/ui/_src/gen_ui_speed.py`. Validação: `_src/speed_sheet.png` (4 estados, 2x/1x, sobre creme e roxo), `_src/speed_check_x1.png`, `_src/speed_check_tray.png` (bandeja: não cabe) e a prévia `docs/img/botao-velocidade.png`.
+
+| Arquivo | PNG | Uso |
+|---|---|---|
+| `ui_speed_x1.png` | 96×96 | Normal: painel escuro, moldura ciano, ">" + "x1" |
+| `ui_speed_x1_pressed.png` | 96×96 | Pressionado do x1: moldura `holo_text2`, miolo `#0E5A70`, corpo 4 px mais baixo |
+| `ui_speed_x2.png` | 96×96 | Ativo: ciano cheio (como o primário), brilho forte, ">>" + "x2" em `holo_ink` |
+| `ui_speed_x2_pressed.png` | 96×96 | Pressionado do x2: degradê mais escuro, brilho menor, corpo 4 px mais baixo |
+
+- **Texto na arte** ("x1"/"x2", Outfit 800, e as setas): o AG02 só troca a textura (`TextureButton`: `texture_normal`/`texture_pressed` por estado). Números não precisam de localização.
+- Corpo 68×68 px em (14, 10) do PNG, base escura até y 84; o resto é brilho. Alvo de toque: o retângulo inteiro (96×96) ou ≥ 64×64 centrado no corpo (centro do corpo em (48, 44)).
+- **Posição sugerida:** fileira do topo, à direita da pausa (centro do corpo em x ~157 no viewport 720, alinhado na vertical com a pausa), entre a pausa e a pílula "ONDA". Ao lado das skills não cabe sem mexer nos slots (sobram ~78 px à direita do slot 3).
+
 - **Draw calls:** todas as peças estão em PNG separados; para o batching do Compatibility, o AG07/AG02 pode montar o atlas `atlas_ui_holo` (cabem num 512×512) se o profiler pedir.
 - **Não incluídos:** Moeda (`ui_icon_coin`, T-162; as folhas usam um provisório), peças do hangar (slots bloqueado/próximo, molduras por raridade, M3). O brilho do painel "Subida de nível" do mockup é opcional (`ui_holo_glow` esticado atrás, `modulate.a` ~0,3).

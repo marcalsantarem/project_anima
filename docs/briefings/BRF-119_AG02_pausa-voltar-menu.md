@@ -1,0 +1,5 @@
+# BRF-119 — AG02 — T-288 pausa: botão "Voltar ao menu"
+**Leia:** `src/ui/screens/pause_screen.gd`/`.tscn`, `src/core/scene_flow.gd` (≈linha 228: já escuta `menu_requested`), `docs/ui.md` (seção Pausa). **Regra:** respostas curtas; sem commit/push/branches; UTF-8; confirme que o GUT mostra o teste novo entre os executados (um arquivo só: `-gselect=NOME`).
+**Fazer:** adicione à tela de Pausa o botão **"Voltar ao menu"** que emite o sinal `menu_requested` (o fluxo já escuta). Estilo e tamanho de toque iguais aos botões atuais da pausa (tokens/`ScreenKit`); secundário em relação a "Continuar". Sem confirmação extra (partida abandonada não dá recompensa; o fluxo decide). Não mexa em `SceneFlow`; se ele não tratar corretamente a saída pela pausa (despausar, limpar a partida), **só reporte**. Teste GUT: botão existe, emite `menu_requested` ao ser pressionado. Capture 375x812 em `docs/img/pausa-menu-375x812.png`. Nota curta em `docs/ui.md`.
+**Permitido:** `src/ui/`, `tests/unit/ui/`, `docs/img/`, `docs/ui.md`. **Proibido:** `assets/`, `src/core/`, `src/meta/`, `src/match/`, `project.godot`.
+**Entrega:** até 4 linhas: o que mudou, testes, o que não foi verificado.
