@@ -264,6 +264,13 @@ func _k(view: Vector2) -> float:
 	return minf(k, (view.y * (1.0 - PEDESTAL_END) - gap) / BLOCK_H)
 
 
+## Coluna do conteúdo: faixa horizontal da arte do título (centralizada), recortada à tela. Em retrato é a tela toda.
+static func column_rect(view: Vector2) -> Rect2:
+	var w := TitleScreen.ART.x * TitleScreen.art_scale(view)
+	var x0 := maxf(0.0, (view.x - w) / 2.0)
+	return Rect2(x0, 0.0, minf(w, view.x - x0), view.y)
+
+
 func _layout() -> void:
 	var view := get_viewport_rect().size
 	var safe := ScreenKit.safe_area(get_viewport())
@@ -312,7 +319,9 @@ func _layout() -> void:
 
 	var gear := maxf(GEAR_SIZE * k, UiTokens.TOUCH_MIN)
 	settings_button.size = Vector2.ONE * gear
-	settings_button.position = Vector2(view.x - float(safe.right) - GEAR_MARGIN * k - gear, float(safe.top) + UiTokens.SPACE_M)
+	var col := column_rect(view)
+	var right := minf(col.end.x, view.x - float(safe.right))
+	settings_button.position = Vector2(right - GEAR_MARGIN * k - gear, float(safe.top) + UiTokens.SPACE_M)
 	_update_bar()
 
 

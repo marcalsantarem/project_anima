@@ -330,6 +330,7 @@ Cenas independentes em `src/ui/screens/`, com o tema na raiz (via `ScreenKit`). 
 - **API:** `setup(view: Dictionary)` com `level`, `xp`, `xp_to_next`, `coins`, `is_max` (antes ou depois de entrar na árvore); sinal `play_pressed`. Não chama Backend nem SceneFlow (T-187 liga). Helpers estáticos: `format_number` (1.250) e `xp_ratio`.
 - **Nível 30 (`is_max`):** texto `MAX` e barra cheia. XP no limite ou acima: barra cheia (clamp).
 - **Layout:** fundo e animações da arte do título (`TitleScreen.build_art`); bloco único ancorado embaixo (logotipo, linha selo/barra/Moeda, Jogar), escala `largura / 375` (até 720) e menor em telas baixas para não cobrir o pedestal. Jogar >= 281x78 (1x). Peças `ui_holo_*` em `StyleBoxTexture` (Jogar com `expand_margin` 16 e texto 6 px abaixo ao pressionar; pílula; engrenagem) e `NinePatchRect` (barra).
+- **Engrenagem (BRF-117):** ancorada ao canto superior direito da coluna do conteúdo (`MenuScreen.column_rect`: faixa da arte do título recortada à tela; em retrato é a tela toda), não da janela.
 - **Engrenagem:** sem ação no M2 (nenhuma conexão em `pressed`). Sem Módulos, dicas de slot, ALFA nem versão.
 - **Moeda provisória:** `MenuScreen.COIN_ICON` (único ponto de troca; T-162).
 
