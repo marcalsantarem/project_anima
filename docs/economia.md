@@ -38,36 +38,36 @@ Custo por nível crescente, sem degraus (passo de +30 a +60 por nível).
 | N→N+1 | XP para subir | Acumulado |
 |---|---|---|
 | 1→2 | 50 | 50 |
-| 2→3 | 100 | 150 |
-| 3→4 | 130 | 280 |
-| 4→5 | 170 | 450 |
-| 5→6 | 220 | 670 |
-| 6→7 | 280 | 950 |
-| 7→8 | 320 | 1270 |
-| 8→9 | 360 | 1630 |
-| 9→10 | 410 | 2040 |
-| 10→11 | 460 | 2500 |
-| 11→12 | 500 | 3000 |
-| 12→13 | 560 | 3560 |
-| 13→14 | 600 | 4160 |
-| 14→15 | 640 | 4800 |
-| 15→16 | 680 | 5480 |
-| 16→17 | 720 | 6200 |
-| 17→18 | 760 | 6960 |
-| 18→19 | 800 | 7760 |
-| 19→20 | 840 | 8600 |
-| 20→21 | 900 | 9500 |
-| 21→22 | 950 | 10450 |
-| 22→23 | 1000 | 11450 |
-| 23→24 | 1040 | 12490 |
-| 24→25 | 1090 | 13580 |
-| 25→26 | 1140 | 14720 |
-| 26→27 | 1190 | 15910 |
-| 27→28 | 1240 | 17150 |
-| 28→29 | 1290 | 18440 |
-| 29→30 | 1340 | 19780 |
+| 2→3 | 70 | 120 |
+| 3→4 | 80 | 200 |
+| 4→5 | 100 | 300 |
+| 5→6 | 140 | 440 |
+| 6→7 | 180 | 620 |
+| 7→8 | 230 | 850 |
+| 8→9 | 360 | 1210 |
+| 9→10 | 410 | 1620 |
+| 10→11 | 460 | 2080 |
+| 11→12 | 500 | 2580 |
+| 12→13 | 560 | 3140 |
+| 13→14 | 600 | 3740 |
+| 14→15 | 640 | 4380 |
+| 15→16 | 680 | 5060 |
+| 16→17 | 720 | 5780 |
+| 17→18 | 760 | 6540 |
+| 18→19 | 800 | 7340 |
+| 19→20 | 840 | 8180 |
+| 20→21 | 900 | 9080 |
+| 21→22 | 950 | 10030 |
+| 22→23 | 1000 | 11030 |
+| 23→24 | 1040 | 12070 |
+| 24→25 | 1090 | 13160 |
+| 25→26 | 1140 | 14300 |
+| 26→27 | 1190 | 15490 |
+| 27→28 | 1240 | 16730 |
+| 28→29 | 1290 | 18020 |
+| 29→30 | 1340 | 19360 |
 
-Slots: nível 3, 7 e 12 (`slot_unlock_levels`).
+Slots: nível **2, 5 e 8** (`slot_unlock_levels`, decisão 63). Demais desbloqueios (`feature_unlock_levels`, só dado): Núcleos 3, Componentes 4, botão x2 6, fusão de Componentes 7; helper `ProgressionData.is_unlocked(feature, level)`.
 
 ## Metas de partidas por nível
 
@@ -75,13 +75,17 @@ Modelo de XP médio por partida: P1 a P4 = derrotas nas ondas 3, 4, 6 e 7 (19, 3
 
 | Marco | Acumulado | Partidas |
 |---|---|---|
-| Nível 3 (slot 1) | 150 | **4** (3 derrotas somam 108, a 4ª passa de 150; com a 1ª vitória na 4ª também) |
-| Nível 7 (slot 2) | 950 | ~11 |
-| Nível 12 (slot 3) | 3000 | ~26 |
-| Nível 20 | 8600 | ~61 |
-| Nível 30 | 19780 | ~131 |
+| Nível 2 (slot 1) | 50 | **2** (P1 = 19, P2 = 31: soma exata 50) |
+| Nível 3 (Núcleos) | 120 | 3 |
+| Nível 4 (Componentes) | 200 | 4 |
+| Nível 5 (slot 2) | 300 | **5** (P4 acumula 183, P5 ~120) |
+| Nível 6 (x2) | 440 | 6 |
+| Nível 7 (fusão) | 620 | 8 |
+| Nível 8 (slot 3) | 850 | **~10** (2 a 3 dias a 4/dia) |
+| Nível 20 | 8180 | ~58 |
+| Nível 30 | 19360 | ~128 |
 
-**Justificativa do nível 30:** 131 partidas a 3 a 5 por dia = 26 a 44 dias (~4 a 6 semanas, 4/dia ≈ 33 dias). Slot 1 na primeira sessão de ~4 partidas; slot 2 em 2 a 3 dias; slot 3 em ~1 semana; depois o ritmo desacelera. Só os números do `.tres` precisam mudar para reajustar.
+**Justificativa do nível 30:** 128 partidas a 3 a 5 por dia = 26 a 43 dias (~4 a 6 semanas, 4/dia ≈ 32 dias), pois a curva dos níveis 2 a 8 foi suavizada (degraus 70, 80, 100, 140, 180, 230; total -420 XP; do nível 9 em diante igual). Slot 1 na 2ª partida; slot 2 na 1ª sessão (5 partidas); slot 3 em 2 a 3 dias; depois o ritmo desacelera. Só os números do `.tres` precisam mudar para reajustar.
 
 ## Perguntas em aberto para o dono
 

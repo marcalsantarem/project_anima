@@ -73,26 +73,27 @@ func test_apply_xp_exact_limit() -> void:
 
 func test_multiple_levels_and_slots() -> void:
 	var p := PlayerProfile.new()
-	var o := MetaProgress.apply_xp(p, 50 + 100 + 7, prog)
+	var o := MetaProgress.apply_xp(p, 50 + 70 + 7, prog)
 	assert_eq(o["new_level"], 3)
 	assert_eq(o["levels_gained"], 2)
 	assert_eq(o["slots_unlocked"], [1] as Array[int])
 	assert_eq(p.xp, 7)
-	o = MetaProgress.apply_xp(p, 130 + 170 + 220 + 280, prog)
+	o = MetaProgress.apply_xp(p, 80 + 100 + 140 + 180 - 7 + 7, prog)
 	assert_eq(o["new_level"], 7)
 	assert_eq(o["slots_unlocked"], [2] as Array[int])
 
 
-func test_slot3_at_12_and_slots_for_level() -> void:
+func test_slot3_at_8_and_slots_for_level() -> void:
 	var p := PlayerProfile.new()
 	var o := MetaProgress.apply_xp(p, 100000, prog)
 	assert_eq(o["new_level"], 30)
 	assert_eq(o["slots_unlocked"], [1, 2, 3] as Array[int])
-	assert_eq(MetaProgress.slots_for_level(2, prog), 0)
-	assert_eq(MetaProgress.slots_for_level(3, prog), 1)
+	assert_eq(MetaProgress.slots_for_level(1, prog), 0)
+	assert_eq(MetaProgress.slots_for_level(2, prog), 1)
+	assert_eq(MetaProgress.slots_for_level(4, prog), 1)
+	assert_eq(MetaProgress.slots_for_level(5, prog), 2)
 	assert_eq(MetaProgress.slots_for_level(7, prog), 2)
-	assert_eq(MetaProgress.slots_for_level(11, prog), 2)
-	assert_eq(MetaProgress.slots_for_level(12, prog), 3)
+	assert_eq(MetaProgress.slots_for_level(8, prog), 3)
 
 
 func test_cap_30_discards_xp() -> void:

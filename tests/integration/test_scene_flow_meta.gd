@@ -159,7 +159,7 @@ func test_multiple_level_ups_and_slot_unlock() -> void:
 	var s := SceneFlow.settle_and_save(r)
 	assert_gt(s.levels_gained, 1, "várias subidas")
 	assert_eq(s.level_after, 1 + s.levels_gained)
-	assert_has(s.slots_unlocked, 1, "slot 1 liberado no nível 3")
+	assert_has(s.slots_unlocked, 1, "slot 1 liberado no nível 2")
 	assert_true(s.slots_unlocked is Array)
 	assert_eq(s.xp_to_next_after, SceneFlow.progression.xp_to_next[s.level_after - 1])
 	assert_eq(_fake.stored.level, s.level_after)

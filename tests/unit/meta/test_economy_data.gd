@@ -17,7 +17,17 @@ func test_progression_curve() -> void:
 
 func test_slot_unlocks() -> void:
 	var p: ProgressionData = load(PROG)
-	assert_eq(p.slot_unlock_levels, PackedInt32Array([3, 7, 12]))
+	assert_eq(p.slot_unlock_levels, PackedInt32Array([2, 5, 8]))
+	assert_eq(p.feature_unlock_levels, {"nuclei": 3, "components": 4, "speed_x2": 6, "component_fusion": 7})
+	assert_false(p.is_unlocked(&"components", 3))
+	assert_true(p.is_unlocked(&"components", 4))
+	assert_false(p.is_unlocked(&"component_fusion", 6))
+	assert_true(p.is_unlocked(&"component_fusion", 7))
+	var bad := ProgressionData.new()
+	bad.max_level = 2
+	bad.xp_to_next = PackedInt32Array([50])
+	bad.feature_unlock_levels = {"nuclei": 31}
+	assert_gt(bad.validate().size(), 0)
 
 
 func test_rewards_valid_and_cover_enemies() -> void:
@@ -39,9 +49,13 @@ func test_curve_milestones() -> void:
 	var cum := 0
 	for i in 29:
 		cum += p.xp_to_next[i]
-		if i == 1:
-			assert_eq(cum, 150, "nível 3")
-	assert_eq(cum, 19780, "nível 30")
+		if i == 0:
+			assert_eq(cum, 50, "nível 2")
+		if i == 3:
+			assert_eq(cum, 300, "nível 5")
+		if i == 6:
+			assert_eq(cum, 850, "nível 8")
+	assert_eq(cum, 19360, "nível 30")
 
 
 func test_validate_rejects_bad_data() -> void:

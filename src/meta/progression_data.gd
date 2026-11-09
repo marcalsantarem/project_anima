@@ -8,6 +8,16 @@ extends Resource
 ## Nível da conta que libera cada slot de skill (slot 1, 2, 3).
 @export var slot_unlock_levels: PackedInt32Array = PackedInt32Array()
 
+## Nível que libera cada funcionalidade (decisão 63): nuclei, components, speed_x2, component_fusion. Só dado.
+@export var feature_unlock_levels: Dictionary = {}
+
+
+## Verdadeiro se a funcionalidade (chave de feature_unlock_levels) está liberada no nível. Chave ausente = liberada.
+func is_unlocked(feature: StringName, level: int) -> bool:
+	if not feature_unlock_levels.has(String(feature)):
+		return true
+	return level >= int(feature_unlock_levels[String(feature)])
+
 
 ## Retorna a lista de erros (vazia = válido).
 func validate() -> PackedStringArray:
@@ -25,4 +35,8 @@ func validate() -> PackedStringArray:
 	for lv in slot_unlock_levels:
 		if lv < 2 or lv > max_level:
 			errors.append("slot_unlock_levels fora de 2..max_level")
+	for k in feature_unlock_levels:
+		var lv := int(feature_unlock_levels[k])
+		if lv < 1 or lv > 30:
+			errors.append("feature_unlock_levels[%s] fora de 1..30" % k)
 	return errors
