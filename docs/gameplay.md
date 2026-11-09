@@ -370,6 +370,31 @@ O `project.godot` é do AG07. Layers sugeridas:
 - **Medidas no PC (headless, Godot 4.7.2)**, microbench de spawn de 150 corredores: **~60 µs/spawn instanciando -> ~6 µs reaproveitando (~10x)**. Estresse 150/300, 120 quadros: física ~48-61 ms/quadro medidos pelo monitor do headless (inclui o servidor de física 2D sem renderizar; variação entre rodadas; antes e depois equivalentes, pois o ganho do pool está no spawn/free e não no passo). Nós estáveis (2758 -> ~2770), sem órfãos.
 - **Não medido:** FPS real no iPhone/Safari (renderização, draw calls). Gargalo provável lá: desenho de ~450 sprites + colisão Area2D (150 inimigos x 300 projéteis), não a lógica. Se < 50 fps, próximos candidatos: reduzir projéteis do estresse por tipo, desligar `monitorable` de projéteis inimigos sem alvo ou passar a colisão projétil-inimigo para grade espacial.
 
+## Aceleração x1/x2 (T-272, BRF-118; decisão 59) [Proposta: aguarda o dono nos itens 2 e 4]
+
+Botão de velocidade no HUD da partida (T-275). Implementação em T-273; nada disso está codificado.
+
+1. **A velocidade escolhida nunca é reduzida sozinha.** Um único dono (`SpeedController`, autoload ou nó do `SceneFlow`, a definir pelo AG07) guarda `chosen` (1.0 ou 2.0) e é o único que escreve o valor "de repouso" de `Engine.time_scale`.
+   - **Pausa:** usa `get_tree().paused`; não toca em `time_scale`. Ao despausar vale `chosen`.
+   - **Hit-stop:** hoje restaura "o `time_scale` anterior". Passa a restaurar `SpeedController.chosen` (não o valor lido ao iniciar), então um toque no botão durante os 30–80 ms só muda `chosen` e vale ao fim. Continua sem empilhar e em tempo real.
+   - **Resultado e telas de fim:** a partida terminada mantém `chosen` (animações do Resultado e da recompensa rodam na velocidade escolhida; tweens de UI que não devem acelerar usam `ignore_time_scale`). Menu e Título também respeitam `chosen`; o botão só aparece na partida.
+   - **Câmera lenta do F3 (0,25x):** é debug; ao sair volta a `chosen`.
+2. **Escopo da sessão. Recomendado: "até fechar o app", só em memória, sem salvar.**
+   - Vale entre partidas (Partida → Resultado → Menu → Partida) enquanto o app estiver aberto; ao abrir o app, começa em x1.
+   - Por quê: quem escolhe x2 não precisa tocar de novo a cada partida; e nunca começa acelerado por surpresa depois de dias (a primeira partida do dia é a de aprender/ler). "Só a partida" irritaria quem joga em x2; salvar no disco cria estado persistente, migração e risco com a futura trava (item 4, que poderia deixar salvo um x2 não liberado).
+   - UI: o botão mostra a velocidade atual (x1/x2) e a partida seguinte já abre com o estado do botão correspondente. Menu: nada (opcionalmente um indicador discreto, decisão do AG02).
+   - Save: **nada** no M2. Se o dono preferir lembrar entre aberturas: uma chave `speed` em `user://settings.cfg` (fora de `src/meta/`), lida no boot e validada por `can_use_speed`.
+3. **Recompensa:** XP e Moeda continuam **só por monstros derrotados e ondas**, nunca por tempo (decisão 59). O valor por monstro é o mesmo em x1 e x2; x2 só encurta o tempo real da partida. Nada em `src/meta/` lê `Engine.time_scale`, tempo real ou duração. Partículas idem (por morte). Teste (T-273): mesma seed e mesmo bot, x1 e x2 produzem o mesmo `MatchResult` (kills, XP, Moeda).
+4. **Ponto de extensão para travas futuras (não implementar):** um único ponto, `SpeedController.can_use_speed(speed: float) -> bool`, mais o sinal `speed_lock_changed(speed, unlocked)`. Hoje retorna sempre verdadeiro. O botão (T-275) pergunta a ele e mostra cadeado/anúncio se falso; `set_speed()` recusa o que ele recusar. Trava futura (nível da conta, anúncio recompensado, premium) muda **só** o corpo dessa função (ex.: `Progression.level >= N`); UI e partida não mudam. Se uma trava cair com x2 ativo (anúncio expirou), `chosen` volta a 1.0 pela mesma função.
+5. **Bot e headless:** sempre x1 (o controlador ignora `set_speed` quando `DisplayServer.get_name() == "headless"` ou com o bot ativo); testes e simulações do balanceamento não mudam. O `time_scale` escala cooldowns, ondas, spawn, inimigos, projéteis e VFX (tudo em `_physics_process`/`delta`/`Timer`). Atenção: `get_tree().create_timer(t)` escala por padrão; só o que for de tempo real (hit-stop, `StressMode`, relógio do log) usa `ignore_time_scale = true`.
+6. **Riscos para o iPhone (T-276):**
+   - x2 roda 2 passos de física por quadro (`max_physics_steps_per_frame` padrão 8): se o quadro já é caro (medido 46,9 fps com 150 inimigos), o custo de lógica/colisão dobra e pode virar espiral (quadro lento, mais passos, mais lento). Medir com `?debug=1&stress=150,300` em x2 e registrar fps médio/mín e p95.
+   - Se cair demais: limitar `max_physics_steps_per_frame` (ex.: 4) aceitando câmera "mais lenta" que x2 sob carga, ou desligar x2 no aparelho (via `can_use_speed`).
+   - Túnel de projéteis: a 900 px/s por 2 passos de ~15 ms, o deslocamento por passo é o mesmo (passo fixo); sem risco novo.
+   - Áudio: `time_scale` altera o tom/andamento de sons; decidir com o AG11 se SFX seguem o `time_scale` (padrão do Godot: não altera o pitch, só o tempo de disparo).
+   - Tremor, números de dano e flash usam `delta` e acelerarão junto; aceito.
+7. **Dúvidas para o dono:** (a) confirmar "até fechar o app, sem salvar" (ou lembrar entre aberturas); (b) x2 livre no M2 ou já nascer com trava (nível/anúncio); (c) mostrar o botão também no Menu ou só na partida.
+
 ## Status dos sistemas
 
 | Sistema | Status | Task |
@@ -387,3 +412,4 @@ O `project.godot` é do AG07. Layers sugeridas:
 | Upgrades da partida | protótipo | T-134 |
 | Foco manual do ataque, mira manual do meteoro (API) | protótipo | T-176, T-177 |
 | Game feel: tremor, hit-stop, números de dano, efeitos reduzidos | protótipo | T-117 |
+| Aceleração x1/x2 (design) | proposta | T-272 (código: T-273) |
