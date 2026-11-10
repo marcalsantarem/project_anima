@@ -10,6 +10,9 @@ Objetivo: saber se o x2 aguenta no iPhone com carga (referência: 46,9 fps com 1
 5. No modo app (PWA), a `tag` só vale se o link salvo na tela de início já tiver o `?tag=`: ajuste o link antes de adicioná-lo.
 - `speed` só vale com `?debug=1` e **não** altera a velocidade salva do jogo.
 
+## Antes de medir: Modo de Pouca Energia (iPhone)
+As partidas reais no iPhone rodaram a ~30 fps (PC: ~60) com quadros presos em 33 ms: suspeita de **Modo de Pouca Energia** (iOS limita o `requestAnimationFrame` a 30 Hz). O Safari não expõe esse modo, então o log infere pela cadência: `header.env.raf_hz_inicio` (início) e `web_end.raf_hz_fim` (fim), mais `suspeita_30fps_cap` (true se ~30 Hz ±4 com `Engine.max_fps == 0`). A linha de cadência do `resumo` mostra `cadência rAF: 30 Hz (possível Pouca Energia)` ou `60 Hz`. **Se aparecer 30 Hz, desligue o Modo de Pouca Energia (Ajustes > Bateria) e repita a rodada**: o fps medido não vale para decidir o x2. O log traz também `por_velocidade` (fps de x1 e x2 separados) e a velocidade real (`velocidade_inicial`).
+
 ## Anotar
 fps médio · fps mínimo · p95 do quadro (ms) · quadros >50 ms. Se o jogo "andar mais devagar que x2" (câmera lenta sob carga), anote.
 

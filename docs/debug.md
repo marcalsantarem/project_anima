@@ -15,7 +15,7 @@ Módulo `src/debug/` (sem autoload). O `SceneFlow` cria o gravador e o overlay n
 
 ## 1. O que é registrado
 
-- **Cabeçalho:** jogo, versão, Godot, data/hora local, plataforma, modelo, renderer, GPU, tela, janela, viewport, safe area, núcleos, efeitos reduzidos e seed da partida. Na web (`header.web`): user agent, `devicePixelRatio`, tela CSS, orientação, safe area do shell, `WEBGL_debug_renderer_info` (vendor/renderer), `deviceMemory`, `hardwareConcurrency`, `window.ANIMA_BUILD` (se existir) e a URL **sem query string**. `header.ui_insets`: insets que a UI usa (px do jogo; `bottom` já pela regra de docs/ui.md §9.1, `bottom_raw`, `covers_bottom`, `css_k`). `header.web.viewport` (T-172, `animaViewportInfo()` do shell, lido na hora): `inner` (innerWidth e innerHeight **nativo**), `app_h` (altura usada no canvas), `outer_h`, `vv` (visualViewport width, height, offsetTop, scale), `client_h`, `screen`, sondas `svh`/`dvh`/`lvh`, `canvas` (top, bottom, height do `getBoundingClientRect`), `canvas_h` (altura aplicada pelo Godot no estilo do canvas), `standalone` e `safe` (o mesmo `animaGetSafeArea()` que a UI lê).
+- **Cabeçalho:** jogo, versão, Godot, data/hora local, plataforma, modelo, renderer, GPU, tela, janela, viewport, safe area, núcleos, efeitos reduzidos e seed da partida. Na web (`header.web`): user agent, `devicePixelRatio`, tela CSS, orientação, safe area do shell, `WEBGL_debug_renderer_info` (vendor/renderer), `deviceMemory`, `hardwareConcurrency`, `window.ANIMA_BUILD` (se existir) e a URL **sem query string** em `url` e a query completa (`?debug=1&stress=…&tag=…`, até 300 caracteres) em `query` (T-295). `header.ui_insets`: insets que a UI usa (px do jogo; `bottom` já pela regra de docs/ui.md §9.1, `bottom_raw`, `covers_bottom`, `css_k`). `header.web.viewport` (T-172, `animaViewportInfo()` do shell, lido na hora): `inner` (innerWidth e innerHeight **nativo**), `app_h` (altura usada no canvas), `outer_h`, `vv` (visualViewport width, height, offsetTop, scale), `client_h`, `screen`, sondas `svh`/`dvh`/`lvh`, `canvas` (top, bottom, height do `getBoundingClientRect`), `canvas_h` (altura aplicada pelo Godot no estilo do canvas), `standalone` e `safe` (o mesmo `animaGetSafeArea()` que a UI lê).
 - **Amostras** a cada 1 s (0,25 s com o chefe vivo). Colunas em `samples_cols`:
   - tempo, FPS da janela, ms médio e máximo, quadros > 33 e > 50 ms;
   - tempo de processo e de física, draw calls, objetos, nós, órfãos;
@@ -23,8 +23,8 @@ Módulo `src/debug/` (sem autoload). O `SceneFlow` cria o gravador e o overlay n
   - inimigos (total e por tipo), projéteis do jogador e dos inimigos, efeitos vivos no pool;
   - Energia, onda, Partículas, vida e defesa do chefe, pausado.
 - **Eventos** (`events`, `{t, e, ...}`):
-  - partida: `inicio`, `onda`, `fim`;
-  - combate: `dano` (valor, fonte, Energia), `mortes` e `contatos` (por segundo e tipo);
+  - partida: `inicio`, `velocidade` inicial (`de: null`), `onda`, `fim`;
+  - combate: `dano` (valor, fonte, Energia; até 5 golpes pequenos por janela de 1 s, acima disso `dano_agg` {t, fonte, soma, contagem}; golpe grande ou letal é sempre individual), `mortes` e `contatos` (por segundo e tipo);
   - upgrades: `upgrade` (id, nível, custo, Partículas restantes) e `upgrade_negado`;
   - skills: `skill`, `meteoro`/`skill_impacto` (alvo, raio, atingidos, chefe);
   - chefe: `chefe`, `chefe_defesa` (início, cada quarto perdido, zero e recarga), `chefe_lancado`, `chefe_derrotado`;
@@ -66,11 +66,15 @@ Todos **opcionais**: log antigo continua válido. Fora do navegador ficam ausent
 | `header.env` e `web_end` | `display_mode` (`standalone`/`browser`), `standalone_mq`, `standalone_nav`, `orientation`, `dpr`, `screen`, `inner`, `cores`, `device_memory`, `connection` (`type`, `downlink`, `rtt`, `save_data`), `language`, `online`, `perf_now_ms`, `nav` (`response_end`, `dcl`, `load`), `resources` (`count`, `transfer_bytes`, `encoded_bytes`, `decoded_bytes`), `audio_state`, `life` | `env` = início da partida; `web_end` = a mesma leitura no fim. Só na web |
 | `…life` | `hidden_count`, `hidden_ms`, `longest_hidden_ms`, `pagehide`, `pageshow`, `freeze`, `resume`, `gl_lost`, `gl_restored` | ciclo de vida **acumulado desde a 1ª partida da sessão** (o gancho JS nasce nela). Por partida: eventos `aba_oculta`/`aba_visivel` |
 | `samples_cols` | `render_objects`, `time_scale` | `RENDER_TOTAL_OBJECTS_IN_FRAME` e `Engine.time_scale` (a cada 1 s) |
-| `events` | `velocidade` | `{t, de, para}` a cada troca x1/x2 |
+| `events` | `velocidade` | `{t, de, para}`: o 1º, no início da partida, tem `de: null` (velocidade real); depois, toda troca x1/x2, inclusive `StressMode` (`speed=`) e restauração |
+| `events` | `dano_agg` | `{t, fonte, soma, contagem}`: dano por fonte numa janela de 1 s com mais de 5 golpes pequenos (T-295). O resumo soma individuais e agregados |
+| `header` | `refresh_hz`, `max_fps`, `audio` | `DisplayServer.screen_get_refresh_rate()`, `Engine.max_fps`; áudio do Godot: `unlocked`, `music_playing`, `voices_playing`, `music_volume`, `sfx_volume`, `mix_rate`. No fim: `audio_end` na raiz |
+| `header.env` / `web_end` | `raf_hz_inicio` / `raf_hz_fim`, `suspeita_30fps_cap`, `audio_ctx` | cadência do `requestAnimationFrame` (Hz, janela de 1,5 s; início lido aos 1,7 s da partida); `suspeita_30fps_cap` = ~30 Hz (±4) com `Engine.max_fps == 0` (possível Modo de Pouca Energia do iOS, que o Safari não expõe); `audio_ctx` = `{count, state, sample_rate, base_latency, output_latency}` do último `AudioContext` (guardados pelo `web/shell.html` em `window.__anima_audio`) |
+| `summary` | `velocidade_inicial`, `por_velocidade` | velocidade com que a partida começou; `{"1": {segundos, fps_medio, fps_min, quadro_p95_ms}, "2": {...}}` pela coluna `time_scale` (`quadro_p95_ms` = p95 dos ms médios por amostra). `velocidades` continua só com as mudanças |
 | raiz | `worst_frames` | os 5 piores quadros `[t, ms, onda]`, mesmo sem passar de 50 ms |
 | `summary` | `velocidades`, `pausas`, `skills_usadas` (por slot), `mortes_por_tipo`, `energia_5s`, `piores_quadros`, `erros_por_tipo`; `erros_primeiros` com até 20 | derivados dos eventos e das amostras |
 
-A série de 1 s (fps, ms médio, `proc_ms`, `phys_ms`, objetos, nós, draw calls, memória, inimigos, projéteis) já estava em `samples`. No Safari/iOS não existem `deviceMemory` e `navigator.connection` (vêm `null`); `transferSize` de recursos de outra origem vem 0; `audio_state` depende de `GodotAudio.ctx` (`null` se ausente).
+A série de 1 s (fps, ms médio, `proc_ms`, `phys_ms`, objetos, nós, draw calls, memória, inimigos, projéteis) já estava em `samples`. No Safari/iOS não existem `deviceMemory` e `navigator.connection` (vêm `null`); `transferSize` de recursos de outra origem vem 0; `audio_state` vem do último `AudioContext` guardado pelo shell (`null` só se o jogo nunca criou um). `result` enviado à API no estresse é `quit` (o `resultado: "estresse"` fica dentro do `log`). O Safari não expõe o Modo de Pouca Energia: só a cadência rAF o denuncia.
 
 ## 4. Overlay
 

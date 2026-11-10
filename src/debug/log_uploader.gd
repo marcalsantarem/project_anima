@@ -39,6 +39,9 @@ static func build_payload(res: MatchResult, doc: Dictionary, user_agent: String 
 	var dur := 0.0
 	if res != null:
 		outcome = "victory" if res.outcome == MatchResult.Outcome.VICTORY else "defeat"
+		# Estresse não é vitória nem derrota: a API recebe `quit`; `resultado: "estresse"` fica dentro do log (BRF-137).
+		if doc.get("header", {}).has("stress") or str(doc.get("result", {}).get("resultado", "")) == "estresse":
+			outcome = "quit"
 		wave = res.wave_reached
 		dur = res.duration_s
 	var b := BuildInfo.current()

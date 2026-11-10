@@ -25,8 +25,10 @@ try { var nav = performance.getEntriesByType('navigation')[0];
 try { var rs = performance.getEntriesByType('resource'), tr = 0, en = 0, de = 0;
  for (var i = 0; i < rs.length; i++) { tr += rs[i].transferSize || 0; en += rs[i].encodedBodySize || 0; de += rs[i].decodedBodySize || 0; }
  o.resources = {count: rs.length, transfer_bytes: tr, encoded_bytes: en, decoded_bytes: de}; } catch (e) { o.resources = null; }
-var ac = null; try { ac = (window.GodotAudio && GodotAudio.ctx && GodotAudio.ctx.state) || null; } catch (e) {}
-o.audio_state = ac;
+var ac = null, au = null; try { var A = window.__anima_audio || []; var c0 = A.length ? A[A.length - 1] : (window.GodotAudio && GodotAudio.ctx) || null;
+ if (c0) { ac = c0.state; au = {count: A.length, state: c0.state, sample_rate: c0.sampleRate, base_latency: n(c0.baseLatency), output_latency: n(c0.outputLatency)}; } } catch (e) {}
+o.audio_state = ac; o.audio_ctx = au;
+o.raf_hz = window.__animaRaf ? window.__animaRaf.hz(1500) : null;
 var L = window.__animaDbg && window.__animaDbg.life;
 o.life = L ? {hidden_count: L.hidden_count, hidden_ms: Math.round(L.hidden_ms + (L.hidden_since === null ? 0 : performance.now() - L.hidden_since)),
  longest_hidden_ms: Math.round(L.longest), pagehide: L.pagehide, pageshow: L.pageshow, freeze: L.freeze, resume: L.resume,
@@ -116,6 +118,31 @@ static func web_snapshot() -> Dictionary:
 	var nav = d.get("standalone_nav")
 	d["display_mode"] = null if mq == null and nav == null else ("standalone" if (mq == true or nav == true) else "browser")
 	return d
+
+
+## Cadência atual do requestAnimationFrame (Hz, janela de 1,5 s), ou null (fora da web, sem gancho ou aba parada).
+static func raf_hz() -> Variant:
+	if not OS.has_feature("web"):
+		return null
+	var v = JavaScriptBridge.eval("window.__animaRaf ? __animaRaf.hz(1500) : null", true)
+	return float(v) if v != null else null
+
+
+## Cadência ~30 Hz (±4) com `Engine.max_fps == 0`: o navegador está limitando a 30 (Modo de Pouca Energia do iOS?).
+static func suspect_30fps_cap(hz: Variant, max_fps: int) -> Variant:
+	if hz == null:
+		return null
+	return max_fps == 0 and absf(float(hz) - 30.0) <= 4.0
+
+
+## Estado do áudio do lado do Godot: desbloqueado, música tocando, vozes de SFX ativas, volumes e taxa de mixagem.
+static func audio_info() -> Dictionary:
+	var node := (Engine.get_main_loop() as SceneTree).root.get_node_or_null("Audio") if Engine.get_main_loop() is SceneTree else null
+	if node == null:
+		return {}
+	return {"unlocked": node.get("unlocked"), "music_playing": node.call("is_music_playing"),
+		"voices_playing": node.call("voices_playing"), "music_volume": node.get("music_volume"),
+		"sfx_volume": node.get("sfx_volume"), "mix_rate": AudioServer.get_mix_rate()}
 
 
 ## Cabeçalho da identificação do ensaio (`header.run`).

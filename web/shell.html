@@ -388,6 +388,25 @@ html, body {
 	}
 }
 		</style>
+		<!-- T-295: guarda os AudioContext criados pelo jogo em window.__anima_audio (o log lê estado e sampleRate). Antes do motor. -->
+		<script>
+(function () {
+	var w = window;
+	w.__anima_audio = [];
+	['AudioContext', 'webkitAudioContext'].forEach(function (name) {
+		var Orig = w[name];
+		if (!Orig || Orig.__animaWrapped) { return; }
+		var Wrapped = function () {
+			var ctx = arguments.length ? new Orig(arguments[0]) : new Orig();
+			try { w.__anima_audio.push(ctx); if (w.__anima_audio.length > 8) { w.__anima_audio.shift(); } } catch (e) {}
+			return ctx;
+		};
+		Wrapped.prototype = Orig.prototype;
+		Wrapped.__animaWrapped = true;
+		try { w[name] = Wrapped; } catch (e) {}
+	});
+})();
+		</script>
 		$GODOT_HEAD_INCLUDE
 		<!-- T-165: o deploy troca o marcador abaixo por window.ANIMA_BUILD = {...} (web/inject_build.sh). Inline: sem cache antigo. -->
 		<script>/*ANIMA_BUILD*/</script>

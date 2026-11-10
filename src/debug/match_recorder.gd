@@ -23,6 +23,11 @@ const MAX_EVENTS := 3000
 const MAX_HITCHES := 300
 const MAX_ERRORS := 200
 const WORST_FRAMES := 5
+## Dano ao Núcleo: até DMG_INDIVIDUAL golpes pequenos por janela de 1 s ficam como evento `dano`;
+## passando disso, a janela vira `dano_agg` por fonte (T-295). Golpe grande ou letal é sempre individual.
+const DMG_INDIVIDUAL := 5
+const DMG_BIG_FRACTION := 0.1
+const RAF_READ_AT_S := 1.7 ## partida: instante de ler a cadência rAF do início (janela de 1,5 s)
 const MAX_BYTES := 1_000_000
 const SAMPLE_COLS: Array[String] = [
 	"t", "fps", "ms_avg", "ms_max", "n33", "n50", "proc_ms", "phys_ms", "draw_calls", "objects",
@@ -56,6 +61,9 @@ document.addEventListener('freeze', function(){ L.freeze++; });
 document.addEventListener('resume', function(){ L.resume++; });
 var cv = document.querySelector('canvas');
 if (cv) { cv.addEventListener('webglcontextlost', function(){ L.gl_lost++; }); cv.addEventListener('webglcontextrestored', function(){ L.gl_restored++; }); }
+var R = window.__animaRaf = {ts: [], hz: function(win){ var t = this.ts, n = t.length; if (n < 3 || performance.now() - t[n - 1] > 500) return null;
+ var i = n - 1; while (i > 0 && t[n - 1] - t[i - 1] <= win) i--; var k = n - 1 - i; if (k < 2) return null; return Math.round(10000 * k / (t[n - 1] - t[i])) / 10; }};
+(function loop(ts){ var t = R.ts; t.push(ts); if (t.length > 240) t.shift(); requestAnimationFrame(loop); })(performance.now());
 d.drain = function(){ var out = JSON.stringify({q: d.q, dropped: d.dropped}); d.q = []; d.dropped = 0; return out; };
 })();"""
 const JS_ENV := """JSON.stringify((function(){
@@ -63,7 +71,7 @@ var o = {ua: navigator.userAgent, dpr: window.devicePixelRatio, screen: [screen.
  inner: [window.innerWidth, window.innerHeight], url: location.origin + location.pathname,
  orientation: (screen.orientation && screen.orientation.type) || (window.innerHeight >= window.innerWidth ? 'portrait' : 'landscape'),
  device_memory: navigator.deviceMemory || null, cores: navigator.hardwareConcurrency || null,
- build: window.ANIMA_BUILD || null,
+ build: window.ANIMA_BUILD || null, query: String(location.search || '').slice(0, 300),
  safe_area: window.animaGetSafeArea ? JSON.parse(animaGetSafeArea()) : null};
 try { var c = document.createElement('canvas'); var gl = c.getContext('webgl2') || c.getContext('webgl');
  if (gl) { o.gl_version = gl.getParameter(gl.VERSION); var ext = gl.getExtension('WEBGL_debug_renderer_info');
@@ -144,8 +152,13 @@ var _last_damage_frame := -1
 var _logger: RecorderLogger
 var _started_at := ""
 var _start_ms := 0.0
+## Fonte da velocidade (testes trocam; vazio = autoload SpeedController).
+var speed_source: Node
 var _speed_node: Node
 var _speed_cur := 1.0
+var _raf_start_done := false
+var _dmg_window := -1 ## segundo (inteiro) da janela de dano em andamento
+var _dmg_pending: Array = [] ## golpes pequenos da janela, ainda sem decidir (individual ou agregado)
 ## Os piores quadros da partida: [t, ms, onda], do maior ao menor (no máximo WORST_FRAMES).
 var _worst: Array = []
 var _worst_min := 0.0
@@ -189,7 +202,7 @@ func _ready() -> void:
 	SessionInfo.next_run()
 	_started_at = SessionInfo.utc_now()
 	_start_ms = SessionInfo.now_ms()
-	_speed_node = get_node_or_null(^"/root/SpeedController")
+	_speed_node = speed_source if speed_source != null else get_node_or_null(^"/root/SpeedController")
 	_speed_cur = float(_speed_node.get("chosen")) if _speed_node != null else 1.0
 	if _speed_node != null and _speed_node.has_signal(&"speed_changed"):
 		_speed_node.connect(&"speed_changed", _on_speed_changed)
@@ -198,6 +211,7 @@ func _ready() -> void:
 		MatchRecorder.rotate_files()
 	_install_error_hooks()
 	event("inicio", {"seed": _seed})
+	event("velocidade", {"de": null, "para": _speed_cur}) ## velocidade real ao começar (BRF-137)
 	meta_before = meta_snapshot()
 	if not meta_before.is_empty():
 		event("meta_antes", meta_before)
@@ -270,6 +284,12 @@ func step(ms: float, paused: bool = false) -> void:
 			_win_50 += 1
 			_hitch(ms)
 	_saved_this_frame = false
+	_check_speed()
+	if int(match_time) != _dmg_window:
+		_flush_damage()
+		_dmg_window = int(match_time)
+	if not _raf_start_done and match_time >= RAF_READ_AT_S:
+		_read_raf_start()
 	if not header.has("stress"):
 		_detect_stress()
 	_kills_left -= dt
@@ -296,8 +316,18 @@ func event(type: String, data: Dictionary = {}) -> void:
 
 ## Troca de velocidade do jogador (x1/x2) com o instante da partida (BRF-136).
 func _on_speed_changed(speed: float) -> void:
+	if is_equal_approx(speed, _speed_cur):
+		return
 	event("velocidade", {"de": _speed_cur, "para": speed})
 	_speed_cur = speed
+
+
+## Pega mudanças que não passam pelo sinal (StressMode, restauração): compara a escolha com a registrada.
+func _check_speed() -> void:
+	if _speed_node != null and is_instance_valid(_speed_node):
+		var now: Variant = _speed_node.get("chosen")
+		if now != null and not is_equal_approx(float(now), _speed_cur):
+			_on_speed_changed(float(now))
 
 
 ## Guarda o quadro entre os WORST_FRAMES piores. Só aloca quando entra um novo (raro depois do começo).
@@ -324,11 +354,36 @@ func _on_core_hp_changed(current: int, max_hp: int) -> void:
 		_last_damage = {"t": snappedf(match_time, 0.001), "e": "dano", "valor": _hp - current,
 			"fonte": source, "energia": current, "energia_max": max_hp}
 		_last_damage_frame = frame
-		events.push(_last_damage)
+		if current <= 0 or float(_hp - current) >= DMG_BIG_FRACTION * max_hp:
+			events.push(_last_damage) # golpe grande ou letal: sempre individual
+		else:
+			_dmg_pending.append(_last_damage) # decide ao fechar a janela de 1 s
 	elif max_hp != _hp_max and _hp >= 0:
 		event("energia_max", {"energia": current, "energia_max": max_hp})
 	_hp = current
 	_hp_max = max_hp
+
+
+## Fecha a janela de dano: até DMG_INDIVIDUAL golpes viram eventos `dano`; acima disso, um `dano_agg` por fonte.
+func _flush_damage() -> void:
+	if _dmg_pending.is_empty():
+		return
+	if _dmg_pending.size() <= DMG_INDIVIDUAL:
+		for d in _dmg_pending:
+			events.push(d)
+	else:
+		var by := {}
+		for d in _dmg_pending:
+			var src := str(d.get("fonte", "?"))
+			var a: Dictionary = by.get(src, {"soma": 0, "contagem": 0})
+			a["soma"] = int(a["soma"]) + int(d.get("valor", 0))
+			a["contagem"] = int(a["contagem"]) + 1
+			by[src] = a
+		var t0 := float(_dmg_pending[0].get("t", 0.0))
+		for src in by:
+			events.push({"t": snappedf(floorf(t0), 0.001), "e": "dano_agg", "fonte": src,
+				"soma": by[src]["soma"], "contagem": by[src]["contagem"]})
+	_dmg_pending = []
 
 
 ## Fonte do dano: o sinal pode vir antes ou depois da queda de Energia no mesmo quadro de física.
@@ -543,6 +598,16 @@ func _remove_error_hooks() -> void:
 		_js_visibility_cb = null
 
 
+## Cadência do requestAnimationFrame no início da partida (janela de 1,5 s) e a suspeita de limite de 30 fps.
+func _read_raf_start() -> void:
+	_raf_start_done = true
+	if not OS.has_feature("web") or not header.has("env"):
+		return
+	var hz = SessionInfo.raf_hz()
+	header["env"]["raf_hz_inicio"] = hz
+	header["env"]["suspeita_30fps_cap"] = SessionInfo.suspect_30fps_cap(hz, Engine.max_fps)
+
+
 func _on_web_visibility(_args: Array) -> void:
 	event("aba_oculta" if JavaScriptBridge.eval("document.hidden", true) else "aba_visivel")
 
@@ -587,6 +652,7 @@ func finish(result = null) -> void:
 		return
 	_detect_stress()
 	_flush_kills()
+	_flush_damage()
 	_sample()
 	if result != null:
 		_result = {
@@ -639,7 +705,13 @@ func build_log(with_summary: bool) -> Dictionary:
 	if not meta_before.is_empty():
 		doc["meta"] = {"antes": meta_before, "depois": meta_after}
 	if OS.has_feature("web"):
-		doc["web_end"] = SessionInfo.web_snapshot()
+		var end := SessionInfo.web_snapshot()
+		var hz = end.get("raf_hz")
+		end.erase("raf_hz")
+		end["raf_hz_fim"] = hz
+		end["suspeita_30fps_cap"] = SessionInfo.suspect_30fps_cap(hz, Engine.max_fps)
+		doc["web_end"] = end
+	doc["audio_end"] = SessionInfo.audio_info()
 	if with_summary:
 		doc["summary"] = LogReport.summarize(doc)
 	return doc
@@ -703,6 +775,9 @@ func build_header() -> Dictionary:
 		"build": BuildInfo.current().duplicate(),
 		"run": SessionInfo.run_info(_started_at),
 		"speed_initial": _speed_cur,
+		"refresh_hz": snappedf(DisplayServer.screen_get_refresh_rate(), 0.1),
+		"max_fps": Engine.max_fps,
+		"audio": SessionInfo.audio_info(),
 		"load": {"title_ms": snappedf(SessionInfo.title_ms(), 1.0) if SessionInfo.title_ms() >= 0.0 else null,
 			"match_start_ms": snappedf(_start_ms, 1.0)},
 	}
@@ -715,6 +790,7 @@ func build_header() -> Dictionary:
 		h["web"] = MatchRecorder.web_env().duplicate()
 		h["web"]["viewport"] = MatchRecorder.web_viewport()
 		h["env"] = SessionInfo.web_snapshot()
+		h["env"].erase("raf_hz") # a cadência do início é lida em RAF_READ_AT_S (raf_hz_inicio)
 		h["os"] = SessionInfo.ua_short(str(h["web"].get("ua", "")))
 	return h
 
