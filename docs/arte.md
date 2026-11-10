@@ -272,7 +272,21 @@ Sem contorno escuro grosso (é do cartoon); o brilho só em títulos e números 
 
 **Botão de velocidade (T-274, BRF-121):** exceção holográfica no HUD cartoon da partida, `ui_speed_x1` / `ui_speed_x2` (+ `_pressed`), 96×96, corpo chanfrado 68×68. x1 = painel escuro com moldura ciano; x2 = ciano cheio com brilho forte. Setas e "x1"/"x2" vêm na arte. Sugestão: no topo, ao lado da pausa. Prévia: [`docs/img/botao-velocidade.png`](img/botao-velocidade.png). Detalhes no `assets/ui/README.md`.
 
-A Moeda (`ui_icon_coin`) vem da T-162; as molduras por raridade (`ui_frame_<raridade>`) ficam para o M3.
+A Moeda (`ui_icon_coin`) veio da T-162 (§11.7); as molduras por raridade (`ui_frame_<raridade>`) ficam para o M3.
+
+### 11.7 Moeda e ícones do glossário (T-162, BRF-130)
+
+Uma forma e uma cor por conceito, reconhecíveis a 28 px sem texto; contorno `#021423`, brilho pintado. Prévia: [`icones-glossario.png`](img/icones-glossario.png).
+
+| Conceito | Arquivo | Forma | Cor |
+|---|---|---|---|
+| Moeda | `ui_icon_coin` (128) / `ui_icon_coin_small` (48) | disco com losango em relevo | `gold` `#FFC93D` |
+| Módulo | `ui_icon_module` | placa chanfrada com raio | ciano `#3FE8F5` |
+| Componente | `ui_icon_component` | peça com pinos e soquete | laranja `#FF9F43` |
+| Núcleo | `ui_icon_core` | esfera ligada a três nós | azul `#4F8DFF` |
+| Fragmento de Módulo | `ui_icon_module_fragment` | cacos de cristal com o raio do Módulo | orquídea `#E07BFF` |
+
+Formas exclusivas: círculo = Moeda, estrela = Partículas, hexágono = XP. Laranja, azul e orquídea são **cores de interface do hangar** (não entram na arena; o laranja fica longe do `enemy_runner` por ser só menu).
 
 ## 12. HUD holográfico da partida (T-289, BRF-125; decisão 64)
 

@@ -418,3 +418,6 @@ Botão de velocidade no HUD da partida (T-275). Controlador implementado na T-27
 | Foco manual do ataque, mira manual do meteoro (API) | protótipo | T-176, T-177 |
 | Game feel: tremor, hit-stop, números de dano, efeitos reduzidos | protótipo | T-117 |
 | Aceleração x1/x2 (design) | proposta | T-272 (código: T-273) |
+
+## Slots de Módulo pelo nível da conta (T-188)
+`MatchConfig.for_account(nível, ProgressionData.slot_unlock_levels)` define `unlocked_slots`: slot n ativo só se `nível >= slot_unlock_levels[n-1]`. A Arena zera os slots não liberados (`slot_modules` vazio = Módulos da cena; hoje só o meteoro no slot 1). Nível 1 = só ataque básico; teclas e botões de slot bloqueado são ignorados (sem skill, sem erro). `MatchConfig.new()` (bot, testes, demo) mantém o slot 1 liberado.

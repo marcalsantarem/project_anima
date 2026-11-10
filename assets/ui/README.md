@@ -18,7 +18,7 @@ Fonte: `_src/gen_ui.py` (SVG por código → Chrome headless). Para regenerar, r
 | `ui_icon_lock.png` | 128×128 | 64×64 | Cadeado dos slots bloqueados (acima do texto "NV 7"/"NV 12") |
 | `ui_icon_particles.png` | 128×128 | 64×64 (24–32 no HUD/pílula) | **Partículas** (decisão 40, BRF-061): estrela verde de 4 pontas com facetas tipo "chip", núcleo claro e brilho. Fonte: `g_particles(P_GREEN)` |
 | `ui_icon_particles_off.png` | 128×128 | 64×64 | Variante apagada (cinza-lilás) para custo sem Partículas (alternativa ao `modulate.a`) |
-| `ui_icon_particle.png` | 64×64 | 32×32 | **Obsoleto**: estrela dourada, reservada para a Moeda do M2. Não usar para Partículas |
+| `ui_icon_particle.png` | 64×64 | 32×32 | **Obsoleto**: estrela dourada. A Moeda agora é `ui_icon_coin` (T-162); pode sair do `.pck` quando o AG02 trocar o uso |
 | `ui_icon_pause.png` | 128×128 | 64×64 | Botão de pausa completo (quadrado branco + barras), canto superior esquerdo |
 
 Ícone sem Partículas: `modulate.a = 0.55` (o círculo fica colorido; o mockup usa cinza, aceitável a 55%).
@@ -126,7 +126,7 @@ HUD da partida, estilo `ui_holo_*` (mesma escala: **1 px do PNG ≈ 1 px de tela
 - **Posição sugerida:** fileira do topo, à direita da pausa (centro do corpo em x ~157 no viewport 720, alinhado na vertical com a pausa), entre a pausa e a pílula "ONDA". Ao lado das skills não cabe sem mexer nos slots (sobram ~78 px à direita do slot 3).
 
 - **Draw calls:** todas as peças estão em PNG separados; para o batching do Compatibility, o AG07/AG02 pode montar o atlas `atlas_ui_holo` (cabem num 512×512) se o profiler pedir.
-- **Não incluídos:** Moeda (`ui_icon_coin`, T-162; as folhas usam um provisório), peças do hangar (slots bloqueado/próximo, molduras por raridade, M3). O brilho do painel "Subida de nível" do mockup é opcional (`ui_holo_glow` esticado atrás, `modulate.a` ~0,3).
+- **Não incluídos:** Moeda (feita depois na T-162, ver "Moeda e glossário"), peças do hangar (slots bloqueado/próximo, molduras por raridade, M3). O brilho do painel "Subida de nível" do mockup é opcional (`ui_holo_glow` esticado atrás, `modulate.a` ~0,3).
 
 ## HUD holográfico da partida (T-289, BRF-125, decisão 64)
 
@@ -162,3 +162,18 @@ Todo o HUD da partida no estilo `ui_holo_*` (guia: `docs/arte.md` §12). Fonte: 
 - **Texto fica na UI** (Outfit 800, `holo_text` com contorno `#021423` de 4–5 px, como no mockup): "ONDA X/Y", número de Partículas, "ENERGIA atual / máx", "Boss" e números do chefe, "Nv n", custos, "MAX", "NV n", dígitos das teclas e os segundos da recarga. Só a pausa ("II") e a velocidade têm o símbolo na arte.
 - Ícones de upgrade e de Módulo atuais mantidos sem recolorir (funcionam sobre o fundo escuro).
 - Peças antigas (`ui_skill_frame_*`, `ui_upgrade_*`, `ui_pill_*`, `ui_bar_*`, `ui_icon_pause`) ficam até o AG02 aplicar a T-290; depois podem sair do `.pck`.
+
+## Moeda e glossário do hangar (T-162, BRF-130)
+
+Estilo holográfico (§11/§12 do `docs/arte.md`), contorno `#021423`, brilho pintado, sem texto. Fonte: `_src/gen_ui_icons.py` (`python assets/ui/_src/gen_ui_icons.py`; precisa de Chrome e ffmpeg no PATH). Folha de conferência: `_src/icons_glossary_sheet.png`; prévia: `docs/img/icones-glossario.png` (fundo do HUD, bandeja e arena clara; 64, 44 e 28 px).
+
+| Arquivo | PNG | Tela | Uso |
+|---|---|---|---|
+| `ui_icon_coin.png` | 128×128 | 44–88 | **Moeda**: disco dourado com aro e losango em relevo (círculo; Partícula = estrela verde, XP = hexágono violeta). Resultado, loja, custos |
+| `ui_icon_coin_small.png` | 48×48 | 24–48 | Moeda simplificada (contorno grosso, sem aro fino) para a pílula do menu (~44 px no viewport 720) e textos em linha |
+| `ui_icon_module.png` | 128×128 | 28–64 | **Módulo** (poder ativo): placa chanfrada ciano com raio. Ciano = jogador |
+| `ui_icon_component.png` | 128×128 | 28–64 | **Componente** (equipamento): peça laranja com pinos e soquete |
+| `ui_icon_core.png` | 128×128 | 28–64 | **Núcleo** (talento): esfera azul `#4F8DFF` ligada a três nós (árvore) |
+| `ui_icon_module_fragment.png` | 128×128 | 28–64 | **Fragmento de Módulo**: cacos de cristal orquídea `#E07BFF` com o raio ciano do Módulo |
+
+Total ~55 KB. Use `TextureRect` com `expand_mode = EXPAND_IGNORE_SIZE` e `STRETCH_KEEP_ASPECT_CENTERED`.

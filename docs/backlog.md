@@ -74,7 +74,7 @@
 | T-159 | Remover o ícone provisório do `skill_pulse` e deixar o do meteoro como padrão | M1 | AG02 | feita (BRF-083; sobra o PNG do pulse sem uso, limpeza com o AG08) |
 | T-160 | Arte do ícone de Partículas: estrela verde, estilo "chip" (e nova cor dos efeitos de coleta) | M1 | AG08 | feita |
 | T-161 | Aplicar o ícone verde de Partículas no HUD, Resultado, botões de upgrade e efeitos (hoje dourado) | M1 | AG02 + AG09 | feita |
-| T-162 | Arte do ícone de Moeda (moeda dourada) e do glossário na UI (para o M2) | M2 | AG08 | a fazer |
+| T-162 | Arte do ícone de Moeda (moeda dourada) e do glossário na UI (para o M2) | M2 | AG08 | feita |
 | T-163 | Textos do jogo e docs com os nomes oficiais (Módulo, Componente, Núcleo, Moeda); decidir a colisão de "Núcleo" | M2 | AG00 + AG04 + AG02 | a fazer |
 | T-164 | Rótulo da vida do Anima: "NÚCLEO" vira "ENERGIA" no HUD, Resultado e docs de UI | M1 | AG02 | feita |
 | T-165 | Build e versão no cabeçalho do log (commit e data do deploy) | M1 | AG07 + AG02 | feita |
@@ -100,11 +100,11 @@
 | T-185 | Save local: autoload `Backend` (interface) + `LocalBackend` em `user://` com versão, migração e recuperação; ADR | M2 | AG05 + AG07 | feita |
 | T-186 | Lógica pura do meta em `src/meta/`: recompensa do `MatchResult`, XP → nível, slots liberados; testes GUT | M2 | AG04 | feita |
 | T-187 | Fluxo de cenas com menu: Título → Menu → Partida → Resultado → Menu; aplica a recompensa e salva | M2 | AG07 | feita |
-| T-188 | Partida monta os slots pelo nível da conta (`MatchConfig`); conta sem Módulo joga só com ataque básico | M2 | AG01 | a fazer |
+| T-188 | Partida monta os slots pelo nível da conta (`MatchConfig`); conta sem Módulo joga só com ataque básico | M2 | AG01 | feita |
 | T-189 | Arte do menu holográfico: painéis, botões, barra de XP, selo de nível, ícone de XP | M2 | AG08 | feita |
 | T-190 | Tela do menu principal: Jogar, nível e barra de XP, saldo de Moeda e ícone de configurações (engrenagem) sem ação até o M8; sem Módulos na tela | M2 | AG02 | feita |
 | T-191 | Resultado com recompensa: XP e Moeda animados, barra enchendo, subida de nível e aviso de slot liberado | M2 | AG02 + AG09 | feita |
-| T-192 | HUD: slots bloqueados mostram o nível que os libera | M2 | AG02 | a fazer |
+| T-192 | HUD: slots bloqueados mostram o nível que os libera | M2 | AG02 | feita (T-290 + T-188: "NV n" ligado ao nível da conta) |
 | T-193 | Debug do meta: zerar save e dar XP/Moeda pelo overlay `?debug=1`; meta no log da partida | M2 | AG02 + AG05 | a fazer |
 | T-194 | Assets de áudio do M2: música de entrada e som do tiro (próprios ou CC0, licença registrada) | M2 | AG11 | feita (falta ouvir no dispositivo) |
 | T-195 | Balanceamento da progressão: partidas até os níveis 2, 5 e 8 pela simulação do bot | M2 | AG04 | a fazer |

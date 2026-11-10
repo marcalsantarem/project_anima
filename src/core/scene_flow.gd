@@ -102,10 +102,9 @@ static func xp_to_next_of(level: int, prog: ProgressionData) -> int:
 	return prog.xp_to_next[level - 1]
 
 
-## Config da partida a partir do perfil. Por enquanto igual para todos (slots pelo nível: T-188, AG01).
+## Config da partida a partir do perfil: slots de Módulo pelo nível da conta (T-188).
 func build_match_config() -> MatchConfig:
-	_ensure_profile()
-	return MatchConfig.new()
+	return MatchConfig.for_account(_ensure_profile().level, progression.slot_unlock_levels)
 
 
 func start_match(config: MatchConfig = null) -> void:
@@ -125,6 +124,7 @@ func start_match(config: MatchConfig = null) -> void:
 	match_root.add_child(pause)
 	# `bind` antes de a arena entrar na árvore, para o HUD receber o estado inicial.
 	hud.bind(arena)
+	_link_slot_levels(hud, config)
 	pause.bind(arena)
 	pause.restart_requested.connect(func() -> void: start_match(config), CONNECT_ONE_SHOT)
 	_connect_back_to_menu(pause)
@@ -135,6 +135,17 @@ func start_match(config: MatchConfig = null) -> void:
 	_link_debug(arena, hud, pause, match_root)
 	match_root.add_child(arena)
 	_swap(match_root, config.match_scene_path)
+
+
+## Slots no HUD pelo nível da conta (T-188). Config sem conta (`account_level` 0) mantém o padrão do HUD.
+func _link_slot_levels(hud: Hud, config: MatchConfig) -> void:
+	if config.account_level <= 0:
+		return
+	hud.set_slot_unlock_levels(MatchConfig.hud_lock_levels(config.account_level, progression.slot_unlock_levels))
+	hud.ready.connect(func() -> void:
+		for slot in range(1, MatchConfig.SLOT_COUNT + 1):
+			hud.set_slot_empty(slot, slot <= config.unlocked_slots and slot > maxi(config.slot_modules.size(), 1)),
+		CONNECT_ONE_SHOT)
 
 
 ## Efeitos (docs/vfx.md §1.1): pool como filho direto da Arena (Y-sort com as entidades; decalques
