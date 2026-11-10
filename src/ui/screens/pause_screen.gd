@@ -19,6 +19,12 @@ const T_PRIMARY := preload("res://assets/ui/ui_holo_btn_primary_normal.png")
 const T_PRIMARY_DOWN := preload("res://assets/ui/ui_holo_btn_primary_pressed.png")
 const T_SECONDARY := preload("res://assets/ui/ui_holo_btn_secondary_normal.png")
 const T_SECONDARY_DOWN := preload("res://assets/ui/ui_holo_btn_secondary_pressed.png")
+const TOGGLE_FONT := 16
+const T_TOGGLE_OFF := preload("res://assets/ui/ui_holo_toggle_off.png")
+const T_TOGGLE_OFF_DOWN := preload("res://assets/ui/ui_holo_toggle_off_pressed.png")
+const T_TOGGLE_ON := preload("res://assets/ui/ui_holo_toggle_on.png")
+const T_TOGGLE_ON_DOWN := preload("res://assets/ui/ui_holo_toggle_on_pressed.png")
+const T_TOGGLE_DISABLED := preload("res://assets/ui/ui_holo_toggle_disabled.png")
 const VEIL := Color(0.008, 0.078, 0.137, 0.78) # HOLO_BG a 78%
 
 var enabled := true
@@ -168,13 +174,43 @@ func _toggle_button(node_name: String, cb: Callable) -> Button:
 	var b := _holo_button("", false, cb)
 	b.name = node_name
 	b.custom_minimum_size = DEBUG_BUTTON_SIZE
-	b.add_theme_font_size_override("font_size", 20)
-	for state in ["normal", "hover", "pressed", "focus", "disabled"]:
-		var sb: StyleBoxTexture = (b.get_theme_stylebox(state) as StyleBoxTexture).duplicate()
-		sb.content_margin_left = 4.0
-		sb.content_margin_right = 4.0
-		b.add_theme_stylebox_override(state, sb)
+	b.size = DEBUG_BUTTON_SIZE
+	b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	b.clip_text = false
+	b.add_theme_font_size_override("font_size", TOGGLE_FONT)
 	return b
+
+
+## Interruptor holográfico (T-297): a chave da arte mostra o estado; o texto é só o rótulo.
+## Área do texto x 16-152 (margens esq. 16, dir. 76, base 4); pressionado soma 4 px ao topo.
+func _style_toggle(b: Button, on: bool, label: String, state_text: String) -> void:
+	b.text = label
+	b.tooltip_text = "%s: %s" % [label, state_text]
+	b.accessibility_name = b.tooltip_text
+	var up: Texture2D = T_TOGGLE_ON if on else T_TOGGLE_OFF
+	var down: Texture2D = T_TOGGLE_ON_DOWN if on else T_TOGGLE_OFF_DOWN
+	var normal := _toggle_box(up, 0)
+	var pressed := _toggle_box(down, 4)
+	b.add_theme_stylebox_override("normal", normal)
+	b.add_theme_stylebox_override("hover", normal)
+	b.add_theme_stylebox_override("focus", normal)
+	b.add_theme_stylebox_override("pressed", pressed)
+	b.add_theme_stylebox_override("disabled", _toggle_box(T_TOGGLE_DISABLED, 0))
+
+
+static func _toggle_box(tex: Texture2D, top: int) -> StyleBoxTexture:
+	var sb := StyleBoxTexture.new()
+	sb.texture = tex
+	sb.texture_margin_left = 24
+	sb.texture_margin_right = 96
+	sb.texture_margin_top = 24
+	sb.texture_margin_bottom = 24
+	sb.content_margin_left = 16
+	sb.content_margin_right = 76
+	sb.content_margin_top = top
+	sb.content_margin_bottom = 4
+	return sb
 
 
 static func _outline(l: Control) -> void:
@@ -252,5 +288,7 @@ static func _holo_button(text: String, primary: bool, cb: Callable) -> Button:
 
 func _refresh_debug() -> void:
 	_apply_debug_visibility()
-	debug_toggle.text = "Debug: %s" % ("ligado" if DebugSettings.overlay_enabled() else "desligado")
-	reduced_toggle.text = "Efeitos reduzidos: %s" % ("sim" if DebugSettings.reduced_effects() else "não")
+	var dbg := DebugSettings.overlay_enabled()
+	_style_toggle(debug_toggle, dbg, "Debug", "ligado" if dbg else "desligado")
+	var red := DebugSettings.reduced_effects()
+	_style_toggle(reduced_toggle, red, "Efeitos reduzidos", "sim" if red else "não")
