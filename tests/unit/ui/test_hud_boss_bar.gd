@@ -33,7 +33,7 @@ func test_hidden_until_boss_spawns_then_grows_top() -> void:
 	assert_true(row.visible)
 	var bar: UiBar = row.get_node("BossBar")
 	assert_eq(bar.title, "Boss")
-	assert_eq(bar.fill_color, UiTokens.BOSS_HP)
+	assert_eq(bar.fill_color, UiTokens.BOSS_HOLO)
 	assert_eq(hud.top_inset(), float(Hud.TOP_INSET + Hud.BOSS_BAR_INSET))
 	assert_eq(hud.get_node("Root/Top").size.y, float(Hud.TOP_INSET + Hud.BOSS_BAR_INSET))
 

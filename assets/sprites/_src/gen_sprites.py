@@ -280,9 +280,7 @@ def place(content, ax, ay, gx, gy, s=1.0):
 
 # nome: (largura 1x, altura 1x, conteúdo)
 SPRITES = {
-    "anima_default_base": (128, 128, place(ANIMA_BASE, 64, 100, 360, 696)),
-    "anima_default_crystal": (128, 128, place(ANIMA_CRYSTAL, 64, 64, 360, 586)),
-    "anima_default_node": (32, 32, ANIMA_NODE),
+    # anima_default_*: desde a T-291 vêm de gen_anima_holo.py (holográfico); o cartoon está em anima_cartoon_backup/
     "enemy_runner": (64, 64, place(RUNNER, 32, 60, 170, 420, 0.9)),
     "enemy_tank": (128, 128, place(TANK, 64, 112, 330, 336)),
     "enemy_shooter": (128, 128, place(SHOOTER, 64, 112, 520, 300)),

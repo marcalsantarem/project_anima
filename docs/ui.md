@@ -118,7 +118,7 @@ y=1280 └───────────────────────�
 | Energia (vida do Anima) | linha 2, largura total | altura 40 px, cristal `accent` à esquerda | texto "ENERGIA atual / máx" (decisão 41), cor por faixa, flash `danger` e barra fantasma |
 | Barra "Boss" | linha 3, mesma largura útil da barra de Energia | controle 36 px, trilho 32 px (~89% da Energia) | vermelha (`boss_hp`), rótulo "Boss" à esquerda e "atual / máx" à direita, com contorno; fade de 200 ms ao aparecer (`boss_spawned` ou `boss_hp_changed`) e ao sumir (`boss_defeated`, vida 0 ou `match_ended`); queda do preenchimento em 150 ms (BRF-058) |
 
-- **Sem faixa de fundo (BRF-039):** o fundo da arena passa por trás do topo; os elementos ficam sobrepostos a ele. Para leitura, um degradê `ink` (alfa 0,35 → 0) cobre só a altura do topo (`Hud/Root/TopScrim`). Pílulas e barra mantêm o contorno.
+- **Sem faixa de fundo (BRF-039):** o fundo da arena passa por trás do topo; os elementos ficam sobrepostos a ele. Para leitura, um degradê `holo_bg` (alfa 0,6 → 0) cobre só a altura do topo (`Hud/Root/TopScrim`). Pílulas e barra mantêm o contorno.
 
 ### 4.2 Zona de combate
 
@@ -128,10 +128,12 @@ y=1280 └───────────────────────�
 
 ### 4.3 Bandeja inferior (`Hud/Tray`)
 
-- Painel `bg_panel_alt` de largura total com contorno superior `ink`; vai até a borda inferior, cobrindo a safe area (a safe area entra como margem interna; os botões ficam acima dela). Pilha (BRF-066): contorno 4 + faixa 96 (6 + 80 + 6 + contorno 4) + respiro 8 (`Hud.SKILLS_TOP_PAD`) + slot 150 (Ø 144 + sombra 6) + max(8, inset inferior da UI) (§9.1, T-172).
-- **Fileira de upgrades** (`Hud.upgrade_row`, decisão 35): faixa `tray_band` com 80 px úteis (padding 6, `Hud.UPGRADE_BAND_PAD`), 5 botões `UpgradeButton` de 128×80 com gap 12 e margem 16 (5×128 + 4×12 = 688 = 720 − 2×16), na ordem `UpgradeButton.IDS` (§5.4). A faixa fica abaixo da arena: não cobre inimigos nem os slots.
+- Painel opaco `holo_tray` `#06182A` (`ui_hud_tray`, linha ciano no topo) de largura total; vai até a borda inferior, cobrindo a safe area (a safe area entra como margem interna; os botões ficam acima dela). Pilha (BRF-066): contorno 4 + faixa 96 (6 + 80 + 6 + contorno 4) + respiro 8 (`Hud.SKILLS_TOP_PAD`) + slot 150 (Ø 144 + sombra 6) + max(8, inset inferior da UI) (§9.1, T-172).
+- **Fileira de upgrades** (`Hud.upgrade_row`, decisão 35): faixa `ui_hud_tray_band` com 80 px úteis (padding 6, `Hud.UPGRADE_BAND_PAD`), 5 botões `UpgradeButton` de 128×80 com gap 12 e margem 16 (5×128 + 4×12 = 688 = 720 − 2×16), na ordem `UpgradeButton.IDS` (§5.4). A faixa fica abaixo da arena: não cobre inimigos nem os slots.
 - **3 slots de skill de Ø 144 px**, gap 66, centros em x = 150 / 360 / 570, cy ≈ 1194 sem safe area.
-- Slots 2 e 3 bloqueados com cadeado e "NV 7"/"NV 12" (T-136). Os níveis vêm de `Hud.slot_unlock_levels` (padrão do M1 `[0, 7, 12]`, 0 = liberado); no M2 o meta-jogo passa a lista com `set_slot_unlock_levels()` conforme o nível da conta.
+- Slots 2 e 3 bloqueados com cadeado e "NV 5"/"NV 8" (T-136, decisão 63). Os níveis vêm de `Hud.slot_unlock_levels` (padrão `Hud.DEFAULT_UNLOCK_LEVELS = [0, 5, 8]`, 0 = liberado: o HUD ainda não recebe o nível da conta, então o slot 1 fica liberado); o meta-jogo passa `[2, 5, 8]` (`ProgressionData.slot_unlock_levels`) com `set_slot_unlock_levels()`.
+
+**HUD holográfico (T-290, BRF-127, decisão 64; `docs/arte.md` §12):** pílulas, pausa, barras (Energia e chefe), bandeja, slots e upgrades usam as peças `ui_hud_*` 1:1 (`UiArt.hud_*`, `UiNinePatch.expand` para o brilho que passa do retângulo). Textos com contorno `holo_bg` de 5 px (`UiTokens.HOLO_OUTLINE`). Chefe em `boss_holo` `#FF4F8B` (`UiBar.boss_art`); a cor da página na partida é `holo_tray`. `SkillButton.set_empty()` / `Hud.set_slot_empty()` mostram o slot liberado sem Módulo (visual, não ligado por padrão); `UpgradeButton` mostra a moldura pressionada enquanto o toque/clique está segurado. Posições, tamanhos e sinais não mudaram. Capturas: `docs/img/hud-holo-aplicado-{375x812,1280x720}.png`.
 - **Área de toque = o círculo inteiro.** Toques entre os botões não fazem nada.
 
 ### 4.4 Alturas para o gameplay (BRF-039)

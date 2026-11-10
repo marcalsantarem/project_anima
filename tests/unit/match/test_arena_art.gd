@@ -28,13 +28,13 @@ func _assert_sprite_rules(s: Sprite2D) -> void:
 
 
 ## BRF-041: fundo em tela cheia (tile, selo no Anima, degradê, 4 pilares com sombra e Y-sort).
-func test_floor_covers_screen_ring_on_anima_and_pillars_in_corners() -> void:
+func test_floor_covers_screen_without_ring_and_pillars_in_corners() -> void:
 	var arena := _arena()
 	await wait_physics_frames(1)
 	var floor_node := arena.get_node("Floor") as ArenaFloor
 	assert_true(floor_node.y_sort_enabled)
 	var sprites := _sprites(floor_node)
-	assert_eq(sprites.size(), 3 + 4, "tile, degradê, selo e 4 pilares")
+	assert_eq(sprites.size(), 2 + 4, "tile, degradê e 4 pilares (sem selo, T-292)")
 	for s in sprites:
 		_assert_sprite_rules(s)
 		assert_eq(s.texture.get_mipmap_count(), 0, "%s sem mipmaps" % s.texture.resource_path)
@@ -43,11 +43,8 @@ func test_floor_covers_screen_ring_on_anima_and_pillars_in_corners() -> void:
 	assert_eq(tile.texture_repeat, CanvasItem.TEXTURE_REPEAT_ENABLED)
 	assert_eq(tile.position, Vector2.ZERO)
 	assert_eq(tile.region_rect.size * SpriteArt.SCALE, arena.arena_size(), "tile cobre a tela inteira")
-	var ring := sprites[2]
-	assert_lt(ring.z_index, -1)
-	assert_eq(ring.position, arena.anima.position)
-	assert_eq(ring.scale, Vector2(ArenaFloor.RING_SCALE, ArenaFloor.RING_SCALE), "selo menor (decisão 43)")
-	assert_almost_eq(ArenaFloor.RING_SCALE, SpriteArt.SCALE.x * 0.7, 0.001, "~70% do tamanho anterior")
+	for s in sprites:
+		assert_false(s.texture.resource_path.contains("floor_ring"), "T-292: sem selo/anel no chão")
 	var rect := arena.free_rect()
 	var pillars := floor_node.get_children().filter(func(c: Node) -> bool: return c.get_child_count() == 2)
 	assert_eq(pillars.size(), 4)
@@ -63,7 +60,6 @@ func test_layout_follows_tray_inset() -> void:
 	assert_eq(arena.arena_rect().end.y, arena.arena_size().y - 400.0)
 	var center_y := (arena.arena_top_inset + arena.arena_rect().end.y) / 2.0
 	assert_eq(arena.anima.position, Vector2(arena.arena_size().x / 2.0, center_y), "centro da área livre")
-	assert_eq((arena.get_node("Floor").get_child(2) as Sprite2D).position, arena.anima.position)
 
 
 ## T-169: Anima no centro da área livre entre o topo do HUD (fixo) e a bandeja.

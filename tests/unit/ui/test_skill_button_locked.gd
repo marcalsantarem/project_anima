@@ -20,9 +20,9 @@ func _key_action(action: StringName) -> InputEventAction:
 
 func test_locked_ignores_gameplay_signals() -> void:
 	var sb := _button()
-	sb.set_locked(true, 7)
+	sb.set_locked(true, 5)
 	assert_true(sb.is_locked())
-	assert_eq(sb.unlock_level, 7)
+	assert_eq(sb.unlock_level, 5)
 	sb.set_cooldown(3.0, 5.0)
 	sb.set_ready()
 	sb.on_used()
@@ -32,7 +32,7 @@ func test_locked_ignores_gameplay_signals() -> void:
 
 func test_locked_touch_does_not_activate() -> void:
 	var sb := _button()
-	sb.set_locked(true, 7)
+	sb.set_locked(true, 5)
 	watch_signals(sb)
 	var touch := InputEventScreenTouch.new()
 	touch.pressed = true
@@ -57,7 +57,7 @@ class Listener:
 
 func test_locked_swallows_its_action_only() -> void:
 	var sb := _button(2)
-	sb.set_locked(true, 7)
+	sb.set_locked(true, 5)
 	var listener := Listener.new()
 	add_child_autofree(listener)
 	var vp := sb.get_viewport()
@@ -68,7 +68,7 @@ func test_locked_swallows_its_action_only() -> void:
 
 func test_unlock_returns_to_ready() -> void:
 	var sb := _button()
-	sb.set_locked(true, 12)
+	sb.set_locked(true, 8)
 	sb.set_locked(false)
 	assert_eq(sb.state, SkillButton.State.READY)
 	assert_eq(sb.unlock_level, 0)
@@ -81,15 +81,15 @@ func test_hud_m1_default_locks_slots_2_and_3() -> void:
 	add_child_autofree(hud)
 	assert_false(hud._skill(1).is_locked())
 	assert_true(hud._skill(2).is_locked())
-	assert_eq(hud._skill(2).unlock_level, 7)
+	assert_eq(hud._skill(2).unlock_level, 5)
 	assert_true(hud._skill(3).is_locked())
-	assert_eq(hud._skill(3).unlock_level, 12)
+	assert_eq(hud._skill(3).unlock_level, 8)
 
 
 func test_hud_unlock_levels_are_data() -> void:
 	var hud: Hud = HUD_SCENE.instantiate()
 	add_child_autofree(hud)
-	hud.set_slot_unlock_levels([0, 0, 12] as Array[int])
+	hud.set_slot_unlock_levels([0, 0, 8] as Array[int])
 	assert_false(hud._skill(2).is_locked())
 	assert_true(hud._skill(3).is_locked())
 	hud.set_slot_unlock_levels([] as Array[int])

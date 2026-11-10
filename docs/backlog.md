@@ -202,9 +202,9 @@
 | T-287 | `MatchResult.kills_by_type`: a Arena conta as mortes por tipo de inimigo (enxame 1 por membro, chefe, meteoro), base da recompensa por monstro (tam. P) | M2 | AG01 | feita |
 | T-288 | Pausa: botão "Voltar ao menu" (sinal `menu_requested`), que o fluxo da T-187 já escuta; hoje a pausa não tem saída para o menu (tam. P) | M2 | AG02 | feita |
 | T-289 | Arte do HUD holográfico da partida (decisão 64): ondas, pausa, barras de vida (Anima e chefe), contador de Partículas, bandeja de Módulos e botões de upgrade; mockup e peças | M2 | AG08 | feita |
-| T-290 | Aplicar o HUD holográfico na partida (substitui o estilo atual; sem mudar comportamento) | M2 | AG02 | a fazer (depende da T-289) |
-| T-291 | Anima holográfico na partida: pedestal, cristal e nós no estilo do título/menu (mesmos arquivos `anima_default_*`, mesmas âncoras) | M2 | AG08 | a fazer (após a T-289) |
-| T-292 | Remover o círculo (anel roxo) em volta do Anima na arena | M2 | AG01 | a fazer |
+| T-290 | Aplicar o HUD holográfico na partida (substitui o estilo atual; sem mudar comportamento) | M2 | AG02 | feita |
+| T-291 | Anima holográfico na partida: pedestal, cristal e nós no estilo do título/menu (mesmos arquivos `anima_default_*`, mesmas âncoras) | M2 | AG08 | feita |
+| T-292 | Remover o círculo (anel roxo) em volta do Anima na arena | M2 | AG01 | feita |
 | T-148 | Sinais da Arena para VFX (projectile_fired, projectile_hit, enemy_died, particles_gained, skill_cast, boss_telegraph_started, boss_phase_changed) | M1 | AG01 | feita |
 
 ## Próximas prontas p/ briefing

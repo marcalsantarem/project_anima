@@ -13,12 +13,15 @@ extends StyleBox
 @export var art_scale := 0.5
 @export var modulate_color := Color.WHITE
 @export var draw_center := true
+## Quanto a arte passa do retângulo do controle (esq., cima, dir., baixo), em px da tela: brilho das peças holográficas.
+@export var expand := Vector4.ZERO
 
 
 func _draw(to_canvas_item: RID, rect: Rect2) -> void:
 	if texture == null or rect.size.x <= 0.0 or rect.size.y <= 0.0:
 		return
 	var k := art_scale
+	rect = Rect2(rect.position - Vector2(expand.x, expand.y), rect.size + Vector2(expand.x + expand.z, expand.y + expand.w))
 	RenderingServer.canvas_item_add_set_transform(to_canvas_item, Transform2D(0.0, Vector2(k, k), 0.0, rect.position))
 	RenderingServer.canvas_item_add_nine_patch(to_canvas_item, Rect2(Vector2.ZERO, rect.size / k),
 		Rect2(Vector2.ZERO, texture.get_size()), texture.get_rid(),

@@ -58,7 +58,8 @@ func _build() -> void:
 	col.add_child(_label("Chefe", &"LabelCaption"))
 	_boss_bar = UiBar.new()
 	_boss_bar.color_mode = UiBar.ColorMode.FIXED
-	_boss_bar.fill_color = UiTokens.BOSS_HP
+	_boss_bar.fill_color = UiTokens.BOSS_HOLO
+	_boss_bar.boss_art = true
 	_boss_bar.title = "Boss"
 	_boss_bar.track_height = Hud.BOSS_TRACK_HEIGHT
 	_boss_bar.fill_time = Hud.BOSS_FILL_TIME
@@ -269,7 +270,7 @@ func _on_toggle_disabled() -> void:
 		ub.set_disabled(_disabled)
 
 
-## T-136: slots 2 e 3 bloqueados ("NV 7" / "NV 12"), como no padrão do HUD no M1.
+## T-136: slots 2 e 3 bloqueados ("NV 5" / "NV 8"), como no padrão do HUD no M1.
 func _on_toggle_locked() -> void:
 	_locked = not _locked
 	_apply_locks()
@@ -277,5 +278,5 @@ func _on_toggle_locked() -> void:
 
 func _apply_locks() -> void:
 	for i in 3:
-		var level: int = Hud.M1_UNLOCK_LEVELS[i] if _locked else 0
+		var level: int = Hud.DEFAULT_UNLOCK_LEVELS[i] if _locked else 0
 		_skills[i].set_locked(level > 0, level)

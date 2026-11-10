@@ -94,4 +94,4 @@ func test_hud_sets_page_color() -> void:
 	var hud: Hud = HUD_SCENE.instantiate()
 	add_child_autofree(hud)
 	await wait_process_frames(1)
-	assert_eq(ScreenKit.last_page_color, UiTokens.BG_PANEL_ALT)
+	assert_eq(ScreenKit.last_page_color, UiTokens.HOLO_TRAY)

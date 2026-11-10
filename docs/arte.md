@@ -60,6 +60,7 @@
 Pedestal cilíndrico neutro (`vessel`) com aro ciano + **cristal losango ciano flutuando** acima, com faceta clara (`soul`), halo ciano e 3 nós orbitando. Fica no centro da arena (360, ~690 na referência 720×1280).
 - **Skins (decisão 33):** separar em `anima_<skin>_base` (pedestal) e `anima_<skin>_crystal` (parte que flutua/anima). A skin troca formas e cores do pedestal; o cristal mantém ciano para não quebrar a regra.
 - Animação por transformação: cristal sobe/desce 4–6 px em ~1,5 s; nós giram; brilho pulsa no tiro.
+- **Holográfico (T-291, BRF-126; decisão 64):** o Anima da partida segue o estilo do título/menu: pedestal de aço em dois degraus com aros ciano, cápsulas de luz e emissor de vidro com anéis; feixe suave até o cristal; cristal losango em 4 facetas `#E6FFFF`→`#0B6E86` com halo; nós como orbes de energia. Contorno `holo_ink` (`#03202E`) mantém a leitura no chão creme. Mesmos canvas e âncoras (sem mudança de código). Prévia: [`anima-holo-arena.png`](img/anima-holo-arena.png) e [`-375x812`](img/anima-holo-arena-375x812.png); fonte `assets/sprites/_src/gen_anima_holo.py`. **Exceção à §12:** a arena segue cartoon, mas o Anima passa a ser holográfico.
 
 ## 5. Silhuetas por arquétipo
 
@@ -108,7 +109,7 @@ Pedestal cilíndrico neutro (`vessel`) com aro ciano + **cristal losango ciano f
 | Projéteis / moeda | `assets/sprites/` | `projectile_player.png`, `pickup_particle.png` |
 | Skills (sprites base) | `assets/sprites/` | `skill_meteor.png`, `skill_meteor_crater.png` (cores quentes, sem ciano: o efeito é do jogador, mas o fogo lê melhor em laranja; BRF-047) |
 | Ícones / UI | `assets/ui/` | `ui_icon_skill_meteor.png`, `ui_frame_epic.png` |
-| Fundos | `assets/backgrounds/` | `floor_tile.png`, `floor_ring.png`, `floor_pillar.png` (tela cheia em peças, BRF-040; ver `assets/sprites/README.md`) |
+| Fundos | `assets/backgrounds/` | `floor_tile.png`, `floor_pillar.png` (o `floor_ring.png`, selo rúnico, saiu da arena na T-292 e está órfão) (tela cheia em peças, BRF-040; ver `assets/sprites/README.md`) |
 | Atlas | `assets/sprites/atlas/` | `atlas_enemies.png` |
 
 ## 8. Checklist de um asset
