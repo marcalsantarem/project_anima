@@ -128,6 +128,23 @@ HUD da partida, estilo `ui_holo_*` (mesma escala: **1 px do PNG ≈ 1 px de tela
 - **Draw calls:** todas as peças estão em PNG separados; para o batching do Compatibility, o AG07/AG02 pode montar o atlas `atlas_ui_holo` (cabem num 512×512) se o profiler pedir.
 - **Não incluídos:** Moeda (feita depois na T-162, ver "Moeda e glossário"), peças do hangar (slots bloqueado/próximo, molduras por raridade, M3). O brilho do painel "Subida de nível" do mockup é opcional (`ui_holo_glow` esticado atrás, `modulate.a` ~0,3).
 
+## Interruptor holográfico liga/desliga (T-296, BRF-138)
+
+Pausa (e futuras Configurações), `docs/arte.md` §11.8. Fonte: `_src/gen_ui_toggle.py` (importa os helpers do `gen_ui_holo.py`); regenerar: `python assets/ui/_src/gen_ui_toggle.py`. **1 px do PNG = 1 px de tela** (viewport 720). Validação: `_src/toggle_sheet.png` (5 estados a 1x sobre o painel e o creme) e a prévia `docs/img/interruptor-holo.png`. Total ~19 KB.
+
+| Arquivo | PNG | Uso |
+|---|---|---|
+| `ui_holo_toggle_off.png` | 228×88 | Desligado: moldura `#1C7F8E`, miolo escuro, botão cinza `holo_muted` à esquerda, marca `O` |
+| `ui_holo_toggle_off_pressed.png` | 228×88 | Desligado pressionado: moldura `#2AA3B3`, miolo `#09344A`, corpo 4 px mais baixo |
+| `ui_holo_toggle_on.png` | 228×88 | Ligado: moldura `holo_line`, brilho interno, trilho ciano cheio com brilho, botão branco à direita, marca `I` |
+| `ui_holo_toggle_on_pressed.png` | 228×88 | Ligado pressionado: moldura `holo_text2`, brilho menor, corpo 4 px mais baixo |
+| `ui_holo_toggle_disabled.png` | 228×88 | Tokens `holo_dis_*`, botão à esquerda; texto `holo_dis_text` |
+
+- **Geometria:** igual ao `ui_holo_btn_secondary_*` esticado a 228×88: corpo 228×84 (chanfro 20 px, moldura 4 px, contorno `#021423` de 2 px), 4 px livres embaixo; o pressionado desce 4 px (somar 4 px ao `content_margin_top` no estilo pressionado, como no secundário). Trilho em x 164–212, y 28–56 (centrado no corpo); alvo de toque = o botão inteiro (88 px de altura).
+- **Área do texto:** x 16–152, y 0–84 (136×84 px). `content_margin` esq 16 / dir 76 / topo 0 / base 4. "Efeitos reduzidos" a 20 px não cabe em uma linha (≈165 px): usar **duas linhas** ("Efeitos" / "reduzidos", `autowrap`) ou fonte 16. O estado sai do texto (a chave mostra).
+- **Uso direto** (sem 9-slice), tamanho fixo 228×88. Se precisar de outra largura: 9-slice esq 24 / dir 96 / topo 24 / base 24 (só a faixa do rótulo estica; a chave fica intacta).
+- **Texto:** `holo_text` no ligado, `holo_text2` no desligado, `holo_dis_text` no desabilitado; contorno `HOLO_BG` como hoje.
+
 ## HUD holográfico da partida (T-289, BRF-125, decisão 64)
 
 Todo o HUD da partida no estilo `ui_holo_*` (guia: `docs/arte.md` §12). Fonte: `_src/gen_ui_hud.py` (importa os helpers do `gen_ui_holo.py`); regenerar: `python assets/ui/_src/gen_ui_hud.py`. Desenho direto em px do viewport 720: **1 px do PNG = 1 px de tela**, sem `scale`. Total: 26 PNG, **~110 KB** (RGBA). Validação: `_src/hud_sheet.png` (todas as peças sobre navy e sobre o chão) e os mockups `docs/img/hud-holo-mockup.png` (720×1280) e `docs/img/hud-holo-mockup-375x812.png`.

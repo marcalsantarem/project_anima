@@ -288,6 +288,10 @@ Uma forma e uma cor por conceito, reconhecíveis a 28 px sem texto; contorno `#0
 
 Formas exclusivas: círculo = Moeda, estrela = Partículas, hexágono = XP. Laranja, azul e orquídea são **cores de interface do hangar** (não entram na arena; o laranja fica longe do `enemy_runner` por ser só menu).
 
+### 11.8 Interruptor liga/desliga (T-296, BRF-138)
+
+`ui_holo_toggle_{off,on}[_pressed]` e `ui_holo_toggle_disabled` (228×88, corpo igual ao secundário esticado). Rótulo à esquerda (texto da UI), chave chanfrada à direita (trilho 48×28). O estado não depende só da cor: **posição do botão** (esquerda = desligado, direita = ligado), **marca** no trilho (`O` desligado, `I` ligado) e **brilho** (só o ligado brilha). Desligado = moldura ciano escuro `#1C7F8E`; ligado = moldura `holo_line` + trilho ciano cheio; desabilitado = tokens `holo_dis_*`. Contorno `#021423`. Prévia: [`interruptor-holo.png`](img/interruptor-holo.png). Detalhes e margens em `assets/ui/README.md`.
+
 ## 12. HUD holográfico da partida (T-289, BRF-125; decisão 64)
 
 O estilo dos menus (§11) e do botão de velocidade vale para **todo o HUD da partida**; a arena (chão, inimigos, Anima) segue cartoon 3/4. **Posições, tamanhos de toque e comportamento não mudam** (`docs/ui.md` §4); a T-290 (AG02) só troca a arte.
