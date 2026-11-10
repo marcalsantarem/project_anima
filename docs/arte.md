@@ -272,3 +272,34 @@ Sem contorno escuro grosso (é do cartoon); o brilho só em títulos e números 
 **Botão de velocidade (T-274, BRF-121):** exceção holográfica no HUD cartoon da partida, `ui_speed_x1` / `ui_speed_x2` (+ `_pressed`), 96×96, corpo chanfrado 68×68. x1 = painel escuro com moldura ciano; x2 = ciano cheio com brilho forte. Setas e "x1"/"x2" vêm na arte. Sugestão: no topo, ao lado da pausa. Prévia: [`docs/img/botao-velocidade.png`](img/botao-velocidade.png). Detalhes no `assets/ui/README.md`.
 
 A Moeda (`ui_icon_coin`) vem da T-162; as molduras por raridade (`ui_frame_<raridade>`) ficam para o M3.
+
+## 12. HUD holográfico da partida (T-289, BRF-125; decisão 64)
+
+O estilo dos menus (§11) e do botão de velocidade vale para **todo o HUD da partida**; a arena (chão, inimigos, Anima) segue cartoon 3/4. **Posições, tamanhos de toque e comportamento não mudam** (`docs/ui.md` §4); a T-290 (AG02) só troca a arte.
+
+**Mockups:** [`hud-holo-mockup.png`](img/hud-holo-mockup.png) (720×1280: chefe com barra, slot 1 pronto, slot 2 em recarga, slot 3 bloqueado "NV 8", Atk power sem saldo, Cooldown no máximo) e [`hud-holo-mockup-375x812.png`](img/hud-holo-mockup-375x812.png) (sem chefe, Energia baixa com flash de dano, slot 2 liberado vazio, upgrade pressionado e outro sem saldo). Folha de estados: `assets/ui/_src/hud_sheet.png`.
+
+### 12.1 Regras
+
+- **Legibilidade sobre a arena clara:** toda peça tem miolo escuro (`#041626` a 90%) e moldura ciano; todo texto do HUD tem contorno `#021423` de 4–5 px (exceção do HUD à regra "sem contorno grosso" do §11.3). O degradê do topo (`TopScrim`) passa de `ink` 35% para `holo_bg` `#021423` **60% → 0**, até 24 px abaixo do HUD.
+- **Cores:** ciano = jogador (pílula da onda, Energia, slots, upgrades compráveis); **magenta-vermelho `#FF4F8B`** = chefe (trilho, enchimento, emblema; proposta de token `boss_holo` ao AG02, no lugar do `boss_hp` vermelho); `gold` = máximo; `holo_dis_*` = bloqueado e sem Partículas. Cores da Energia por faixa mantidas (`core_hp_color`, via `modulate` do enchimento branco).
+- **Bandeja opaca** `#06182A`: a cor da página na partida (`ScreenKit.set_page_color`, `web/shell.html`) passa de `#5A4A9A` para `#06182A`, senão aparece uma faixa lilás no rodapé do Safari.
+- **Desempenho:** sem shader nem blur em tempo real (brilhos pintados, §11.5); 26 PNG, ~110 KB; cabem num atlas 512×512 com as peças `ui_holo_*`.
+
+### 12.2 Peças, tamanhos e margens (px do PNG = px de tela no viewport 720)
+
+| Elemento | Peças | Tamanho na tela | 9-slice E/D/C/B · `expand_margin` |
+|---|---|---|---|
+| "ONDA X/Y" | `ui_hud_pill_wave` | 220×64 | 40/40/28/28 · 8 |
+| Partículas | `ui_hud_pill` + `ui_icon_particles` 32 | ~184×64 | 40/40/28/28 · 8 |
+| Pausa | `ui_hud_btn_pause(_pressed)` | arte 96, corpo 68, toque 88 | — |
+| Energia | `ui_hud_icon_energy` 56×64 · `ui_hud_bar_track` · `ui_hud_bar_fill` (branco + `modulate`) · `ui_hud_bar_tip` · `ui_hud_bar_flash` | barra 40, enchimento 32 (recuo 4) | trilho e flash 20 · 8; enchimento 10 · 0 |
+| Chefe | `ui_hud_icon_boss` 48 · `ui_hud_bar_track_boss` · `ui_hud_bar_fill_boss` · ponta com `scale.y` 0,8 | trilho 32, enchimento 24 | igual à Energia |
+| Bandeja | `ui_hud_tray` · `ui_hud_tray_band` | 720 × 266 (+ safe area) · faixa 96 | 8/8/24/8 · topo 12; faixa 4/4/4/6 |
+| Slots de Módulo | `ui_hud_skill_ready/cooldown/locked/empty` · `_cooldown_ring` (progresso radial) · `_cooldown_mask` 144 · `ui_hud_key_badge(_off)` 44 · `ui_icon_lock_holo` 64 | Ø144, canvas 176×184 com centro em (88, 88) | — |
+| Upgrades | `ui_hud_upgrade_normal/pressed/disabled/max` | corpo 128×80, canvas 144×96 | fixo · 8 |
+
+- **Estados dos slots:** pronto = anel ciano 6 px + brilho; recarga = anel apagado + véu do setor restante + anel de progresso ciano + segundos (56 px); bloqueado = `holo_dis_*`, anel tracejado, cadeado e "NV n" em `holo_muted` 30 px, badge `_off`; vazio = anel tracejado apagado.
+- **Estados dos upgrades:** comprável = moldura ciano + brilho, custo `#FFE08A`; pressionado = moldura `holo_text2`, miolo `#0E5A70` (escala 0,94 do código); sem Partículas = `holo_dis_*`, ícone a 55%, "Nv" em `holo_dis_text`, custo `#FF9AA6`; máximo = dourado com "MAX".
+- **Dano na Energia:** `ui_hud_bar_flash` com `modulate` `danger`, alfa 1 → 0 em ~250 ms (o flash `danger` atual continua; a barra fantasma usa o enchimento com branco a 45%).
+- Detalhes de uso por peça: `assets/ui/README.md` ("HUD holográfico da partida").

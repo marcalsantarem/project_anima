@@ -127,3 +127,38 @@ HUD da partida, estilo `ui_holo_*` (mesma escala: **1 px do PNG ≈ 1 px de tela
 
 - **Draw calls:** todas as peças estão em PNG separados; para o batching do Compatibility, o AG07/AG02 pode montar o atlas `atlas_ui_holo` (cabem num 512×512) se o profiler pedir.
 - **Não incluídos:** Moeda (`ui_icon_coin`, T-162; as folhas usam um provisório), peças do hangar (slots bloqueado/próximo, molduras por raridade, M3). O brilho do painel "Subida de nível" do mockup é opcional (`ui_holo_glow` esticado atrás, `modulate.a` ~0,3).
+
+## HUD holográfico da partida (T-289, BRF-125, decisão 64)
+
+Todo o HUD da partida no estilo `ui_holo_*` (guia: `docs/arte.md` §12). Fonte: `_src/gen_ui_hud.py` (importa os helpers do `gen_ui_holo.py`); regenerar: `python assets/ui/_src/gen_ui_hud.py`. Desenho direto em px do viewport 720: **1 px do PNG = 1 px de tela**, sem `scale`. Total: 26 PNG, **~110 KB** (RGBA). Validação: `_src/hud_sheet.png` (todas as peças sobre navy e sobre o chão) e os mockups `docs/img/hud-holo-mockup.png` (720×1280) e `docs/img/hud-holo-mockup-375x812.png`.
+
+| Arquivo | PNG | 9-slice E/D/C/B | `expand_margin` | Uso |
+|---|---|---|---|---|
+| `ui_hud_pill_wave.png` | 112×80 | 40/40/28/28 | 8 | Pílula "ONDA X/Y" (moldura ciano, brilho, colchetes). Corpo 96×64 em (8, 8) |
+| `ui_hud_pill.png` | 112×80 | 40/40/28/28 | 8 | Pílula de Partículas (moldura `holo_line_dim`, sem brilho); ícone `ui_icon_particles` 32 px à esquerda |
+| `ui_hud_btn_pause.png` / `_pressed.png` | 96×96 | — | — | Pausa com "II" na arte (geometria do `ui_speed_x1`: corpo 68×68 em (14, 10), centro (48, 44)). Alvo de toque 88×88 mantido. Substitui `ui_icon_pause` |
+| `ui_hud_bar_track.png` | 80×56 | 20/20/20/20 | 8 | Trilho da Energia (corpo 64×40) |
+| `ui_hud_bar_track_boss.png` | 80×56 | 20/20/20/20 | 8 | Trilho do chefe: moldura magenta `#FF4F8B` com brilho. Altura 32 |
+| `ui_hud_bar_fill.png` | 64×32 | 10/10/10/10 | — | Enchimento **branco** da Energia: tingir por `modulate` (`UiTokens.core_hp_color`, como hoje). Recuo de 4 px dentro do trilho. Barra fantasma: o mesmo PNG com `modulate` branco a 45% |
+| `ui_hud_bar_fill_boss.png` | 64×32 | 10/10/10/10 | — | Enchimento do chefe já colorido (magenta → vermelho); `modulate` branco. Altura 24 |
+| `ui_hud_bar_flash.png` | 80×56 | 20/20/20/20 | 8 | Contorno branco com brilho por cima do trilho: estado de dano = `modulate` `danger` + `Tween` de alfa 1 → 0 (~250 ms) |
+| `ui_hud_bar_tip.png` | 16×48 | — | — | Ponta branca com brilho (tingível): centro x na borda direita do enchimento, centrada na barra; `scale.y` 0,8 no chefe |
+| `ui_hud_icon_energy.png` | 56×64 | — | — | Diamante ciano à esquerda da Energia (no lugar do cristal desenhado; corpo 40×52, sobra de brilho de 8) |
+| `ui_hud_icon_boss.png` | 56×56 | — | — | Emblema do chefe (hexágono com chifres, magenta), à esquerda da barra do chefe (48 px) |
+| `ui_hud_tray.png` | 64×80 | 8/8/24/8 | topo 12 | Fundo da bandeja: linha ciano no topo com brilho para cima (12 px sobre a arena) e miolo **opaco** `#06182A` |
+| `ui_hud_tray_band.png` | 64×32 | 4/4/4/6 | — | Faixa dos upgrades (mais clara, filete `holo_line_dim` embaixo, 2 px). Altura 96 |
+| `ui_hud_skill_ready.png` | 176×184 | — | — | Slot pronto: anel ciano 6 px + brilho, marcas a 45°. **Centro do círculo em (88, 88)**, raio 72 (Ø144), base escura 6 px abaixo |
+| `ui_hud_skill_cooldown.png` | 176×184 | — | — | Slot em recarga: anel `holo_line_dim`, sem brilho |
+| `ui_hud_skill_cooldown_ring.png` | 176×184 | — | — | Anel de progresso da recarga (ciano com brilho): `TextureProgressBar` radial (`fill_mode` horário, `radial_center` (88, 88)) por cima de `_cooldown`; enche à medida que a recarga passa |
+| `ui_hud_skill_cooldown_mask.png` | 144×144 | — | — | Véu do setor restante (`#021423` 62%), mesmo uso do `ui_skill_cooldown_mask` |
+| `ui_hud_skill_locked.png` | 176×184 | — | — | Bloqueado: tokens `holo_dis_*`, anel tracejado. Por cima: `ui_icon_lock_holo` 64 px e "NV n" |
+| `ui_hud_skill_empty.png` | 176×184 | — | — | Liberado sem Módulo: anel tracejado `holo_line_dim`, sem ícone |
+| `ui_hud_key_badge.png` / `_off.png` | 44×44 | — | — | Badge da tecla (corpo 36×36 em (4, 4)); `_off` no bloqueado. Centro em (cx + 52, cy − 60) do slot |
+| `ui_hud_upgrade_normal.png` | 144×96 | — | 8 | Upgrade comprável. Corpo 128×80 em (8, 8); poço do ícone centrado em (39, 36) r 24 (= `ICON_C` + 8) e faixa do custo = `UpgradeButton.PILL` + (8, 8). Tamanho fixo |
+| `ui_hud_upgrade_pressed.png` | 144×96 | — | 8 | Pressionado (moldura `holo_text2`, miolo `#0E5A70`); mantém a escala 0,94 do código |
+| `ui_hud_upgrade_disabled.png` | 144×96 | — | 8 | Sem Partículas: `holo_dis_*`, sem brilho; ícone a 55%, custo `#FF9AA6` |
+| `ui_hud_upgrade_max.png` | 144×96 | — | 8 | Máximo: moldura e faixa douradas; "MAX" em `gold` |
+
+- **Texto fica na UI** (Outfit 800, `holo_text` com contorno `#021423` de 4–5 px, como no mockup): "ONDA X/Y", número de Partículas, "ENERGIA atual / máx", "Boss" e números do chefe, "Nv n", custos, "MAX", "NV n", dígitos das teclas e os segundos da recarga. Só a pausa ("II") e a velocidade têm o símbolo na arte.
+- Ícones de upgrade e de Módulo atuais mantidos sem recolorir (funcionam sobre o fundo escuro).
+- Peças antigas (`ui_skill_frame_*`, `ui_upgrade_*`, `ui_pill_*`, `ui_bar_*`, `ui_icon_pause`) ficam até o AG02 aplicar a T-290; depois podem sair do `.pck`.
