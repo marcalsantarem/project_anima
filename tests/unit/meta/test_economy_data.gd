@@ -52,10 +52,10 @@ func test_curve_milestones() -> void:
 		if i == 0:
 			assert_eq(cum, 50, "nível 2")
 		if i == 3:
-			assert_eq(cum, 300, "nível 5")
+			assert_eq(cum, 1000, "nível 5")
 		if i == 6:
-			assert_eq(cum, 850, "nível 8")
-	assert_eq(cum, 19360, "nível 30")
+			assert_eq(cum, 2500, "nível 8")
+	assert_eq(cum, 29450, "nível 30")
 
 
 func test_validate_rejects_bad_data() -> void:

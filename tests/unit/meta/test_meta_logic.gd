@@ -73,12 +73,12 @@ func test_apply_xp_exact_limit() -> void:
 
 func test_multiple_levels_and_slots() -> void:
 	var p := PlayerProfile.new()
-	var o := MetaProgress.apply_xp(p, 50 + 70 + 7, prog)
+	var o := MetaProgress.apply_xp(p, 50 + 150 + 7, prog)
 	assert_eq(o["new_level"], 3)
 	assert_eq(o["levels_gained"], 2)
 	assert_eq(o["slots_unlocked"], [1] as Array[int])
 	assert_eq(p.xp, 7)
-	o = MetaProgress.apply_xp(p, 80 + 100 + 140 + 180 - 7 + 7, prog)
+	o = MetaProgress.apply_xp(p, 300 + 500 + 500 + 500 - 7 + 7, prog)
 	assert_eq(o["new_level"], 7)
 	assert_eq(o["slots_unlocked"], [2] as Array[int])
 

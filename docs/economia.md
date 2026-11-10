@@ -31,65 +31,63 @@ Fase 1 inteira (92 runners, ~98 membros de swarm, 7 shooters, 10 tanks, 1 chefe)
 - **Campo:** `PlayerProfile.last_first_win_date: String`, vazio = nunca. Paga se `hoje != last_first_win_date`; depois grava `hoje`. Entra na T-186 (campo e lógica).
 - **Risco (sem defesa agora):** o save e o relógio são manipuláveis. Adiantar/atrasar o relógio ou editar o save repete o bônus (ganho limitado a +100 XP e +115 Moeda por repetição). Relógio atrasado para uma data anterior ao `last_first_win_date` não deve pagar (regra: pagar só se `hoje > last_first_win_date`). Defesa real exige data do servidor (backend, depois).
 
-## Curva de XP (nível N para N+1, teto 30)
+## Curva de XP (nível N para N+1, teto 30; revista no BRF-132 / T-195)
 
-Custo por nível crescente, sem degraus (passo de +30 a +60 por nível).
+Custo por nível crescente, sem queda. Os degraus 4 a 7 são iguais (500) para manter a curva monotônica.
 
 | N→N+1 | XP para subir | Acumulado |
 |---|---|---|
 | 1→2 | 50 | 50 |
-| 2→3 | 70 | 120 |
-| 3→4 | 80 | 200 |
-| 4→5 | 100 | 300 |
-| 5→6 | 140 | 440 |
-| 6→7 | 180 | 620 |
-| 7→8 | 230 | 850 |
-| 8→9 | 360 | 1210 |
-| 9→10 | 410 | 1620 |
-| 10→11 | 460 | 2080 |
-| 11→12 | 500 | 2580 |
-| 12→13 | 560 | 3140 |
-| 13→14 | 600 | 3740 |
-| 14→15 | 640 | 4380 |
-| 15→16 | 680 | 5060 |
-| 16→17 | 720 | 5780 |
-| 17→18 | 760 | 6540 |
-| 18→19 | 800 | 7340 |
-| 19→20 | 840 | 8180 |
-| 20→21 | 900 | 9080 |
-| 21→22 | 950 | 10030 |
-| 22→23 | 1000 | 11030 |
-| 23→24 | 1040 | 12070 |
-| 24→25 | 1090 | 13160 |
-| 25→26 | 1140 | 14300 |
-| 26→27 | 1190 | 15490 |
-| 27→28 | 1240 | 16730 |
-| 28→29 | 1290 | 18020 |
-| 29→30 | 1340 | 19360 |
+| 2→3 | 150 | 200 |
+| 3→4 | 300 | 500 |
+| 4→5 | 500 | 1000 |
+| 5→6 | 500 | 1500 |
+| 6→7 | 500 | 2000 |
+| 7→8 | 500 | 2500 |
+| 8→9 | 700 | 3200 |
+| 9→10 | 750 | 3950 |
+| 10→11 | 800 | 4750 |
+| 11→12 | 850 | 5600 |
+| 12→13 | 900 | 6500 |
+| 13→14 | 950 | 7450 |
+| 14→15 | 1000 | 8450 |
+| 15→16 | 1050 | 9500 |
+| 16→17 | 1100 | 10600 |
+| 17→18 | 1150 | 11750 |
+| 18→19 | 1200 | 12950 |
+| 19→20 | 1250 | 14200 |
+| 20→21 | 1300 | 15500 |
+| 21→22 | 1350 | 16850 |
+| 22→23 | 1400 | 18250 |
+| 23→24 | 1450 | 19700 |
+| 24→25 | 1500 | 21200 |
+| 25→26 | 1550 | 22750 |
+| 26→27 | 1600 | 24350 |
+| 27→28 | 1650 | 26000 |
+| 28→29 | 1700 | 27700 |
+| 29→30 | 1750 | 29450 |
 
 Slots: nível **2, 5 e 8** (`slot_unlock_levels`, decisão 63). Demais desbloqueios (`feature_unlock_levels`, só dado): Núcleos 3, Componentes 4, botão x2 6, fusão de Componentes 7; helper `ProgressionData.is_unlocked(feature, level)`.
 
-## Metas de partidas por nível
+## Simulação de progressão (BRF-132, T-195)
 
-Modelo de XP médio por partida: P1 a P4 = derrotas nas ondas 3, 4, 6 e 7 (19, 31, 58, 75; acumulado 183); P5 a P20 ~120 (derrotas nas ondas 8 e 9 e as primeiras vitórias, com bônus do dia); P21 em diante ~160 (~55% de vitórias de 195, resto derrotas ~100, mais o bônus diário diluído).
+Substitui o modelo de XP estimado. Ferramenta: `tests/tools/run_progression.gd` (bot em x1, seeds 1 a 100 por perfil, rewards de `rewards_m2.tres`, derrota x0,7, 1ª vitória do dia, 20 ordens circulares das seeds para a média). Comando: `godot --headless --path . --fixed-fps 60 -s tests/tools/run_progression.gd -- --seeds=100 --per-day=4`.
 
-| Marco | Acumulado | Partidas |
-|---|---|---|
-| Nível 2 (slot 1) | 50 | **2** (P1 = 19, P2 = 31: soma exata 50) |
-| Nível 3 (Núcleos) | 120 | 3 |
-| Nível 4 (Componentes) | 200 | 4 |
-| Nível 5 (slot 2) | 300 | **5** (P4 acumula 183, P5 ~120) |
-| Nível 6 (x2) | 440 | 6 |
-| Nível 7 (fusão) | 620 | 8 |
-| Nível 8 (slot 3) | 850 | **~10** (2 a 3 dias a 4/dia) |
-| Nível 20 | 8180 | ~58 |
-| Nível 30 | 19360 | ~128 |
+**Perfis:** *mediano* = bot atual (vence 100% das partidas; ~189 XP e ~225 Moeda por partida, sem o bônus do dia). *Fraco* = bot passivo (sem skill nem upgrades) com Núcleo a 15% do HP, só nesta ferramenta; perde nas ondas 4 a 6 (75% na 5) e rende ~34 XP e ~34 Moeda por partida. O passivo sem handicap cai nas ondas 7 e 8 (~64 XP).
 
-**Justificativa do nível 30:** 128 partidas a 3 a 5 por dia = 26 a 43 dias (~4 a 6 semanas, 4/dia ≈ 32 dias), pois a curva dos níveis 2 a 8 foi suavizada (degraus 70, 80, 100, 140, 180, 230; total -420 XP; do nível 9 em diante igual). Slot 1 na 2ª partida; slot 2 na 1ª sessão (5 partidas); slot 3 em 2 a 3 dias; depois o ritmo desacelera. Só os números do `.tres` precisam mudar para reajustar.
+Partidas até cada nível (4 partidas por dia; com 5 por dia muda <= 3 partidas, ex.: N30 = 141):
 
-## Perguntas em aberto para o dono
+| Nível | Alvo (dec. 63) | Mediano antes | Mediano depois | Fraco antes | Fraco depois |
+|---|---|---|---|---|---|
+| 2 | 1 a 2 | 1 | **1** | 1 | **2** |
+| 5 | 4 a 6 (1ª sessão) | 2 | **5** | 5 | 30 |
+| 8 | 10 a 14 (2 a 3 dias) | 4 | **12** | 14 | 74 |
+| 12 | ref. | 13 | 26 | 41 | 165 |
+| 20 | ref. | 39 | 67 | 129 | 418 |
+| 30 | 4 a 6 semanas | 91 (23 dias) | **138 (~35 dias)** | 305 | 866 |
 
-1. Fases futuras: escalar os valores por fase ou manter o mesmo peso por tipo de monstro?
-2. O bônus diário deve valer também em fases já vencidas, ou só em qualquer vitória (como está)?
+*Antes* = curva antiga (N5 = 300, N8 = 850, N30 = 19360 XP); o "fraco antes" foi medido com o passivo sem handicap (cai nas ondas 7 e 8, ~64 XP), então não é comparável: o fraco "depois" é mais fraco por definição.
 
-> Multiplicador de anúncio (rewarded ad): fora do escopo agora; nota M12+.
+**Ajuste:** só `progression_m2.tres` (curva); `rewards_m2.tres` não mudou. O modelo antigo subestimava o XP do bot (~120 a 160 por partida contra ~189 reais), então os níveis vinham cedo demais. Nova curva: acumulado 50 / 200 / 500 / 1000 (N5) / 1500 / 2000 / 2500 (N8) / 29450 (N30). Nível 2 continua na 1ª partida do mediano e na 2ª do fraco; N5 na 1ª sessão (5 partidas); N8 em 3 dias; N30 em ~5 semanas.
+
+**Risco:** o jogador fraco simulado leva ~30 partidas até o N5 (7 dias) e 74 até o N8: para ele a curva é lenta. O bot mediano vence sempre, então o mediano real (que perde parte das partidas) fica entre os dois perfis. Alavancas se o dono quiser acelerar o fraco sem mexer no mediano: subir `defeat_multiplier` (0,7) ou o XP por monstro das ondas 3 a 6 (runner/swarm/shooter).
