@@ -75,6 +75,9 @@ var auto_process := true
 var header := {}
 var finished_ok := false
 var log_data: Dictionary = {}
+## Meta da conta (T-193): no início da partida e depois da recompensa.
+var meta_before: Dictionary = {}
+var meta_after: Dictionary = {}
 ## Tempo de partida (s): soma dos quadros sem pausa.
 var match_time := 0.0
 var frames := FrameStats.new()
@@ -171,9 +174,34 @@ func _ready() -> void:
 		MatchRecorder.rotate_files()
 	_install_error_hooks()
 	event("inicio", {"seed": _seed})
+	meta_before = meta_snapshot()
+	if not meta_before.is_empty():
+		event("meta_antes", meta_before)
+		Backend.profile_saved.connect(_on_profile_saved)
+
+
+## Nível, XP e Moeda da conta (T-193), ou `{}` sem perfil carregado.
+func meta_snapshot() -> Dictionary:
+	return DebugMeta.snapshot(SceneFlow.profile) if SceneFlow.profile != null else {}
+
+
+## Depois do fim, o 1º save do perfil (a recompensa da partida) fecha o par antes/depois no log
+## (muda `log_data` no lugar, pois o Resultado já guarda a referência) e regrava o arquivo.
+func _on_profile_saved() -> void:
+	if not finished_ok or not meta_after.is_empty():
+		return
+	meta_after = meta_snapshot()
+	var e := {"t": snappedf(match_time, 0.001), "e": "meta_depois"}
+	e.merge(meta_after)
+	(log_data["events"] as Array).append(e)
+	log_data["meta"] = {"antes": meta_before, "depois": meta_after}
+	if save_enabled:
+		_write(log_data)
 
 
 func _exit_tree() -> void:
+	if Backend.profile_saved.is_connected(_on_profile_saved):
+		Backend.profile_saved.disconnect(_on_profile_saved)
 	if not finished_ok:
 		finish(null)
 	_remove_error_hooks()
@@ -542,6 +570,7 @@ func _detect_stress() -> void:
 	var node := _arena.get_node_or_null(^"StressMode")
 	if node != null:
 		header["stress"] = [int(node.get("enemy_target")), int(node.get("projectile_target"))]
+		header["speed"] = float((Engine.get_main_loop() as SceneTree).root.get_node("SpeedController").get("chosen")) if float(node.get("speed")) > 0.0 else 1.0
 
 
 func build_log(with_summary: bool) -> Dictionary:
@@ -562,6 +591,8 @@ func build_log(with_summary: bool) -> Dictionary:
 			"cost_us_max": cost_us_max, "saves": saves, "save_ms_max": snappedf(save_ms_max, 0.01),
 		},
 	}
+	if not meta_before.is_empty():
+		doc["meta"] = {"antes": meta_before, "depois": meta_after}
 	if with_summary:
 		doc["summary"] = LogReport.summarize(doc)
 	return doc

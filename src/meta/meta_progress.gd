@@ -23,6 +23,12 @@ static func apply_xp(profile: PlayerProfile, xp: int, progression: ProgressionDa
 	return {"levels_gained": level - old_level, "new_level": level, "slots_unlocked": unlocked}
 
 
+## Debug (T-193): define o nível da conta (1..max_level) com o XP no início do nível.
+static func debug_set_level(profile: PlayerProfile, level: int, progression: ProgressionData) -> void:
+	profile.level = clampi(level, 1, progression.max_level)
+	profile.xp = 0
+
+
 ## Quantidade de slots liberados no nível dado.
 static func slots_for_level(level: int, progression: ProgressionData) -> int:
 	var n := 0

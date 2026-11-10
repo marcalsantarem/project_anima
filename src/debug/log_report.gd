@@ -168,7 +168,7 @@ static func _stress_summary(doc: Dictionary, params: Array, proj: Array, fps: Ar
 	var nodes := column(doc, "nodes", false)
 	var enemies := column(doc, "enemies", false)
 	return {
-		"parametros": "stress=%d,%d" % [int(params[0]), int(params[1])],
+		"parametros": "stress=%d,%d" % [int(params[0]), int(params[1])] + (" speed=%d" % int(h.get("speed")) if h.has("speed") and float(h.speed) > 1.0 else ""),
 		"fps_medio": snappedf(_avg(fps), 0.1),
 		"fps_min": snappedf(percentile(fps, 0.0), 0.1),
 		"quadro_ms_p95": FrameStats.hist_percentile(hist, count, 95.0),

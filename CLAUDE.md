@@ -108,7 +108,7 @@ godot --editor --path .
 # Testes (GUT 9.7.1, lê .gutconfig.json: tests/unit e tests/integration). Num clone limpo, rode antes: godot --headless --path . --import
 godot --headless --path . -s addons/gut/gut_cmdln.gd -gexit
 # Um único arquivo de teste
-godot --headless --path . -s addons/gut/gut_cmdln.gd -gtest=res://tests/unit/test_smoke.gd -gexit
+godot --headless --path . -s addons/gut/gut_cmdln.gd -gselect=test_smoke -gexit
 
 # Exportar para Web (precisa de um preset "Web" em export_presets.cfg e dos export templates)
 godot --headless --path . --export-release "Web" build/web/index.html && bash web/copy_pwa.sh build/web  # + manifesto e ícones (T-175)

@@ -60,6 +60,12 @@ Módulo `src/debug/` (sem autoload). O `SceneFlow` cria o gravador e o overlay n
 - Liga por: `?debug=1` na URL (`?debug=0` desliga), **F3** (action `debug_toggle`) ou o botão **"Debug"** do menu de pausa.
 - Vem desligado e o estado fica salvo. O gravador grava de qualquer jeito.
 
+### 4.1 Seção "Meta" (T-193, BRF-134)
+
+- Dentro do overlay (só visível com `?debug=1`/F3/botão "Debug"; nunca em build sem debug): botão **Meta ▸** (recolhido por padrão) abre a linha `Nível · XP · Moeda` e os botões (>= 64 px, tokens `HOLO_*`): **+100 XP**, **+1000 XP**, **+500 Moeda**, **Nível −/+** (1..30, XP no início do nível) e **Zerar save** (2 toques: "Confirmar?" por 3 s).
+- Tudo passa por `DebugMeta` (`src/debug/debug_meta.gd`) → `MetaProgress`/`Backend` (`apply_xp` e teto 30 respeitados; salva em seguida; zerar = `Backend.reset_profile()` + recarga do perfil). Novo em `src/meta/`: `MetaProgress.debug_set_level`.
+- **Log:** eventos `meta_antes` (início da partida), `debug_meta` (`acao`, `antes`, `depois`) e `meta_depois` (após a recompensa, gravado no 1º save do perfil depois do fim), além de `meta: {antes, depois}` na raiz (campo aditivo; `format` igual).
+
 ## 5. Como baixar no iPhone
 
 1. No fim da partida, toque em **Logs** na tela de Resultado. Se a aba recarregou, use **Último log** no canto da tela de título.

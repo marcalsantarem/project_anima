@@ -78,3 +78,20 @@ func test_canvas_size_has_width() -> void:
 	var vp := {"canvas": [0.0, 616.0, 616.0], "inner": [390, 664]}
 	assert_eq(LogReport._canvas_size(vp, {}), [390.0, 616.0])
 	assert_eq(LogReport._canvas_size({}, {"window": [1, 2]}), [1, 2])
+
+
+func test_apply_speed_sets_x2_without_saving() -> void:
+	var saved_path: String = SpeedController.settings_path
+	SpeedController.settings_path = "user://test_stress_speed.cfg"
+	DirAccess.remove_absolute(SpeedController.settings_path)
+	var was_locked: bool = SpeedController.locked_to_x1
+	StressMode.apply_speed(2.0)
+	assert_eq(Engine.time_scale, 2.0)
+	assert_false(FileAccess.file_exists(SpeedController.settings_path), "nao salva a escolha")
+	StressMode.apply_speed(0.0) # não pedida: não muda nada
+	assert_eq(Engine.time_scale, 2.0)
+	SpeedController.chosen = 1.0
+	SpeedController.locked_to_x1 = was_locked
+	SpeedController.restore()
+	SpeedController.settings_path = saved_path
+	assert_eq(Engine.time_scale, 1.0)
