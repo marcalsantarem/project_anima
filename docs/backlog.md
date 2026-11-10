@@ -208,6 +208,8 @@
 | T-293 | Menu de pausa no estilo holográfico (decisão 64): painel, botões, interruptores | M2 | AG02 | feita (falta peça de interruptor holográfico, AG08) |
 | T-294 | Log de teste enriquecido para as medições no iPhone (x1/x2, estresse) e remoção do botão "Logs" (visualizador): daqui em diante só envio; contrato da API intocado | M2 | AG02 | feita |
 | T-295 | Ajustes do log pela análise dos primeiros envios do iPhone: rótulo de velocidade, dano agregado, estresse como `quit`, taxa real de quadros (Pouca Energia), áudio, fps por velocidade | M2 | AG02 | feita |
+| T-296 | Arte do interruptor holográfico (liga/desliga) para a pausa | M2 | AG08 | a fazer |
+| T-297 | Aplicar o interruptor holográfico na pausa (depende da T-296) | M2 | AG02 | a fazer |
 | T-148 | Sinais da Arena para VFX (projectile_fired, projectile_hit, enemy_died, particles_gained, skill_cast, boss_telegraph_started, boss_phase_changed) | M1 | AG01 | feita |
 
 ## Próximas prontas p/ briefing
