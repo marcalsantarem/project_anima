@@ -12,7 +12,14 @@ signal restart_requested
 signal menu_requested
 signal reduced_effects_changed(on: bool)
 
-const DEBUG_BUTTON_SIZE := Vector2(228, 64)
+const DEBUG_BUTTON_SIZE := Vector2(228, 88)
+## Estilo holográfico (T-293, BRF-133; docs/arte.md §11).
+const T_PANEL := preload("res://assets/ui/ui_holo_panel.png")
+const T_PRIMARY := preload("res://assets/ui/ui_holo_btn_primary_normal.png")
+const T_PRIMARY_DOWN := preload("res://assets/ui/ui_holo_btn_primary_pressed.png")
+const T_SECONDARY := preload("res://assets/ui/ui_holo_btn_secondary_normal.png")
+const T_SECONDARY_DOWN := preload("res://assets/ui/ui_holo_btn_secondary_pressed.png")
+const VEIL := Color(0.008, 0.078, 0.137, 0.78) # HOLO_BG a 78%
 
 var enabled := true
 var _root: Control
@@ -30,14 +37,16 @@ var version_label: Label
 func _ready() -> void:
 	layer = 20
 	process_mode = PROCESS_MODE_ALWAYS
-	_root = ScreenKit.root(self, UiTokens.BG_DIM)
+	_root = ScreenKit.root(self, VEIL)
 	_root.mouse_filter = Control.MOUSE_FILTER_STOP
-	var col := ScreenKit.card(_root)
-	col.add_child(ScreenKit.label("Pausado", &"LabelTitle"))
-	_continue = ScreenKit.button("Continuar", true, close)
+	var col := _holo_card(_root)
+	var title := ScreenKit.label("PAUSADO", &"LabelTitle", UiTokens.HOLO_TEXT)
+	_outline(title)
+	col.add_child(title)
+	_continue = _holo_button("Continuar", true, close)
 	col.add_child(_continue)
-	col.add_child(ScreenKit.button("Recomeçar", false, _on_restart))
-	menu_button = ScreenKit.button("Voltar ao menu", false, _on_menu)
+	col.add_child(_holo_button("Recomeçar", false, _on_restart))
+	menu_button = _holo_button("Voltar ao menu", false, _on_menu)
 	menu_button.name = "MenuButton"
 	col.add_child(menu_button)
 	var toggles := HBoxContainer.new()
@@ -156,10 +165,88 @@ func _on_reduced_toggled() -> void:
 
 
 func _toggle_button(node_name: String, cb: Callable) -> Button:
-	var b := ScreenKit.button("", false, cb)
+	var b := _holo_button("", false, cb)
 	b.name = node_name
 	b.custom_minimum_size = DEBUG_BUTTON_SIZE
-	b.add_theme_font_size_override("font_size", UiTokens.FONT_CAPTION)
+	b.add_theme_font_size_override("font_size", 20)
+	for state in ["normal", "hover", "pressed", "focus", "disabled"]:
+		var sb: StyleBoxTexture = (b.get_theme_stylebox(state) as StyleBoxTexture).duplicate()
+		sb.content_margin_left = 4.0
+		sb.content_margin_right = 4.0
+		b.add_theme_stylebox_override(state, sb)
+	return b
+
+
+static func _outline(l: Control) -> void:
+	l.add_theme_color_override("font_outline_color", UiTokens.HOLO_BG)
+	l.add_theme_constant_override("outline_size", UiTokens.HOLO_OUTLINE)
+
+
+static func _tex_box(tex: Texture2D, margin: int, content: Vector2 = Vector2.ZERO, expand: int = 0) -> StyleBoxTexture:
+	var sb := StyleBoxTexture.new()
+	sb.texture = tex
+	sb.set_texture_margin_all(margin)
+	sb.set_expand_margin_all(expand)
+	sb.content_margin_left = content.x
+	sb.content_margin_right = content.x
+	sb.content_margin_top = content.y
+	sb.content_margin_bottom = content.y
+	return sb
+
+
+## Painel holográfico centralizado (520 px, nunca mais largo que a tela) com uma coluna dentro.
+static func _holo_card(parent: Control) -> VBoxContainer:
+	var center := CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	parent.add_child(center)
+	var panel := PanelContainer.new()
+	panel.name = "HoloPanel"
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	panel.add_theme_stylebox_override("panel", _tex_box(T_PANEL, 48, Vector2(UiTokens.SPACE_M, UiTokens.SPACE_M)))
+	center.add_child(panel)
+	var fit := func() -> void:
+		panel.custom_minimum_size.x = clampf(center.size.x - 2 * UiTokens.MARGIN_SCREEN, 0.0, ScreenKit.CARD_WIDTH)
+	center.resized.connect(fit)
+	fit.call()
+	var col := VBoxContainer.new()
+	col.alignment = BoxContainer.ALIGNMENT_CENTER
+	col.add_theme_constant_override("separation", UiTokens.SPACE_M)
+	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	panel.add_child(col)
+	return col
+
+
+## Primário (Continuar): ciano com brilho; secundário: moldura ciano. Texto com contorno `HOLO_BG`.
+static func _holo_button(text: String, primary: bool, cb: Callable) -> Button:
+	var b := ScreenKit.button(text, primary, cb)
+	var normal: StyleBoxTexture
+	var down: StyleBoxTexture
+	if primary:
+		b.custom_minimum_size = Vector2(360, 112)
+		normal = _tex_box(T_PRIMARY, 48, Vector2.ZERO, 16)
+		normal.texture_margin_top = 56
+		normal.texture_margin_bottom = 56
+		down = normal.duplicate()
+		down.texture = T_PRIMARY_DOWN
+		down.content_margin_top = 6
+	else:
+		normal = _tex_box(T_SECONDARY, 24)
+		down = _tex_box(T_SECONDARY_DOWN, 24)
+	b.add_theme_stylebox_override("normal", normal)
+	b.add_theme_stylebox_override("hover", normal)
+	b.add_theme_stylebox_override("pressed", down)
+	b.add_theme_stylebox_override("focus", normal)
+	b.add_theme_stylebox_override("disabled", normal)
+	var ink := Color("#03202E") if primary else UiTokens.HOLO_TEXT
+	for k in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color", "font_disabled_color"]:
+		b.add_theme_color_override(k, ink)
+	if primary:
+		b.add_theme_constant_override("outline_size", 0)
+		b.add_theme_font_size_override("font_size", 34)
+	else:
+		_outline(b)
+		b.add_theme_font_size_override("font_size", UiTokens.FONT_HUD)
 	return b
 
 
