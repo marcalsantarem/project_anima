@@ -188,7 +188,7 @@
 | T-273 | Controlador de velocidade (`Engine.time_scale`): alterna x1/x2, **mantém** a escolha em pausa, hit-stop (restaura para a escolhida) e Resultado; bot/headless em x1; testes GUT (tam. M) | M2 | AG01 | feita |
 | T-274 | Arte do botão de velocidade: estados x1 e x2 (tam. P) | M2 | AG08 | feita |
 | T-275 | Botão de velocidade no HUD (toque e tecla no PC via Input Action, sem atrapalhar as skills; mostra a velocidade atual) (tam. M) | M2 | AG02 + AG07 | feita |
-| T-276 | Medir o x2 no iPhone com a cena de estresse (T-006/T-118) e registrar o fps (tam. P) | M2 | AG01 + AG10 | preparada (túnel de projétil corrigido; falta medir no iPhone, roteiro em docs/qa/medicao-x2-iphone.md) |
+| T-276 | Medir o x2 no iPhone com a cena de estresse (T-006/T-118) e registrar o fps (tam. P) | M2 | AG01 + AG10 | feita (medida pelo dono no iPhone: sem problemas, inclusive em estresse forçado, 2026-11-10) |
 | T-277 | Fundo holográfico na tela de Resultado: preparar a arte do dono (corte retrato 9:16, peso baixo, sem texto ilegível sob os botões) e aplicar no `result_screen`, com painéis e textos legíveis sobre ele (tam. M) | M1 | AG08 + AG02 | feita (BRF-092, BRF-093); falta ver no iPhone |
 | T-278 | Arte do fundo paisagem para PC: preparar as 2 artes do dono (retocar bateria e textos miúdos, peso baixo, 16:9 e telas mais largas/estreitas) (tam. P) | M1 | AG08 | feita (BRF-096); artes guardadas, sem uso |
 | T-279 | ~~Fundo paisagem no shell Web~~ | M1 | — | cancelada (decisão 61; shell revertido) |
