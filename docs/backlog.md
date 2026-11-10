@@ -205,6 +205,7 @@
 | T-290 | Aplicar o HUD holográfico na partida (substitui o estilo atual; sem mudar comportamento) | M2 | AG02 | feita |
 | T-291 | Anima holográfico na partida: pedestal, cristal e nós no estilo do título/menu (mesmos arquivos `anima_default_*`, mesmas âncoras) | M2 | AG08 | feita |
 | T-292 | Remover o círculo (anel roxo) em volta do Anima na arena | M2 | AG01 | feita |
+| T-293 | Menu de pausa no estilo holográfico (decisão 64): painel, botões, interruptores | M2 | AG02 | a fazer |
 | T-148 | Sinais da Arena para VFX (projectile_fired, projectile_hit, enemy_died, particles_gained, skill_cast, boss_telegraph_started, boss_phase_changed) | M1 | AG01 | feita |
 
 ## Próximas prontas p/ briefing
