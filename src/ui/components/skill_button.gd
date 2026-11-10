@@ -176,7 +176,7 @@ func is_locked() -> bool:
 
 
 func _update_accessibility() -> void:
-	var text := "Skill %d" % slot
+	var text := "Módulo %d" % slot
 	if state == State.LOCKED:
 		text += ", bloqueada" + (" até o nível %d" % unlock_level if unlock_level > 0 else "")
 	accessibility_name = text

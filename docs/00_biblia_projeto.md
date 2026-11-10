@@ -12,7 +12,7 @@
 
 **Pilares:**
 1. **Timing é tudo:** sem movimento, a habilidade do jogador está em **quando** usar cada skill. Poucas decisões, todas importantes.
-2. **Progressão que se sente:** cada nível, Módulo, Fragmento e upgrade muda números **e** o visual.
+2. **Progressão que se sente:** cada nível, Módulo, Componente e upgrade muda números **e** o visual.
 3. **Clareza no caos:** centenas de projéteis, e mesmo assim tudo legível numa tela de celular.
 4. **Zero atrito:** abriu o link, está jogando, no PC ou no iPhone.
 
@@ -71,7 +71,7 @@ Nomes oficiais que o jogador vê. Os **identificadores de código continuam em i
   - **Moeda:** a moeda do jogo (meta), dourada. A quantidade ganha varia a cada partida jogada.
   - **Partículas:** a moeda da partida, estrela verde (chip). Começa em zero, é zerada a cada partida e não cai no mapa por enquanto.
 - **Núcleos (a árvore de talentos):** continua, comprada com Moeda. O detalhe fica no AG04.
-- **[A DEFINIR]:** quais atributos os Fragmentos dão (dano, velocidade de ataque, vida, armadura, regeneração, redução de cooldown).
+- **[A DEFINIR]:** quais atributos os Componentes dão (dano, velocidade de ataque, vida, armadura, regeneração, redução de cooldown).
 
 ## Roadmap (decisão 53, 2026-11-05)
 

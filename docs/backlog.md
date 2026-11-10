@@ -75,7 +75,7 @@
 | T-160 | Arte do ícone de Partículas: estrela verde, estilo "chip" (e nova cor dos efeitos de coleta) | M1 | AG08 | feita |
 | T-161 | Aplicar o ícone verde de Partículas no HUD, Resultado, botões de upgrade e efeitos (hoje dourado) | M1 | AG02 + AG09 | feita |
 | T-162 | Arte do ícone de Moeda (moeda dourada) e do glossário na UI (para o M2) | M2 | AG08 | feita |
-| T-163 | Textos do jogo e docs com os nomes oficiais (Módulo, Componente, Núcleo, Moeda); decidir a colisão de "Núcleo" | M2 | AG00 + AG04 + AG02 | a fazer |
+| T-163 | Textos do jogo e docs com os nomes oficiais (Módulo, Componente, Núcleo, Moeda); decidir a colisão de "Núcleo" | M2 | AG00 + AG04 + AG02 | feita |
 | T-164 | Rótulo da vida do Anima: "NÚCLEO" vira "ENERGIA" no HUD, Resultado e docs de UI | M1 | AG02 | feita |
 | T-165 | Build e versão no cabeçalho do log (commit e data do deploy) | M1 | AG07 + AG02 | feita |
 | T-166 | Chefe sem barra de defesa (mecânica arquivada, desligada por dados); meteoro lança e atordoa; rebalancear | M1 | AG01 | feita |

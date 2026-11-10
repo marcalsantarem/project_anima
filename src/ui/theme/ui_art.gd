@@ -11,7 +11,7 @@ const SPEED_X1_PRESSED := preload("res://assets/ui/ui_speed_x1_pressed.png")
 const SPEED_X2 := preload("res://assets/ui/ui_speed_x2.png")
 const SPEED_X2_PRESSED := preload("res://assets/ui/ui_speed_x2_pressed.png")
 const LOCK_HOLO := preload("res://assets/ui/ui_icon_lock_holo.png")
-## Partículas (T-160/T-161). O `ui_icon_particle.png` dourado é obsoleto (reservado à Moeda do M2).
+## Partículas (T-160/T-161).
 const PARTICLE := preload("res://assets/ui/ui_icon_particles.png")
 const PARTICLE_OFF := preload("res://assets/ui/ui_icon_particles_off.png")
 ## Ícone do meteoro (decisão 37): fonte única, padrão do SkillButton `Icon.CIRCLE`. Carregado por caminho: se faltar, o botão desenha o ícone de formas.

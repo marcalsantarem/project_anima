@@ -96,7 +96,7 @@ O comportamento fica em um script por `type` (`SkillBehavior` → `AreaSkill`, .
 - **Tempo:** telegraph no chão (elipse que enche) por `telegraph_time` = 0,6 s; o meteoro cai nos últimos `fall_time` = 0,35 s (de `fall_height` = 360 px acima, acelerando); no impacto, dano em área no chão e `skill_cast`; a cratera fica `crater_time` = 0,5 s. Nada é alocado na animação (nós criados no `_ready`).
 - **Arte:** `assets/sprites/skill_meteor.png` (âncora 64,164) e `skill_meteor_crater.png` (âncora 128,96, escalada para largura 1x = 2 × raio × 1,07); sem textura, desenho provisório por código. `icon` = `assets/ui/ui_icon_skill_meteor.png` (o HUD ainda não lê esse campo: AG02).
 - **Balanceamento:** 40 de dano mata enxame (8), corredor (20) e atirador (35); tanque (120) leva 1/3. Raio 160 cobre um grupo de enxame (espalhamento 48). Com 1 uso a cada 10 s, limpa grupos sem resolver as ondas 5+ (12–14 corredores vindos de bordas diferentes). Upgrades futuros: `radius`, `damage`, `cooldown` são campos separados; `upgrade_cooldown` já vale.
-- Cards e raridades (AG04, depois do M1) só alteram números e efeitos via `SkillData`. O gameplay não conhece cards.
+- Níveis de Módulo, Componentes e raridades (AG04, depois do M1) só alteram números e efeitos via `SkillData`. O gameplay não conhece o meta.
 
 ## Inimigos
 

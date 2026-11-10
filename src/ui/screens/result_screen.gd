@@ -475,7 +475,7 @@ func _build_reward_panel(parent: Control) -> void:
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	v.add_child(row)
 	_xp_value = _reward_cell(row, TXT_XP, HOLO_VIOLET, _icon(T_XP, 76))
-	_coin_value = _reward_cell(row, TXT_COIN, UiTokens.GOLD, CoinIcon.new())
+	_coin_value = _reward_cell(row, TXT_COIN, UiTokens.GOLD, _coin_icon())
 	var seal := PanelContainer.new()
 	seal.name = "FirstWinSeal"
 	seal.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -486,6 +486,18 @@ func _build_reward_panel(parent: Control) -> void:
 	seal.add_child(seal_label)
 	v.add_child(seal)
 	_seal = seal
+
+
+func _coin_icon() -> TextureRect:
+	var t := TextureRect.new()
+	t.name = "CoinIcon"
+	t.texture = load("res://assets/ui/ui_icon_coin.png")
+	t.custom_minimum_size = Vector2(76, 76)
+	t.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	t.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	t.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	t.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return t
 
 
 func _reward_cell(row: HBoxContainer, caption: String, color: Color, icon: Control) -> Label:
@@ -637,23 +649,6 @@ func _slot_notice(slot: int) -> Control:
 	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	txt.add_child(sub)
 	return holder
-
-
-## Moeda provisória (sem arte `ui_icon_coin` ainda, T-162): disco dourado com losango.
-class CoinIcon extends Control:
-	func _init() -> void:
-		custom_minimum_size = Vector2(76, 76)
-		size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		mouse_filter = Control.MOUSE_FILTER_IGNORE
-
-	func _draw() -> void:
-		var c := size * 0.5
-		var r := minf(size.x, size.y) * 0.5 - 2.0
-		draw_circle(c, r, Color("#B9780F"))
-		draw_circle(c, r - 4.0, Color("#FFC93D"))
-		var d := r * 0.45
-		var pts := PackedVector2Array([c + Vector2(0, -d), c + Vector2(d, 0), c + Vector2(0, d), c + Vector2(-d, 0)])
-		draw_colored_polygon(pts, Color("#FFF1C2"))
 
 
 ## Log da partida (MatchRecorder) para o botão "Logs".

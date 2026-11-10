@@ -14,7 +14,7 @@ const TXT_XP := "%s / %s XP"
 const TXT_MAX := "MAX"
 
 ## Moeda provisória (T-162 troca): único ponto de troca do ícone.
-const COIN_ICON := preload("res://assets/ui/ui_icon_particle.png")
+const COIN_ICON := preload("res://assets/ui/ui_icon_coin_small.png")
 const ICON_SETTINGS := preload("res://assets/ui/ui_icon_settings.png")
 const PANEL_PILL := preload("res://assets/ui/ui_holo_pill.png")
 const BTN_PRIMARY := preload("res://assets/ui/ui_holo_btn_primary_normal.png")
