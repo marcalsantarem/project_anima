@@ -3,10 +3,11 @@
 Objetivo: saber se o x2 aguenta no iPhone com carga (referência: 46,9 fps com 150 inimigos em x1, T-007).
 
 ## Como medir
-1. Abra no iPhone (Safari) o link de teste + `?debug=1&stress=150,300&speed=1`. A partida roda 60 s sozinha (Núcleo imortal) e abre o Resultado.
+1. Abra no iPhone (Safari) o link de teste + `?debug=1&stress=150,300&speed=1&tag=iphone11-safari-x1-150`. A `tag` é livre (até 64 caracteres, sem espaços): use uma por rodada, ex. `iphone11-app-x2-300`; ela identifica o ensaio no banco. A partida roda 60 s sozinha (Núcleo imortal) e abre o Resultado.
 2. Repita com `&speed=2`, e depois com `stress=300,300`. Ordem: x1 150, x2 150, x1 300, x2 300.
 3. Repita tudo no modo app (tela de início / PWA). Use o mesmo link e feche o app entre medições. Deixe o aparelho carregado e frio (sem modo de baixo consumo).
-4. Em cada medição, no Resultado abra o log e copie a linha `ESTRESSE ... speed=2` (traz fps médio, mín, p95 em ms, quadros >50 ms). Mande o log ou a linha.
+4. Em cada medição, no Resultado toque em **Enviar log** e espere "Enviado ✔". **Não há mais visualizador**: cada rodada precisa ser **enviada**, uma por vez (limite de 20 envios por hora por rede). Os números saem do banco (consultas em `docs/logs-api.md`); o `resumo` do log traz tag, fps médio, p95 e resultado.
+5. No modo app (PWA), a `tag` só vale se o link salvo na tela de início já tiver o `?tag=`: ajuste o link antes de adicioná-lo.
 - `speed` só vale com `?debug=1` e **não** altera a velocidade salva do jogo.
 
 ## Anotar

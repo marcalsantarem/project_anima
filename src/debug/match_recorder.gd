@@ -22,12 +22,13 @@ const MAX_SAMPLES := 1500
 const MAX_EVENTS := 3000
 const MAX_HITCHES := 300
 const MAX_ERRORS := 200
+const WORST_FRAMES := 5
 const MAX_BYTES := 1_000_000
 const SAMPLE_COLS: Array[String] = [
 	"t", "fps", "ms_avg", "ms_max", "n33", "n50", "proc_ms", "phys_ms", "draw_calls", "objects",
 	"nodes", "orphans", "mem_static_mb", "mem_tex_mb", "mem_video_mb", "enemies", "enemies_by_type",
 	"proj_player", "proj_enemy", "fx_live", "energy", "energy_max", "wave", "particles", "boss_hp",
-	"boss_def", "paused",
+	"boss_def", "paused", "render_objects", "time_scale",
 ]
 const FX_TYPES: Array[StringName] = [
 	&"fx_muzzle", &"fx_trail", &"fx_hit", &"fx_death", &"fx_pickup", &"fx_upgrade", &"fx_skill_cast",
@@ -46,6 +47,15 @@ function push(k, m){ if (d.q.length >= d.max) { d.dropped++; return; } d.q.push(
  return orig.apply(console, arguments); }; });
 window.addEventListener('error', function(ev){ push('onerror', (ev.message || '') + ' @' + (ev.filename || '') + ':' + (ev.lineno || 0)); });
 window.addEventListener('unhandledrejection', function(ev){ var r = ev.reason; push('unhandledrejection', r && (r.stack || r.message) || r); });
+var L = d.life = {hidden_count: 0, hidden_ms: 0, hidden_since: null, longest: 0, pagehide: 0, pageshow: 0, freeze: 0, resume: 0, gl_lost: 0, gl_restored: 0, since: performance.now()};
+document.addEventListener('visibilitychange', function(){ if (document.hidden) { L.hidden_count++; L.hidden_since = performance.now(); }
+ else if (L.hidden_since !== null) { var dt = performance.now() - L.hidden_since; L.hidden_ms += dt; if (dt > L.longest) L.longest = dt; L.hidden_since = null; } });
+window.addEventListener('pagehide', function(){ L.pagehide++; });
+window.addEventListener('pageshow', function(){ L.pageshow++; });
+document.addEventListener('freeze', function(){ L.freeze++; });
+document.addEventListener('resume', function(){ L.resume++; });
+var cv = document.querySelector('canvas');
+if (cv) { cv.addEventListener('webglcontextlost', function(){ L.gl_lost++; }); cv.addEventListener('webglcontextrestored', function(){ L.gl_restored++; }); }
 d.drain = function(){ var out = JSON.stringify({q: d.q, dropped: d.dropped}); d.q = []; d.dropped = 0; return out; };
 })();"""
 const JS_ENV := """JSON.stringify((function(){
@@ -132,6 +142,13 @@ var _hint_frame := -1
 var _last_damage: Dictionary = {}
 var _last_damage_frame := -1
 var _logger: RecorderLogger
+var _started_at := ""
+var _start_ms := 0.0
+var _speed_node: Node
+var _speed_cur := 1.0
+## Os piores quadros da partida: [t, ms, onda], do maior ao menor (no máximo WORST_FRAMES).
+var _worst: Array = []
+var _worst_min := 0.0
 var _js_visibility_cb: JavaScriptObject
 
 
@@ -169,6 +186,13 @@ func _link(source: Node, sig: StringName, cb: Callable) -> void:
 func _ready() -> void:
 	process_mode = PROCESS_MODE_ALWAYS
 	set_process(auto_process)
+	SessionInfo.next_run()
+	_started_at = SessionInfo.utc_now()
+	_start_ms = SessionInfo.now_ms()
+	_speed_node = get_node_or_null(^"/root/SpeedController")
+	_speed_cur = float(_speed_node.get("chosen")) if _speed_node != null else 1.0
+	if _speed_node != null and _speed_node.has_signal(&"speed_changed"):
+		_speed_node.connect(&"speed_changed", _on_speed_changed)
 	header = build_header()
 	if save_enabled:
 		MatchRecorder.rotate_files()
@@ -205,6 +229,8 @@ func _exit_tree() -> void:
 	if not finished_ok:
 		finish(null)
 	_remove_error_hooks()
+	if _speed_node != null and is_instance_valid(_speed_node) and _speed_node.is_connected(&"speed_changed", _on_speed_changed):
+		_speed_node.disconnect(&"speed_changed", _on_speed_changed)
 
 
 func _process(delta: float) -> void:
@@ -236,6 +262,8 @@ func step(ms: float, paused: bool = false) -> void:
 	_win_count += 1
 	_win_sum += ms
 	_win_max = maxf(_win_max, ms)
+	if ms > _worst_min:
+		_note_worst(ms)
 	if ms > SLOW_MS:
 		_win_33 += 1
 		if ms > HITCH_MS:
@@ -264,6 +292,21 @@ func event(type: String, data: Dictionary = {}) -> void:
 	var e := {"t": snappedf(match_time, 0.001), "e": type}
 	e.merge(data)
 	events.push(e)
+
+
+## Troca de velocidade do jogador (x1/x2) com o instante da partida (BRF-136).
+func _on_speed_changed(speed: float) -> void:
+	event("velocidade", {"de": _speed_cur, "para": speed})
+	_speed_cur = speed
+
+
+## Guarda o quadro entre os WORST_FRAMES piores. Só aloca quando entra um novo (raro depois do começo).
+func _note_worst(ms: float) -> void:
+	_worst.append([snappedf(match_time, 0.001), snappedf(ms, 0.1), _wave])
+	_worst.sort_custom(func(a, b) -> bool: return a[1] > b[1])
+	if _worst.size() > WORST_FRAMES:
+		_worst.resize(WORST_FRAMES)
+	_worst_min = float(_worst[-1][1]) if _worst.size() >= WORST_FRAMES else 0.0
 
 
 # --- Sinais ---
@@ -428,6 +471,7 @@ func _sample() -> void:
 		_enemy_count(), by_type, _pool_count(&"projectiles"), _pool_count(&"enemy_projectiles"), _fx_live(),
 		_hp, _hp_max, _wave, _arena_int(&"particles", _particles), _boss_hp if _boss_active else -1,
 		_boss_def if _boss_active else -1, _paused,
+		int(Performance.get_monitor(Performance.RENDER_TOTAL_OBJECTS_IN_FRAME)), snappedf(Engine.time_scale, 0.01),
 	]
 	samples.push(row)
 	for i in SAMPLE_COLS.size():
@@ -586,6 +630,7 @@ func build_log(with_summary: bool) -> Dictionary:
 		"errors": errors.to_array(),
 		"truncated": {"samples": samples.dropped, "events": events.dropped, "hitches": hitches.dropped,
 			"errors": errors.dropped, "js_errors": js_errors_dropped, "size_limit": false},
+		"worst_frames": _worst.duplicate(true),
 		"recorder": {
 			"cost_us_avg": snappedf(float(cost_us_total) / cost_frames, 0.1) if cost_frames > 0 else 0.0,
 			"cost_us_max": cost_us_max, "saves": saves, "save_ms_max": snappedf(save_ms_max, 0.01),
@@ -593,6 +638,8 @@ func build_log(with_summary: bool) -> Dictionary:
 	}
 	if not meta_before.is_empty():
 		doc["meta"] = {"antes": meta_before, "depois": meta_after}
+	if OS.has_feature("web"):
+		doc["web_end"] = SessionInfo.web_snapshot()
 	if with_summary:
 		doc["summary"] = LogReport.summarize(doc)
 	return doc
@@ -654,6 +701,10 @@ func build_header() -> Dictionary:
 		"reduced_effects": bool(_fx_pool.get(&"reduced_effects")) if _fx_pool else false,
 		"seed": _seed,
 		"build": BuildInfo.current().duplicate(),
+		"run": SessionInfo.run_info(_started_at),
+		"speed_initial": _speed_cur,
+		"load": {"title_ms": snappedf(SessionInfo.title_ms(), 1.0) if SessionInfo.title_ms() >= 0.0 else null,
+			"match_start_ms": snappedf(_start_ms, 1.0)},
 	}
 	if vp:
 		var ui := ScreenKit.safe_area(vp)
@@ -663,6 +714,8 @@ func build_header() -> Dictionary:
 	if OS.has_feature("web"):
 		h["web"] = MatchRecorder.web_env().duplicate()
 		h["web"]["viewport"] = MatchRecorder.web_viewport()
+		h["env"] = SessionInfo.web_snapshot()
+		h["os"] = SessionInfo.ua_short(str(h["web"].get("ua", "")))
 	return h
 
 

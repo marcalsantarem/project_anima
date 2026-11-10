@@ -1,5 +1,5 @@
 extends GutTest
-## Gravador com a Arena real e o botão "Logs" do Resultado (BRF-063).
+## Gravador com a Arena real e o Resultado (sem visualizador, BRF-136) (BRF-063).
 
 const SAMPLE_LOG_DIR := "user://test_logs_ui/"
 
@@ -61,7 +61,7 @@ func _sample_doc() -> Dictionary:
 	return doc
 
 
-func test_result_logs_button_opens_viewer_and_keeps_buttons() -> void:
+func test_result_has_no_logs_button_but_keeps_send_and_main_buttons() -> void:
 	var screen: ResultScreen = load(SceneFlow.RESULT_SCENE).instantiate()
 	var r := MatchResult.new()
 	r.wave_reached = 3
@@ -70,26 +70,11 @@ func test_result_logs_button_opens_viewer_and_keeps_buttons() -> void:
 	screen.set_log(_sample_doc())
 	add_child_autofree(screen)
 	await wait_process_frames(1)
-	var logs := screen.find_child("Logs", true, false) as Button
-	assert_not_null(logs, "botão Logs")
-	if logs == null:
-		return
-	assert_gte(logs.custom_minimum_size.y, 44.0)
-	logs.pressed.emit()
-	assert_not_null(screen.viewer, "visualizador aberto")
-	await wait_process_frames(1)
-	var body := screen.viewer.body
-	assert_gt(body.get_child_count(), 0)
-	assert_string_contains((body.get_child(0) as Label).text, "RESUMO")
-	assert_string_contains(screen.viewer.text, "LINHA DO TEMPO")
-	assert_false(get_tree().paused, "não pausa")
-	var paths := screen.viewer.save_files()
-	assert_true(FileAccess.file_exists(paths[0]), ".json gravado fora da web")
-	for p in paths:
-		DirAccess.remove_absolute(p)
-	screen.viewer.close()
-	await wait_process_frames(1)
-	assert_null(screen.viewer, "fechado")
+	assert_null(screen.find_child("Logs", true, false), "sem botão Logs (visualizador removido)")
+	var send := screen.find_child("SendLog", true, false) as Button
+	assert_not_null(send, "botão Enviar log")
+	if send != null:
+		assert_gte(send.custom_minimum_size.y, 44.0)
 	watch_signals(screen)
 	(screen.find_child("PlayAgain", true, false) as Button).pressed.emit()
 	(screen.find_child("BackToTitle", true, false) as Button).pressed.emit()

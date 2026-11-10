@@ -62,6 +62,7 @@ var _build_tag: Label
 
 
 func _ready() -> void:
+	SessionInfo.mark_title()
 	set_anchors_and_offsets_preset(PRESET_FULL_RECT)
 	var root := ScreenKit.root(self, BG_DEEP)
 	ScreenKit.set_page_color(BG_DEEP)

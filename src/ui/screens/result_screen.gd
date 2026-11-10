@@ -7,7 +7,7 @@ extends Control
 ## level_before, xp_before, xp_to_next_before, level_after, xp_after, xp_to_next_after (0 = teto), result_outcome.
 ## Sem `set_reward` não há seção de recompensa. A animação (contagem, barra, subidas) usa tempo real
 ## (decisão 59), pula com um toque e não bloqueia os botões; `reduced_effects` vai direto ao estado final.
-## Botão secundário "Logs" (BRF-063): abre o LogViewer com `set_log(doc)` (ou o último log salvo).
+## Botão "Enviar log" (T-269): envia `set_log(doc)` (ou o último log salvo). Sem visualizador (BRF-136).
 
 signal play_again_requested
 signal title_requested
@@ -56,7 +56,7 @@ const HOLO_VIOLET := Color("#B9A5FF")
 const HOLO_INK := Color("#03202E")
 const GLOW := Color(0.18, 0.85, 1.0, 0.35)
 
-## Botão "Logs": secundário e menor que os dois principais (alvo ≥ 44 px, BRF-063).
+## Botão "Enviar log": secundário e menor que os dois principais (alvo ≥ 44 px, BRF-063).
 const LOGS_BUTTON_SIZE := Vector2(200, 64)
 const COUNT_TIME := 1.0 ## contagem de XP e Moeda (s, tempo real)
 const BAR_TIME := 1.0 ## barra sem subida de nível
@@ -78,9 +78,7 @@ var _stats: Label
 var _particles_label: Label
 var _stats_tail: Label
 var _log: Dictionary = {}
-var _logs_button: Button
 ## Visualizador aberto, ou null.
-var viewer: LogViewer
 var _uploader: LogUploader
 var _send_button: Button
 var _notice: Label
@@ -196,11 +194,6 @@ func _ready() -> void:
 	small_row.alignment = BoxContainer.ALIGNMENT_CENTER
 	small_row.add_theme_constant_override("separation", UiTokens.SPACE_S)
 	col.add_child(small_row)
-	_logs_button = _button("Logs", false, open_logs)
-	_logs_button.name = "Logs"
-	_logs_button.custom_minimum_size = LOGS_BUTTON_SIZE
-	_logs_button.add_theme_font_size_override("font_size", UiTokens.FONT_CAPTION)
-	small_row.add_child(_logs_button)
 	if LogUploader.ENABLED:
 		_uploader = LogUploader.new()
 		add_child(_uploader)
@@ -213,12 +206,9 @@ func _ready() -> void:
 		_notice = _lbl(LogUploader.TXT_NOTICE, UiTokens.FONT_CAPTION - 2, HOLO_MUTED)
 		_notice.name = "SendNotice"
 		col.add_child(_notice)
-		_logs_button.focus_neighbor_right = _logs_button.get_path_to(_send_button)
-		_send_button.focus_neighbor_left = _send_button.get_path_to(_logs_button)
 		_send_button.focus_neighbor_top = _send_button.get_path_to(back)
+		back.focus_neighbor_bottom = back.get_path_to(_send_button)
 	back.focus_neighbor_top = back.get_path_to(play)
-	back.focus_neighbor_bottom = back.get_path_to(_logs_button)
-	_logs_button.focus_neighbor_top = _logs_button.get_path_to(back)
 	play.call_deferred(&"grab_focus")
 	ScreenKit.fade_in(_root)
 	_refresh()
@@ -651,7 +641,7 @@ func _slot_notice(slot: int) -> Control:
 	return holder
 
 
-## Log da partida (MatchRecorder) para o botão "Logs".
+## Log da partida (MatchRecorder) para o botão "Enviar log".
 func set_log(doc: Dictionary) -> void:
 	_log = doc
 
@@ -683,14 +673,3 @@ func _on_upload_state(s: int) -> void:
 			_send_button.text = LogUploader.TXT_SEND
 			_send_button.disabled = false
 
-
-## Abre o visualizador por cima (não pausa nem mexe nos botões; ao fechar, o foco volta ao "Logs").
-func open_logs() -> void:
-	if viewer != null and is_instance_valid(viewer):
-		return
-	var doc := _log if not _log.is_empty() else MatchRecorder.load_last()
-	viewer = LogViewer.open(self, doc)
-	viewer.closed.connect(func() -> void:
-		viewer = null
-		if is_instance_valid(_logs_button):
-			_logs_button.grab_focus())

@@ -101,7 +101,7 @@ func test_without_reward_has_no_section() -> void:
 	assert_false(s._level_panel.visible)
 	assert_eq(s._slots_box.get_child_count(), 0)
 	assert_eq(s._title.text, "VITÓRIA")
-	assert_not_null(s.find_child("Logs", true, false))
+	assert_not_null(s.find_child("SendLog", true, false))
 	assert_not_null(s.find_child("PlayAgain", true, false))
 	assert_not_null(s.find_child("BackToTitle", true, false))
 
@@ -156,6 +156,6 @@ func test_timeline_is_pure_function_of_time() -> void:
 
 func test_buttons_not_blocked_during_animation() -> void:
 	var s := await _screen(_sum(), false)
-	for n in ["PlayAgain", "BackToTitle", "Logs"]:
+	for n in ["PlayAgain", "BackToTitle", "SendLog"]:
 		assert_false((s.find_child(n, true, false) as Button).disabled, n)
 	assert_lt(s._anim_total, 2.5)

@@ -6,6 +6,9 @@ extends RefCounted
 const MAX_TIMELINE := 600 ## eventos no texto (os mais recentes)
 const MAX_SAMPLE_ROWS := 400 ## linhas da tabela de amostras no texto
 const TOP_HITCHES := 5
+const FIRST_ERRORS := 20 ## mensagens de erro no resumo (BRF-136)
+## Teto do log enviado (campo `log` do contrato; o corpo tem de caber em 200 KB, docs/logs-api.md).
+const UPLOAD_MAX_BYTES := 150 * 1024
 
 
 ## Percentil por ordem (nearest-rank) de uma lista de números. p em 0–100.
@@ -73,8 +76,18 @@ static func summarize(doc: Dictionary) -> Dictionary:
 	var damage_by := {}
 	var upgrades := []
 	var denied := 0
+	var skills := {}
+	var speed_changes := []
+	var pauses := 0
 	for e in events:
 		match str(e.get("e", "")):
+			"skill":
+				var slot := str(int(e.get("slot", 0)))
+				skills[slot] = int(skills.get(slot, 0)) + 1
+			"velocidade":
+				speed_changes.append([snappedf(float(e.get("t", 0)), 0.1), float(e.get("de", 1)), float(e.get("para", 1))])
+			"pausa":
+				pauses += 1
 			"dano":
 				var v := int(e.get("valor", 0))
 				damage_total += v
@@ -115,6 +128,14 @@ static func summarize(doc: Dictionary) -> Dictionary:
 	if duration <= 0.0 and not samples.is_empty() and t_i >= 0:
 		duration = float(samples[-1][t_i])
 
+	var err_by := {}
+	for e in errors:
+		var k := "%s/%s" % [e.get("fonte", ""), e.get("tipo", "")]
+		err_by[k] = int(err_by.get(k, 0)) + 1
+	var energy := column(doc, "energy", false)
+	var hp_5s := []
+	for i in range(0, energy.size(), 5):
+		hp_5s.append(int(energy[i]))
 	var out := {
 		"duracao_s": snappedf(duration, 0.1),
 		"resultado": str(result.get("resultado", "?")),
@@ -148,7 +169,14 @@ static func summarize(doc: Dictionary) -> Dictionary:
 		"upgrades": upgrades,
 		"upgrades_negados": denied,
 		"erros": errors.size(),
-		"erros_primeiros": errors.slice(0, 5).map(func(e) -> String: return "%s: %s" % [e.get("tipo", ""), e.get("msg", "")]),
+		"erros_por_tipo": err_by,
+		"skills_usadas": skills,
+		"mortes_por_tipo": result.get("mortes_por_tipo", {}),
+		"velocidades": speed_changes,
+		"pausas": pauses,
+		"energia_5s": hp_5s,
+		"piores_quadros": doc.get("worst_frames", []),
+		"erros_primeiros": errors.slice(0, FIRST_ERRORS).map(func(e) -> String: return "%s: %s" % [e.get("tipo", ""), e.get("msg", "")]),
 		"maiores_travadas": top,
 		"truncado": doc.get("truncated", {}),
 	}
@@ -190,6 +218,82 @@ static func _canvas_size(vp: Dictionary, h: Dictionary) -> Array:
 		return [float(inner[0]), float(c[2])]
 	var w = h.get("window", [])
 	return w if w is Array else []
+
+
+## Resumo em 5 a 8 linhas para bater o olho no banco (BRF-136). Funciona com log antigo ou novo.
+static func header_lines(doc: Dictionary) -> PackedStringArray:
+	var s: Dictionary = doc.get("summary", {})
+	if s.is_empty():
+		s = summarize(doc)
+	var h: Dictionary = doc.get("header", {})
+	var run: Dictionary = h.get("run", {})
+	var web: Dictionary = h.get("web", {})
+	var env: Dictionary = h.get("env", {})
+	var out := PackedStringArray()
+	var tag := str(run.get("tag", ""))
+	out.append("tag: %s · sessão %s · partida #%s · %s" % [tag if tag != "" else "(sem tag)", run.get("session_id", "?"),
+		_i(run.get("run_index")), run.get("run_started_at", h.get("date", "?"))])
+	var dev := str(h.get("os", ""))
+	if web.is_empty():
+		dev = "%s %s" % [h.get("platform", "?"), h.get("model", "")]
+	elif dev.is_empty():
+		dev = str(web.get("ua", "?")).left(60)
+	out.append("aparelho: %s · %s núcleos · dpr %s · tela %s" % [dev, _s(env.get("cores", web.get("cores"))),
+		_s(env.get("dpr", web.get("dpr"))), _s(env.get("inner", web.get("inner")))])
+	var mode := str(env.get("display_mode", "")) if env.get("display_mode") != null else ("web" if not web.is_empty() else "nativo")
+	out.append("modo: %s · v%s · %s" % [{"standalone": "PWA", "browser": "navegador"}.get(mode, mode), h.get("version", "?"),
+		BuildInfo.label(BuildInfo.parse(h.get("build")))])
+	var speeds: Array = s.get("velocidades", [])
+	var stress = h.get("stress")
+	out.append("velocidade: x%s inicial · %d mudanças · estresse: %s" % [_s(h.get("speed", h.get("speed_initial", 1.0))),
+		speeds.size(), "%d inimigos, %d proj" % [int(stress[0]), int(stress[1])] if stress is Array else "não"])
+	out.append("fps médio %s · quadro p95 %s ms · p99 %s ms · >50 ms: %d" % [s.fps_medio, s.quadro_ms_p95,
+		s.quadro_ms_p99, s.travadas_50])
+	out.append("resultado: %s · onda %d/%d · %s" % [s.resultado, s.onda, s.ondas, _time(float(s.duracao_s))])
+	out.append("erros: %d · picos: %d inimigos, %d proj" % [s.erros, s.pico_inimigos, s.pico_projeteis])
+	return out
+
+
+static func _s(v: Variant) -> String:
+	return "?" if v == null else str(v)
+
+
+static func _i(v: Variant) -> String:
+	return "?" if v == null else str(int(v))
+
+
+## Conteúdo do campo `log` enviado: JSON `anima_log/1` com `resumo` (texto) em primeiro lugar, o
+## mesmo documento do gravador e `upload` (o que foi cortado para caber). Nunca passa de `max_bytes`
+## (UTF-8): corta amostras (1 a cada 2) e eventos (metade mais antiga) até caber. O doc original não muda.
+static func upload_text(doc: Dictionary, max_bytes: int = UPLOAD_MAX_BYTES) -> String:
+	var body := {"resumo": Array(header_lines(doc))} if not doc.is_empty() else {"resumo": ["sem log"]}
+	body["format"] = doc.get("format", "anima_log/1")
+	for k in doc:
+		if k != "format":
+			body[k] = doc[k]
+	var info := {"samples_stride": 1, "events_dropped": 0, "limit_bytes": max_bytes}
+	body["upload"] = info
+	var text := JSON.stringify(body, "", false)
+	var tries := 0
+	while text.to_utf8_buffer().size() > max_bytes and tries < 12:
+		tries += 1
+		var samples: Array = body.get("samples", [])
+		var events: Array = body.get("events", [])
+		if samples.size() > 60 and tries % 2 == 1:
+			var kept := []
+			for i in range(0, samples.size(), 2):
+				kept.append(samples[i])
+			body["samples"] = kept
+			info["samples_stride"] = int(info["samples_stride"]) * 2
+		elif events.size() > 20:
+			var half := events.size() / 2
+			body["events"] = events.slice(half)
+			info["events_dropped"] = int(info["events_dropped"]) + half
+		else:
+			body.erase("samples")
+			info["samples_stride"] = 0
+		text = JSON.stringify(body, "", false)
+	return text
 
 
 ## Texto legível: RESUMO, linha do tempo e tabela compacta de amostras.
