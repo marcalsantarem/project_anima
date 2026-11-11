@@ -39,6 +39,15 @@ func test_gesture_emits_once_and_fades_from_dark() -> void:
 	assert_null(get_tree().root.get_node_or_null(NodePath(TitleScreen.FADE_NAME)), "véu se libera")
 
 
-func test_empty_build_tag_creates_nothing() -> void:
+func test_build_tag_shows_alfa_in_red() -> void:
+	var tag := title.find_child("BuildTag", true, false) as Label
 	if TitleScreen.TXT_BUILD_TAG == "":
-		assert_null(title.find_child("BuildTag", true, false), "gancho vazio: sem nó")
+		assert_null(tag, "gancho vazio: sem nó")
+		return
+	assert_not_null(tag)
+	if tag != null:
+		assert_eq(TitleScreen.TXT_BUILD_TAG, "ALFA")
+		assert_eq(tag.text, "ALFA")
+		assert_eq(tag.get_theme_color("font_color"), TitleScreen.TAG_COLOR)
+		var b := title.find_child("StartButton", true, false) as Button
+		assert_lt(tag.position.y, b.position.y, "acima do botão")

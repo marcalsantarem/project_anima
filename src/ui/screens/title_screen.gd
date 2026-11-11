@@ -35,7 +35,7 @@ const SUB_GAP := 12.0
 const BUTTON_CENTER_Y := 1211.0 ## centro da barra do shell
 const BUTTON_SIZE := Vector2(495, 110)
 const BUTTON_FONT := 36.0
-const TXT_BUILD_TAG := "" ## vazio = sem subtítulo; T-283 troca por "ALFA"
+const TXT_BUILD_TAG := "ALFA" ## vazio = sem subtítulo (T-283)
 const TAG_FONT := 38.0 ## entre "PROJECT:" e "ANIMA" e o rodapé
 const TAG_COLOR := Color("#FF5A6E") ## vermelho `danger` da paleta
 const TAG_GLOW := Color(1.0, 0.25, 0.35, 0.7)
