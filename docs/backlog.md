@@ -109,7 +109,7 @@
 | T-194 | Assets de áudio do M2: música de entrada e som do tiro (próprios ou CC0, licença registrada) | M2 | AG11 | feita (falta ouvir no dispositivo) |
 | T-195 | Balanceamento da progressão: partidas até os níveis 2, 5 e 8 pela simulação do bot | M2 | AG04 | feita (mediano dentro dos alvos; jogador fraco lento, ver economia.md) |
 | T-196 | Validação do M2 (inclui o botão de velocidade, T-272 a T-276; inclui save persistindo no iPhone, no Safari e no modo app) | M2 | AG03 | feita (veredito: passa com ressalvas, ver docs/qa/qa-M2.md) |
-| T-197 | Fechar o M2 como v0.2.0: tag `v0.2.0`, branch `alfa` e deploy em `alfa--projectanimagame.netlify.app` (quando o dono pedir) | M2 | AG00 + AG10 | feita (tag v0.2.0; branch `alfa` pendente de decisão) |
+| T-197 | Fechar o M2 como v0.2.0: tag `v0.2.0` e deploy em `v0-2-0--projectanimagame.netlify.app` | M2 | AG00 + AG10 | feita (sem branch `alfa`, abandonada) |
 | T-198 | Mockup do hangar: navegação entre Jogar, Núcleos, Módulos, Componentes e Configurações (abas ou barra inferior) (tam. M) | M3 | AG08 | a fazer |
 | T-199 | Arte do hangar: fundo, ícones das abas, estados ativo/bloqueado (tam. M) | M3 | AG08 | a fazer |
 | T-200 | Fluxo de cenas do hangar: telas filhas carregadas sob demanda, voltar, estado preservado (tam. P) | M3 | AG07 | a fazer |
@@ -178,7 +178,7 @@
 | T-263 | Balanceamento das 5 fases (bot e playtest) (tam. M) | M10 | AG12 + AG04 | a fazer |
 | T-264 | Polimento de gráficos, efeitos e gameplay (lista do playtest) (tam. G) | M10 | AG01 + AG02 + AG09 | a fazer |
 | T-265 | Desempenho no iPhone com o conteúdo novo (tam. M) | M10 | AG01 + AG10 | a fazer |
-| T-266 | Validação e fechamento da v0.3.0: tag, branch `beta` e deploy em `beta--projectanimagame.netlify.app` (tam. M) | M10 | AG03 + AG00 + AG10 | a fazer |
+| T-266 | Validação e fechamento da v0.3.0: tag `v0.3.0` e deploy em `v0-3-0--projectanimagame.netlify.app` (tam. M) | M10 | AG03 + AG00 + AG10 | a fazer |
 | T-267 | Envio de logs: contrato da API, esquema da tabela (`logs`), limites e ADR (decisão 58) (tam. P) | M1 | AG05 | feita (BRF-087) |
 | T-268 | Netlify Function `POST /api/log` gravando no Neon: validação, limite de tamanho, chave de cliente, limite por IP, limpeza em 30 dias; testes (tam. M) | M1 | AG05 | feita (BRF-087) |
 | T-269 | Botão "Enviar log" no Resultado (só em build de teste): aviso do que é enviado, estados enviando/enviado/falhou, texto por chave de tradução (tam. P) | M1 | AG02 | feita (BRF-088) |
