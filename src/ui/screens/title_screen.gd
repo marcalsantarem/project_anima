@@ -4,7 +4,7 @@ extends Control
 ## Continuação da splash tecnológica do `web/shell.html` (T-179, decisão 48): mesma arte, título e animações
 ## nas mesmas posições; o botão holográfico ocupa o lugar da barra. Contrato: emite `start_requested` uma vez,
 ## no primeiro toque, clique ou tecla; em seguida um véu escuro some em ~0,3 s sobre a partida (sem corte seco).
-## Subtítulo temporário `TXT_BUILD_TAG` (BRF-099) entre o título e o botão.
+## Gancho `TXT_BUILD_TAG`: se não vazio, mostra o subtítulo (ex. "ALFA", T-283) entre o título e o botão; vazio = nada é criado.
 
 signal start_requested
 
@@ -35,7 +35,7 @@ const SUB_GAP := 12.0
 const BUTTON_CENTER_Y := 1211.0 ## centro da barra do shell
 const BUTTON_SIZE := Vector2(495, 110)
 const BUTTON_FONT := 36.0
-const TXT_BUILD_TAG := "VERTICAL SLICE" ## T-282 remove; T-283 troca por "ALFA"
+const TXT_BUILD_TAG := "ALFA" ## vazio = sem subtítulo (T-283)
 const TAG_FONT := 38.0 ## entre "PROJECT:" e "ANIMA" e o rodapé
 const TAG_COLOR := Color("#FF5A6E") ## vermelho `danger` da paleta
 const TAG_GLOW := Color(1.0, 0.25, 0.35, 0.7)
@@ -62,23 +62,25 @@ var _build_tag: Label
 
 
 func _ready() -> void:
+	SessionInfo.mark_title()
 	set_anchors_and_offsets_preset(PRESET_FULL_RECT)
 	var root := ScreenKit.root(self, BG_DEEP)
 	ScreenKit.set_page_color(BG_DEEP)
 	var reduced := DebugSettings.reduced_effects()
-	_art = _build_art(reduced)
+	_art = build_art(reduced)
 	root.add_child(_art)
 
-	_sub_title = _title_label("PROJECT:")
+	_sub_title = title_label("PROJECT:")
 	root.add_child(_sub_title)
-	_title = _title_label("ANIMA")
+	_title = title_label("ANIMA")
 	root.add_child(_title)
 
-	_build_tag = _title_label(TXT_BUILD_TAG)
-	_build_tag.name = "BuildTag"
-	_build_tag.add_theme_color_override("font_color", TAG_COLOR)
-	_build_tag.add_theme_color_override("font_shadow_color", TAG_GLOW)
-	root.add_child(_build_tag)
+	if TXT_BUILD_TAG != "":
+		_build_tag = title_label(TXT_BUILD_TAG)
+		_build_tag.name = "BuildTag"
+		_build_tag.add_theme_color_override("font_color", TAG_COLOR)
+		_build_tag.add_theme_color_override("font_shadow_color", TAG_GLOW)
+		root.add_child(_build_tag)
 
 	_button = Button.new()
 	_button.name = "StartButton"
@@ -108,7 +110,7 @@ func _ready() -> void:
 
 
 ## Quadro da arte em px da arte (768×1376), escalado como o `#status-art` do shell.
-func _build_art(reduced: bool) -> Control:
+static func build_art(reduced: bool) -> Control:
 	var art := Control.new()
 	art.name = "Art"
 	art.size = ART
@@ -150,7 +152,7 @@ func _build_art(reduced: bool) -> Control:
 
 
 ## Anel tracejado achatado: o suporte achata (scale.y) e o anel gira dentro dele, como no CSS.
-func _ring(center: Vector2, radius: float, squash: float, period: float, alpha: float, reduced: bool) -> Control:
+static func _ring(center: Vector2, radius: float, squash: float, period: float, alpha: float, reduced: bool) -> Control:
 	var holder := Control.new()
 	holder.position = center
 	holder.scale = Vector2(1.0, squash)
@@ -166,13 +168,13 @@ func _ring(center: Vector2, radius: float, squash: float, period: float, alpha: 
 
 
 ## Vai e volta (alternate), como as animações CSS da splash. Sem alocação por quadro.
-func _loop(node: Node, prop: String, from: Variant, to: Variant, time: float) -> void:
+static func _loop(node: Node, prop: String, from: Variant, to: Variant, time: float) -> void:
 	var t := node.create_tween().set_loops()
 	t.tween_property(node, prop, to, time).from(from).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	t.tween_property(node, prop, from, time).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 
 
-func _glow_texture() -> GradientTexture2D:
+static func _glow_texture() -> GradientTexture2D:
 	var g := Gradient.new()
 	g.offsets = PackedFloat32Array([0.0, 0.45, 1.0])
 	g.colors = PackedColorArray([Color(0.59, 0.98, 1.0, 0.5), Color(CYAN, 0.2), Color(CYAN, 0.0)])
@@ -186,7 +188,7 @@ func _glow_texture() -> GradientTexture2D:
 	return tex
 
 
-func _title_label(text: String) -> Label:
+static func title_label(text: String) -> Label:
 	var l := Label.new()
 	l.text = text
 	l.theme_type_variation = &"LabelDisplay"
@@ -252,10 +254,13 @@ func _layout() -> void:
 	# Título e subtítulo sobem o necessário para caber o subtítulo entre "ANIMA" e o botão (telas baixas).
 	var gap := UiTokens.SPACE_XS
 	var title_end := (TITLE_TOP + SUB_FONT + SUB_GAP + TITLE_FONT) * s
-	var shift := minf(0.0, by - gap * 2.0 - tag_font - title_end)
+	var shift := 0.0
+	if _build_tag != null:
+		shift = minf(0.0, by - gap * 2.0 - tag_font - title_end)
 	_place_title(_sub_title, sub_font, TITLE_TOP * s + shift, view.x)
 	_place_title(_title, title_font, (TITLE_TOP + SUB_FONT + SUB_GAP) * s + shift, view.x)
-	_place_title(_build_tag, tag_font, by - gap - tag_font * 1.05, view.x)
+	if _build_tag != null:
+		_place_title(_build_tag, tag_font, by - gap - tag_font * 1.05, view.x)
 	ScreenKit.place_corner_label(version_label, get_viewport(), STUDIO_BOTTOM)
 
 
@@ -291,9 +296,12 @@ func _show_pressed() -> void:
 	_button.scale = Vector2.ONE
 
 
-## O Godot retoma o AudioContext no gesto do usuário. Aqui só garantimos que o bus principal não ficou mudo.
+## O Godot retoma o AudioContext no gesto do usuário. Aqui liberamos o `Audio` (música e SFX só tocam depois disto).
 func _unlock_audio() -> void:
 	AudioServer.set_bus_mute(0, false)
+	var audio := get_node_or_null(^"/root/Audio")
+	if audio != null:
+		audio.unlock()
 
 
 ## Véu na cor da base por cima de tudo, que some em FADE_TIME: a troca para a partida (cartoon claro) não corta

@@ -3,7 +3,8 @@ extends Control
 ## Botão de upgrade da partida (T-135, decisão 35). docs/ui.md §5.4.
 ## Não compra nada: toque/clique/ui_accept emitem `buy_requested(id)` só no estado `affordable`.
 ## O estado vem do gameplay: set_upgrade() ← upgrade_changed, set_particles() ← particles_changed.
-## Arte da T-128 (T-138): moldura por estado, ícone do upgrade (UiArt.UPGRADE_ICONS ou `icon_texture`), pílula de custo.
+## Arte holográfica (T-290, ui_hud_upgrade_*, 1:1): moldura por estado (comprável, pressionado, sem saldo, máximo),
+## ícone do upgrade (UiArt.UPGRADE_ICONS ou `icon_texture`) e custo na faixa da própria arte.
 
 signal buy_requested(id: StringName)
 ## Primeira vez na partida em que o botão fica `affordable` (T-117: pulso discreto no HUD).
@@ -25,7 +26,6 @@ const NAMES := {
 ## Ações de gameplay que nunca acionam o botão pelo teclado (Espaço = skill_4 e também ui_accept).
 const GAME_ACTIONS: Array[StringName] = [&"skill_1", &"skill_2", &"skill_3", &"skill_4", &"pause"]
 
-const COST_POOR := Color("#FF9AA6")
 const RADIUS := 18 ## cantos do corpo da arte
 const DIM_ALPHA := 0.55 ## ícone sem Partículas
 ## Layout interno (assets/ui/README.md, relativo ao corpo 128×80).
@@ -35,7 +35,6 @@ const PILL := Rect2(9, 52, 112, 25)
 const PILL_STAR := 20.0
 const LEVEL_SIZE := 26
 const COST_SIZE := 20
-const MAX_OUTLINE := 6 ## contorno total do "MAX" (assets/ui/README.md)
 const PLUS_RISE := 28.0
 const SHAKE_PX := 5.0
 const AFFORDABLE_POP := 1.06
@@ -62,6 +61,8 @@ var _was_affordable := false ## já ficou `affordable` alguma vez (pulso só na 
 var _disabled := false
 var _plus := 0.0 ## 0..1: progresso do "+1" (0 = invisível)
 var _touch_index := -1
+## Dedo/botão do mouse sobre o botão: mostra a moldura pressionada.
+var _held := false
 var _anim: Tween
 var _plus_tween: Tween
 var _focus_box: StyleBoxFlat
@@ -109,6 +110,7 @@ func set_particles(total: int) -> void:
 
 func set_disabled(disabled: bool) -> void:
 	_disabled = disabled
+	_set_held(false)
 	_touch_index = -1
 	_refresh_state()
 
@@ -127,6 +129,12 @@ func reject() -> void:
 
 func display_name() -> String:
 	return NAMES.get(upgrade_id, String(upgrade_id))
+
+
+func _set_held(on: bool) -> void:
+	if _held != on:
+		_held = on
+		queue_redraw()
 
 
 func _refresh_state() -> void:
@@ -167,9 +175,11 @@ func _gui_input(event: InputEvent) -> void:
 		if event.pressed and _touch_index == -1:
 			_touch_index = event.index
 			_release_pointer_focus()
+			_set_held(state == State.AFFORDABLE)
 			_activate()
 		elif not event.pressed and event.index == _touch_index:
 			_touch_index = -1
+			_set_held(false)
 		accept_event()
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		# Toque já foi tratado acima; ignora o mouse emulado.
@@ -178,7 +188,10 @@ func _gui_input(event: InputEvent) -> void:
 			return
 		if event.pressed:
 			_release_pointer_focus()
+			_set_held(state == State.AFFORDABLE)
 			_activate()
+		else:
+			_set_held(false)
 		accept_event()
 	elif event.is_action_pressed(&"ui_accept") and not event.is_echo() and not _is_game_action(event):
 		_activate()
@@ -246,7 +259,13 @@ func _set_plus(v: float) -> void:
 func _draw() -> void:
 	var body := Rect2(Vector2.ZERO, size)
 	var poor := state == State.POOR or state == State.DISABLED
-	var frame := UiArt.UPGRADE_BTN_MAX if state == State.MAX else (UiArt.UPGRADE_BTN_DISABLED if poor else UiArt.UPGRADE_BTN_NORMAL)
+	var frame := UiArt.HUD_UPGRADE_NORMAL
+	if _held and state != State.DISABLED:
+		frame = UiArt.HUD_UPGRADE_PRESSED
+	elif state == State.MAX:
+		frame = UiArt.HUD_UPGRADE_MAX
+	elif poor:
+		frame = UiArt.HUD_UPGRADE_DISABLED
 	draw_texture_rect(frame, UiArt.UPGRADE_FRAME_RECT, false)
 	if has_focus():
 		draw_style_box(_focus_box, body.grow(6))
@@ -256,7 +275,7 @@ func _draw() -> void:
 	if icon:
 		draw_texture_rect(icon, Rect2(ICON_C - Vector2(ICON_R, ICON_R), Vector2(ICON_R, ICON_R) * 2.0), false, Color(1, 1, 1, DIM_ALPHA) if poor else Color.WHITE)
 
-	# "Nv N" (centro em x = 90, alinhado ao ícone)
+	# "Nv N" (à direita do ícone)
 	var lv_x := ICON_C.x + ICON_R + 4.0
 	var lv_w := size.x - lv_x - 4.0
 	var lv := "Nv %d" % level
@@ -264,28 +283,29 @@ func _draw() -> void:
 	while lv_fs > 14 and font.get_string_size(lv, HORIZONTAL_ALIGNMENT_LEFT, -1, lv_fs).x > lv_w - 2.0:
 		lv_fs -= 2 # "Nv 10" encolhe para caber
 	var lv_y := ICON_C.y + (font.get_ascent(lv_fs) - font.get_descent(lv_fs)) * 0.5
-	draw_string_outline(font, Vector2(lv_x, lv_y), lv, HORIZONTAL_ALIGNMENT_CENTER, lv_w, lv_fs, UiTokens.TEXT_OUTLINE, UiTokens.INK)
-	draw_string(font, Vector2(lv_x, lv_y), lv, HORIZONTAL_ALIGNMENT_CENTER, lv_w, lv_fs, UiTokens.TEXT_PRIMARY)
+	var lv_color := UiTokens.HOLO_DIS_TEXT if poor else UiTokens.HOLO_TEXT
+	draw_string_outline(font, Vector2(lv_x, lv_y), lv, HORIZONTAL_ALIGNMENT_CENTER, lv_w, lv_fs, UiTokens.HOLO_OUTLINE, UiTokens.HOLO_BG)
+	draw_string(font, Vector2(lv_x, lv_y), lv, HORIZONTAL_ALIGNMENT_CENTER, lv_w, lv_fs, lv_color)
 
-	# Pílula de custo (estrela + número) ou "MAX"
+	# Custo (a faixa vem na arte): estrela + número, ou "MAX"
 	var cy := PILL.get_center().y + (font.get_ascent(COST_SIZE) - font.get_descent(COST_SIZE)) * 0.5
 	if state == State.MAX:
-		draw_texture_rect(UiArt.UPGRADE_COST_PILL_MAX, PILL, false)
-		# Branco com contorno ink de 6 px (T-154; a arte não tem texto).
 		draw_string_outline(font, Vector2(PILL.position.x, cy), "MAX", HORIZONTAL_ALIGNMENT_CENTER, PILL.size.x, COST_SIZE,
-			MAX_OUTLINE, UiTokens.INK)
-		draw_string(font, Vector2(PILL.position.x, cy), "MAX", HORIZONTAL_ALIGNMENT_CENTER, PILL.size.x, COST_SIZE, UiTokens.TEXT_PRIMARY)
+			UiTokens.HOLO_OUTLINE, UiTokens.HOLO_BG)
+		draw_string(font, Vector2(PILL.position.x, cy), "MAX", HORIZONTAL_ALIGNMENT_CENTER, PILL.size.x, COST_SIZE, UiTokens.GOLD)
 	else:
-		draw_texture_rect(UiArt.UPGRADE_COST_PILL, PILL, false)
 		var star := Rect2(PILL.position + Vector2(4.0, (PILL.size.y - PILL_STAR) * 0.5), Vector2(PILL_STAR, PILL_STAR))
 		draw_texture_rect(UiArt.PARTICLE_OFF if state == State.DISABLED else UiArt.PARTICLE, star, false)
 		var cost := UiTokens.format_int(next_cost) if _known and next_cost >= 0 else "—"
-		var color := COST_POOR if state == State.POOR else (UiTokens.TEXT_SECONDARY if state == State.DISABLED else UiTokens.TEXT_PRIMARY)
-		draw_string(font, Vector2(PILL.position.x + 26.0, cy), cost, HORIZONTAL_ALIGNMENT_RIGHT, PILL.size.x - 34.0, COST_SIZE, color)
+		var color := UiTokens.COST_POOR if state == State.POOR else (UiTokens.HOLO_DIS_TEXT if state == State.DISABLED else UiTokens.COST_GOLD)
+		var cx := PILL.position.x + 26.0
+		var cw := PILL.size.x - 34.0
+		draw_string_outline(font, Vector2(cx, cy), cost, HORIZONTAL_ALIGNMENT_RIGHT, cw, COST_SIZE, UiTokens.HOLO_OUTLINE - 1, UiTokens.HOLO_BG)
+		draw_string(font, Vector2(cx, cy), cost, HORIZONTAL_ALIGNMENT_RIGHT, cw, COST_SIZE, color)
 
 	# "+1" subindo acima do canto superior esquerdo
 	if _plus > 0.0:
 		var a := 1.0 - maxf(_plus - 0.5, 0.0) * 2.0
 		var p := Vector2(ICON_C.x - 18.0, -6.0 - PLUS_RISE * _plus)
-		draw_string_outline(font, p, "+1", HORIZONTAL_ALIGNMENT_LEFT, -1, LEVEL_SIZE, UiTokens.TEXT_OUTLINE, Color(UiTokens.INK, a))
+		draw_string_outline(font, p, "+1", HORIZONTAL_ALIGNMENT_LEFT, -1, LEVEL_SIZE, UiTokens.HOLO_OUTLINE, Color(UiTokens.HOLO_BG, a))
 		draw_string(font, p, "+1", HORIZONTAL_ALIGNMENT_LEFT, -1, LEVEL_SIZE, Color(UiTokens.GOLD, a))

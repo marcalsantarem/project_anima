@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ProgressionData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/meta/progression_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+max_level = 30
+xp_to_next = PackedInt32Array(50, 150, 300, 500, 500, 500, 500, 700, 750, 800, 850, 900, 950, 1000, 1050, 1100, 1150, 1200, 1250, 1300, 1350, 1400, 1450, 1500, 1550, 1600, 1650, 1700, 1750)
+slot_unlock_levels = PackedInt32Array(2, 5, 8)
+feature_unlock_levels = {
+"component_fusion": 7,
+"components": 4,
+"nuclei": 3,
+"speed_x2": 6
+}

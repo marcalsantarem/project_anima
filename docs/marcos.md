@@ -5,8 +5,8 @@
 | Marco | Versão | Tag | Status |
 |---|---|---|---|
 | M0 — Fundação | — | — | feito |
-| M1 | v0.1.0 | Vertical slice | em fechamento |
-| M2 | v0.2.0 | Versão Alfa | a quebrar |
+| M1 | v0.1.0 | Vertical slice | **concluído** (tag `v0.1.0`, 2026-11-06) |
+| M2 | v0.2.0 | Versão Alfa | quebrado em tarefas (T-162 a T-197, T-282, T-283) |
 | M3 | v0.2.1 | Hangar | a quebrar |
 | M4 | v0.2.2 | Núcleos | a quebrar |
 | M5 | v0.2.3 | Módulos | a quebrar |

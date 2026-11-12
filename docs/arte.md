@@ -60,6 +60,7 @@
 Pedestal cilíndrico neutro (`vessel`) com aro ciano + **cristal losango ciano flutuando** acima, com faceta clara (`soul`), halo ciano e 3 nós orbitando. Fica no centro da arena (360, ~690 na referência 720×1280).
 - **Skins (decisão 33):** separar em `anima_<skin>_base` (pedestal) e `anima_<skin>_crystal` (parte que flutua/anima). A skin troca formas e cores do pedestal; o cristal mantém ciano para não quebrar a regra.
 - Animação por transformação: cristal sobe/desce 4–6 px em ~1,5 s; nós giram; brilho pulsa no tiro.
+- **Holográfico (T-291, BRF-126; decisão 64):** o Anima da partida segue o estilo do título/menu: pedestal de aço em dois degraus com aros ciano, cápsulas de luz e emissor de vidro com anéis; feixe suave até o cristal; cristal losango em 4 facetas `#E6FFFF`→`#0B6E86` com halo; nós como orbes de energia. Contorno `holo_ink` (`#03202E`) mantém a leitura no chão creme. Mesmos canvas e âncoras (sem mudança de código). Prévia: [`anima-holo-arena.png`](img/anima-holo-arena.png) e [`-375x812`](img/anima-holo-arena-375x812.png); fonte `assets/sprites/_src/gen_anima_holo.py`. **Exceção à §12:** a arena segue cartoon, mas o Anima passa a ser holográfico.
 
 ## 5. Silhuetas por arquétipo
 
@@ -108,7 +109,7 @@ Pedestal cilíndrico neutro (`vessel`) com aro ciano + **cristal losango ciano f
 | Projéteis / moeda | `assets/sprites/` | `projectile_player.png`, `pickup_particle.png` |
 | Skills (sprites base) | `assets/sprites/` | `skill_meteor.png`, `skill_meteor_crater.png` (cores quentes, sem ciano: o efeito é do jogador, mas o fogo lê melhor em laranja; BRF-047) |
 | Ícones / UI | `assets/ui/` | `ui_icon_skill_meteor.png`, `ui_frame_epic.png` |
-| Fundos | `assets/backgrounds/` | `floor_tile.png`, `floor_ring.png`, `floor_pillar.png` (tela cheia em peças, BRF-040; ver `assets/sprites/README.md`) |
+| Fundos | `assets/backgrounds/` | `floor_tile.png`, `floor_pillar.png` (o `floor_ring.png`, selo rúnico, saiu da arena na T-292 e está órfão) (tela cheia em peças, BRF-040; ver `assets/sprites/README.md`) |
 | Atlas | `assets/sprites/atlas/` | `atlas_enemies.png` |
 
 ## 8. Checklist de um asset
@@ -169,4 +170,155 @@ Todas as peças da UI agora têm arte 9-patch em `assets/ui/` (`ui_pill_wave`, `
 | Decisão 34 (fonte da arte final, §9.2) | usuário, via AG00 |
 | Colisão em círculo × elipse no chão; raio do chefe e do projétil inimigo | AG01 (T-144) |
 | Quem desenha o brilho base (sprite × shader) | AG09 |
-| Mockups fora do build Web | AG07 (T-146) |
+| Mockups fora do build Web | AG07 (T-146); `assets/mockups/` já tem `.gdignore` |
+| Aprovar os mockups holográficos (§11) antes da T-189 | usuário, via AG00 |
+
+## 11. Menus holográficos (T-180, BRF-105; decisões 48, 49 e 60)
+
+Vale para o **menu principal e o Resultado do M2** (hangar no M3). A partida segue no cartoon claro (decisão 50). Base: as artes do dono (`title_bg_tech.webp`, `result_tech_bg.webp`): azul-marinho, brilhos ciano, roxo discreto, linhas finas de HUD.
+
+**Mockups** (375×812 @2x; fonte `assets/mockups/_src/mockup_holo.html`, gerar com `bash assets/mockups/_src/render.sh`; pasta fora do `.pck`):
+- [`mockup_holo_menu.png`](../assets/mockups/mockup_holo_menu.png): menu, conta nível 4: no topo só a engrenagem; no terço inferior, um bloco único (logotipo → linha "selo + nível/barra de XP | Moeda" → Jogar), sem espaço vazio entre logotipo e Jogar;
+- [`mockup_holo_menu_lvl1.png`](../assets/mockups/mockup_holo_menu_lvl1.png): conta nova (nível 1, 0 Moeda), mesmo layout;
+- **O menu principal não mostra Módulos** (BRF-109): nada de slots, ícones, lista nem dica de slot/desbloqueio; eles vivem no hangar (M3). Também sem "ALFA" e sem rótulo de versão solto. **Layout do menu (375×812):** "PROJECT:" em y 440 e "ANIMA" em 462; linha de nível/Moeda em y 548–606 (selo à esquerda em x 44, pílula da Moeda à direita até x 332, centrada); Jogar 281×78 em y 636 (folga ~22 px abaixo do bloco e ~98 px até a base). O bloco fica ancorado embaixo; a arte de fundo (cristal e plataforma) ocupa a metade de cima;
+- [`mockup_holo_result.png`](../assets/mockups/mockup_holo_result.png): vitória, XP e Moeda ganhos, nível 2 → 3, "Slot 1 liberado";
+- [`mockup_holo_parts.png`](../assets/mockups/mockup_holo_parts.png): estados dos botões, painel, selo, ícones, barra, raridades e paleta.
+
+### 11.1 Paleta (tokens `holo_*`, propostos ao AG02)
+
+| Token | Hex | Uso | Contraste |
+|---|---|---|---|
+| `holo_bg` | `#021423` | fundo e cor da página (já usada na splash/título) | — |
+| `holo_panel` | `#06223A` a 78% | preenchimento dos painéis | base das medidas |
+| `holo_line` | `#3FE8F5` (100% / 38% `holo_line_dim`) | molduras, colchetes, varredura, ponta da barra | 12,5:1 no `holo_bg` |
+| `holo_text` | `#E6FFFF` | texto principal e números | 15,5:1 |
+| `holo_text2` | `#9FF6FF` | títulos de painel, rótulos | 13,2:1 |
+| `holo_muted` | `#7FA3B8` | legendas, "320 / 500 XP" | 6,0:1 |
+| `holo_violet` | `#8A6CFF` (claro `#B9A5FF`) | XP: início do degradê da barra, selo, rótulo "XP" | 7,6:1 (claro) |
+| `gold` | `#FFC93D` (claro `#FFE08A`) | Moeda, "VITÓRIA", aviso de desbloqueio | 10,5:1 |
+| `holo_ink` | `#03202E` | texto do botão primário (ciano) | 11:1 (6:1 pressionado) |
+| `holo_dis_fill` / `holo_dis_line` / `holo_dis_text` | `#0E2233` / `#36506A` / `#5F7A92` | desabilitado e bloqueado | 3,6:1 (isento) |
+| `danger` | `#FF5A6E` | derrota, erro | — |
+
+- **Contraste mínimo:** 4,5:1 para texto até 18 px; 3:1 para texto grande, ícones e bordas de estado. Medido sobre `holo_panel` opaco; sobre o fundo, o texto sempre fica num painel ou tem brilho.
+- **Ciano continua do jogador** (Jogar, foco, XP, Módulos). Roxo é só apoio (XP, selo); dourado é Moeda e prêmio. Raridades seguem o `ui.md`.
+
+### 11.2 Formas e peças
+
+- **Painel:** retângulo de **cantos chanfrados** (12 px a 1x), moldura `holo_line_dim` de 1,5 px, preenchimento `holo_panel` translúcido, **colchetes** `holo_line` de 22×2 px no canto superior esquerdo e inferior direito, título centrado em `holo_text2` com espaçamento 3 e linha de varredura abaixo.
+- **Botão primário** (Jogar, Continuar): ≥ 280×72, chanfro 16, degradê vertical `#7FF5FF` → `#2FE6F2` → `#0FA9C4`, filete branco a 75% no topo, base escura de 6 px, brilho externo ciano a 55%. Texto `holo_ink` 26–30 px. **Pressionado:** degradê um passo mais escuro, desce 3 px, brilho cai para 4 px.
+- **Botão secundário:** moldura ciano 2 px + interior `holo_panel` a 90%, texto `holo_text` 17 px. **Pressionado:** moldura `holo_text2` e interior `#0E5A70`, desce 2 px. **Desabilitado:** tokens `holo_dis_*`, sem brilho.
+- Alvos de toque ≥ 44×44 (engrenagem, slots).
+- **Engrenagem (configurações):** botão de ícone 44×44 no canto superior direito, mesmo painel chanfrado da pílula da Moeda (sozinho no topo do menu). **Sem ação no M2** (o toque não faz nada: sem tela, sem toggle); as configurações vêm no M8. A arte nunca leva texto (§9.5).
+- **Barra de XP:** trilho 12 px (14 no Resultado), moldura `holo_line_dim`, fundo `#071A2B`, preenchimento em degradê `holo_violet` → `holo_line` e **ponta clara** `#E6FFFF` de 3 px com brilho. No Resultado, marcas a cada 25%. Números tabulares abaixo, em `holo_muted`.
+- **Selo de nível:** hexágono em pé (52×58 no menu, 64×70 no Resultado), degradê índigo `#3B2C9A` → `#150F4A`, contorno `holo_line` 2,5 px e hexágono interno `holo_violet`; número `holo_text` 800. Na subida de nível, anel tracejado ciano em volta.
+- **Ícone de XP:** hexágono violeta com losango ciano e faceta clara (lembra o cristal, sem copiar o núcleo). **Moeda:** moeda dourada com losango em relevo; **o desenho final é da T-162**, os mockups usam um provisório no mesmo espírito.
+- **Slots de Módulo** (só no Resultado no M2; o resto fica para o hangar, M3): 60×60, chanfro 10. Com Módulo: moldura ciano + brilho; liberado vazio (no Resultado): cadeado aberto ciano; bloqueado: `holo_dis_*` com cadeado e "NV 7"/"NV 12"; o próximo a abrir usa moldura `holo_line_dim` e "NV 3" em `holo_text2`.
+- **Aviso de desbloqueio:** painel com moldura `gold` e brilho dourado, interior escuro quente `#1E1A14` a 88%, título `gold` 22 px.
+- **Molduras por raridade (M3+):** mesma forma chanfrada; comum = borda lisa; rara = + 2 losangos de canto; épica = borda dupla + 4 losangos + brilho interno; lendária = borda dupla + 4 gemas claras + brilho (animação do AG09). Cores do `ui.md`.
+
+### 11.3 Tipografia (Outfit, já no projeto; tamanhos a 1x em 375 px)
+
+| Uso | Tamanho / peso | Cor e efeito |
+|---|---|---|
+| "ANIMA" / "PROJECT:" | 58 / 22, 800 / 700 | `holo_text` + brilho ciano (sombra sem deslocamento, como o título) |
+| "VITÓRIA" | 48, 900 | `gold` + brilho dourado + sombra `#6A4300` 2 px |
+| Destaques ("NÍVEL 3!", "+180") | 26–32, 800 | `holo_text` + brilho ciano; Moeda em `#FFE08A` |
+| Botão primário / secundário | 26–30 / 17, 800, espaçamento 2 | `holo_ink` / `holo_text` |
+| Título de painel, "NÍVEL 4" | 12–13, 700, espaçamento 3 | `holo_text2` |
+| Texto corrido | 12, 600 | `holo_text`/`holo_text2` |
+| Legenda | 11, 600 (mínimo absoluto) | `holo_muted` |
+
+Sem contorno escuro grosso (é do cartoon); o brilho só em títulos e números de destaque.
+
+### 11.4 Animações baratas (só `Tween` de posição, escala e `modulate`)
+
+- **Pulsar:** Jogar escala 1 → 1,03 e brilho 60% → 100% em 1,6 s, em laço.
+- **Varredura:** sprite de linha (`ui_holo_scanline`) desce pelo painel a cada 4 s, alfa 0,5.
+- **Contagem:** XP e Moeda contam de 0 ao valor em 0,8 s (ease-out); depois a barra enche em 0,6 s; ao completar, flash branco de 0,1 s, selo "pula" (1,25 → 1 em 0,25 s), anel gira e some em 0,6 s; o aviso do slot entra deslizando (0,3 s).
+- Tocar a tela pula a sequência para o fim.
+
+### 11.5 Desempenho no iPhone
+
+- **Sem blur, sem shader de tela** (`BackBufferCopy`, `SCREEN_TEXTURE`) e sem glow do `WorldEnvironment`. O brilho é **pintado na textura** (margem extra usada como `expand_margin` do `StyleBoxTexture`) ou é um **sprite aditivo** (`ui_holo_glow`).
+- Painéis e botões em **9-patch** (`StyleBoxTexture`/`NinePatchRect`); todas as peças num atlas `atlas_ui_holo` ≤ 1024×1024, para o batching do Compatibility.
+- Um único fundo por tela (`title_bg_tech.webp` / `result_tech_bg.webp`, Lossy 0,85); nada de fundo em tela cheia novo.
+- Alvo: ≤ 40 draw calls no menu; brilho de texto (sombra) só nos títulos; translucidez só em painéis (pouca sobreposição).
+- Arte nova da T-189 ≤ ~300 KB no `.pck`.
+- **Altura curta (375×616):** engrenagem ancorada na área segura; o bloco logotipo + nível/Moeda + Jogar fica junto, ancorado embaixo (Jogar a 24 px + área segura); o fundo segue a escala do shell; abaixo de 700 px "ANIMA" cai para 44 px.
+
+### 11.6 Peças da T-189 (PNG 2x, `assets/ui/`; margens 9-patch em px 2x: esq/dir/topo/base)
+
+| Arquivo | Canvas 2x | 9-patch | Observação |
+|---|---|---|---|
+| `ui_holo_panel.png` | 192×192 | 72/72/72/72 | moldura + preenchimento + colchetes nos cantos |
+| `ui_holo_panel_gold.png` | 192×192 | 72/72/72/72 | aviso de desbloqueio (brilho dourado incluído, +16 de margem) |
+| `ui_holo_pill.png` | 96×64 | 20/20/20/20 | Moeda e botão de ícone (engrenagem) |
+| `ui_holo_btn_primary_normal.png` / `_pressed.png` | 192×160 | 40/40/40/48 | brilho pintado com 16 px de margem (`expand_margin` 8 a 1x) |
+| `ui_holo_btn_secondary_normal.png` / `_pressed.png` / `_disabled.png` | 128×96 | 24/24/24/24 | |
+| `ui_holo_bar_track.png` | 64×32 | 8/8/8/8 | |
+| `ui_holo_bar_fill.png` | 64×24 | 6/6/6/6 | degradê violeta → ciano (ou branco tingido por `modulate`) |
+| `ui_holo_bar_tip.png` | 16×40 | — | ponta clara com brilho |
+| `ui_holo_level_badge.png` | 128×144 | — | selo sem número |
+| `ui_holo_level_ring.png` | 192×192 | — | anel tracejado da subida de nível |
+| `ui_holo_slot_ready.png` | 128×128 | — | slot liberado do aviso do Resultado (`_locked`/`_next` ficam para o hangar, M3) |
+| `ui_icon_xp.png` | 64×64 | — | |
+| `ui_icon_settings.png` | 48×48 | — | engrenagem `holo_text2`; sem ação no M2 (configurações no M8) |
+| `ui_icon_lock_holo.png` / `ui_icon_unlock_holo.png` | 64×64 | — | |
+| `ui_holo_scanline.png` | 256×4 | 64/64/0/0 | varredura |
+| `ui_holo_glow.png` | 128×128 | — | brilho radial aditivo |
+
+**Status (BRF-110):** as 20 peças foram geradas (`assets/ui/_src/gen_ui_holo.py`, ~65 KB no total); detalhes e uso no `assets/ui/README.md`. Ajuste: o botão primário usa margens **48/48/56/56** (as 40/40/40/48 não cabiam o chanfro de 16 + brilho + o deslocamento do pressionado).
+
+**Botão de velocidade (T-274, BRF-121):** exceção holográfica no HUD cartoon da partida, `ui_speed_x1` / `ui_speed_x2` (+ `_pressed`), 96×96, corpo chanfrado 68×68. x1 = painel escuro com moldura ciano; x2 = ciano cheio com brilho forte. Setas e "x1"/"x2" vêm na arte. Sugestão: no topo, ao lado da pausa. Prévia: [`docs/img/botao-velocidade.png`](img/botao-velocidade.png). Detalhes no `assets/ui/README.md`.
+
+A Moeda (`ui_icon_coin`) veio da T-162 (§11.7); as molduras por raridade (`ui_frame_<raridade>`) ficam para o M3.
+
+### 11.7 Moeda e ícones do glossário (T-162, BRF-130)
+
+Uma forma e uma cor por conceito, reconhecíveis a 28 px sem texto; contorno `#021423`, brilho pintado. Prévia: [`icones-glossario.png`](img/icones-glossario.png).
+
+| Conceito | Arquivo | Forma | Cor |
+|---|---|---|---|
+| Moeda | `ui_icon_coin` (128) / `ui_icon_coin_small` (48) | disco com losango em relevo | `gold` `#FFC93D` |
+| Módulo | `ui_icon_module` | placa chanfrada com raio | ciano `#3FE8F5` |
+| Componente | `ui_icon_component` | peça com pinos e soquete | laranja `#FF9F43` |
+| Núcleo | `ui_icon_core` | esfera ligada a três nós | azul `#4F8DFF` |
+| Fragmento de Módulo | `ui_icon_module_fragment` | cacos de cristal com o raio do Módulo | orquídea `#E07BFF` |
+
+Formas exclusivas: círculo = Moeda, estrela = Partículas, hexágono = XP. Laranja, azul e orquídea são **cores de interface do hangar** (não entram na arena; o laranja fica longe do `enemy_runner` por ser só menu).
+
+### 11.8 Interruptor liga/desliga (T-296, BRF-138)
+
+`ui_holo_toggle_{off,on}[_pressed]` e `ui_holo_toggle_disabled` (228×88, corpo igual ao secundário esticado). Rótulo à esquerda (texto da UI), chave chanfrada à direita (trilho 48×28). O estado não depende só da cor: **posição do botão** (esquerda = desligado, direita = ligado), **marca** no trilho (`O` desligado, `I` ligado) e **brilho** (só o ligado brilha). Desligado = moldura ciano escuro `#1C7F8E`; ligado = moldura `holo_line` + trilho ciano cheio; desabilitado = tokens `holo_dis_*`. Contorno `#021423`. Prévia: [`interruptor-holo.png`](img/interruptor-holo.png). Detalhes e margens em `assets/ui/README.md`.
+
+## 12. HUD holográfico da partida (T-289, BRF-125; decisão 64)
+
+O estilo dos menus (§11) e do botão de velocidade vale para **todo o HUD da partida**; a arena (chão, inimigos, Anima) segue cartoon 3/4. **Posições, tamanhos de toque e comportamento não mudam** (`docs/ui.md` §4); a T-290 (AG02) só troca a arte.
+
+**Mockups:** [`hud-holo-mockup.png`](img/hud-holo-mockup.png) (720×1280: chefe com barra, slot 1 pronto, slot 2 em recarga, slot 3 bloqueado "NV 8", Atk power sem saldo, Cooldown no máximo) e [`hud-holo-mockup-375x812.png`](img/hud-holo-mockup-375x812.png) (sem chefe, Energia baixa com flash de dano, slot 2 liberado vazio, upgrade pressionado e outro sem saldo). Folha de estados: `assets/ui/_src/hud_sheet.png`.
+
+### 12.1 Regras
+
+- **Legibilidade sobre a arena clara:** toda peça tem miolo escuro (`#041626` a 90%) e moldura ciano; todo texto do HUD tem contorno `#021423` de 4–5 px (exceção do HUD à regra "sem contorno grosso" do §11.3). O degradê do topo (`TopScrim`) passa de `ink` 35% para `holo_bg` `#021423` **60% → 0**, até 24 px abaixo do HUD.
+- **Cores:** ciano = jogador (pílula da onda, Energia, slots, upgrades compráveis); **magenta-vermelho `#FF4F8B`** = chefe (trilho, enchimento, emblema; proposta de token `boss_holo` ao AG02, no lugar do `boss_hp` vermelho); `gold` = máximo; `holo_dis_*` = bloqueado e sem Partículas. Cores da Energia por faixa mantidas (`core_hp_color`, via `modulate` do enchimento branco).
+- **Bandeja opaca** `#06182A`: a cor da página na partida (`ScreenKit.set_page_color`, `web/shell.html`) passa de `#5A4A9A` para `#06182A`, senão aparece uma faixa lilás no rodapé do Safari.
+- **Desempenho:** sem shader nem blur em tempo real (brilhos pintados, §11.5); 26 PNG, ~110 KB; cabem num atlas 512×512 com as peças `ui_holo_*`.
+
+### 12.2 Peças, tamanhos e margens (px do PNG = px de tela no viewport 720)
+
+| Elemento | Peças | Tamanho na tela | 9-slice E/D/C/B · `expand_margin` |
+|---|---|---|---|
+| "ONDA X/Y" | `ui_hud_pill_wave` | 220×64 | 40/40/28/28 · 8 |
+| Partículas | `ui_hud_pill` + `ui_icon_particles` 32 | ~184×64 | 40/40/28/28 · 8 |
+| Pausa | `ui_hud_btn_pause(_pressed)` | arte 96, corpo 68, toque 88 | — |
+| Energia | `ui_hud_icon_energy` 56×64 · `ui_hud_bar_track` · `ui_hud_bar_fill` (branco + `modulate`) · `ui_hud_bar_tip` · `ui_hud_bar_flash` | barra 40, enchimento 32 (recuo 4) | trilho e flash 20 · 8; enchimento 10 · 0 |
+| Chefe | `ui_hud_icon_boss` 48 · `ui_hud_bar_track_boss` · `ui_hud_bar_fill_boss` · ponta com `scale.y` 0,8 | trilho 32, enchimento 24 | igual à Energia |
+| Bandeja | `ui_hud_tray` · `ui_hud_tray_band` | 720 × 266 (+ safe area) · faixa 96 | 8/8/24/8 · topo 12; faixa 4/4/4/6 |
+| Slots de Módulo | `ui_hud_skill_ready/cooldown/locked/empty` · `_cooldown_ring` (progresso radial) · `_cooldown_mask` 144 · `ui_hud_key_badge(_off)` 44 · `ui_icon_lock_holo` 64 | Ø144, canvas 176×184 com centro em (88, 88) | — |
+| Upgrades | `ui_hud_upgrade_normal/pressed/disabled/max` | corpo 128×80, canvas 144×96 | fixo · 8 |
+
+- **Estados dos slots:** pronto = anel ciano 6 px + brilho; recarga = anel apagado + véu do setor restante + anel de progresso ciano + segundos (56 px); bloqueado = `holo_dis_*`, anel tracejado, cadeado e "NV n" em `holo_muted` 30 px, badge `_off`; vazio = anel tracejado apagado.
+- **Estados dos upgrades:** comprável = moldura ciano + brilho, custo `#FFE08A`; pressionado = moldura `holo_text2`, miolo `#0E5A70` (escala 0,94 do código); sem Partículas = `holo_dis_*`, ícone a 55%, "Nv" em `holo_dis_text`, custo `#FF9AA6`; máximo = dourado com "MAX".
+- **Dano na Energia:** `ui_hud_bar_flash` com `modulate` `danger`, alfa 1 → 0 em ~250 ms (o flash `danger` atual continua; a barra fantasma usa o enchimento com branco a 45%).
+- Detalhes de uso por peça: `assets/ui/README.md` ("HUD holográfico da partida").

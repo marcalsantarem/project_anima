@@ -10,7 +10,7 @@ func test_parse_with_data() -> void:
 	assert_eq(b.run, "42", "número do JSON sem .0")
 	assert_eq(BuildInfo.label(b), "abc1234")
 	assert_eq(BuildInfo.summary_line(b), "Build: abc1234 (dev) · 2026-11-04T22:00:00Z · exec #42")
-	assert_eq(BuildInfo.pause_text(b, "0.1.0"), "v0.1.0 · abc1234")
+	assert_eq(BuildInfo.pause_text(b, "0.2.0"), "v0.2.0 · abc1234")
 
 
 func test_parse_short_sha_from_full() -> void:
@@ -35,9 +35,9 @@ func test_version_falls_back_to_constant() -> void:
 
 
 func test_version_is_0_1_0_without_v() -> void:
-	assert_eq(BuildInfo.DEFAULT_VERSION, "0.1.0")
-	assert_eq(BuildInfo.version(), "0.1.0", "project.godot config/version, sem o v")
-	assert_eq(BuildInfo.pause_text(BuildInfo.parse(null), BuildInfo.version()), "v0.1.0 · dev local")
+	assert_eq(BuildInfo.DEFAULT_VERSION, "0.2.0")
+	assert_eq(BuildInfo.version(), "0.2.0", "project.godot config/version, sem o v")
+	assert_eq(BuildInfo.pause_text(BuildInfo.parse(null), BuildInfo.version()), "v0.2.0 · dev local")
 
 
 func test_current_off_web_is_local() -> void:

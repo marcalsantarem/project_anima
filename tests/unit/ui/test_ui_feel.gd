@@ -102,10 +102,11 @@ func test_pause_toggle_emits_and_saves() -> void:
 	var pause: PauseScreen = PAUSE_SCENE.instantiate()
 	add_child_autofree(pause)
 	watch_signals(pause)
-	assert_string_contains(pause.reduced_toggle.text, "não")
+	assert_string_contains(pause.reduced_toggle.tooltip_text, "não")
+	assert_eq(pause.reduced_toggle.text, "Efeitos reduzidos")
 	pause.reduced_toggle.pressed.emit()
 	assert_signal_emitted_with_parameters(pause, "reduced_effects_changed", [true])
-	assert_string_contains(pause.reduced_toggle.text, "sim")
+	assert_string_contains(pause.reduced_toggle.tooltip_text, "sim")
 	DebugSettings.reset()
 	assert_true(DebugSettings.reduced_effects())
 
@@ -143,3 +144,13 @@ func test_pause_debug_toggle_only_with_query_param() -> void:
 	assert_true(p.debug_toggle.visible, "com ?debug: visível")
 	p.close()
 	DebugSettings.query_has_debug_override = null
+
+
+func test_pause_toggle_uses_holo_art_per_state() -> void:
+	var pause := PauseScreen.new()
+	add_child_autofree(pause)
+	var off: StyleBoxTexture = pause.reduced_toggle.get_theme_stylebox("normal")
+	pause.reduced_toggle.pressed.emit()
+	var on: StyleBoxTexture = pause.reduced_toggle.get_theme_stylebox("normal")
+	assert_ne(off.texture, on.texture, "a chave muda com o estado")
+	assert_true(pause.reduced_toggle.size.y >= 64.0)

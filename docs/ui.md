@@ -112,12 +112,13 @@ y=1280 └───────────────────────�
 | Elemento | Posição | Tamanho | Notas |
 |---|---|---|---|
 | Pausa | linha 1, à esquerda | **88×88**, botão claro | "II"; também `Esc` |
+| Velocidade | linha 1, à direita da pausa | **88×88** (arte 96, corpo 68), `TextureButton` | x1/x2 (T-275, decisão 59): mostra `SpeedController.chosen`, toque ou tecla `F` (`toggle_speed`) alterna; só na partida; sem efeito em pausa ou após `match_ended` |
 | "ONDA X/Y" | linha 1, centro | pílula `bg_panel`, `font_hud` | pulso de escala (200 ms) ao trocar de onda |
 | Partículas | linha 1, à direita | pílula `surface`, ícone verde `ui_icon_particles` (`StarIcon`) + número `particles` com contorno `ink` | total de Partículas da partida, com milhar |
 | Energia (vida do Anima) | linha 2, largura total | altura 40 px, cristal `accent` à esquerda | texto "ENERGIA atual / máx" (decisão 41), cor por faixa, flash `danger` e barra fantasma |
 | Barra "Boss" | linha 3, mesma largura útil da barra de Energia | controle 36 px, trilho 32 px (~89% da Energia) | vermelha (`boss_hp`), rótulo "Boss" à esquerda e "atual / máx" à direita, com contorno; fade de 200 ms ao aparecer (`boss_spawned` ou `boss_hp_changed`) e ao sumir (`boss_defeated`, vida 0 ou `match_ended`); queda do preenchimento em 150 ms (BRF-058) |
 
-- **Sem faixa de fundo (BRF-039):** o fundo da arena passa por trás do topo; os elementos ficam sobrepostos a ele. Para leitura, um degradê `ink` (alfa 0,35 → 0) cobre só a altura do topo (`Hud/Root/TopScrim`). Pílulas e barra mantêm o contorno.
+- **Sem faixa de fundo (BRF-039):** o fundo da arena passa por trás do topo; os elementos ficam sobrepostos a ele. Para leitura, um degradê `holo_bg` (alfa 0,6 → 0) cobre só a altura do topo (`Hud/Root/TopScrim`). Pílulas e barra mantêm o contorno.
 
 ### 4.2 Zona de combate
 
@@ -127,10 +128,12 @@ y=1280 └───────────────────────�
 
 ### 4.3 Bandeja inferior (`Hud/Tray`)
 
-- Painel `bg_panel_alt` de largura total com contorno superior `ink`; vai até a borda inferior, cobrindo a safe area (a safe area entra como margem interna; os botões ficam acima dela). Pilha (BRF-066): contorno 4 + faixa 96 (6 + 80 + 6 + contorno 4) + respiro 8 (`Hud.SKILLS_TOP_PAD`) + slot 150 (Ø 144 + sombra 6) + max(8, inset inferior da UI) (§9.1, T-172).
-- **Fileira de upgrades** (`Hud.upgrade_row`, decisão 35): faixa `tray_band` com 80 px úteis (padding 6, `Hud.UPGRADE_BAND_PAD`), 5 botões `UpgradeButton` de 128×80 com gap 12 e margem 16 (5×128 + 4×12 = 688 = 720 − 2×16), na ordem `UpgradeButton.IDS` (§5.4). A faixa fica abaixo da arena: não cobre inimigos nem os slots.
+- Painel opaco `holo_tray` `#06182A` (`ui_hud_tray`, linha ciano no topo) de largura total; vai até a borda inferior, cobrindo a safe area (a safe area entra como margem interna; os botões ficam acima dela). Pilha (BRF-066): contorno 4 + faixa 96 (6 + 80 + 6 + contorno 4) + respiro 8 (`Hud.SKILLS_TOP_PAD`) + slot 150 (Ø 144 + sombra 6) + max(8, inset inferior da UI) (§9.1, T-172).
+- **Fileira de upgrades** (`Hud.upgrade_row`, decisão 35): faixa `ui_hud_tray_band` com 80 px úteis (padding 6, `Hud.UPGRADE_BAND_PAD`), 5 botões `UpgradeButton` de 128×80 com gap 12 e margem 16 (5×128 + 4×12 = 688 = 720 − 2×16), na ordem `UpgradeButton.IDS` (§5.4). A faixa fica abaixo da arena: não cobre inimigos nem os slots.
 - **3 slots de skill de Ø 144 px**, gap 66, centros em x = 150 / 360 / 570, cy ≈ 1194 sem safe area.
-- Slots 2 e 3 bloqueados com cadeado e "NV 7"/"NV 12" (T-136). Os níveis vêm de `Hud.slot_unlock_levels` (padrão do M1 `[0, 7, 12]`, 0 = liberado); no M2 o meta-jogo passa a lista com `set_slot_unlock_levels()` conforme o nível da conta.
+- Slots 2 e 3 bloqueados com cadeado e "NV 5"/"NV 8" (T-136, decisão 63). Os níveis vêm de `Hud.slot_unlock_levels` (padrão `Hud.DEFAULT_UNLOCK_LEVELS = [0, 5, 8]`, 0 = liberado: o HUD ainda não recebe o nível da conta, então o slot 1 fica liberado); o meta-jogo passa `[2, 5, 8]` (`ProgressionData.slot_unlock_levels`) com `set_slot_unlock_levels()`.
+
+**HUD holográfico (T-290, BRF-127, decisão 64; `docs/arte.md` §12):** pílulas, pausa, barras (Energia e chefe), bandeja, slots e upgrades usam as peças `ui_hud_*` 1:1 (`UiArt.hud_*`, `UiNinePatch.expand` para o brilho que passa do retângulo). Textos com contorno `holo_bg` de 5 px (`UiTokens.HOLO_OUTLINE`). Chefe em `boss_holo` `#FF4F8B` (`UiBar.boss_art`); a cor da página na partida é `holo_tray`. `SkillButton.set_empty()` / `Hud.set_slot_empty()` mostram o slot liberado sem Módulo (visual, não ligado por padrão); `UpgradeButton` mostra a moldura pressionada enquanto o toque/clique está segurado. Posições, tamanhos e sinais não mudaram. Capturas: `docs/img/hud-holo-aplicado-{375x812,1280x720}.png`.
 - **Área de toque = o círculo inteiro.** Toques entre os botões não fazem nada.
 
 ### 4.4 Alturas para o gameplay (BRF-039)
@@ -176,7 +179,7 @@ Teste: `tests/unit/ui/test_hud_layout.gd` confere as constantes contra o layout 
 
 - Altura mínima de 88 px, largura ≥ 360 px nos botões principais, `radius_m`, contorno `ink` 4 px e sombra de base de 6 px (pressionado = afunda).
 - Principal: fundo `accent`, texto `text_on_light`. Secundário: fundo `surface`, texto `text_on_light`. Desabilitado: `locked`.
-- Arte (T-138): `ButtonPrimary` usa `ui_button_big_normal/pressed` (9-patch; pressionado desce 4 px; desabilitado = normal esmaecido). O secundário (`Button`, padrão) usa `ui_button_secondary/_pressed` (T-153, BRF-075), com a mesma geometria e content margins: Resultado ("Voltar ao título", "Logs"), pausa ("Recomeçar", "Debug") e visualizador de logs. O foco segue em `StyleBoxFlat`.
+- Arte (T-138): `ButtonPrimary` usa `ui_button_big_normal/pressed` (9-patch; pressionado desce 4 px; desabilitado = normal esmaecido). O secundário (`Button`, padrão) usa `ui_button_secondary/_pressed` (T-153, BRF-075), com a mesma geometria e content margins: Resultado ("Voltar ao título", "Enviar log") e pausa ("Recomeçar", "Debug"). O foco segue em `StyleBoxFlat`.
 - Painéis (`PanelContainer`): `ui_panel` (9-patch, conteúdo a 20 px, 26 embaixo). `PanelPill` = `ui_pill_wave` (ONDA x/y, content 20/6/20/12) e `PanelPillLight` = `ui_pill_particles` (estrela de 32 px e número `text_on_light` sem contorno, content 10/6/20/12), ambos `UiNinePatch` a 0,5 (T-153). Só o `PanelTray` segue em `StyleBoxFlat`. "MAX" do `UpgradeButton`: a arte não tem texto e o jogo desenha centralizado, branco com contorno `ink` de 6 px, bold, 20 px (T-154). Título, pausa e resultado usam o cartão central (`ScreenKit.card`).
 - **9-patch em 2x:** `UiNinePatch` (`src/ui/theme/ui_nine_patch.gd`) desenha o PNG em escala 0,5 com as margens do README; o `StyleBoxTexture` desenharia as bordas no tamanho do PNG (o dobro). Texturas e tamanhos em `UiArt` (`src/ui/theme/ui_art.gd`). Filtro Linear (padrão do projeto), sem mipmaps.
 - Foco por teclado visível (borda `accent` 4 px por fora); `Enter`/`Espaço` ativam.
@@ -225,6 +228,7 @@ Os sinais são emitidos pelo nó raiz `Match`.
 | `skill_1`..`skill_3` | botão de skill | `1` `2` `3` |
 | `skill_4` | Depois (fora do M1) | `Espaço` |
 | `pause` | botão ⏸ | `Esc` |
+| `toggle_speed` | botão x1/x2 | `F` |
 | `ui_accept` (telas) | botão | `Enter` / `Espaço` |
 
 - Nada de teclas fixas no código: tudo via Input Actions. Alterar o Input Map exige autorização do AG00.
@@ -244,7 +248,7 @@ Boot/Loading (HTML shell) → Toque para começar → Partida ⇄ Pausa → Resu
 | **Loading** (HTML, em `web/`) | logo/nome em texto, barra de progresso `accent` sobre `bg_void` | automática → Toque para começar |
 | **Toque para começar** | continuação da splash tecnológica (§11.1): mesma arte e título; botão holográfico "Toque para começar" pulsando no lugar da barra; sai com véu escuro de 0,3 s | qualquer toque, clique ou tecla → **libera o áudio** → Partida |
 | **Partida** | HUD (§4) | ⏸ / `Esc` → Pausa; `match_ended` → Resultado |
-| **Pausa** (overlay) | véu `bg_panel` sobre o jogo, título "Pausado", botões **Continuar** e **Recomeçar** | Continuar / `Esc` → Partida; Recomeçar → nova Partida |
+| **Pausa** (overlay) | véu `bg_panel` sobre o jogo, título "Pausado", botões **Continuar**, **Recomeçar** e **Voltar ao menu** | Continuar / `Esc` → Partida; Recomeçar → nova Partida; Voltar ao menu → Menu (T-288) |
 | **Resultado** | "Vitória" (`gold`) ou "Derrota" (`danger`) em `font_display`, num cartão com moldura; "Onda wave_reached/waves_total", ícone verde + "Partículas: N", inimigos derrotados, tempo (mm:ss); botões **Jogar de novo** (primário, foco inicial) e **Voltar ao título** (secundário, abaixo; T-155) | Jogar de novo → nova Partida (`play_again_requested`); Voltar ao título → Toque para começar (`title_requested`) |
 
 - **Perda de foco** (troca de aba ou app, `NOTIFICATION_APPLICATION_FOCUS_OUT` / `visibilitychange`): abre a Pausa automaticamente. A volta **não** retoma sozinha; o jogador toca em Continuar.
@@ -283,9 +287,12 @@ iPhone 375×812 CSS, Safari em aba (k = 1,92 px do jogo/CSS)
 ## 9b. Debug e logs (T-107, BRF-063)
 
 - **Resultado, fundo (T-277, BRF-093, decisão 60):** `assets/backgrounds/result_tech_bg_dim.webp` num `TextureRect` `Background` em tela cheia (`Ignore Size` + `Keep Aspect Covered`), atrás do cartão. Só o fundo mudou; o cartão roxo e os botões seguem no estilo atual até o M2 (T-180/T-190). Capturas: `docs/img/resultado-vitoria.png`, `resultado-derrota.png`.
-- **Resultado:** botão secundário **"Logs"** (200×64), abaixo de "Voltar ao título". Abre o `LogViewer`. Ao lado, **"Enviar log"** (T-269, mesma geometria; `LogUploader` em `src/debug/`, contrato em `docs/logs-api.md`): estados enviando / enviado ✔ (desabilitado) / falhou (tenta de novo), com aviso curto de privacidade abaixo. `LogUploader.ENABLED` desliga tudo no build final; textos em constantes `TXT_*` (trocar por chaves na T-240).
-- **Título:** sem link de log (removido, BRF-099); logs só em Resultado e pausa. Subtítulo temporário **`VERTICAL SLICE`** (`TitleScreen.TXT_BUILD_TAG`, vermelho `danger`, entre "ANIMA" e o botão; T-282 remove, T-283 troca por `ALFA`). Capturas: `docs/img/titulo-vs-375x616.png` e `-375x812.png`.
-- **Pausa:** linha com dois interruptores 228×64: **"Efeitos reduzidos: sim/não"** (T-132, BRF-080) e **"Debug: ligado/desligado"**, que liga o overlay. O "Debug" (T-286, BRF-103) só existe na web com `?debug` na URL (qualquer valor; `DebugSettings.debug_ui_available()`), mesmo com o estado salvo; sem ele fica oculto e o "Efeitos reduzidos" centraliza. Fora da web, sempre visível. Os dois ficam em `user://debug.cfg` (`DebugSettings`; seções `[debug] overlay` e `[fx] reduced_effects`).
+- **Resultado com recompensa (T-191, BRF-115):** holográfico (mockup `mockup_holo_result.png`; peças `ui_holo_*`). `ResultScreen.set_reward(summary)` (chaves: `xp`, `coins`, `first_win_bonus`, `levels_gained`, `slots_unlocked`, `level_before/after`, `xp_before/after`, `xp_to_next_before/after` (0 = teto → "MAX"), `result_outcome`); sem ele não há seção de recompensa. Painéis: Recompensas (XP e Moeda contam de 0 ao valor em 1 s, selo "1ª vitória do dia" se `first_win_bonus`), Nível (selo + barra de XP; com subidas a barra enche/esvazia por nível, o selo pulsa com `ui_holo_level_ring`) e um aviso dourado "Slot N liberado" por item de `slots_unlocked` (aparece ao fim). Animação = função pura do tempo (`_apply(t)`), tween em tempo real (`set_ignore_time_scale`, decisão 59); toque na área pula; `reduced_effects` mostra o estado final direto; botões nunca ficam bloqueados. Gancho de VFX: `_play_level_up_fx(level)` (vazio, AG09). Moeda: ícone provisório desenhado até a T-162. Conteúdo rola em telas baixas. Botões: "Jogar de novo" (primário), "Voltar", "Enviar log". Capturas: `docs/img/resultado-recompensa-{vitoria,derrota}-375x{812,616}.png`. Testes: `tests/unit/ui/test_result_reward.gd`.
+- **Resultado:** o botão "Logs" e o visualizador saíram (T-294, BRF-136). Abaixo de "Voltar ao título", **"Enviar log"** (T-269, 200×64; `LogUploader` em `src/debug/`, contrato em `docs/logs-api.md`): estados enviando / enviado ✔ (desabilitado) / falhou (tenta de novo), com aviso curto de privacidade abaixo. `LogUploader.ENABLED` desliga tudo no build final; textos em constantes `TXT_*` (trocar por chaves na T-240).
+- **Título:** sem link de log (removido, BRF-099); logs só em Resultado e pausa. Subtítulo `TitleScreen.TXT_BUILD_TAG` = `ALFA` (T-283, BRF-140): vermelho `danger`, maiúsculas, entre "ANIMA" e o botão; vazio = nada é criado. Remover ao fechar a v0.2.0 se o dono pedir. Capturas: `docs/img/titulo-alfa-375x812.png`, `-1280x720.png`, `docs/img/titulo-375x616.png` e `-375x812.png`.
+- **Pausa, "Voltar ao menu" (T-288, BRF-119):** botão secundário (mesmo estilo/tamanho de "Recomeçar"), `PauseScreen.menu_button`; despausa e emite `menu_requested` (o `SceneFlow` ouve e vai ao Menu; abandono sem recompensa). Captura: `docs/img/pausa-menu-375x812.png`.
+- **Pausa holográfica (T-293, BRF-133):** véu `HOLO_BG` a 78%, painel `ui_holo_panel`, título "PAUSADO" (contorno `HOLO_BG`), Continuar primário (`ui_holo_btn_primary_*`), Recomeçar e Voltar ao menu secundários (`ui_holo_btn_secondary_*`); interruptores 228×88 com a mesma peça secundária (sem peça própria de interruptor: pendência AG08, ligado/desligado hoje só pelo texto). Sem mudança de sinais nem ordem. Capturas: `docs/img/pausa-holo-375x812.png` e `-1280x720.png`.
+- **Pausa:** linha com dois interruptores 228×88: **"Efeitos reduzidos: sim/não"** (T-132, BRF-080) e **"Debug: ligado/desligado"**, que liga o overlay. O "Debug" (T-286, BRF-103) só existe na web com `?debug` na URL (qualquer valor; `DebugSettings.debug_ui_available()`), mesmo com o estado salvo; sem ele fica oculto e o "Efeitos reduzidos" centraliza. Fora da web, sempre visível. Os dois ficam em `user://debug.cfg` (`DebugSettings`; seções `[debug] overlay` e `[fx] reduced_effects`).
 - **Efeitos reduzidos:** a pausa emite `reduced_effects_changed(on)`; o `SceneFlow` aplica na criação da partida e na hora (partida em curso) via `apply_reduced_effects(arena, director, on)`: `Arena.reduced_effects` (só se a propriedade existir) e `FxDirector.reduced_effects` (que repassa ao `FxPool`, de onde o `MatchRecorder` lê `reduced_effects` no log).
 - **HUD:** sinal `ui_pressed(button, ok)` para o gravador.
 - Detalhes, formato e como baixar no iPhone: [docs/debug.md](debug.md).
@@ -323,6 +330,16 @@ Cenas independentes em `src/ui/screens/`, com o tema na raiz (via `ScreenKit`). 
 - **Recomeçar:** despausa e emite `restart_requested`. Quem ouve (SceneFlow) inicia uma partida nova.
 - **Teste do fluxo:** `src/ui/demo/screens_demo.tscn` (Título → Partida → Pausa → Resultado → Jogar de novo).
 
+### Menu principal (T-190, BRF-113)
+
+`src/ui/screens/menu_screen.tscn` (`MenuScreen`), fiel a `assets/mockups/mockup_holo_menu.png`. Capturas: `docs/img/menu-375x616.png` e `menu-375x812.png`.
+- **API:** `setup(view: Dictionary)` com `level`, `xp`, `xp_to_next`, `coins`, `is_max` (antes ou depois de entrar na árvore); sinal `play_pressed`. Não chama Backend nem SceneFlow (T-187 liga). Helpers estáticos: `format_number` (1.250) e `xp_ratio`.
+- **Nível 30 (`is_max`):** texto `MAX` e barra cheia. XP no limite ou acima: barra cheia (clamp).
+- **Layout:** fundo e animações da arte do título (`TitleScreen.build_art`); bloco único ancorado embaixo (logotipo, linha selo/barra/Moeda, Jogar), escala `largura / 375` (até 720) e menor em telas baixas para não cobrir o pedestal. Jogar >= 281x78 (1x). Peças `ui_holo_*` em `StyleBoxTexture` (Jogar com `expand_margin` 16 e texto 6 px abaixo ao pressionar; pílula; engrenagem) e `NinePatchRect` (barra).
+- **Engrenagem (BRF-117):** ancorada ao canto superior direito da coluna do conteúdo (`MenuScreen.column_rect`: faixa da arte do título recortada à tela; em retrato é a tela toda), não da janela.
+- **Engrenagem:** sem ação no M2 (nenhuma conexão em `pressed`). Sem Módulos, dicas de slot, ALFA nem versão.
+- **Moeda provisória:** `MenuScreen.COIN_ICON` (único ponto de troca; T-162).
+
 ## 11. Exportação Web
 
 - **Preset `Web`** (`export_presets.cfg`): sem threads, sem extensões, VRAM compression só desktop (o 2D usa textura sem compressão VRAM), resize policy *adaptive*, saída em `build/web/index.html`. Exclui `tests/`, `addons/gut/`, `docs/` e `build/`.
@@ -351,6 +368,11 @@ Cenas independentes em `src/ui/screens/`, com o tema na raiz (via `ScreenKit`). 
 - contrato mantido: qualquer toque, clique ou tecla emite `start_requested` uma vez e libera o áudio. No mesmo gesto, `TitleScreen.fade_from_dark()` põe um véu `#021423` (CanvasLayer 128 na raiz, ignora toque) que some em 0,3 s sobre a partida: sem corte seco do escuro para o cartoon claro;
 - se a splash mudar no `web/shell.html`, ajuste as constantes do topo do script (px da arte).
 
+## 11b. Áudio básico (T-182, BRF-123)
+- Autoload `Audio` (`src/audio/audio_manager.gd`); barramentos `Music` e `SFX` em `default_bus_layout.tres`. Nada toca antes do 1º gesto: `TitleScreen` chama `Audio.unlock()`.
+- Música (`mus_entrada.ogg`, loop) no Título e no Menu, com fade; para ao entrar na partida e no Resultado, volta ao Menu. Tiro do Anima: `Audio.play_shot()` (pool de 6 vozes, tom ±6%).
+- Volumes 0-1 em `user://settings.cfg`, seção `audio` (`music`, `sfx`); `Audio.set_music_volume/set_sfx_volume`. Sem UI ainda. Fontes dos áudios: `assets/audio/_src/gen_audio.py`.
+
 ## 12. App na tela de início (T-175)
 
 - **Arquivos:** `web/pwa/manifest.webmanifest` e ícones (cópia de `assets/app/`, AG08; atualizar com `bash web/copy_pwa.sh --sync-icons`). O export do Godot não copia extras: `bash web/copy_pwa.sh build/web` roda depois do `--export-release` (local e no workflow `deploy-web.yml`) e também sobrescreve `index.apple-touch-icon.png`/`index.icon.png`, que o preset (`html/export_icon`) injeta com o ícone do projeto. `web/pwa/.gdignore` mantém os PNGs fora do `.pck`.
@@ -359,3 +381,5 @@ Cenas independentes em `src/ui/screens/`, com o tema na raiz (via `ScreenKit`). 
 - **Shell:** `<link rel="manifest">`, `apple-touch-icon` 180, favicons 32/48/ico, `apple-mobile-web-app-capable`, `mobile-web-app-capable`, `apple-mobile-web-app-title` "Anima", status bar `black-translucent`, `viewport-fit=cover`.
 - **Standalone no iPhone:** sem barra do Safari; o web view vai da borda de cima (sob relógio/bateria) até a de baixo. O HUD já soma `safe-area-inset-top`. Altura do canvas pela regra do §9.1 (área visível real); se o canvas chega à borda, `covers_bottom = true` e a UI usa `max(12, 0,5 × inset)` embaixo. Conferir no log (`header.web.viewport`: `standalone`, `inner`, `vv`, `canvas`, `safe`).
 - **Reinstalar no iPhone:** o iOS só relê manifesto, nome e ícone ao criar o atalho. Remova o atalho antigo (toque e segure › Remover App › Excluir da Tela de Início), abra o link no Safari e use Compartilhar › Adicionar à Tela de Início.
+
+**Interruptor holográfico na Pausa (T-297, BRF-139):** "Efeitos reduzidos" e "Debug" usam `ui_holo_toggle_{off,on}[_pressed]` (228x88, `StyleBoxTexture`, 9-slice 24/96/24/24, conteúdo esq. 16, dir. 76, base 4; pressionado soma 4 px ao topo). A chave mostra o estado; o texto é só o rótulo (16 px, autowrap, contorno `holo_bg`); o estado fica em `tooltip_text`/`accessibility_name` ("Rótulo: sim/não, ligado/desligado"). Comportamento, sinais e ordem não mudaram. Capturas: `docs/img/pausa-interruptor-{375x812,1280x720}.png`.

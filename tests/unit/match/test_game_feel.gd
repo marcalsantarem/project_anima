@@ -43,14 +43,15 @@ func test_hit_stop_does_not_stack_and_restores_time() -> void:
 	assert_true(arena.start_hit_stop(0.05), "pode começar de novo depois")
 
 
-func test_hit_stop_restores_previous_scale_on_stop() -> void:
-	Engine.time_scale = 0.5
+func test_hit_stop_restores_chosen_speed_on_stop() -> void:
+	Engine.time_scale = 0.5 # valor lido ao iniciar não importa: vale SpeedController (T-273)
 	var hs := HitStop.new()
 	assert_true(hs.start(get_tree(), 1.0, 0.0))
 	hs.stop()
-	assert_eq(Engine.time_scale, 0.5)
+	assert_eq(Engine.time_scale, SpeedController.rest_scale())
+	Engine.time_scale = 0.25
 	hs.stop()
-	assert_eq(Engine.time_scale, 0.5, "stop repetido não muda nada")
+	assert_eq(Engine.time_scale, 0.25, "stop repetido não muda nada")
 
 
 func test_hit_stop_restored_when_arena_leaves_tree() -> void:

@@ -6,6 +6,9 @@ extends RefCounted
 const MAX_TIMELINE := 600 ## eventos no texto (os mais recentes)
 const MAX_SAMPLE_ROWS := 400 ## linhas da tabela de amostras no texto
 const TOP_HITCHES := 5
+const FIRST_ERRORS := 20 ## mensagens de erro no resumo (BRF-136)
+## Teto do log enviado (campo `log` do contrato; o corpo tem de caber em 200 KB, docs/logs-api.md).
+const UPLOAD_MAX_BYTES := 150 * 1024
 
 
 ## Percentil por ordem (nearest-rank) de uma lista de números. p em 0–100.
@@ -73,14 +76,31 @@ static func summarize(doc: Dictionary) -> Dictionary:
 	var damage_by := {}
 	var upgrades := []
 	var denied := 0
+	var skills := {}
+	var speed_changes := []
+	var pauses := 0
 	for e in events:
 		match str(e.get("e", "")):
+			"skill":
+				var slot := str(int(e.get("slot", 0)))
+				skills[slot] = int(skills.get(slot, 0)) + 1
+			"velocidade":
+				if e.get("de") != null: # de=null é a velocidade inicial (BRF-137), fora da lista de mudanças
+					speed_changes.append([snappedf(float(e.get("t", 0)), 0.1), float(e.get("de", 1)), float(e.get("para", 1))])
+			"pausa":
+				pauses += 1
 			"dano":
 				var v := int(e.get("valor", 0))
 				damage_total += v
 				damage_hits += 1
 				var src := str(e.get("fonte", "?"))
 				damage_by[src] = int(damage_by.get(src, 0)) + v
+			"dano_agg":
+				var n := int(e.get("soma", 0))
+				damage_total += n
+				damage_hits += int(e.get("contagem", 0))
+				var asrc := str(e.get("fonte", "?"))
+				damage_by[asrc] = int(damage_by.get(asrc, 0)) + n
 			"upgrade":
 				upgrades.append("%s nv%d (%d)" % [e.get("id", ""), int(e.get("nivel", 0)), int(e.get("custo", 0))])
 			"upgrade_negado":
@@ -115,6 +135,14 @@ static func summarize(doc: Dictionary) -> Dictionary:
 	if duration <= 0.0 and not samples.is_empty() and t_i >= 0:
 		duration = float(samples[-1][t_i])
 
+	var err_by := {}
+	for e in errors:
+		var k := "%s/%s" % [e.get("fonte", ""), e.get("tipo", "")]
+		err_by[k] = int(err_by.get(k, 0)) + 1
+	var energy := column(doc, "energy", false)
+	var hp_5s := []
+	for i in range(0, energy.size(), 5):
+		hp_5s.append(int(energy[i]))
 	var out := {
 		"duracao_s": snappedf(duration, 0.1),
 		"resultado": str(result.get("resultado", "?")),
@@ -148,13 +176,73 @@ static func summarize(doc: Dictionary) -> Dictionary:
 		"upgrades": upgrades,
 		"upgrades_negados": denied,
 		"erros": errors.size(),
-		"erros_primeiros": errors.slice(0, 5).map(func(e) -> String: return "%s: %s" % [e.get("tipo", ""), e.get("msg", "")]),
+		"erros_por_tipo": err_by,
+		"skills_usadas": skills,
+		"mortes_por_tipo": result.get("mortes_por_tipo", {}),
+		"velocidades": speed_changes,
+		"velocidade_inicial": initial_speed(doc),
+		"por_velocidade": by_speed(doc),
+		"pausas": pauses,
+		"energia_5s": hp_5s,
+		"piores_quadros": doc.get("worst_frames", []),
+		"erros_primeiros": errors.slice(0, FIRST_ERRORS).map(func(e) -> String: return "%s: %s" % [e.get("tipo", ""), e.get("msg", "")]),
 		"maiores_travadas": top,
 		"truncado": doc.get("truncated", {}),
 	}
 	var stress = doc.get("header", {}).get("stress")
 	if stress is Array:
 		out["estresse"] = _stress_summary(doc, stress, proj, fps, hist, count, frames)
+	return out
+
+
+## Velocidade (1 ou 2) com que a partida começou: evento inicial (de=null), senão `header.speed_initial`,
+## senão a 1ª `time_scale` arredondada para 1/2 (log antigo), senão 1.
+static func initial_speed(doc: Dictionary) -> int:
+	for e in doc.get("events", []):
+		if str(e.get("e", "")) == "velocidade" and e.get("de") == null:
+			return 2 if float(e.get("para", 1)) >= 1.5 else 1
+	var h: Dictionary = doc.get("header", {})
+	if h.get("speed_initial") != null:
+		return 2 if float(h.speed_initial) >= 1.5 else 1
+	for v in column(doc, "time_scale", false):
+		if is_equal_approx(float(v), 1.0) or is_equal_approx(float(v), 2.0):
+			return int(roundf(float(v)))
+	return 1
+
+
+## fps por velocidade real (coluna `time_scale` de cada amostra; hit-stop e câmera lenta ficam de fora):
+## {"1": {segundos, fps_medio, fps_min, quadro_p95_ms}, "2": {...}}. `quadro_p95_ms` = p95 dos ms médios por amostra.
+static func by_speed(doc: Dictionary) -> Dictionary:
+	var ts := _col(doc, "time_scale")
+	var ti := _col(doc, "t")
+	var fi := _col(doc, "fps")
+	var mi := _col(doc, "ms_avg")
+	var pi := _col(doc, "paused")
+	var out := {}
+	if ts < 0 or ti < 0 or fi < 0:
+		return out
+	var acc := {}
+	var prev_t := 0.0
+	for row in doc.get("samples", []):
+		var t := float(row[ti])
+		var dt := maxf(t - prev_t, 0.0)
+		prev_t = t
+		if pi >= 0 and bool(row[pi]):
+			continue
+		var sc := float(row[ts])
+		var key := "1" if is_equal_approx(sc, 1.0) else ("2" if is_equal_approx(sc, 2.0) else "")
+		if key == "":
+			continue
+		var a: Dictionary = acc.get(key, {"s": 0.0, "fps": [], "ms": []})
+		a["s"] = float(a["s"]) + dt
+		a["fps"].append(float(row[fi]))
+		if mi >= 0:
+			a["ms"].append(float(row[mi]))
+		acc[key] = a
+	for key in acc:
+		var a: Dictionary = acc[key]
+		out[key] = {"segundos": snappedf(float(a["s"]), 0.1), "fps_medio": snappedf(_avg(a["fps"]), 0.1),
+			"fps_min": snappedf(percentile(a["fps"], 0.0), 0.1), "quadro_p95_ms": snappedf(percentile(a["ms"], 95.0), 0.1)}
 	return out
 
 
@@ -168,7 +256,7 @@ static func _stress_summary(doc: Dictionary, params: Array, proj: Array, fps: Ar
 	var nodes := column(doc, "nodes", false)
 	var enemies := column(doc, "enemies", false)
 	return {
-		"parametros": "stress=%d,%d" % [int(params[0]), int(params[1])],
+		"parametros": "stress=%d,%d" % [int(params[0]), int(params[1])] + (" speed=%d" % int(h.get("speed")) if h.has("speed") and float(h.speed) > 1.0 else ""),
 		"fps_medio": snappedf(_avg(fps), 0.1),
 		"fps_min": snappedf(percentile(fps, 0.0), 0.1),
 		"quadro_ms_p95": FrameStats.hist_percentile(hist, count, 95.0),
@@ -190,6 +278,105 @@ static func _canvas_size(vp: Dictionary, h: Dictionary) -> Array:
 		return [float(inner[0]), float(c[2])]
 	var w = h.get("window", [])
 	return w if w is Array else []
+
+
+## Resumo em 5 a 8 linhas para bater o olho no banco (BRF-136). Funciona com log antigo ou novo.
+static func header_lines(doc: Dictionary) -> PackedStringArray:
+	var s: Dictionary = doc.get("summary", {})
+	if s.is_empty():
+		s = summarize(doc)
+	var h: Dictionary = doc.get("header", {})
+	var run: Dictionary = h.get("run", {})
+	var web: Dictionary = h.get("web", {})
+	var env: Dictionary = h.get("env", {})
+	var out := PackedStringArray()
+	var tag := str(run.get("tag", ""))
+	out.append("tag: %s · sessão %s · partida #%s · %s" % [tag if tag != "" else "(sem tag)", run.get("session_id", "?"),
+		_i(run.get("run_index")), run.get("run_started_at", h.get("date", "?"))])
+	var dev := str(h.get("os", ""))
+	if web.is_empty():
+		dev = "%s %s" % [h.get("platform", "?"), h.get("model", "")]
+	elif dev.is_empty():
+		dev = str(web.get("ua", "?")).left(60)
+	out.append("aparelho: %s · %s núcleos · dpr %s · tela %s" % [dev, _s(env.get("cores", web.get("cores"))),
+		_s(env.get("dpr", web.get("dpr"))), _s(env.get("inner", web.get("inner")))])
+	var mode := str(env.get("display_mode", "")) if env.get("display_mode") != null else ("web" if not web.is_empty() else "nativo")
+	out.append("modo: %s · v%s · %s" % [{"standalone": "PWA", "browser": "navegador"}.get(mode, mode), h.get("version", "?"),
+		BuildInfo.label(BuildInfo.parse(h.get("build")))])
+	var speeds: Array = s.get("velocidades", [])
+	var stress = h.get("stress")
+	out.append("velocidade: x%d inicial · %d mudanças · estresse: %s" % [int(s.get("velocidade_inicial", initial_speed(doc))),
+		speeds.size(), "%d inimigos, %d proj" % [int(stress[0]), int(stress[1])] if stress is Array else "não"])
+	var bs: Dictionary = s.get("por_velocidade", {})
+	var per := []
+	for k in ["1", "2"]:
+		if bs.has(k):
+			per.append("x%s %s fps (%ss)" % [k, bs[k].fps_medio, bs[k].segundos])
+	out.append("fps médio %s%s · quadro p95 %s ms · p99 %s ms · >50 ms: %d" % [s.fps_medio,
+		" (" + " · ".join(per) + ")" if per.size() > 1 or bs.has("2") else "", s.quadro_ms_p95, s.quadro_ms_p99, s.travadas_50])
+	out.append("resultado: %s · onda %d/%d · %s · erros: %d · picos: %d inimigos, %d proj" % [s.resultado, s.onda,
+		s.ondas, _time(float(s.duracao_s)), s.erros, s.pico_inimigos, s.pico_projeteis])
+	var raf := _raf_line(h, doc.get("web_end", {}))
+	if raf != "":
+		out.append(raf)
+	return out
+
+
+## "cadência rAF: 30 Hz (possível Pouca Energia)" ou "60 Hz". Vazio fora da web. Usa início e fim da partida.
+static func _raf_line(h: Dictionary, end: Dictionary) -> String:
+	var env: Dictionary = h.get("env", {})
+	if env.is_empty() and end.is_empty():
+		return ""
+	var a = env.get("raf_hz_inicio")
+	var b = end.get("raf_hz_fim")
+	var txt := "início %s · fim %s" % [("%d Hz" % roundi(a)) if a != null else "?", ("%d Hz" % roundi(b)) if b != null else "?"]
+	if a != null and b != null and roundi(a) == roundi(b):
+		txt = "%d Hz" % roundi(a)
+	var suspect: bool = env.get("suspeita_30fps_cap") == true or end.get("suspeita_30fps_cap") == true
+	return "cadência rAF: %s%s · tela %s Hz · max_fps %s" % [txt, " (possível Pouca Energia)" if suspect else "",
+		_s(h.get("refresh_hz")), _s(h.get("max_fps"))]
+
+
+static func _s(v: Variant) -> String:
+	return "?" if v == null else str(v)
+
+
+static func _i(v: Variant) -> String:
+	return "?" if v == null else str(int(v))
+
+
+## Conteúdo do campo `log` enviado: JSON `anima_log/1` com `resumo` (texto) em primeiro lugar, o
+## mesmo documento do gravador e `upload` (o que foi cortado para caber). Nunca passa de `max_bytes`
+## (UTF-8): corta amostras (1 a cada 2) e eventos (metade mais antiga) até caber. O doc original não muda.
+static func upload_text(doc: Dictionary, max_bytes: int = UPLOAD_MAX_BYTES) -> String:
+	var body := {"resumo": Array(header_lines(doc))} if not doc.is_empty() else {"resumo": ["sem log"]}
+	body["format"] = doc.get("format", "anima_log/1")
+	for k in doc:
+		if k != "format":
+			body[k] = doc[k]
+	var info := {"samples_stride": 1, "events_dropped": 0, "limit_bytes": max_bytes}
+	body["upload"] = info
+	var text := JSON.stringify(body, "", false)
+	var tries := 0
+	while text.to_utf8_buffer().size() > max_bytes and tries < 12:
+		tries += 1
+		var samples: Array = body.get("samples", [])
+		var events: Array = body.get("events", [])
+		if samples.size() > 60 and tries % 2 == 1:
+			var kept := []
+			for i in range(0, samples.size(), 2):
+				kept.append(samples[i])
+			body["samples"] = kept
+			info["samples_stride"] = int(info["samples_stride"]) * 2
+		elif events.size() > 20:
+			var half := events.size() / 2
+			body["events"] = events.slice(half)
+			info["events_dropped"] = int(info["events_dropped"]) + half
+		else:
+			body.erase("samples")
+			info["samples_stride"] = 0
+		text = JSON.stringify(body, "", false)
+	return text
 
 
 ## Texto legível: RESUMO, linha do tempo e tabela compacta de amostras.
@@ -226,6 +413,9 @@ static func to_text(doc: Dictionary) -> String:
 		s.memoria_mb[2], s.memoria_video_mb[0], s.memoria_video_mb[1], s.memoria_video_mb[2]])
 	lines.append("Nós: %d → %d (%+d)  ·  órfãos %d → %d (%+d)" % [s.nos[0], s.nos[1], s.nos[2], s.orfaos[0],
 		s.orfaos[1], s.orfaos[2]])
+	for k in (s.get("por_velocidade", {}) as Dictionary):
+		var v: Dictionary = s.por_velocidade[k]
+		lines.append("Velocidade x%s: %s s · fps médio %s · mín %s · quadro p95 %s ms" % [k, v.segundos, v.fps_medio, v.fps_min, v.quadro_p95_ms])
 	if s.has("estresse"):
 		var e: Dictionary = s.estresse
 		lines.append("ESTRESSE %s: fps médio %s · mín %s · p95 %s ms · quadros >50 ms %d · draw [méd,máx] %s · nós %s · inimigos %s · proj %s · dpr %s · canvas %s" % [

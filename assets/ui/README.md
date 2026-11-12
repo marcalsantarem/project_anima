@@ -18,7 +18,7 @@ Fonte: `_src/gen_ui.py` (SVG por código → Chrome headless). Para regenerar, r
 | `ui_icon_lock.png` | 128×128 | 64×64 | Cadeado dos slots bloqueados (acima do texto "NV 7"/"NV 12") |
 | `ui_icon_particles.png` | 128×128 | 64×64 (24–32 no HUD/pílula) | **Partículas** (decisão 40, BRF-061): estrela verde de 4 pontas com facetas tipo "chip", núcleo claro e brilho. Fonte: `g_particles(P_GREEN)` |
 | `ui_icon_particles_off.png` | 128×128 | 64×64 | Variante apagada (cinza-lilás) para custo sem Partículas (alternativa ao `modulate.a`) |
-| `ui_icon_particle.png` | 64×64 | 32×32 | **Obsoleto**: estrela dourada, reservada para a Moeda do M2. Não usar para Partículas |
+| `ui_icon_particle.png` | 64×64 | 32×32 | **Obsoleto**: estrela dourada. A Moeda agora é `ui_icon_coin` (T-162); pode sair do `.pck` quando o AG02 trocar o uso |
 | `ui_icon_pause.png` | 128×128 | 64×64 | Botão de pausa completo (quadrado branco + barras), canto superior esquerdo |
 
 Ícone sem Partículas: `modulate.a = 0.55` (o círculo fica colorido; o mockup usa cinza, aceitável a 55%).
@@ -82,3 +82,115 @@ Verde-limão/esmeralda, sem ciano e distinto do verde das barras de vida (`#3FD2
 | Médio-escuro | `#3CC23A` | faceta sombreada, rastro |
 | Escuro | `#1F8A3B` | borda, fim do rastro |
 | Contorno | `#124F24` | contorno do ícone |
+
+## Menus holográficos (T-189, BRF-110)
+
+Menu principal e Resultado do M2 (`docs/arte.md` §11, mockups `assets/mockups/mockup_holo_*.png`). Fonte: `_src/gen_ui_holo.py` (mesmo pipeline; não toca nas peças acima). Regenerar: `python assets/ui/_src/gen_ui_holo.py`. Validação: `_src/holo_compare.png` (mockup | peças a 2x | peças a 1x) e `_src/holo_check_*.png` (375×812).
+**Escala:** o PNG é 2x do mockup de 375 px; no viewport de 720, **1 px do PNG ≈ 1 px de tela** (×0,96). Por isso as margens abaixo valem direto em `texture_margin_*` do `StyleBoxTexture` (ou `patch_margin_*` do `NinePatchRect`), sem `scale`. Total: 20 PNG, **~65 KB**. RGBA (alfa suave dos brilhos; paleta indexada piorava as bordas e o ganho seria de poucos KB). Use o filtro linear padrão (não o "nearest").
+
+| Arquivo | PNG | Margens 9-patch E/D/C/B (px do PNG) | Uso / o que o AG02 faz |
+|---|---|---|---|
+| `ui_holo_panel.png` | 192×192 | 72/72/72/72 | Painel chanfrado (moldura `holo_line_dim`, miolo `holo_panel` 78%, colchetes ciano nos cantos sup. esq./inf. dir.). Sem brilho: corpo = canvas, `expand_margin` 0. Título e varredura por cima |
+| `ui_holo_panel_gold.png` | 192×192 | 72/72/72/72 | Aviso de desbloqueio (moldura dourada, miolo `#1E1A14` 88%, brilho dourado pintado). Corpo a 16 px da borda: **`expand_margin` 16** nos 4 lados |
+| `ui_holo_pill.png` | 96×64 | 20/20/20/20 | Pílula da Moeda e fundo do botão da engrenagem (44×44 no mockup ≈ 84 px). Sem brilho; o brilho da pílula da Moeda é opcional com `ui_holo_glow` atrás |
+| `ui_holo_btn_primary_normal.png` | 192×160 | **48/48/56/56** | Jogar/Continuar. Brilho ciano pintado: **`expand_margin` 16** nos 4 lados (o retângulo do botão = corpo). Inclui filete branco e base escura de 12 px. Texto `holo_ink` |
+| `ui_holo_btn_primary_pressed.png` | 192×160 | **48/48/56/56** | Pressionado: degradê mais escuro, corpo 6 px mais baixo, brilho menor. Mesmo canvas: troca direta. Mover o texto 6 px (content margin topo +6) |
+| `ui_holo_btn_secondary_normal.png` | 128×96 | 24/24/24/24 | Secundário: moldura ciano 4 px + miolo `holo_panel` 90%. Corpo ocupa 92 px de altura; 4 px livres embaixo (espaço do pressionado). Texto `holo_text` |
+| `ui_holo_btn_secondary_pressed.png` | 128×96 | 24/24/24/24 | Moldura `holo_text2`, miolo `#0E5A70`, corpo 4 px mais baixo |
+| `ui_holo_btn_secondary_disabled.png` | 128×96 | 24/24/24/24 | Tokens `holo_dis_*`; texto `holo_dis_text` |
+| `ui_holo_bar_track.png` | 64×32 | 8/8/8/8 | Trilho da barra de XP (moldura `holo_line_dim` 2 px, fundo `#071A2B`). Altura 24 px no menu, 28 no Resultado |
+| `ui_holo_bar_fill.png` | 64×24 | 6/6/6/6 | Enchimento violeta → ciano (o degradê acompanha a largura). Recuo de 4 px dentro do trilho. `TextureProgressBar` com `nine_patch_stretch` ou `NinePatchRect` com largura = progresso |
+| `ui_holo_bar_tip.png` | 16×40 | — | Ponta clara com brilho; centro horizontal na borda direita do enchimento, centrada na vertical. Marcas de 25% no Resultado: `ColorRect` 2 px `#021423` 70% |
+| `ui_holo_level_badge.png` | 128×144 | — | Selo hexagonal sem número (hexágono em y 2–142). Resultado: tamanho nativo; menu: escala 0,8125 (52×58 do mockup). Número `holo_text` 800 por cima |
+| `ui_holo_level_ring.png` | 192×192 | — | Anel tracejado da subida de nível, centrado no selo (diâmetro 164 px do anel). Girar (`rotation`) e sumir (`modulate.a`) por `Tween` |
+| `ui_holo_slot_ready.png` | 128×128 | — | Slot liberado do aviso (corpo 120×120 + 4 px de brilho). Ícone `ui_icon_unlock_holo` a 64 px centrado por cima |
+| `ui_icon_xp.png` | 64×64 | — | Ícone de XP (88 px no Resultado: escala 1,375 aceitável; ou 64 nativo) |
+| `ui_icon_settings.png` | 48×48 | — | Engrenagem `holo_text2`, centrada na pílula 84×84. Sem ação no M2 |
+| `ui_icon_lock_holo.png` / `ui_icon_unlock_holo.png` | 64×64 | — | Cadeado fechado (`holo_muted`) / aberto (ciano) |
+| `ui_holo_scanline.png` | 256×4 | 64/64/0/0 | Linha de varredura (ciano 55%, pontas que somem). Estica na largura do painel; `modulate.a` 0,5 na animação |
+| `ui_holo_glow.png` | 128×128 | — | Brilho radial **branco**: tingir com `modulate` (`holo_line` ou `gold`) e `CanvasItemMaterial` com `blend_mode = Add`. Pode esticar (ex.: elipse atrás da pílula da Moeda, ou o pulsar do Jogar, já que o brilho do botão é pintado) |
+
+## Botão de velocidade x1/x2 (T-274, BRF-121)
+
+HUD da partida, estilo `ui_holo_*` (mesma escala: **1 px do PNG ≈ 1 px de tela**, sem `scale`). Fonte: `_src/gen_ui_speed.py` (importa os helpers do `gen_ui_holo.py`); regenerar: `python assets/ui/_src/gen_ui_speed.py`. Validação: `_src/speed_sheet.png` (4 estados, 2x/1x, sobre creme e roxo), `_src/speed_check_x1.png`, `_src/speed_check_tray.png` (bandeja: não cabe) e a prévia `docs/img/botao-velocidade.png`.
+
+| Arquivo | PNG | Uso |
+|---|---|---|
+| `ui_speed_x1.png` | 96×96 | Normal: painel escuro, moldura ciano, ">" + "x1" |
+| `ui_speed_x1_pressed.png` | 96×96 | Pressionado do x1: moldura `holo_text2`, miolo `#0E5A70`, corpo 4 px mais baixo |
+| `ui_speed_x2.png` | 96×96 | Ativo: ciano cheio (como o primário), brilho forte, ">>" + "x2" em `holo_ink` |
+| `ui_speed_x2_pressed.png` | 96×96 | Pressionado do x2: degradê mais escuro, brilho menor, corpo 4 px mais baixo |
+
+- **Texto na arte** ("x1"/"x2", Outfit 800, e as setas): o AG02 só troca a textura (`TextureButton`: `texture_normal`/`texture_pressed` por estado). Números não precisam de localização.
+- Corpo 68×68 px em (14, 10) do PNG, base escura até y 84; o resto é brilho. Alvo de toque: o retângulo inteiro (96×96) ou ≥ 64×64 centrado no corpo (centro do corpo em (48, 44)).
+- **Posição sugerida:** fileira do topo, à direita da pausa (centro do corpo em x ~157 no viewport 720, alinhado na vertical com a pausa), entre a pausa e a pílula "ONDA". Ao lado das skills não cabe sem mexer nos slots (sobram ~78 px à direita do slot 3).
+
+- **Draw calls:** todas as peças estão em PNG separados; para o batching do Compatibility, o AG07/AG02 pode montar o atlas `atlas_ui_holo` (cabem num 512×512) se o profiler pedir.
+- **Não incluídos:** Moeda (feita depois na T-162, ver "Moeda e glossário"), peças do hangar (slots bloqueado/próximo, molduras por raridade, M3). O brilho do painel "Subida de nível" do mockup é opcional (`ui_holo_glow` esticado atrás, `modulate.a` ~0,3).
+
+## Interruptor holográfico liga/desliga (T-296, BRF-138)
+
+Pausa (e futuras Configurações), `docs/arte.md` §11.8. Fonte: `_src/gen_ui_toggle.py` (importa os helpers do `gen_ui_holo.py`); regenerar: `python assets/ui/_src/gen_ui_toggle.py`. **1 px do PNG = 1 px de tela** (viewport 720). Validação: `_src/toggle_sheet.png` (5 estados a 1x sobre o painel e o creme) e a prévia `docs/img/interruptor-holo.png`. Total ~19 KB.
+
+| Arquivo | PNG | Uso |
+|---|---|---|
+| `ui_holo_toggle_off.png` | 228×88 | Desligado: moldura `#1C7F8E`, miolo escuro, botão cinza `holo_muted` à esquerda, marca `O` |
+| `ui_holo_toggle_off_pressed.png` | 228×88 | Desligado pressionado: moldura `#2AA3B3`, miolo `#09344A`, corpo 4 px mais baixo |
+| `ui_holo_toggle_on.png` | 228×88 | Ligado: moldura `holo_line`, brilho interno, trilho ciano cheio com brilho, botão branco à direita, marca `I` |
+| `ui_holo_toggle_on_pressed.png` | 228×88 | Ligado pressionado: moldura `holo_text2`, brilho menor, corpo 4 px mais baixo |
+| `ui_holo_toggle_disabled.png` | 228×88 | Tokens `holo_dis_*`, botão à esquerda; texto `holo_dis_text` |
+
+- **Geometria:** igual ao `ui_holo_btn_secondary_*` esticado a 228×88: corpo 228×84 (chanfro 20 px, moldura 4 px, contorno `#021423` de 2 px), 4 px livres embaixo; o pressionado desce 4 px (somar 4 px ao `content_margin_top` no estilo pressionado, como no secundário). Trilho em x 164–212, y 28–56 (centrado no corpo); alvo de toque = o botão inteiro (88 px de altura).
+- **Área do texto:** x 16–152, y 0–84 (136×84 px). `content_margin` esq 16 / dir 76 / topo 0 / base 4. "Efeitos reduzidos" a 20 px não cabe em uma linha (≈165 px): usar **duas linhas** ("Efeitos" / "reduzidos", `autowrap`) ou fonte 16. O estado sai do texto (a chave mostra).
+- **Uso direto** (sem 9-slice), tamanho fixo 228×88. Se precisar de outra largura: 9-slice esq 24 / dir 96 / topo 24 / base 24 (só a faixa do rótulo estica; a chave fica intacta).
+- **Texto:** `holo_text` no ligado, `holo_text2` no desligado, `holo_dis_text` no desabilitado; contorno `HOLO_BG` como hoje.
+
+## HUD holográfico da partida (T-289, BRF-125, decisão 64)
+
+Todo o HUD da partida no estilo `ui_holo_*` (guia: `docs/arte.md` §12). Fonte: `_src/gen_ui_hud.py` (importa os helpers do `gen_ui_holo.py`); regenerar: `python assets/ui/_src/gen_ui_hud.py`. Desenho direto em px do viewport 720: **1 px do PNG = 1 px de tela**, sem `scale`. Total: 26 PNG, **~110 KB** (RGBA). Validação: `_src/hud_sheet.png` (todas as peças sobre navy e sobre o chão) e os mockups `docs/img/hud-holo-mockup.png` (720×1280) e `docs/img/hud-holo-mockup-375x812.png`.
+
+| Arquivo | PNG | 9-slice E/D/C/B | `expand_margin` | Uso |
+|---|---|---|---|---|
+| `ui_hud_pill_wave.png` | 112×80 | 40/40/28/28 | 8 | Pílula "ONDA X/Y" (moldura ciano, brilho, colchetes). Corpo 96×64 em (8, 8) |
+| `ui_hud_pill.png` | 112×80 | 40/40/28/28 | 8 | Pílula de Partículas (moldura `holo_line_dim`, sem brilho); ícone `ui_icon_particles` 32 px à esquerda |
+| `ui_hud_btn_pause.png` / `_pressed.png` | 96×96 | — | — | Pausa com "II" na arte (geometria do `ui_speed_x1`: corpo 68×68 em (14, 10), centro (48, 44)). Alvo de toque 88×88 mantido. Substitui `ui_icon_pause` |
+| `ui_hud_bar_track.png` | 80×56 | 20/20/20/20 | 8 | Trilho da Energia (corpo 64×40) |
+| `ui_hud_bar_track_boss.png` | 80×56 | 20/20/20/20 | 8 | Trilho do chefe: moldura magenta `#FF4F8B` com brilho. Altura 32 |
+| `ui_hud_bar_fill.png` | 64×32 | 10/10/10/10 | — | Enchimento **branco** da Energia: tingir por `modulate` (`UiTokens.core_hp_color`, como hoje). Recuo de 4 px dentro do trilho. Barra fantasma: o mesmo PNG com `modulate` branco a 45% |
+| `ui_hud_bar_fill_boss.png` | 64×32 | 10/10/10/10 | — | Enchimento do chefe já colorido (magenta → vermelho); `modulate` branco. Altura 24 |
+| `ui_hud_bar_flash.png` | 80×56 | 20/20/20/20 | 8 | Contorno branco com brilho por cima do trilho: estado de dano = `modulate` `danger` + `Tween` de alfa 1 → 0 (~250 ms) |
+| `ui_hud_bar_tip.png` | 16×48 | — | — | Ponta branca com brilho (tingível): centro x na borda direita do enchimento, centrada na barra; `scale.y` 0,8 no chefe |
+| `ui_hud_icon_energy.png` | 56×64 | — | — | Diamante ciano à esquerda da Energia (no lugar do cristal desenhado; corpo 40×52, sobra de brilho de 8) |
+| `ui_hud_icon_boss.png` | 56×56 | — | — | Emblema do chefe (hexágono com chifres, magenta), à esquerda da barra do chefe (48 px) |
+| `ui_hud_tray.png` | 64×80 | 8/8/24/8 | topo 12 | Fundo da bandeja: linha ciano no topo com brilho para cima (12 px sobre a arena) e miolo **opaco** `#06182A` |
+| `ui_hud_tray_band.png` | 64×32 | 4/4/4/6 | — | Faixa dos upgrades (mais clara, filete `holo_line_dim` embaixo, 2 px). Altura 96 |
+| `ui_hud_skill_ready.png` | 176×184 | — | — | Slot pronto: anel ciano 6 px + brilho, marcas a 45°. **Centro do círculo em (88, 88)**, raio 72 (Ø144), base escura 6 px abaixo |
+| `ui_hud_skill_cooldown.png` | 176×184 | — | — | Slot em recarga: anel `holo_line_dim`, sem brilho |
+| `ui_hud_skill_cooldown_ring.png` | 176×184 | — | — | Anel de progresso da recarga (ciano com brilho): `TextureProgressBar` radial (`fill_mode` horário, `radial_center` (88, 88)) por cima de `_cooldown`; enche à medida que a recarga passa |
+| `ui_hud_skill_cooldown_mask.png` | 144×144 | — | — | Véu do setor restante (`#021423` 62%), mesmo uso do `ui_skill_cooldown_mask` |
+| `ui_hud_skill_locked.png` | 176×184 | — | — | Bloqueado: tokens `holo_dis_*`, anel tracejado. Por cima: `ui_icon_lock_holo` 64 px e "NV n" |
+| `ui_hud_skill_empty.png` | 176×184 | — | — | Liberado sem Módulo: anel tracejado `holo_line_dim`, sem ícone |
+| `ui_hud_key_badge.png` / `_off.png` | 44×44 | — | — | Badge da tecla (corpo 36×36 em (4, 4)); `_off` no bloqueado. Centro em (cx + 52, cy − 60) do slot |
+| `ui_hud_upgrade_normal.png` | 144×96 | — | 8 | Upgrade comprável. Corpo 128×80 em (8, 8); poço do ícone centrado em (39, 36) r 24 (= `ICON_C` + 8) e faixa do custo = `UpgradeButton.PILL` + (8, 8). Tamanho fixo |
+| `ui_hud_upgrade_pressed.png` | 144×96 | — | 8 | Pressionado (moldura `holo_text2`, miolo `#0E5A70`); mantém a escala 0,94 do código |
+| `ui_hud_upgrade_disabled.png` | 144×96 | — | 8 | Sem Partículas: `holo_dis_*`, sem brilho; ícone a 55%, custo `#FF9AA6` |
+| `ui_hud_upgrade_max.png` | 144×96 | — | 8 | Máximo: moldura e faixa douradas; "MAX" em `gold` |
+
+- **Texto fica na UI** (Outfit 800, `holo_text` com contorno `#021423` de 4–5 px, como no mockup): "ONDA X/Y", número de Partículas, "ENERGIA atual / máx", "Boss" e números do chefe, "Nv n", custos, "MAX", "NV n", dígitos das teclas e os segundos da recarga. Só a pausa ("II") e a velocidade têm o símbolo na arte.
+- Ícones de upgrade e de Módulo atuais mantidos sem recolorir (funcionam sobre o fundo escuro).
+- Peças antigas (`ui_skill_frame_*`, `ui_upgrade_*`, `ui_pill_*`, `ui_bar_*`, `ui_icon_pause`) ficam até o AG02 aplicar a T-290; depois podem sair do `.pck`.
+
+## Moeda e glossário do hangar (T-162, BRF-130)
+
+Estilo holográfico (§11/§12 do `docs/arte.md`), contorno `#021423`, brilho pintado, sem texto. Fonte: `_src/gen_ui_icons.py` (`python assets/ui/_src/gen_ui_icons.py`; precisa de Chrome e ffmpeg no PATH). Folha de conferência: `_src/icons_glossary_sheet.png`; prévia: `docs/img/icones-glossario.png` (fundo do HUD, bandeja e arena clara; 64, 44 e 28 px).
+
+| Arquivo | PNG | Tela | Uso |
+|---|---|---|---|
+| `ui_icon_coin.png` | 128×128 | 44–88 | **Moeda**: disco dourado com aro e losango em relevo (círculo; Partícula = estrela verde, XP = hexágono violeta). Resultado, loja, custos |
+| `ui_icon_coin_small.png` | 48×48 | 24–48 | Moeda simplificada (contorno grosso, sem aro fino) para a pílula do menu (~44 px no viewport 720) e textos em linha |
+| `ui_icon_module.png` | 128×128 | 28–64 | **Módulo** (poder ativo): placa chanfrada ciano com raio. Ciano = jogador |
+| `ui_icon_component.png` | 128×128 | 28–64 | **Componente** (equipamento): peça laranja com pinos e soquete |
+| `ui_icon_core.png` | 128×128 | 28–64 | **Núcleo** (talento): esfera azul `#4F8DFF` ligada a três nós (árvore) |
+| `ui_icon_module_fragment.png` | 128×128 | 28–64 | **Fragmento de Módulo**: cacos de cristal orquídea `#E07BFF` com o raio ciano do Módulo |
+
+Total ~55 KB. Use `TextureRect` com `expand_mode = EXPAND_IGNORE_SIZE` e `STRETCH_KEEP_ASPECT_CENTERED`.

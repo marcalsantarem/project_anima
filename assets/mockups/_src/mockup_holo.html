@@ -1,0 +1,188 @@
+<!doctype html>
+<!-- Mockups dos menus holográficos (T-180, BRF-105). Render: bash assets/mockups/_src/render.sh -->
+<html lang="pt-BR"><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Outfit;src:url(../../fonts/Outfit-Variable.ttf);font-weight:100 900}
+:root{
+  --bg:#021423; --panel:rgba(6,34,58,.78); --panel-solid:#06223A;
+  --line:#3FE8F5; --line-dim:rgba(63,232,245,.38); --glow:rgba(47,230,242,.55);
+  --text:#E6FFFF; --text2:#9FF6FF; --muted:#7FA3B8;
+  --violet:#8A6CFF; --violet-soft:#B9A5FF; --gold:#FFC93D; --gold-soft:#FFE08A;
+  --dis-fill:#0E2233; --dis-line:#36506A; --dis-text:#5F7A92; --ink:#03202E;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:375px;height:812px;overflow:hidden;background:var(--bg);font-family:Outfit,sans-serif;color:var(--text)}
+.screen{position:absolute;left:0;top:0;width:375px;height:812px;display:none;overflow:hidden}
+.screen.on{display:block}
+.abs{position:absolute}
+/* fundo: escala do shell, min(h/1376, max(w/768, .88h/1376)) = .519 -> 399x714, topo, centro */
+.bg{position:absolute;left:50%;top:0;width:399px;height:714px;transform:translateX(-50%);background-size:100% 100%}
+.bg::after{content:"";position:absolute;left:0;right:0;bottom:0;height:160px;background:linear-gradient(rgba(2,20,35,0),var(--bg))}
+.dim{position:absolute;inset:0;background:rgba(2,20,35,.30)}
+/* painel chanfrado: moldura 1.5px + preenchimento translúcido + colchetes de canto */
+.ch{--c:12px;clip-path:polygon(var(--c) 0,calc(100% - var(--c)) 0,100% var(--c),100% calc(100% - var(--c)),calc(100% - var(--c)) 100%,var(--c) 100%,0 calc(100% - var(--c)),0 var(--c))}
+.panel{position:absolute;background:var(--line-dim)}
+.panel>.fill{position:absolute;inset:1.5px;background:var(--panel)}
+.panel>.fill.ch{--c:11px}
+.panel>.brk{position:absolute;inset:0;pointer-events:none;background:
+  linear-gradient(var(--line),var(--line)) 12px 0/22px 2px no-repeat,
+  linear-gradient(var(--line),var(--line)) 0 12px/2px 22px no-repeat,
+  linear-gradient(var(--line),var(--line)) calc(100% - 12px) 100%/22px 2px no-repeat,
+  linear-gradient(var(--line),var(--line)) 100% calc(100% - 12px)/2px 22px no-repeat}
+.panel>.scan{position:absolute;left:2px;right:2px;height:1px;background:linear-gradient(90deg,rgba(63,232,245,0),rgba(63,232,245,.55),rgba(63,232,245,0))}
+.hdr{position:absolute;left:0;right:0;text-align:center;font-weight:700;font-size:12px;letter-spacing:3px;color:var(--text2)}
+/* botões */
+.glow{filter:drop-shadow(0 0 10px var(--glow))}
+.btn{position:absolute;display:flex;align-items:center;justify-content:center;font-weight:800;letter-spacing:2px}
+.btn.primary{background:linear-gradient(#7FF5FF,#2FE6F2 45%,#0FA9C4);color:var(--ink);font-size:30px}
+.btn.primary::before{content:"";position:absolute;left:14px;right:14px;top:5px;height:2px;background:rgba(255,255,255,.75)}
+.btn.primary::after{content:"";position:absolute;left:0;right:0;bottom:0;height:6px;background:rgba(3,32,46,.35)}
+.btn.secondary{background:var(--line);font-size:17px;color:var(--text)}
+.btn.secondary>.in{position:absolute;inset:2px;background:rgba(6,34,58,.9);display:flex;align-items:center;justify-content:center}
+.btn.secondary>.in.ch{--c:9px}
+.txt-glow{text-shadow:0 0 8px rgba(63,232,245,.8),0 0 2px rgba(63,232,245,.9)}
+.gold-glow{text-shadow:0 0 10px rgba(255,201,61,.75),0 2px 0 #6A4300}
+/* barra de XP */
+.bar{position:absolute;height:12px;background:var(--line-dim)}
+.bar>.trk{position:absolute;inset:1px;background:#071A2B}
+.bar>.fil{position:absolute;left:2px;top:2px;bottom:2px;background:linear-gradient(90deg,var(--violet),var(--line))}
+.bar>.fil::after{content:"";position:absolute;right:-1px;top:-2px;bottom:-2px;width:3px;background:#E6FFFF;box-shadow:0 0 6px var(--line)}
+.bar>.tk{position:absolute;top:2px;bottom:2px;width:1px;background:rgba(2,20,35,.7)}
+.num{font-variant-numeric:tabular-nums}
+.small{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:1px}
+/* slots de Módulo */
+.slot{position:absolute;width:60px;height:60px}
+.slot .frame{position:absolute;inset:0}
+.slot .lbl{position:absolute;left:-10px;right:-10px;top:64px;text-align:center;font-size:11px;font-weight:700;letter-spacing:1px}
+</style></head><body>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="gHex" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3B2C9A"/><stop offset="1" stop-color="#150F4A"/></linearGradient>
+    <linearGradient id="gCoin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE58A"/><stop offset=".55" stop-color="#FFC93D"/><stop offset="1" stop-color="#E89A1A"/></linearGradient>
+    <linearGradient id="gXp" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9B7CFF"/><stop offset="1" stop-color="#4A33C8"/></linearGradient>
+    <symbol id="hex" viewBox="0 0 52 58"><polygon points="26,1.5 50.5,15.5 50.5,42.5 26,56.5 1.5,42.5 1.5,15.5" fill="url(#gHex)" stroke="#3FE8F5" stroke-width="2.5"/><polygon points="26,7 45.5,18.5 45.5,39.5 26,51 6.5,39.5 6.5,18.5" fill="none" stroke="#8A6CFF" stroke-width="1.5" opacity=".9"/></symbol>
+    <symbol id="coin" viewBox="0 0 32 32"><circle cx="16" cy="17" r="13.5" fill="#9A5F0C"/><circle cx="16" cy="15.5" r="13.5" fill="url(#gCoin)" stroke="#9A5F0C" stroke-width="1.5"/><circle cx="16" cy="15.5" r="9.5" fill="none" stroke="#FFF1B8" stroke-width="1.4" opacity=".8"/><path d="M16 8.5 L21 15.5 L16 22.5 L11 15.5Z" fill="#FFF6D6" stroke="#B87410" stroke-width="1"/></symbol>
+    <symbol id="xp" viewBox="0 0 32 32"><polygon points="16,2 28.5,9 28.5,23 16,30 3.5,23 3.5,9" fill="url(#gXp)" stroke="#B9A5FF" stroke-width="1.6"/><path d="M16 7 L21.5 16 L16 25 L10.5 16Z" fill="#3FE8F5"/><path d="M16 7 L16 25 L10.5 16Z" fill="#E6FFFF" opacity=".85"/></symbol>
+    <symbol id="gear" viewBox="0 0 24 24"><path d="M10.3 2h3.4l.5 2.6 1.6.7 2.2-1.5 2.4 2.4-1.5 2.2.7 1.6 2.6.5v3.4l-2.6.5-.7 1.6 1.5 2.2-2.4 2.4-2.2-1.5-1.6.7-.5 2.6h-3.4l-.5-2.6-1.6-.7-2.2 1.5-2.4-2.4 1.5-2.2-.7-1.6L2 13.7v-3.4l2.6-.5.7-1.6-1.5-2.2 2.4-2.4 2.2 1.5 1.6-.7z" fill="#9FF6FF"/><circle cx="12" cy="12" r="3.6" fill="#06223A" stroke="#9FF6FF" stroke-width="1"/></symbol>
+    <symbol id="lock" viewBox="0 0 24 24"><path d="M7.5 11V8a4.5 4.5 0 0 1 9 0v3" fill="none" stroke="#7FA3B8" stroke-width="2.2"/><rect x="5" y="11" width="14" height="10" rx="2" fill="#2A4258" stroke="#7FA3B8" stroke-width="1.6"/><circle cx="12" cy="16" r="1.6" fill="#7FA3B8"/></symbol>
+    <symbol id="unlock" viewBox="0 0 24 24"><path d="M7.5 11V7a4.5 4.5 0 0 1 9 0" fill="none" stroke="#3FE8F5" stroke-width="2.2"/><rect x="5" y="11" width="14" height="10" rx="2" fill="#0B4A5E" stroke="#3FE8F5" stroke-width="1.6"/><circle cx="12" cy="16" r="1.6" fill="#E6FFFF"/></symbol>
+  </defs>
+</svg>
+
+<!-- ============ MENU PRINCIPAL (conta nível 4) ============ -->
+<div class="screen" id="menu">
+  <div class="bg" style="background-image:url(../../ui/title_bg_tech.webp)"></div>
+  <!-- topo: só a engrenagem (sem ação no M2) -->
+  <div class="panel ch" style="left:315px;top:53px;width:44px;height:44px;--c:9px"><div class="fill ch" style="--c:8px"></div></div>
+  <svg class="abs" style="left:325px;top:63px" width="24" height="24"><use href="#gear"/></svg>
+  <!-- bloco central no terço inferior: logotipo, nível/XP + Moeda, Jogar (sem Módulos, dica de slot, ALFA nem versão) -->
+  <div class="abs txt-glow" style="left:0;right:0;top:440px;text-align:center;font-weight:700;font-size:22px;letter-spacing:4px">PROJECT:</div>
+  <div class="abs txt-glow" style="left:0;right:0;top:462px;text-align:center;font-weight:800;font-size:58px;letter-spacing:6px;line-height:1">ANIMA</div>
+  <svg class="abs" style="left:44px;top:548px" width="52" height="58"><use href="#hex"/></svg>
+  <div class="abs num" style="left:44px;top:558px;width:52px;text-align:center;font-weight:800;font-size:26px">4</div>
+  <div class="abs" style="left:106px;top:553px;font-weight:700;font-size:13px;letter-spacing:2px;color:var(--text2)">NÍVEL 4</div>
+  <div class="bar" style="left:106px;top:572px;width:124px"><div class="trk"></div><div class="fil" style="width:74px"></div></div>
+  <div class="abs small num" style="left:106px;top:588px">320 / 500 XP</div>
+  <div class="panel ch glow" style="left:240px;top:558px;width:92px;height:38px;--c:9px"><div class="fill ch" style="--c:8px"></div></div>
+  <svg class="abs" style="left:247px;top:564px" width="26" height="26"><use href="#coin"/></svg>
+  <div class="abs num" style="left:276px;top:566px;width:50px;text-align:right;font-weight:800;font-size:18px">1.250</div>
+  <div class="glow" style="position:absolute;left:47px;top:636px;width:281px;height:78px"><div class="btn primary ch" style="inset:0;--c:16px">JOGAR</div></div>
+</div>
+
+<!-- ============ MENU PRINCIPAL (conta nível 1) ============ -->
+<div class="screen" id="menu_lvl1">
+  <div class="bg" style="background-image:url(../../ui/title_bg_tech.webp)"></div>
+  <!-- topo: só a engrenagem (sem ação no M2) -->
+  <div class="panel ch" style="left:315px;top:53px;width:44px;height:44px;--c:9px"><div class="fill ch" style="--c:8px"></div></div>
+  <svg class="abs" style="left:325px;top:63px" width="24" height="24"><use href="#gear"/></svg>
+  <!-- bloco central no terço inferior: logotipo, nível/XP + Moeda, Jogar (sem Módulos, dica de slot, ALFA nem versão) -->
+  <div class="abs txt-glow" style="left:0;right:0;top:440px;text-align:center;font-weight:700;font-size:22px;letter-spacing:4px">PROJECT:</div>
+  <div class="abs txt-glow" style="left:0;right:0;top:462px;text-align:center;font-weight:800;font-size:58px;letter-spacing:6px;line-height:1">ANIMA</div>
+  <svg class="abs" style="left:44px;top:548px" width="52" height="58"><use href="#hex"/></svg>
+  <div class="abs num" style="left:44px;top:558px;width:52px;text-align:center;font-weight:800;font-size:26px">1</div>
+  <div class="abs" style="left:106px;top:553px;font-weight:700;font-size:13px;letter-spacing:2px;color:var(--text2)">NÍVEL 1</div>
+  <div class="bar" style="left:106px;top:572px;width:124px"><div class="trk"></div><div class="fil" style="width:6px"></div></div>
+  <div class="abs small num" style="left:106px;top:588px">0 / 100 XP</div>
+  <div class="panel ch glow" style="left:240px;top:558px;width:92px;height:38px;--c:9px"><div class="fill ch" style="--c:8px"></div></div>
+  <svg class="abs" style="left:247px;top:564px" width="26" height="26"><use href="#coin"/></svg>
+  <div class="abs num" style="left:276px;top:566px;width:50px;text-align:right;font-weight:800;font-size:18px">0</div>
+  <div class="glow" style="position:absolute;left:47px;top:636px;width:281px;height:78px"><div class="btn primary ch" style="inset:0;--c:16px">JOGAR</div></div>
+</div>
+
+<!-- ============ RESULTADO (vitória + subida de nível + slot 1) ============ -->
+<div class="screen" id="result">
+  <div class="bg" style="background-image:url(../../backgrounds/result_tech_bg.webp)"></div>
+  <div class="dim"></div>
+  <div class="abs gold-glow" style="left:0;right:0;top:56px;text-align:center;font-weight:900;font-size:48px;letter-spacing:5px;color:var(--gold)">VITÓRIA</div>
+  <div class="abs num" style="left:0;right:0;top:116px;text-align:center;font-weight:600;font-size:13px;letter-spacing:3px;color:var(--text2)">ONDA 10/10 · 4:32</div>
+  <!-- recompensas -->
+  <div class="panel ch" style="left:24px;top:152px;width:327px;height:124px"><div class="fill ch"></div><div class="brk"></div><div class="scan" style="top:36px"></div>
+    <div class="hdr" style="top:11px">RECOMPENSAS</div></div>
+  <svg class="abs" style="left:52px;top:200px" width="44" height="44"><use href="#xp"/></svg>
+  <div class="abs num txt-glow" style="left:104px;top:196px;font-weight:800;font-size:32px">+180</div>
+  <div class="abs" style="left:106px;top:236px;font-size:11px;font-weight:700;letter-spacing:2px;color:var(--violet-soft)">XP</div>
+  <div class="abs" style="left:187px;top:198px;width:1px;height:52px;background:var(--line-dim)"></div>
+  <svg class="abs" style="left:208px;top:200px" width="44" height="44"><use href="#coin"/></svg>
+  <div class="abs num" style="left:260px;top:196px;font-weight:800;font-size:32px;color:var(--gold-soft);text-shadow:0 0 8px rgba(255,201,61,.6)">+95</div>
+  <div class="abs" style="left:262px;top:236px;font-size:11px;font-weight:700;letter-spacing:2px;color:var(--gold)">MOEDA</div>
+  <!-- subida de nível -->
+  <div class="panel ch glow" style="left:24px;top:292px;width:327px;height:116px"><div class="fill ch"></div><div class="brk"></div></div>
+  <svg class="abs" style="left:34px;top:306px" width="88" height="88" viewBox="0 0 88 88" opacity=".85">
+    <circle cx="44" cy="44" r="41" fill="none" stroke="#3FE8F5" stroke-width="1.5" stroke-dasharray="6 5"/>
+    <circle cx="44" cy="44" r="35" fill="none" stroke="#8A6CFF" stroke-width="1"/></svg>
+  <svg class="abs" style="left:46px;top:316px" width="64" height="70" viewBox="0 0 52 58"><use href="#hex"/></svg>
+  <div class="abs num" style="left:46px;top:330px;width:64px;text-align:center;font-weight:900;font-size:32px">3</div>
+  <div class="abs txt-glow" style="left:136px;top:310px;font-weight:800;font-size:26px;letter-spacing:2px">NÍVEL 3!</div>
+  <div class="abs small num" style="left:138px;top:342px">NÍVEL 2 → 3</div>
+  <div class="bar" style="left:136px;top:362px;width:196px;height:14px"><div class="trk"></div><div class="fil" style="width:34px"></div><div class="tk" style="left:49px"></div><div class="tk" style="left:98px"></div><div class="tk" style="left:147px"></div></div>
+  <div class="abs small num" style="left:136px;top:382px">40 / 650 XP</div>
+  <!-- aviso de slot -->
+  <div class="panel ch" style="left:24px;top:428px;width:327px;height:92px;background:rgba(255,201,61,.8);filter:drop-shadow(0 0 10px rgba(255,201,61,.45))"><div class="fill ch" style="background:rgba(30,26,20,.88)"></div></div>
+  <div class="slot" style="left:42px;top:444px"><div class="panel ch glow" style="inset:0;--c:10px"><div class="fill ch" style="--c:9px;background:rgba(10,60,84,.95)"></div></div>
+    <svg class="abs" style="left:14px;top:14px" width="32" height="32"><use href="#unlock"/></svg></div>
+  <div class="abs gold-glow" style="left:118px;top:450px;font-weight:800;font-size:22px;letter-spacing:1px;color:var(--gold)">SLOT 1 LIBERADO</div>
+  <div class="abs" style="left:118px;top:480px;width:220px;font-size:12px;font-weight:600;color:var(--text);line-height:1.3">O 1º Módulo entra na próxima partida</div>
+  <!-- ações -->
+  <div class="glow" style="position:absolute;left:47px;top:640px;width:281px;height:72px"><div class="btn primary ch" style="inset:0;--c:15px;font-size:26px">CONTINUAR</div></div>
+  <div class="btn secondary ch" style="left:77px;top:728px;width:221px;height:52px;--c:10px"><div class="in ch">JOGAR DE NOVO</div></div>
+</div>
+
+<!-- ============ FOLHA DE PEÇAS (estados) ============ -->
+<div class="screen" id="parts" style="background:var(--bg)">
+  <div class="abs" style="left:16px;top:16px;font-size:14px;font-weight:800;letter-spacing:2px;color:var(--text2)">PEÇAS · ESTADOS</div>
+  <div class="abs small" style="left:16px;top:44px">primário normal / pressionado</div>
+  <div class="glow" style="position:absolute;left:16px;top:62px;width:160px;height:60px"><div class="btn primary ch" style="inset:0;--c:13px;font-size:22px">JOGAR</div></div>
+  <div style="position:absolute;left:192px;top:65px;width:160px;height:60px;filter:drop-shadow(0 0 4px var(--glow))"><div class="btn primary ch" style="inset:0;--c:13px;font-size:22px;background:linear-gradient(#2FE6F2,#0FA9C4 60%,#0B7F97)">JOGAR</div></div>
+  <div class="abs small" style="left:16px;top:140px">secundário normal / pressionado / desabilitado</div>
+  <div class="btn secondary ch" style="left:16px;top:158px;width:108px;height:48px;--c:9px"><div class="in ch" style="--c:8px">MENU</div></div>
+  <div class="btn secondary ch" style="left:134px;top:160px;width:108px;height:48px;--c:9px;background:var(--text2)"><div class="in ch" style="--c:8px;background:rgba(14,90,112,.95)">MENU</div></div>
+  <div class="btn secondary ch" style="left:252px;top:158px;width:108px;height:48px;--c:9px;background:var(--dis-line)"><div class="in ch" style="--c:8px;background:var(--dis-fill);color:var(--dis-text)">MENU</div></div>
+  <div class="abs small" style="left:16px;top:224px">painel + colchetes + varredura</div>
+  <div class="panel ch" style="left:16px;top:242px;width:200px;height:96px"><div class="fill ch"></div><div class="brk"></div><div class="scan" style="top:34px"></div><div class="hdr" style="top:10px">TÍTULO</div></div>
+  <svg class="abs" style="left:236px;top:248px" width="52" height="58"><use href="#hex"/></svg>
+  <div class="abs num" style="left:236px;top:258px;width:52px;text-align:center;font-weight:800;font-size:26px">12</div>
+  <svg class="abs" style="left:300px;top:250px" width="44" height="44"><use href="#xp"/></svg>
+  <svg class="abs" style="left:300px;top:300px" width="44" height="44"><use href="#coin"/></svg>
+  <div class="abs small" style="left:16px;top:356px">barra de XP (trilho 12 px, ponta clara)</div>
+  <div class="bar" style="left:16px;top:376px;width:343px;height:14px"><div class="trk"></div><div class="fil" style="width:220px"></div></div>
+  <div class="abs small" style="left:16px;top:410px">molduras por raridade (M3+)</div>
+  <div id="rar"></div>
+  <div class="abs small" style="left:16px;top:540px">paleta</div>
+  <div id="pal"></div>
+</div>
+
+<script>
+const id=(location.hash||'#menu').slice(1);document.getElementById(id).classList.add('on');
+// raridades
+const R=[['COMUM','#9AA4B8',1],['RARA','#3D8BF5',2],['ÉPICA','#A04DF5',3],['LENDÁRIA','#F5B83D',4]];
+let h='';R.forEach(([n,c,k],i)=>{const x=16+i*88;
+ h+=`<div class="panel ch" style="left:${x}px;top:430px;width:76px;height:76px;--c:11px;background:${c};${k>=3?`filter:drop-shadow(0 0 ${k*3}px ${c})`:''}"><div class="fill ch" style="inset:${k>=3?4:3}px;--c:9px;background:#06223A"></div>${k>=3?`<div class="fill ch" style="inset:7px;--c:7px;background:${c}"></div><div class="fill ch" style="inset:8.5px;--c:6px;background:linear-gradient(${c}55,#06223A 70%)"></div>`:''}</div>`;
+ if(k>=2)[[x-3,427],[x+67,427],[x-3,497],[x+67,497]].forEach(([a,b],j)=>{if(k<4&&(j==1||j==2))return;h+=`<div class="abs" style="left:${a}px;top:${b}px;width:12px;height:12px;transform:rotate(45deg);background:${k==4?'#FFF1B8':c};border:1.5px solid #021423"></div>`});
+ h+=`<div class="abs" style="left:${x}px;top:512px;width:76px;text-align:center;font-size:10px;font-weight:800;color:${c}">${n}</div>`});
+document.getElementById('rar').outerHTML=h;
+const P=[['#021423','bg'],['#06223A','panel'],['#3FE8F5','line'],['#E6FFFF','text'],['#9FF6FF','text2'],['#7FA3B8','muted'],['#8A6CFF','violet'],['#FFC93D','gold'],['#36506A','dis_line'],['#FF5A6E','danger']];
+let p='';P.forEach(([c,n],i)=>{const x=16+(i%5)*70,y=560+Math.floor(i/5)*70;p+=`<div class="abs" style="left:${x}px;top:${y}px;width:60px;height:40px;background:${c};border:1px solid #3FE8F566"></div><div class="abs" style="left:${x}px;top:${y+43}px;font-size:9px;color:#9FF6FF">${n} ${c}</div>`});
+document.getElementById('pal').outerHTML=p;
+</script>
+</body></html>

@@ -84,6 +84,7 @@ var waves: WaveRunner
 var is_over := false
 var particles := 0 ## moeda da partida: começa em 0 e zera a cada partida
 var enemies_killed := 0
+var kills_by_type := {} ## id do inimigo → mortes (soma = enemies_killed)
 var elapsed := 0.0
 ## Níveis dos upgrades desta partida (novo a cada partida).
 var upgrades: MatchUpgrades
@@ -139,6 +140,7 @@ func _ready() -> void:
 	anima.core_hp_changed.connect(_on_core_hp_feel)
 	_last_core_hp = anima.core.current
 	anima.core_depleted.connect(func() -> void: _end(MatchResult.Outcome.DEFEAT))
+	skills.skills = _slot_skills()
 	skills.setup(SkillContext.new(anima, active_enemies))
 	skills.skill_used.connect(func(slot: int) -> void: skill_used.emit(slot))
 	skills.cooldown_changed.connect(func(slot: int, r: float, t: float) -> void: cooldown_changed.emit(slot, r, t))
@@ -170,6 +172,15 @@ func _physics_process(delta: float) -> void:
 	elapsed += delta
 	if waves_enabled:
 		waves.tick(delta, active_enemies.size())
+
+
+## Módulos por slot pela config: só os `unlocked_slots` primeiros ativos; os demais ficam vazios.
+func _slot_skills() -> Array[SkillData]:
+	var src: Array[SkillData] = config.slot_modules if not config.slot_modules.is_empty() else skills.skills
+	var out: Array[SkillData] = []
+	for i in MatchConfig.SLOT_COUNT:
+		out.append(src[i] if i < config.unlocked_slots and i < src.size() else null)
+	return out
 
 
 ## Fixa a seed do sorteio da partida (bordas RANDOM, grupos, chefe). Chamar antes de entrar
@@ -436,6 +447,7 @@ func _on_enemy_died(enemy: Enemy, cause: Enemy.DeathCause) -> void:
 	enemy_died.emit(enemy.position, enemy.data.id, cause)
 	if cause == Enemy.DeathCause.KILLED and not is_over:
 		enemies_killed += 1
+		kills_by_type[enemy.data.id] = int(kills_by_type.get(enemy.data.id, 0)) + 1
 		particles += enemy.data.particle_drop
 		_emit_particles()
 		if enemy.data.particle_drop > 0:
@@ -467,6 +479,7 @@ func _end(outcome: MatchResult.Outcome) -> void:
 	result.waves_total = waves.total_waves()
 	result.particles = particles
 	result.enemies_killed = enemies_killed
+	result.kills_by_type = kills_by_type.duplicate()
 	result.duration_s = elapsed
 	match_ended.emit(result)
 

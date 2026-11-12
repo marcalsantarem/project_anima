@@ -21,6 +21,7 @@ signal time_up
 var arena: Arena
 var enemy_target := 150
 var projectile_target := 300
+var speed := 0.0 ## velocidade pedida (0 = não pedida; fica a escolhida do jogador)
 
 var time_left := DURATION_S
 var _done := false
@@ -44,6 +45,34 @@ static func requested() -> Vector2i:
 	return Vector2i(maxi(int(parts[0]), 0), maxi(int(parts[1]), 0))
 
 
+## Velocidade pedida (`speed=2` na URL ou `--speed=2`): 1.0, 2.0 ou 0.0 (não pedida/inválida).
+static func requested_speed() -> float:
+	var raw := ""
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--speed="):
+			raw = arg.trim_prefix("--speed=")
+	if raw == "" and OS.has_feature("web") and DebugSettings.overlay_enabled():
+		var v = JavaScriptBridge.eval("(new URLSearchParams(location.search)).get('speed') || ''", true)
+		raw = str(v) if v != null else ""
+	if not raw.is_valid_float() or not (is_equal_approx(float(raw), 1.0) or is_equal_approx(float(raw), 2.0)):
+		return 0.0
+	return float(raw)
+
+
+## Aplica a velocidade do estresse SEM salvar em `user://settings.cfg` (não usa `set_speed`). Destrava o
+## x1 forçado do headless para a medição no PC. Só deve ser chamada com o estresse ativo.
+static func apply_speed(speed: float) -> void:
+	if speed <= 0.0:
+		return
+	# Acesso dinâmico: scripts com class_name compilam antes dos autoloads em ferramentas `-s`.
+	var sc := (Engine.get_main_loop() as SceneTree).root.get_node_or_null("SpeedController")
+	if sc == null:
+		return
+	sc.set("locked_to_x1", false)
+	sc.set("chosen", 2.0 if is_equal_approx(speed, 2.0) else 1.0)
+	sc.call("restore")
+
+
 ## Cópia do projétil do Anima que atravessa tudo (dano 0 vem do fire). Não altera o recurso original.
 static func stress_projectile(base: ProjectileData) -> ProjectileData:
 	var d := base.duplicate() as ProjectileData
@@ -57,6 +86,8 @@ static func attach(p_arena: Arena, enemies: int, projectiles: int) -> StressMode
 	s.enemy_target = enemies
 	s.projectile_target = projectiles
 	p_arena.waves_enabled = false
+	s.speed = requested_speed()
+	apply_speed(s.speed)
 	s.time_up.connect(p_arena.end_by_timeout)
 	p_arena.add_child(s)
 	return s

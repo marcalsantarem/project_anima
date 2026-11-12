@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="RewardData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/meta/reward_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+kill_xp = {
+&"enemy_runner": 1.0,
+&"enemy_swarm": 0.5,
+&"enemy_shooter": 2.0,
+&"enemy_tank": 2.0,
+&"boss_warden": 20.0
+}
+kill_coins = {
+&"enemy_runner": 1.0,
+&"enemy_swarm": 0.5,
+&"enemy_shooter": 3.0,
+&"enemy_tank": 3.0,
+&"boss_warden": 40.0
+}
+defeat_multiplier = 0.7
+first_win_bonus_xp = 100
+first_win_bonus_coins = 115

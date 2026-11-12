@@ -42,6 +42,7 @@
 - Sprites de `assets/sprites/` via `SpriteArt` (`src/match/arena/sprite_art.gd`): PNG 2x, `scale` 0,5, `centered = false`, `offset = -âncora`, filtro Linear. Textura e âncora ficam nos dados: `EnemyData.sprite/sprite_anchor`, `ProjectileData.sprite/sprite_anchor`, `AnimaData` (grupo "Arte": base, cristal a `crystal_height` 110 px com bob de 5 px, 3 nós em elipse 29×12 px). Só visual: colisão, `GroundShadow` e `ground_plane` não mudaram.
 - Projétil: sprite a `height` px acima da âncora, `rotation` = direção do tiro na tela. `ProjectileData.shape/color` seguem como identidade de leitura (testes), sem desenho.
 - Fundo (BRF-041): nó `Floor` (`ArenaFloor`, `src/match/arena/arena_floor.gd`) com as peças de `assets/backgrounds/`: `floor_tile` repetido (Sprite2D com `region` + repeat) cobrindo a tela inteira, `floor_top_shade` no topo e `floor_ring` no Anima (escala `ArenaFloor.RING_SCALE` 0,35 = ~70% do tamanho anterior, decisão 43; todos `z_index = -10`); 4 `floor_pillar` nos cantos da área livre (`free_rect`; insets `pillar_inset_*`, topo 96 abaixo do HUD), com `GroundShadow` e Y-sort junto das entidades. Sem moldura. `ArenaFloor.layout()` só reposiciona (sem alocar por frame).
+- T-292 (BRF-128): o selo rúnico/anel elíptico no chão (`floor_ring.png`) deixou de ser criado em `ArenaFloor` (decisão 64). O PNG segue em `assets/backgrounds/` (órfão, p/ AG08). Alcance do ataque, `show_skill_aim` e telegraphs do chefe inalterados.
 - Chefe: ogro (`boss_ogre.png`, âncora (256, 472), sem anel; `BossData.sprite_attack`/`sprite_stunned` para o wind-up e o atordoamento). Os campos `ring_*` do `EnemyData` continuam disponíveis.
 - Fora: `pickup_particle.png` (ainda não há drop no chão) e `shadow_ground.png` (a sombra segue desenhada pelo jogo).
 
@@ -95,7 +96,7 @@ O comportamento fica em um script por `type` (`SkillBehavior` → `AreaSkill`, .
 - **Tempo:** telegraph no chão (elipse que enche) por `telegraph_time` = 0,6 s; o meteoro cai nos últimos `fall_time` = 0,35 s (de `fall_height` = 360 px acima, acelerando); no impacto, dano em área no chão e `skill_cast`; a cratera fica `crater_time` = 0,5 s. Nada é alocado na animação (nós criados no `_ready`).
 - **Arte:** `assets/sprites/skill_meteor.png` (âncora 64,164) e `skill_meteor_crater.png` (âncora 128,96, escalada para largura 1x = 2 × raio × 1,07); sem textura, desenho provisório por código. `icon` = `assets/ui/ui_icon_skill_meteor.png` (o HUD ainda não lê esse campo: AG02).
 - **Balanceamento:** 40 de dano mata enxame (8), corredor (20) e atirador (35); tanque (120) leva 1/3. Raio 160 cobre um grupo de enxame (espalhamento 48). Com 1 uso a cada 10 s, limpa grupos sem resolver as ondas 5+ (12–14 corredores vindos de bordas diferentes). Upgrades futuros: `radius`, `damage`, `cooldown` são campos separados; `upgrade_cooldown` já vale.
-- Cards e raridades (AG04, depois do M1) só alteram números e efeitos via `SkillData`. O gameplay não conhece cards.
+- Níveis de Módulo, Componentes e raridades (AG04, depois do M1) só alteram números e efeitos via `SkillData`. O gameplay não conhece o meta.
 
 ## Inimigos
 
@@ -370,6 +371,35 @@ O `project.godot` é do AG07. Layers sugeridas:
 - **Medidas no PC (headless, Godot 4.7.2)**, microbench de spawn de 150 corredores: **~60 µs/spawn instanciando -> ~6 µs reaproveitando (~10x)**. Estresse 150/300, 120 quadros: física ~48-61 ms/quadro medidos pelo monitor do headless (inclui o servidor de física 2D sem renderizar; variação entre rodadas; antes e depois equivalentes, pois o ganho do pool está no spawn/free e não no passo). Nós estáveis (2758 -> ~2770), sem órfãos.
 - **Não medido:** FPS real no iPhone/Safari (renderização, draw calls). Gargalo provável lá: desenho de ~450 sprites + colisão Area2D (150 inimigos x 300 projéteis), não a lógica. Se < 50 fps, próximos candidatos: reduzir projéteis do estresse por tipo, desligar `monitorable` de projéteis inimigos sem alvo ou passar a colisão projétil-inimigo para grade espacial.
 
+## Aceleração x1/x2 (T-272, BRF-118; decisão 59) [Decidido pelo dono em 2026-11-09: salvar, x2 livre, botão só na partida]
+
+Botão de velocidade no HUD da partida (T-275). Controlador implementado na T-273 (`src/core/speed_controller.gd`, autoload `SpeedController`); botão na T-275.
+
+**API (T-273):** `chosen` (1.0/2.0), `set_speed(s) -> bool` (recusa valor inválido, trava ou headless/bot; salva em `user://settings.cfg`, seção `game`, chave `speed`), `can_use_speed(s) -> bool` (hoje sempre verdadeiro para x1/x2), `rest_scale()`, `restore()` (volta `Engine.time_scale` a `chosen`; use ao sair de câmera lenta de debug), `notify_lock(s, unlocked)`, sinais `speed_changed(s)` e `speed_lock_changed(s, unlocked)`. `locked_to_x1` é true no headless (testes e simulações ficam em x1). O hit-stop marca `held` e ao terminar chama `restore()`; um `set_speed` durante ele só muda `chosen`. O HitStop acessa o autoload por nome de nó (scripts `-s`, como `run_sim`, compilam antes dos autoloads). Obs.: não há câmera lenta F3 no código hoje (F3 só alterna o overlay); se surgir, deve chamar `restore()`.
+**Medido (Godot 4.7.2):** `Engine.time_scale = 2` mantém 60 ticks de física/s reais e **dobra o `delta`** (passos de 2/60 s), não dobra o número de passos. Corrige a suposição do item 6 ("2 passos por quadro"): o risco no iPhone é de passos maiores (projétil a 900 px/s anda ~30 px/passo; colisão/tunelamento a revisar na T-276), não de mais custo por quadro. Teste de equivalência: mesma seed e mesmo tempo de jogo (900 ticks em x1, 450 em x2) dão as mesmas mortes, Partículas, XP e Moeda.
+
+1. **A velocidade escolhida nunca é reduzida sozinha.** Um único dono (`SpeedController`, autoload ou nó do `SceneFlow`, a definir pelo AG07) guarda `chosen` (1.0 ou 2.0) e é o único que escreve o valor "de repouso" de `Engine.time_scale`.
+   - **Pausa:** usa `get_tree().paused`; não toca em `time_scale`. Ao despausar vale `chosen`.
+   - **Hit-stop:** hoje restaura "o `time_scale` anterior". Passa a restaurar `SpeedController.chosen` (não o valor lido ao iniciar), então um toque no botão durante os 30–80 ms só muda `chosen` e vale ao fim. Continua sem empilhar e em tempo real.
+   - **Resultado e telas de fim:** a partida terminada mantém `chosen` (animações do Resultado e da recompensa rodam na velocidade escolhida; tweens de UI que não devem acelerar usam `ignore_time_scale`). Menu e Título também respeitam `chosen`; o botão só aparece na partida.
+   - **Câmera lenta do F3 (0,25x):** é debug; ao sair volta a `chosen`.
+2. **Escopo da sessão. DECIDIDO (2026-11-09): a escolha é SALVA entre aberturas** em `user://settings.cfg` (chave `speed`, fora de `src/meta/`), lida no boot e validada por `can_use_speed`; vale em toda a sessão. As linhas abaixo que dizem "sem salvar" e "começa em x1" foram a recomendação inicial e **não valem**; o bot e o headless continuam sempre em x1.
+   - Recomendação inicial (superada):
+   - Vale entre partidas (Partida → Resultado → Menu → Partida) enquanto o app estiver aberto; ao abrir o app, começa em x1.
+   - Por quê: quem escolhe x2 não precisa tocar de novo a cada partida; e nunca começa acelerado por surpresa depois de dias (a primeira partida do dia é a de aprender/ler). "Só a partida" irritaria quem joga em x2; salvar no disco cria estado persistente, migração e risco com a futura trava (item 4, que poderia deixar salvo um x2 não liberado).
+   - UI: o botão mostra a velocidade atual (x1/x2) e a partida seguinte já abre com o estado do botão correspondente. Menu: nada (opcionalmente um indicador discreto, decisão do AG02).
+   - Save: **nada** no M2. Se o dono preferir lembrar entre aberturas: uma chave `speed` em `user://settings.cfg` (fora de `src/meta/`), lida no boot e validada por `can_use_speed`.
+3. **Recompensa:** XP e Moeda continuam **só por monstros derrotados e ondas**, nunca por tempo (decisão 59). O valor por monstro é o mesmo em x1 e x2; x2 só encurta o tempo real da partida. Nada em `src/meta/` lê `Engine.time_scale`, tempo real ou duração. Partículas idem (por morte). Teste (T-273): mesma seed e mesmo bot, x1 e x2 produzem o mesmo `MatchResult` (kills, XP, Moeda).
+4. **Ponto de extensão para travas futuras (não implementar):** um único ponto, `SpeedController.can_use_speed(speed: float) -> bool`, mais o sinal `speed_lock_changed(speed, unlocked)`. Hoje retorna sempre verdadeiro. O botão (T-275) pergunta a ele e mostra cadeado/anúncio se falso; `set_speed()` recusa o que ele recusar. Trava futura (nível da conta, anúncio recompensado, premium) muda **só** o corpo dessa função (ex.: `Progression.level >= N`); UI e partida não mudam. Se uma trava cair com x2 ativo (anúncio expirou), `chosen` volta a 1.0 pela mesma função.
+5. **Bot e headless:** sempre x1 (o controlador ignora `set_speed` quando `DisplayServer.get_name() == "headless"` ou com o bot ativo); testes e simulações do balanceamento não mudam. O `time_scale` escala cooldowns, ondas, spawn, inimigos, projéteis e VFX (tudo em `_physics_process`/`delta`/`Timer`). Atenção: `get_tree().create_timer(t)` escala por padrão; só o que for de tempo real (hit-stop, `StressMode`, relógio do log) usa `ignore_time_scale = true`.
+6. **Riscos para o iPhone (T-276):**
+   - **Custo (corrigido, T-276):** x2 mantém 60 passos/s e dobra o `delta`; não há 2 passos por quadro. Referência no PC (headless, 300 proj.): +17% de CPU por passo com 150 inimigos e +25% com 300 (carga 0,41 -> 0,48 e 0,56 -> 0,70). Medição real no iPhone: roteiro e tabela em `docs/qa/medicao-x2-iphone.md` (`?debug=1&stress=150,300&speed=2`; `speed` não salva a escolha; o log traz `speed=2` na linha ESTRESSE).
+   - Se cair demais no aparelho: limitar `max_physics_steps_per_frame` (ex.: 4) ou desligar x2 no aparelho (`can_use_speed`).
+   - **Túnel de projéteis (medido, corrigido):** passo de 30 px a 900 px/s contra o enxame (raio 10): 100 tiros de seed fixa com deslocamento lateral dentro da soma dos raios davam 99 acertos em x1 e 86 em x2 (-13% no pior caso). Correção em `Projectile`: 2ª forma de colisão no ponto médio do passo, ligada só com passo > 20 px (espaçamento de ~15 px igual ao x1); resultado 99 / 99. Teste: `tests/unit/match/test_projectile_tunnel.gd`. Inimigos (<= 140 px/s) e projéteis inimigos (300 px/s) não têm risco.
+   - Áudio: `time_scale` altera o tom/andamento de sons; decidir com o AG11 se SFX seguem o `time_scale` (padrão do Godot: não altera o pitch, só o tempo de disparo).
+   - Tremor, números de dano e flash usam `delta` e acelerarão junto; aceito.
+7. **Respostas do dono (2026-11-09):** (a) **salvar** a escolha; (b) **x2 livre** no M2 (sem trava; `can_use_speed` segue como ponto de extensão e retorna sempre verdadeiro); (c) botão **só na partida**, sem indicador no Menu. Dúvidas originais: (a) confirmar "até fechar o app, sem salvar" (ou lembrar entre aberturas); (b) x2 livre no M2 ou já nascer com trava (nível/anúncio); (c) mostrar o botão também no Menu ou só na partida.
+
 ## Status dos sistemas
 
 | Sistema | Status | Task |
@@ -387,3 +417,7 @@ O `project.godot` é do AG07. Layers sugeridas:
 | Upgrades da partida | protótipo | T-134 |
 | Foco manual do ataque, mira manual do meteoro (API) | protótipo | T-176, T-177 |
 | Game feel: tremor, hit-stop, números de dano, efeitos reduzidos | protótipo | T-117 |
+| Aceleração x1/x2 (design) | proposta | T-272 (código: T-273) |
+
+## Slots de Módulo pelo nível da conta (T-188)
+`MatchConfig.for_account(nível, ProgressionData.slot_unlock_levels)` define `unlocked_slots`: slot n ativo só se `nível >= slot_unlock_levels[n-1]`. A Arena zera os slots não liberados (`slot_modules` vazio = Módulos da cena; hoje só o meteoro no slot 1). Nível 1 = só ataque básico; teclas e botões de slot bloqueado são ignorados (sem skill, sem erro). `MatchConfig.new()` (bot, testes, demo) mantém o slot 1 liberado.

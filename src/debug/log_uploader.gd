@@ -33,16 +33,18 @@ var _http: HTTPRequest
 
 
 ## Corpo JSON do contrato. `res` pode ser null; `doc` é o log do MatchRecorder (pode ser vazio).
-static func build_payload(res: MatchResult, doc: Dictionary, user_agent: String = "") -> Dictionary:
+static func build_payload(res: MatchResult, doc: Dictionary, user_agent: String = "", log_max: int = LogReport.UPLOAD_MAX_BYTES) -> Dictionary:
 	var outcome = null
 	var wave := 0
 	var dur := 0.0
 	if res != null:
 		outcome = "victory" if res.outcome == MatchResult.Outcome.VICTORY else "defeat"
+		# Estresse não é vitória nem derrota: a API recebe `quit`; `resultado: "estresse"` fica dentro do log (BRF-137).
+		if doc.get("header", {}).has("stress") or str(doc.get("result", {}).get("resultado", "")) == "estresse":
+			outcome = "quit"
 		wave = res.wave_reached
 		dur = res.duration_s
 	var b := BuildInfo.current()
-	var text := "" if doc.is_empty() else LogReport.to_text(doc)
 	return {
 		"version": BuildInfo.version(),
 		"build": BuildInfo.label(b),
@@ -51,8 +53,20 @@ static func build_payload(res: MatchResult, doc: Dictionary, user_agent: String 
 		"result": outcome,
 		"wave": wave,
 		"duration_s": dur,
-		"log": text.left(MAX_BYTES - 2048),
+		"log": LogReport.upload_text(doc, log_max),
 	}
+
+
+## Corpo JSON pronto para enviar, sempre dentro do limite do contrato (200 KB). O `log` é um JSON
+## `anima_log/1` (campos novos só adicionam; docs/debug.md §3). Se o corpo (com escapes) passar do
+## limite, o log é recortado de novo (amostras e eventos) até caber.
+static func build_body(res: MatchResult, doc: Dictionary, user_agent: String = "") -> String:
+	var limit := LogReport.UPLOAD_MAX_BYTES
+	var body := JSON.stringify(build_payload(res, doc, user_agent, limit))
+	while body.to_utf8_buffer().size() > MAX_BYTES - 1024 and limit > 8 * 1024:
+		limit = limit * 3 / 4
+		body = JSON.stringify(build_payload(res, doc, user_agent, limit))
+	return body
 
 
 static func user_agent() -> String:
@@ -78,7 +92,7 @@ static func state_for(result: int, code: int) -> int:
 func send(res: MatchResult, doc: Dictionary) -> void:
 	if not ENABLED or state == State.SENDING or state == State.SENT:
 		return
-	var body := JSON.stringify(build_payload(res, doc, user_agent()))
+	var body := build_body(res, doc, user_agent())
 	_http = HTTPRequest.new()
 	_http.timeout = TIMEOUT_S
 	add_child(_http)

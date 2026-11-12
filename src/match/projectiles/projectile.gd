@@ -12,6 +12,10 @@ const TARGET_ENEMY := &"enemy"
 const TARGET_BOSS := &"boss"
 const TARGET_CORE := &"core"
 
+## Anti-túnel (T-276): com passo maior que isto (x2: 900 px/s * 2/60 s = 30 px), uma 2ª forma de colisão
+## cobre o ponto médio do trajeto do passo, dando o mesmo espaçamento de ~15 px do x1.
+const MID_SHAPE_MIN_STEP := 20.0
+
 ## Ponto de estacionamento fora de qualquer arena.
 const PARKED_POSITION := Vector2(-100000.0, -100000.0)
 
@@ -27,6 +31,8 @@ var _hit_ids := PackedInt64Array()
 var _hit_count := 0
 var _shadow: GroundShadow
 var _sprite: Sprite2D
+var _mid_shape: CollisionShape2D ## ponto médio do passo (só com passo grande)
+var _mid_delta := -1.0 ## delta com que a forma média foi posicionada
 
 @onready var _shape_node: CollisionShape2D = $Shape
 
@@ -42,6 +48,12 @@ func configure(p_data: ProjectileData) -> void:
 	data = p_data
 	(_shape_node.shape as CircleShape2D).radius = data.radius
 	_shape_node.scale = GroundPlane.SHAPE_SCALE # círculo no chão
+	if _mid_shape == null:
+		_mid_shape = CollisionShape2D.new()
+		_mid_shape.shape = _shape_node.shape # mesmo círculo (raio compartilhado)
+		_mid_shape.scale = GroundPlane.SHAPE_SCALE
+		_mid_shape.disabled = true
+		add_child(_mid_shape)
 	if _shadow == null:
 		_shadow = GroundShadow.new()
 		add_child(_shadow)
@@ -66,6 +78,7 @@ func fire(origin: Vector2, direction: Vector2, max_distance: float, p_data: Proj
 	_distance_left = max_distance
 	_hits_left = data.pierce + 1
 	_hit_count = 0
+	_mid_delta = -1.0
 	_sprite.rotation = direction.angle() # sprite aponta para +X
 	active = true
 	visible = true
@@ -82,10 +95,20 @@ func park() -> void:
 
 func _physics_process(delta: float) -> void:
 	var step := data.speed * delta
+	if _mid_shape != null and not is_equal_approx(delta, _mid_delta):
+		_update_mid_shape(step, delta)
 	position += GroundPlane.to_screen(_direction * step)
 	_distance_left -= step
 	if _distance_left <= 0.0:
 		_expire()
+
+
+## Posiciona (ou desliga) a forma do ponto médio para o passo atual.
+func _update_mid_shape(step: float, delta: float) -> void:
+	_mid_delta = delta
+	var needed := step > MID_SHAPE_MIN_STEP
+	_mid_shape.set_deferred("disabled", not needed)
+	_mid_shape.position = GroundPlane.to_screen(_direction * -step * 0.5) if needed else Vector2.ZERO
 
 
 func _on_area_entered(area: Area2D) -> void:

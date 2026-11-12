@@ -5,8 +5,8 @@ Módulo `src/debug/` (sem autoload). O `SceneFlow` cria o gravador e o overlay n
 | Arquivo | Papel |
 |---|---|
 | `match_recorder.gd` (`MatchRecorder`) | Gravador sempre ligado; arquivos em `user://logs/` |
-| `log_report.gd` (`LogReport`) | Resumo e texto legível (só no fim ou no visualizador) |
-| `log_viewer.gd` (`LogViewer`) | Visualizador em tela cheia (Resultado e título) |
+| `log_report.gd` (`LogReport`) | Resumo, linhas de texto e JSON do envio (só no fim) |
+| `session_info.gd` (`SessionInfo`) | Tag `?tag=`, id da sessão, nº da partida e leituras do navegador (T-294) |
 | `debug_overlay.gd` (`DebugOverlay`) | Painel de FPS e contadores |
 | `debug_settings.gd` (`DebugSettings`) | Liga/desliga o overlay (`user://debug.cfg`) |
 | `debug_ring.gd`, `frame_stats.gd` | Buffer circular e histograma de quadros (pré-alocados) |
@@ -15,7 +15,7 @@ Módulo `src/debug/` (sem autoload). O `SceneFlow` cria o gravador e o overlay n
 
 ## 1. O que é registrado
 
-- **Cabeçalho:** jogo, versão, Godot, data/hora local, plataforma, modelo, renderer, GPU, tela, janela, viewport, safe area, núcleos, efeitos reduzidos e seed da partida. Na web (`header.web`): user agent, `devicePixelRatio`, tela CSS, orientação, safe area do shell, `WEBGL_debug_renderer_info` (vendor/renderer), `deviceMemory`, `hardwareConcurrency`, `window.ANIMA_BUILD` (se existir) e a URL **sem query string**. `header.ui_insets`: insets que a UI usa (px do jogo; `bottom` já pela regra de docs/ui.md §9.1, `bottom_raw`, `covers_bottom`, `css_k`). `header.web.viewport` (T-172, `animaViewportInfo()` do shell, lido na hora): `inner` (innerWidth e innerHeight **nativo**), `app_h` (altura usada no canvas), `outer_h`, `vv` (visualViewport width, height, offsetTop, scale), `client_h`, `screen`, sondas `svh`/`dvh`/`lvh`, `canvas` (top, bottom, height do `getBoundingClientRect`), `canvas_h` (altura aplicada pelo Godot no estilo do canvas), `standalone` e `safe` (o mesmo `animaGetSafeArea()` que a UI lê).
+- **Cabeçalho:** jogo, versão, Godot, data/hora local, plataforma, modelo, renderer, GPU, tela, janela, viewport, safe area, núcleos, efeitos reduzidos e seed da partida. Na web (`header.web`): user agent, `devicePixelRatio`, tela CSS, orientação, safe area do shell, `WEBGL_debug_renderer_info` (vendor/renderer), `deviceMemory`, `hardwareConcurrency`, `window.ANIMA_BUILD` (se existir) e a URL **sem query string** em `url` e a query completa (`?debug=1&stress=…&tag=…`, até 300 caracteres) em `query` (T-295). `header.ui_insets`: insets que a UI usa (px do jogo; `bottom` já pela regra de docs/ui.md §9.1, `bottom_raw`, `covers_bottom`, `css_k`). `header.web.viewport` (T-172, `animaViewportInfo()` do shell, lido na hora): `inner` (innerWidth e innerHeight **nativo**), `app_h` (altura usada no canvas), `outer_h`, `vv` (visualViewport width, height, offsetTop, scale), `client_h`, `screen`, sondas `svh`/`dvh`/`lvh`, `canvas` (top, bottom, height do `getBoundingClientRect`), `canvas_h` (altura aplicada pelo Godot no estilo do canvas), `standalone` e `safe` (o mesmo `animaGetSafeArea()` que a UI lê).
 - **Amostras** a cada 1 s (0,25 s com o chefe vivo). Colunas em `samples_cols`:
   - tempo, FPS da janela, ms médio e máximo, quadros > 33 e > 50 ms;
   - tempo de processo e de física, draw calls, objetos, nós, órfãos;
@@ -23,8 +23,8 @@ Módulo `src/debug/` (sem autoload). O `SceneFlow` cria o gravador e o overlay n
   - inimigos (total e por tipo), projéteis do jogador e dos inimigos, efeitos vivos no pool;
   - Energia, onda, Partículas, vida e defesa do chefe, pausado.
 - **Eventos** (`events`, `{t, e, ...}`):
-  - partida: `inicio`, `onda`, `fim`;
-  - combate: `dano` (valor, fonte, Energia), `mortes` e `contatos` (por segundo e tipo);
+  - partida: `inicio`, `velocidade` inicial (`de: null`), `onda`, `fim`;
+  - combate: `dano` (valor, fonte, Energia; até 5 golpes pequenos por janela de 1 s, acima disso `dano_agg` {t, fonte, soma, contagem}; golpe grande ou letal é sempre individual), `mortes` e `contatos` (por segundo e tipo);
   - upgrades: `upgrade` (id, nível, custo, Partículas restantes) e `upgrade_negado`;
   - skills: `skill`, `meteoro`/`skill_impacto` (alvo, raio, atingidos, chefe);
   - chefe: `chefe`, `chefe_defesa` (início, cada quarto perdido, zero e recarga), `chefe_lancado`, `chefe_derrotado`;
@@ -46,11 +46,35 @@ Módulo `src/debug/` (sem autoload). O `SceneFlow` cria o gravador e o overlay n
   - Os descartados são contados em `truncated`.
   - Acima de 1 MB, a metade mais antiga de amostras e eventos sai, com `truncated.size_limit = true`.
 - **Custo:** cerca de 23 µs/quadro em média no desktop (meta: < 0,3 ms), com 1 gravação de ~2 ms a cada 10 s. Não aloca por quadro.
-- **Privacidade:** nada sai do aparelho. Não há nenhum envio de rede, e a URL vai sem query.
+- **Privacidade:** nada sai do aparelho sem o toque em **Enviar log**. A URL vai sem query; só a `tag` (`?tag=`) é lida dela.
 
 ## 3. Formato do JSON (`format: "anima_log/1"`)
 
-`header`, `result`, `frames`, `samples_cols`, `samples` (linhas na ordem das colunas), `events`, `hitches`, `errors`, `truncated`, `recorder` e `summary` (no fim; se faltar, o visualizador calcula).
+`header`, `result`, `frames`, `samples_cols`, `samples` (linhas na ordem das colunas), `events`, `hitches`, `errors`, `truncated`, `recorder` e `summary` (no fim; se faltar, é calculado ao enviar).
+
+### Campos novos (T-294, BRF-136)
+
+Todos **opcionais**: log antigo continua válido. Fora do navegador ficam ausentes; o que o navegador não expõe vem `null`.
+
+| Onde | Campo | Conteúdo |
+|---|---|---|
+| raiz (só no envio) | `resumo` | 5 a 8 linhas: tag, aparelho/SO, modo, velocidade, estresse, fps médio/p95/p99, resultado, onda, erros. Sempre a **primeira chave** |
+| raiz (só no envio) | `upload` | `samples_stride` (1 = todas), `events_dropped`, `limit_bytes`: o que foi cortado para caber em ~150 KB |
+| `header.run` | `tag`, `session_id`, `run_index`, `run_started_at` | `?tag=` (até 64 caracteres), id aleatório por abertura do app (8 hex), nº da partida na sessão, UTC (`...Z`) |
+| `header` | `os` | SO e navegador do UA (ex. `iOS 17.2 · Safari 17.2`) |
+| `header` | `speed_initial`, `load` | velocidade ao iniciar; `load.title_ms` (`performance.now()` no título) e `load.match_start_ms` (na partida) |
+| `header.env` e `web_end` | `display_mode` (`standalone`/`browser`), `standalone_mq`, `standalone_nav`, `orientation`, `dpr`, `screen`, `inner`, `cores`, `device_memory`, `connection` (`type`, `downlink`, `rtt`, `save_data`), `language`, `online`, `perf_now_ms`, `nav` (`response_end`, `dcl`, `load`), `resources` (`count`, `transfer_bytes`, `encoded_bytes`, `decoded_bytes`), `audio_state`, `life` | `env` = início da partida; `web_end` = a mesma leitura no fim. Só na web |
+| `…life` | `hidden_count`, `hidden_ms`, `longest_hidden_ms`, `pagehide`, `pageshow`, `freeze`, `resume`, `gl_lost`, `gl_restored` | ciclo de vida **acumulado desde a 1ª partida da sessão** (o gancho JS nasce nela). Por partida: eventos `aba_oculta`/`aba_visivel` |
+| `samples_cols` | `render_objects`, `time_scale` | `RENDER_TOTAL_OBJECTS_IN_FRAME` e `Engine.time_scale` (a cada 1 s) |
+| `events` | `velocidade` | `{t, de, para}`: o 1º, no início da partida, tem `de: null` (velocidade real); depois, toda troca x1/x2, inclusive `StressMode` (`speed=`) e restauração |
+| `events` | `dano_agg` | `{t, fonte, soma, contagem}`: dano por fonte numa janela de 1 s com mais de 5 golpes pequenos (T-295). O resumo soma individuais e agregados |
+| `header` | `refresh_hz`, `max_fps`, `audio` | `DisplayServer.screen_get_refresh_rate()`, `Engine.max_fps`; áudio do Godot: `unlocked`, `music_playing`, `voices_playing`, `music_volume`, `sfx_volume`, `mix_rate`. No fim: `audio_end` na raiz |
+| `header.env` / `web_end` | `raf_hz_inicio` / `raf_hz_fim`, `suspeita_30fps_cap`, `audio_ctx` | cadência do `requestAnimationFrame` (Hz, janela de 1,5 s; início lido aos 1,7 s da partida); `suspeita_30fps_cap` = ~30 Hz (±4) com `Engine.max_fps == 0` (possível Modo de Pouca Energia do iOS, que o Safari não expõe); `audio_ctx` = `{count, state, sample_rate, base_latency, output_latency}` do último `AudioContext` (guardados pelo `web/shell.html` em `window.__anima_audio`) |
+| `summary` | `velocidade_inicial`, `por_velocidade` | velocidade com que a partida começou; `{"1": {segundos, fps_medio, fps_min, quadro_p95_ms}, "2": {...}}` pela coluna `time_scale` (`quadro_p95_ms` = p95 dos ms médios por amostra). `velocidades` continua só com as mudanças |
+| raiz | `worst_frames` | os 5 piores quadros `[t, ms, onda]`, mesmo sem passar de 50 ms |
+| `summary` | `velocidades`, `pausas`, `skills_usadas` (por slot), `mortes_por_tipo`, `energia_5s`, `piores_quadros`, `erros_por_tipo`; `erros_primeiros` com até 20 | derivados dos eventos e das amostras |
+
+A série de 1 s (fps, ms médio, `proc_ms`, `phys_ms`, objetos, nós, draw calls, memória, inimigos, projéteis) já estava em `samples`. No Safari/iOS não existem `deviceMemory` e `navigator.connection` (vêm `null`); `transferSize` de recursos de outra origem vem 0; `audio_state` vem do último `AudioContext` guardado pelo shell (`null` só se o jogo nunca criou um). `result` enviado à API no estresse é `quit` (o `resultado: "estresse"` fica dentro do `log`). O Safari não expõe o Modo de Pouca Energia: só a cadência rAF o denuncia.
 
 ## 4. Overlay
 
@@ -60,16 +84,15 @@ Módulo `src/debug/` (sem autoload). O `SceneFlow` cria o gravador e o overlay n
 - Liga por: `?debug=1` na URL (`?debug=0` desliga), **F3** (action `debug_toggle`) ou o botão **"Debug"** do menu de pausa.
 - Vem desligado e o estado fica salvo. O gravador grava de qualquer jeito.
 
-## 5. Como baixar no iPhone
+### 4.1 Seção "Meta" (T-193, BRF-134)
 
-1. No fim da partida, toque em **Logs** na tela de Resultado. Se a aba recarregou, use **Último log** no canto da tela de título.
-2. O visualizador mostra o **RESUMO** (resultado, FPS médio/mín/p1/p5, quadro p50/p95/p99/máx, travadas e quando ocorreram, picos, crescimento de memória e de nós, dano, upgrades, erros e as 5 maiores travadas). Depois vêm a linha do tempo e a tabela de amostras.
-3. Na web aparece, no rodapé, uma **barra de botões nativos do navegador**: **Baixar .txt**, **Baixar .json**, **Copiar**, **Abrir aba** e **Selecionar**.
-   - No iOS, download, área de transferência e nova aba só são garantidos dentro do toque real. Os botões do Godot rodam fora do gesto do navegador.
-   - **Via garantida:** "Baixar .txt"/".json" na barra (o arquivo vai para o app **Arquivos › Downloads**) ou "Selecionar" (toque e segure › Copiar).
-   - "Copiar" tenta `navigator.clipboard` e, se falhar, cai em "Selecionar". "Abrir aba" avisa se o navegador bloquear.
-4. Os botões do visualizador (Baixar, Copiar, Abrir em outra aba) também tentam a ação e avisam na tela. **Fechar** (ou Esc) volta ao Resultado sem mudar nada.
-5. **Fora da web** (PC/editor), "Baixar" grava `.json` e `.txt` em `user://logs/export/` e mostra o caminho. "Copiar" usa a área de transferência do sistema.
+- Dentro do overlay (só visível com `?debug=1`/F3/botão "Debug"; nunca em build sem debug): botão **Meta ▸** (recolhido por padrão) abre a linha `Nível · XP · Moeda` e os botões (>= 64 px, tokens `HOLO_*`): **+100 XP**, **+1000 XP**, **+500 Moeda**, **Nível −/+** (1..30, XP no início do nível) e **Zerar save** (2 toques: "Confirmar?" por 3 s).
+- Tudo passa por `DebugMeta` (`src/debug/debug_meta.gd`) → `MetaProgress`/`Backend` (`apply_xp` e teto 30 respeitados; salva em seguida; zerar = `Backend.reset_profile()` + recarga do perfil). Novo em `src/meta/`: `MetaProgress.debug_set_level`.
+- **Log:** eventos `meta_antes` (início da partida), `debug_meta` (`acao`, `antes`, `depois`) e `meta_depois` (após a recompensa, gravado no 1º save do perfil depois do fim), além de `meta: {antes, depois}` na raiz (campo aditivo; `format` igual).
+
+## 5. Como enviar o log (BRF-136)
+
+Não há mais visualizador: a única saída é **Enviar log** no Resultado (build de teste; contrato em [logs-api.md](logs-api.md), sem reenvio depois de enviado). O campo `log` enviado é o JSON `anima_log/1` (§3) com `resumo` (5 a 8 linhas de texto) em primeiro lugar. Se a aba recarregar, o último JSON fica em `user://logs/last_match.json` (IndexedDB), mas o botão só envia o da partida atual. Consultas SQL: [logs-api.md](logs-api.md) ("Consultas úteis").
 
 ## 6. Como ler o resumo
 

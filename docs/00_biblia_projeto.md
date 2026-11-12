@@ -12,7 +12,7 @@
 
 **Pilares:**
 1. **Timing é tudo:** sem movimento, a habilidade do jogador está em **quando** usar cada skill. Poucas decisões, todas importantes.
-2. **Progressão que se sente:** cada nível, Módulo, Fragmento e upgrade muda números **e** o visual.
+2. **Progressão que se sente:** cada nível, Módulo, Componente e upgrade muda números **e** o visual.
 3. **Clareza no caos:** centenas de projéteis, e mesmo assim tudo legível numa tela de celular.
 4. **Zero atrito:** abriu o link, está jogando, no PC ou no iPhone.
 
@@ -45,7 +45,7 @@ Nomes oficiais que o jogador vê. Os **identificadores de código continuam em i
 
 | Nome oficial | Era chamado de | O que é | Estado |
 |---|---|---|---|
-| **Módulo** | skill, poder ativo | poder ativo com cooldown (ex.: o meteoro); a conta abre os slots de Módulo nos níveis 3, 7 e 12 | M1: 1 Módulo (meteoro) |
+| **Módulo** | skill, poder ativo | poder ativo com cooldown (ex.: o meteoro); a conta abre os slots de Módulo nos níveis 2, 5 e 8 (decisão 63) | M1: 1 Módulo (meteoro) |
 | **Partículas** | moeda da partida | moeda dropada pelos inimigos mortos; compra os upgrades da partida e **some no fim dela**. **Não cai no mapa por enquanto** (só aumenta o contador; pode mudar depois). Ícone: **estrela verde, como um "chipzinho"** | M1 (o ícone ainda é dourado: T-160 e T-161) |
 | **Moeda** | Gold | moeda do jogo (meta): sobe nível de Módulos, Fragmentos, Núcleos etc. Ícone: **moeda dourada** | futuro (M2+) |
 | **Componente** | Fragmento, módulo (equipamento) | equipamento do Anima (3 no M7, 6 espaços no M13), com raridade e fusão | M7 e M13 (decisão 54) |
@@ -58,7 +58,8 @@ Nomes oficiais que o jogador vê. Os **identificadores de código continuam em i
 
 - **Nível da conta (do jogador):** sobe com XP das partidas. Ele desbloqueia os **slots de Módulo** (as skills):
   - a conta começa com **0 skills**;
-  - o **slot 1** abre no nível **3**, o **slot 2** no nível **7** e o **slot 3** no nível **12**;
+  - o **slot 1** abre no nível **2**, o **slot 2** no nível **5** e o **slot 3** no nível **8** (decisão 63);
+  - **outros desbloqueios (decisão 63):** nível 3 Núcleos; nível 4 Componentes; nível 6 botão x2 (hoje livre); nível 7 fusão de Componentes;
   - os valores são ajustáveis no balanceamento.
   - **[A DEFINIR]:** se a conta ganha outros prêmios por nível.
 - **Módulos (as skills):** são "poderes especiais" ativos, com cooldown. São desbloqueadas pela progressão e não são cards.
@@ -70,7 +71,7 @@ Nomes oficiais que o jogador vê. Os **identificadores de código continuam em i
   - **Moeda:** a moeda do jogo (meta), dourada. A quantidade ganha varia a cada partida jogada.
   - **Partículas:** a moeda da partida, estrela verde (chip). Começa em zero, é zerada a cada partida e não cai no mapa por enquanto.
 - **Núcleos (a árvore de talentos):** continua, comprada com Moeda. O detalhe fica no AG04.
-- **[A DEFINIR]:** quais atributos os Fragmentos dão (dano, velocidade de ataque, vida, armadura, regeneração, redução de cooldown).
+- **[A DEFINIR]:** quais atributos os Componentes dão (dano, velocidade de ataque, vida, armadura, regeneração, redução de cooldown).
 
 ## Roadmap (decisão 53, 2026-11-05)
 

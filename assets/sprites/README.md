@@ -3,12 +3,13 @@
 Estilo A "Jardim Arcano" (`docs/arte.md`). Todos os PNG estão em **2x** com fundo transparente: use `scale = 0.5` no nó. **Sombra no chão fora do sprite** (o jogo desenha; `shadow_ground.png` é opcional).
 Âncora em **pixels do PNG**. No `Sprite2D`: `centered = false` e `offset = -âncora`. Assim a posição do nó é o ponto de contato com o chão (Y-sort).
 Fonte: `_src/gen_sprites.py` (SVG por código → Chrome headless). Para regenerar, rode `python assets/sprites/_src/gen_sprites.py`. A pasta `_src/` tem `.gdignore`.
+**Anima holográfico (T-291, decisão 64):** os três `anima_default_*` vêm de `_src/gen_anima_holo.py` (`python assets/sprites/_src/gen_anima_holo.py preview` também gera `docs/img/anima-holo-arena*.png`); o `gen_sprites.py` não os gera mais. Mesmos canvas e âncoras de antes. Para voltar ao cartoon, copie os PNGs de `_src/anima_cartoon_backup/`.
 
 | Arquivo | PNG (2x) | Tela (1x) | Âncora (px do PNG) | Uso |
 |---|---|---|---|---|
-| `anima_default_base.png` | 256×256 | 128×128 | (128, 200) chão | Pedestal do Anima (camada de baixo) |
-| `anima_default_crystal.png` | 256×256 | 128×128 | (128, 128) centro | Cristal + halo. Centro a **110 px (1x) acima** da âncora da base. Bob de 4–6 px |
-| `anima_default_node.png` | 64×64 | 32×32 | (32, 32) centro | 3 nós orbitando o centro do cristal (elipse ~58×24 px 1x) |
+| `anima_default_base.png` | 256×256 | 128×128 | (128, 200) chão | Pedestal holográfico do Anima (camada de baixo; inclui o brilho no chão e o feixe até o cristal) |
+| `anima_default_crystal.png` | 256×256 | 128×128 | (128, 128) centro | Cristal holográfico + halo + trilha dos nós (elipse 29×12 1x, metade de trás tracejada). Centro a **110 px (1x) acima** da âncora da base. Bob de 4–6 px |
+| `anima_default_node.png` | 64×64 | 32×32 | (32, 32) centro | 3 nós de energia orbitando o centro do cristal (elipse ~58×24 px 1x) |
 | `enemy_runner.png` | 128×128 | 64×64 | (64, 120) chão | Corredor. Linhas de velocidade ficam com o VFX |
 | `enemy_tank.png` | 256×256 | 128×128 | (128, 224) chão | Tanque. A barra de HP é do jogo, não do sprite |
 | `enemy_shooter.png` | 256×256 | 128×128 | (128, 224) chão | Atirador, com o orbe que anuncia o tiro |
@@ -33,6 +34,6 @@ Peças em `assets/backgrounds/`, em 2x (`scale = 0.5`), sem moldura nem muro: o 
 | Arquivo | PNG (2x) | Tela (1x) | Âncora (px do PNG) | Uso |
 |---|---|---|---|---|
 | `floor_tile.png` | 480×480 | 240×240 | (0, 0) canto | Chão creme quadriculado **sem emendas** (4×4 quadrados de 60 px 1x; 720 = 12 colunas exatas). Repetir em X e Y: `TextureRect` com `stretch_mode = TILE` ou `texture_repeat = ENABLED` + `region`. Cobre a tela inteira, `z_index` mais baixo |
-| `floor_ring.png` | 960×720 | 480×360 | (480, 360) centro | Selo rúnico (anéis e losangos), transparente. Centro = posição do Anima |
+| `floor_ring.png` | 960×720 | 480×360 | (480, 360) centro | Selo rúnico (anéis e losangos), transparente. Centro = posição do Anima | **(fora de uso desde a T-292)**
 | `floor_pillar.png` | 128×208 | 64×104 | (64, 192) chão | Pilar com cristal dourado, sem sombra (o jogo desenha a sombra, ~60×20 px 1x). Nos cantos da área jogável, com Y-sort |
 | `floor_top_shade.png` | 1440×440 | 720×220 | (0, 0) canto | **Opcional**: degradê roxo-escuro (30% → 0) para ler o HUD sobre o topo claro. Acima do chão, abaixo de tudo que é da partida |

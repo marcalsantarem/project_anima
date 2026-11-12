@@ -74,8 +74,8 @@
 | T-159 | Remover o ícone provisório do `skill_pulse` e deixar o do meteoro como padrão | M1 | AG02 | feita (BRF-083; sobra o PNG do pulse sem uso, limpeza com o AG08) |
 | T-160 | Arte do ícone de Partículas: estrela verde, estilo "chip" (e nova cor dos efeitos de coleta) | M1 | AG08 | feita |
 | T-161 | Aplicar o ícone verde de Partículas no HUD, Resultado, botões de upgrade e efeitos (hoje dourado) | M1 | AG02 + AG09 | feita |
-| T-162 | Arte do ícone de Moeda (moeda dourada) e do glossário na UI (para o M2) | M2 | AG08 | a fazer |
-| T-163 | Textos do jogo e docs com os nomes oficiais (Módulo, Componente, Núcleo, Moeda); decidir a colisão de "Núcleo" | M2 | AG00 + AG04 + AG02 | a fazer |
+| T-162 | Arte do ícone de Moeda (moeda dourada) e do glossário na UI (para o M2) | M2 | AG08 | feita |
+| T-163 | Textos do jogo e docs com os nomes oficiais (Módulo, Componente, Núcleo, Moeda); decidir a colisão de "Núcleo" | M2 | AG00 + AG04 + AG02 | feita |
 | T-164 | Rótulo da vida do Anima: "NÚCLEO" vira "ENERGIA" no HUD, Resultado e docs de UI | M1 | AG02 | feita |
 | T-165 | Build e versão no cabeçalho do log (commit e data do deploy) | M1 | AG07 + AG02 | feita |
 | T-166 | Chefe sem barra de defesa (mecânica arquivada, desligada por dados); meteoro lança e atordoa; rebalancear | M1 | AG01 | feita |
@@ -92,23 +92,23 @@
 | T-177 | Mira do meteoro: API de alvo manual e prévia do raio; chefe lançado dentro do alcance | M1 | AG01 | feita |
 | T-178 | Arrastar do botão do Módulo para mirar (toque/mouse), segurar 1 + clique no PC | M1 | AG02 | feita |
 | T-179 | Splash e tela de título no estilo holográfico/tecnológico (arte do Gemini como base; texto, barra e brilhos vivos) | M1 | AG02 + AG08 | feita |
-| T-180 | **(1ª do M2)** Guia visual "HUD holográfico" para menus + mockups do menu principal e do Resultado com recompensa | M2 | AG08 | a fazer (início do M2) |
+| T-180 | **(1ª do M2)** Guia visual "HUD holográfico" para menus + mockups do menu principal e do Resultado com recompensa | M2 | AG08 | feita (aprovada pelo dono em 2026-11-06) |
 | T-181 | Ícones do app (iPhone, PWA e favicon) na nova identidade tecnológica da splash e do menu | M1 | AG08 + AG10 | feita (BRF-084; falta o dono reinstalar o atalho no iOS) |
-| T-182 | Áudio básico: música de entrada (título) e som do tiro básico, com volume salvo e respeitando o 1º toque na web | M2 | AG11 | a fazer |
-| T-183 | Fechar o M1 como v0.1.0: versão `0.1.0` no jogo e tag `v0.1.0`, sem branch (decisão 55; quando o dono pedir) | M1 | AG00 + AG10 | a fazer (no fechamento) |
-| T-184 | Economia do M2: curva de XP (níveis 1 a 15), XP e Moeda por partida (por monstros derrotados e ondas, nunca pelo tempo; decisão 59), dados em `.tres` e `docs/economia.md` | M2 | AG04 | a fazer |
-| T-185 | Save local: autoload `Backend` (interface) + `LocalBackend` em `user://` com versão, migração e recuperação; ADR | M2 | AG05 + AG07 | a fazer |
-| T-186 | Lógica pura do meta em `src/meta/`: recompensa do `MatchResult`, XP → nível, slots liberados; testes GUT | M2 | AG04 | a fazer |
-| T-187 | Fluxo de cenas com menu: Título → Menu → Partida → Resultado → Menu; aplica a recompensa e salva | M2 | AG07 | a fazer |
-| T-188 | Partida monta os slots pelo nível da conta (`MatchConfig`); conta sem Módulo joga só com ataque básico | M2 | AG01 | a fazer |
-| T-189 | Arte do menu holográfico: painéis, botões, barra de XP, selo de nível, ícone de XP | M2 | AG08 | a fazer |
-| T-190 | Tela do menu principal: Jogar, nível e barra de XP, saldo de Moeda, som liga/desliga | M2 | AG02 | a fazer |
-| T-191 | Resultado com recompensa: XP e Moeda animados, barra enchendo, subida de nível e aviso de slot liberado | M2 | AG02 + AG09 | a fazer |
-| T-192 | HUD: slots bloqueados mostram o nível que os libera | M2 | AG02 | a fazer |
-| T-193 | Debug do meta: zerar save e dar XP/Moeda pelo overlay `?debug=1`; meta no log da partida | M2 | AG02 + AG05 | a fazer |
-| T-194 | Assets de áudio do M2: música de entrada e som do tiro (próprios ou CC0, licença registrada) | M2 | AG11 | a fazer |
-| T-195 | Balanceamento da progressão: partidas até os níveis 3, 7 e 12 pela simulação do bot | M2 | AG04 | a fazer |
-| T-196 | Validação do M2 (inclui o botão de velocidade, T-272 a T-276; inclui save persistindo no iPhone, no Safari e no modo app) | M2 | AG03 | a fazer |
+| T-182 | Áudio básico: música de entrada (título) e som do tiro básico, com volume salvo e respeitando o 1º toque na web | M2 | AG11 | feita (falta ouvir no dispositivo) |
+| T-183 | Fechar o M1 como v0.1.0: versão `0.1.0` no jogo e tag `v0.1.0`, sem branch (decisão 55; quando o dono pedir) | M1 | AG00 + AG10 | feita (tag v0.1.0 em bc638a3, 2026-11-06) |
+| T-184 | Economia do M2: curva de XP (níveis 1 a 30), XP e Moeda por partida (por monstros derrotados e ondas, nunca pelo tempo; decisão 59), dados em `.tres` e `docs/economia.md` | M2 | AG04 | feita (revisão BRF-108: sem bônus fixos, derrota 70%, bônus do dia, níveis 1 a 30)
+| T-185 | Save local: autoload `Backend` (interface) + `LocalBackend` em `user://` com versão, migração e recuperação; ADR | M2 | AG05 + AG07 | feita |
+| T-186 | Lógica pura do meta em `src/meta/`: recompensa do `MatchResult`, XP → nível, slots liberados; testes GUT | M2 | AG04 | feita |
+| T-187 | Fluxo de cenas com menu: Título → Menu → Partida → Resultado → Menu; aplica a recompensa e salva | M2 | AG07 | feita |
+| T-188 | Partida monta os slots pelo nível da conta (`MatchConfig`); conta sem Módulo joga só com ataque básico | M2 | AG01 | feita |
+| T-189 | Arte do menu holográfico: painéis, botões, barra de XP, selo de nível, ícone de XP | M2 | AG08 | feita |
+| T-190 | Tela do menu principal: Jogar, nível e barra de XP, saldo de Moeda e ícone de configurações (engrenagem) sem ação até o M8; sem Módulos na tela | M2 | AG02 | feita |
+| T-191 | Resultado com recompensa: XP e Moeda animados, barra enchendo, subida de nível e aviso de slot liberado | M2 | AG02 + AG09 | feita |
+| T-192 | HUD: slots bloqueados mostram o nível que os libera | M2 | AG02 | feita (T-290 + T-188: "NV n" ligado ao nível da conta) |
+| T-193 | Debug do meta: zerar save e dar XP/Moeda pelo overlay `?debug=1`; meta no log da partida | M2 | AG02 + AG05 | feita |
+| T-194 | Assets de áudio do M2: música de entrada e som do tiro (próprios ou CC0, licença registrada) | M2 | AG11 | feita (falta ouvir no dispositivo) |
+| T-195 | Balanceamento da progressão: partidas até os níveis 2, 5 e 8 pela simulação do bot | M2 | AG04 | feita (mediano dentro dos alvos; jogador fraco lento, ver economia.md) |
+| T-196 | Validação do M2 (inclui o botão de velocidade, T-272 a T-276; inclui save persistindo no iPhone, no Safari e no modo app) | M2 | AG03 | feita (veredito: passa com ressalvas, ver docs/qa/qa-M2.md) |
 | T-197 | Fechar o M2 como v0.2.0: tag `v0.2.0`, branch `alfa` e deploy em `alfa--projectanimagame.netlify.app` (quando o dono pedir) | M2 | AG00 + AG10 | a fazer (no fechamento) |
 | T-198 | Mockup do hangar: navegação entre Jogar, Núcleos, Módulos, Componentes e Configurações (abas ou barra inferior) (tam. M) | M3 | AG08 | a fazer |
 | T-199 | Arte do hangar: fundo, ícones das abas, estados ativo/bloqueado (tam. M) | M3 | AG08 | a fazer |
@@ -184,21 +184,32 @@
 | T-269 | Botão "Enviar log" no Resultado (só em build de teste): aviso do que é enviado, estados enviando/enviado/falhou, texto por chave de tradução (tam. P) | M1 | AG02 | feita (BRF-088) |
 | T-270 | Deploy do envio: variáveis de ambiente no Netlify, CORS, flag de build de teste, `docs/` com a conta Neon (o dono cria a conta e passa a string de conexão) (tam. P) | M1 | AG10 | feita (BRF-089); falta deploy |
 | T-271 | Validação do envio no PC e no iPhone (log chega na tabela; falha de rede não trava o jogo) (tam. P) | M1 | AG03 | feita (BRF-097, passa; relatório em docs/qa/qa-T-271.md; falta iPhone real e 429) |
-| T-272 | Design da aceleração (x1 e x2): a velocidade não é reduzida sozinha (pausa, hit-stop e Resultado respeitam a escolhida), vale em toda a sessão; definir o escopo da sessão (só a partida ou até fechar o app) e a recompensa por monstros derrotados, não por tempo; deixar o ponto de extensão para travas futuras; registrar em `docs/gameplay.md` (tam. P) | M2 | AG01 | a fazer |
-| T-273 | Controlador de velocidade (`Engine.time_scale`): alterna x1/x2, **mantém** a escolha em pausa, hit-stop (restaura para a escolhida) e Resultado; bot/headless em x1; testes GUT (tam. M) | M2 | AG01 | a fazer |
-| T-274 | Arte do botão de velocidade: estados x1 e x2 (tam. P) | M2 | AG08 | a fazer |
-| T-275 | Botão de velocidade no HUD (toque e tecla no PC via Input Action, sem atrapalhar as skills; mostra a velocidade atual) (tam. M) | M2 | AG02 + AG07 | a fazer |
-| T-276 | Medir o x2 no iPhone com a cena de estresse (T-006/T-118) e registrar o fps (tam. P) | M2 | AG01 + AG10 | a fazer |
+| T-272 | Design da aceleração (x1 e x2): a velocidade não é reduzida sozinha (pausa, hit-stop e Resultado respeitam a escolhida), vale em toda a sessão; definir o escopo da sessão (só a partida ou até fechar o app) e a recompensa por monstros derrotados, não por tempo; deixar o ponto de extensão para travas futuras; registrar em `docs/gameplay.md` (tam. P) | M2 | AG01 | feita (BRF-118; decidido pelo dono em 09/11: salvar a escolha, x2 livre, botão só na partida) |
+| T-273 | Controlador de velocidade (`Engine.time_scale`): alterna x1/x2, **mantém** a escolha em pausa, hit-stop (restaura para a escolhida) e Resultado; bot/headless em x1; testes GUT (tam. M) | M2 | AG01 | feita |
+| T-274 | Arte do botão de velocidade: estados x1 e x2 (tam. P) | M2 | AG08 | feita |
+| T-275 | Botão de velocidade no HUD (toque e tecla no PC via Input Action, sem atrapalhar as skills; mostra a velocidade atual) (tam. M) | M2 | AG02 + AG07 | feita |
+| T-276 | Medir o x2 no iPhone com a cena de estresse (T-006/T-118) e registrar o fps (tam. P) | M2 | AG01 + AG10 | feita (medida pelo dono no iPhone: sem problemas, inclusive em estresse forçado, 2026-11-10) |
 | T-277 | Fundo holográfico na tela de Resultado: preparar a arte do dono (corte retrato 9:16, peso baixo, sem texto ilegível sob os botões) e aplicar no `result_screen`, com painéis e textos legíveis sobre ele (tam. M) | M1 | AG08 + AG02 | feita (BRF-092, BRF-093); falta ver no iPhone |
 | T-278 | Arte do fundo paisagem para PC: preparar as 2 artes do dono (retocar bateria e textos miúdos, peso baixo, 16:9 e telas mais largas/estreitas) (tam. P) | M1 | AG08 | feita (BRF-096); artes guardadas, sem uso |
 | T-279 | ~~Fundo paisagem no shell Web~~ | M1 | — | cancelada (decisão 61; shell revertido) |
 | T-280 | ~~Jogo avisa o shell qual fundo usar~~ | M1 | — | cancelada (decisão 61: um fundo só) |
 | T-281 | Tela inicial: subtítulo vermelho **VERTICAL SLICE** (maiúsculas) entre "ANIMA" e o botão, e remover o link "Último log" (temporário na v0.1.0; tam. P) | M1 | AG02 | feita (BRF-099) |
-| T-282 | **(1ª do M2)** Remover o subtítulo "VERTICAL SLICE" da tela inicial (tam. P) | M2 | AG02 | a fazer |
-| T-283 | **(fim do M2)** Subtítulo vermelho **ALFA** na tela inicial, como o do vertical slice, até o fechamento da v0.2.0 (tam. P) | M2 | AG02 | a fazer |
+| T-282 | **(1ª do M2)** Remover o subtítulo "VERTICAL SLICE" da tela inicial (tam. P) | M2 | AG02 | feita (BRF-104) |
+| T-283 | **(fim do M2)** Subtítulo vermelho **ALFA** na tela inicial, como o do vertical slice, até o fechamento da v0.2.0 (tam. P) | M2 | AG02 | feita (veredito: passa com ressalvas, ver docs/qa/qa-M2.md) |
 | T-284 | Deploy por tag: qualquer tag builda e publica num alias do Netlify + GitHub Release (decisão 62) (tam. M) | M1 | AG10 | feita |
 | T-285 | Versão exibida `v0.1.0` (tela inicial, pausa e log) e `config/version` no `project.godot` (tam. P) | M1 | AG07 | feita |
 | T-286 | Botão "Debug" da pausa só aparece com `?debug` na URL (tam. P) | M1 | AG02 | feita |
+| T-287 | `MatchResult.kills_by_type`: a Arena conta as mortes por tipo de inimigo (enxame 1 por membro, chefe, meteoro), base da recompensa por monstro (tam. P) | M2 | AG01 | feita |
+| T-288 | Pausa: botão "Voltar ao menu" (sinal `menu_requested`), que o fluxo da T-187 já escuta; hoje a pausa não tem saída para o menu (tam. P) | M2 | AG02 | feita |
+| T-289 | Arte do HUD holográfico da partida (decisão 64): ondas, pausa, barras de vida (Anima e chefe), contador de Partículas, bandeja de Módulos e botões de upgrade; mockup e peças | M2 | AG08 | feita |
+| T-290 | Aplicar o HUD holográfico na partida (substitui o estilo atual; sem mudar comportamento) | M2 | AG02 | feita |
+| T-291 | Anima holográfico na partida: pedestal, cristal e nós no estilo do título/menu (mesmos arquivos `anima_default_*`, mesmas âncoras) | M2 | AG08 | feita |
+| T-292 | Remover o círculo (anel roxo) em volta do Anima na arena | M2 | AG01 | feita |
+| T-293 | Menu de pausa no estilo holográfico (decisão 64): painel, botões, interruptores | M2 | AG02 | feita (falta peça de interruptor holográfico, AG08) |
+| T-294 | Log de teste enriquecido para as medições no iPhone (x1/x2, estresse) e remoção do botão "Logs" (visualizador): daqui em diante só envio; contrato da API intocado | M2 | AG02 | feita |
+| T-295 | Ajustes do log pela análise dos primeiros envios do iPhone: rótulo de velocidade, dano agregado, estresse como `quit`, taxa real de quadros (Pouca Energia), áudio, fps por velocidade | M2 | AG02 | feita |
+| T-296 | Arte do interruptor holográfico (liga/desliga) para a pausa | M2 | AG08 | feita |
+| T-297 | Aplicar o interruptor holográfico na pausa (depende da T-296) | M2 | AG02 | feita (rótulo pequeno, 16 px) |
 | T-148 | Sinais da Arena para VFX (projectile_fired, projectile_hit, enemy_died, particles_gained, skill_cast, boss_telegraph_started, boss_phase_changed) | M1 | AG01 | feita |
 
 ## Próximas prontas p/ briefing
@@ -651,7 +662,7 @@
 
 ### T-184 — Economia do M2
 - **Marco:** M2 · **Dono:** AG04 · **Depende de:** decisões 25 e 40
-- **Pronto quando:** `docs/economia.md` com a curva de XP dos níveis 1 a 15 (slots nos níveis 3, 7 e 12), XP e Moeda por partida (vitória, derrota, onda alcançada, chefe), sem gasto de Moeda no M2 (o 1º gasto é no M4); valores em `data/meta/*.tres`, prontos para o Remote Config.
+- **Pronto quando:** `docs/economia.md` com a curva de XP dos níveis 1 a 30 (slots nos níveis 3, 7 e 12), XP e Moeda por partida (vitória, derrota, onda alcançada, chefe), sem gasto de Moeda no M2 (o 1º gasto é no M4); valores em `data/meta/*.tres`, prontos para o Remote Config.
 
 ### T-185 — Save local
 - **Marco:** M2 · **Dono:** AG05 + AG07 · **Depende de:** —

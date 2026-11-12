@@ -20,7 +20,7 @@ func test_payload_has_contract_keys() -> void:
 	assert_eq(p.wave, 4)
 	assert_eq(p.duration_s, 61.5)
 	assert_eq(p.user_agent, "ua")
-	assert_eq(p.log, "")
+	assert_true(JSON.parse_string(p.log) is Dictionary, "log é JSON anima_log/1 mesmo sem doc")
 
 
 func test_payload_defeat_and_null_result() -> void:
@@ -98,7 +98,7 @@ func test_no_resend_while_sending() -> void:
 
 func test_payload_log_capped() -> void:
 	var p := LogUploader.build_payload(null, {})
-	assert_lte(str(p.log).length(), LogUploader.MAX_BYTES - 2048)
+	assert_lte(str(p.log).length(), LogReport.UPLOAD_MAX_BYTES)
 
 
 func test_failure_keeps_result_screen_usable() -> void:
@@ -108,7 +108,6 @@ func test_failure_keeps_result_screen_usable() -> void:
 	s._uploader._on_completed(HTTPRequest.RESULT_CANT_CONNECT, 0, PackedStringArray(), PackedByteArray())
 	assert_eq(b.text, LogUploader.TXT_FAILED)
 	assert_false(b.disabled)
-	for n in ["Logs"]:
-		assert_false((s.find_child(n, true, false) as Button).disabled)
+	assert_null(s.find_child("Logs", true, false))
 	# nova tentativa permitida após falha
 	assert_ne(s._uploader.state, LogUploader.State.SENT)

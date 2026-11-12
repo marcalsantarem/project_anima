@@ -2,9 +2,16 @@ class_name UiArt
 ## Arte final da UI (T-128/T-138). Tamanhos, margens e posições em assets/ui/README.md.
 ## Todos os PNG estão em 2x: desenhe na metade do tamanho (os tamanhos abaixo já estão em 1x).
 
-const PAUSE := preload("res://assets/ui/ui_icon_pause.png")
-const LOCK := preload("res://assets/ui/ui_icon_lock.png")
-## Partículas (T-160/T-161). O `ui_icon_particle.png` dourado é obsoleto (reservado à Moeda do M2).
+## HUD holográfico da partida (T-290, decisão 64): 1 px do PNG = 1 px da tela (art_scale 1), docs/arte.md §12.
+const HUD_PAUSE := preload("res://assets/ui/ui_hud_btn_pause.png")
+const HUD_PAUSE_PRESSED := preload("res://assets/ui/ui_hud_btn_pause_pressed.png")
+## Botão de velocidade (T-275): 96x96, corpo 68x68. O estado é o da velocidade ativa.
+const SPEED_X1 := preload("res://assets/ui/ui_speed_x1.png")
+const SPEED_X1_PRESSED := preload("res://assets/ui/ui_speed_x1_pressed.png")
+const SPEED_X2 := preload("res://assets/ui/ui_speed_x2.png")
+const SPEED_X2_PRESSED := preload("res://assets/ui/ui_speed_x2_pressed.png")
+const LOCK_HOLO := preload("res://assets/ui/ui_icon_lock_holo.png")
+## Partículas (T-160/T-161).
 const PARTICLE := preload("res://assets/ui/ui_icon_particles.png")
 const PARTICLE_OFF := preload("res://assets/ui/ui_icon_particles_off.png")
 ## Ícone do meteoro (decisão 37): fonte única, padrão do SkillButton `Icon.CIRCLE`. Carregado por caminho: se faltar, o botão desenha o ícone de formas.
@@ -17,30 +24,43 @@ const UPGRADE_ICONS := {
 	&"upgrade_max_hp": preload("res://assets/ui/ui_icon_upgrade_max_hp.png"),
 	&"upgrade_cooldown": preload("res://assets/ui/ui_icon_upgrade_cooldown.png"),
 }
-const UPGRADE_BTN_NORMAL := preload("res://assets/ui/ui_upgrade_btn_normal.png")
-const UPGRADE_BTN_DISABLED := preload("res://assets/ui/ui_upgrade_btn_disabled.png")
-const UPGRADE_BTN_MAX := preload("res://assets/ui/ui_upgrade_btn_max.png")
-const UPGRADE_COST_PILL := preload("res://assets/ui/ui_upgrade_cost_pill.png")
-const UPGRADE_COST_PILL_MAX := preload("res://assets/ui/ui_upgrade_cost_pill_max.png")
-## Canvas 1x do botão de upgrade; o corpo (128×80) começa em (2, 2).
-const UPGRADE_FRAME_RECT := Rect2(-2, -2, 132, 90)
+## Botões de upgrade: canvas 144x96, corpo 128x80 em (8, 8).
+const HUD_UPGRADE_NORMAL := preload("res://assets/ui/ui_hud_upgrade_normal.png")
+const HUD_UPGRADE_PRESSED := preload("res://assets/ui/ui_hud_upgrade_pressed.png")
+const HUD_UPGRADE_DISABLED := preload("res://assets/ui/ui_hud_upgrade_disabled.png")
+const HUD_UPGRADE_MAX := preload("res://assets/ui/ui_hud_upgrade_max.png")
+const UPGRADE_FRAME_RECT := Rect2(-8, -8, 144, 96)
 
-const SKILL_FRAME_READY := preload("res://assets/ui/ui_skill_frame_ready.png")
-const SKILL_FRAME_COOLDOWN := preload("res://assets/ui/ui_skill_frame_cooldown.png")
-const SKILL_FRAME_LOCKED := preload("res://assets/ui/ui_skill_frame_locked.png")
-const SKILL_COOLDOWN_MASK := preload("res://assets/ui/ui_skill_cooldown_mask.png")
-## Canvas 1x da moldura (160×168) com o centro do círculo em (80, 80).
-const SKILL_FRAME_SIZE := Vector2(160, 168)
-const SKILL_FRAME_CENTER := Vector2(80, 80)
-const SKILL_MASK_RADIUS := 70.0
+## Slots de Módulo: canvas 176x184 com o centro do círculo em (88, 88); raio do anel 72.
+const HUD_SKILL_READY := preload("res://assets/ui/ui_hud_skill_ready.png")
+const HUD_SKILL_COOLDOWN := preload("res://assets/ui/ui_hud_skill_cooldown.png")
+const HUD_SKILL_RING := preload("res://assets/ui/ui_hud_skill_cooldown_ring.png")
+const HUD_SKILL_MASK := preload("res://assets/ui/ui_hud_skill_cooldown_mask.png")
+const HUD_SKILL_LOCKED := preload("res://assets/ui/ui_hud_skill_locked.png")
+const HUD_SKILL_EMPTY := preload("res://assets/ui/ui_hud_skill_empty.png")
+const HUD_KEY_BADGE := preload("res://assets/ui/ui_hud_key_badge.png")
+const HUD_KEY_BADGE_OFF := preload("res://assets/ui/ui_hud_key_badge_off.png")
+const SKILL_FRAME_SIZE := Vector2(176, 184)
+const SKILL_FRAME_CENTER := Vector2(88, 88)
+const SKILL_MASK_RADIUS := 72.0
+const SKILL_RING_RADIUS := 92.0
+## Centro do badge da tecla em relação ao centro do slot; arte 44x44.
+const KEY_BADGE_OFFSET := Vector2(52, -60)
+const KEY_BADGE_SIZE := 44.0
 
-const BAR_TRACK := preload("res://assets/ui/ui_bar_track.png")
-const BAR_FILL := preload("res://assets/ui/ui_bar_fill.png")
-const BAR_SHINE := preload("res://assets/ui/ui_bar_shine.png")
-const BAR_TRACK_HEIGHT := 36.0
-const BAR_FILL_HEIGHT := 24.0
-const BAR_FILL_INSET := 4.0
-const BAR_SHINE_HEIGHT := 8.0
+## Barras (Energia e chefe) e ícones.
+const HUD_BAR_TRACK := preload("res://assets/ui/ui_hud_bar_track.png")
+const HUD_BAR_TRACK_BOSS := preload("res://assets/ui/ui_hud_bar_track_boss.png")
+const HUD_BAR_FILL := preload("res://assets/ui/ui_hud_bar_fill.png")
+const HUD_BAR_FILL_BOSS := preload("res://assets/ui/ui_hud_bar_fill_boss.png")
+const HUD_BAR_FLASH := preload("res://assets/ui/ui_hud_bar_flash.png")
+const HUD_BAR_TIP := preload("res://assets/ui/ui_hud_bar_tip.png")
+const HUD_ICON_ENERGY := preload("res://assets/ui/ui_hud_icon_energy.png")
+const HUD_ICON_BOSS := preload("res://assets/ui/ui_hud_icon_boss.png")
+const HUD_PILL := preload("res://assets/ui/ui_hud_pill.png")
+const HUD_PILL_WAVE := preload("res://assets/ui/ui_hud_pill_wave.png")
+const HUD_TRAY := preload("res://assets/ui/ui_hud_tray.png")
+const HUD_TRAY_BAND := preload("res://assets/ui/ui_hud_tray_band.png")
 
 const PANEL := preload("res://assets/ui/ui_panel.png")
 const BUTTON_BIG_NORMAL := preload("res://assets/ui/ui_button_big_normal.png")
@@ -48,8 +68,6 @@ const BUTTON_BIG_PRESSED := preload("res://assets/ui/ui_button_big_pressed.png")
 ## Botão secundário (branco → lavanda) e pílulas do topo do HUD (T-153, BRF-075).
 const BUTTON_SECONDARY := preload("res://assets/ui/ui_button_secondary.png")
 const BUTTON_SECONDARY_PRESSED := preload("res://assets/ui/ui_button_secondary_pressed.png")
-const PILL_WAVE := preload("res://assets/ui/ui_pill_wave.png")
-const PILL_PARTICLES := preload("res://assets/ui/ui_pill_particles.png")
 
 
 ## Textura do caminho, ou null se vazio/inexistente (quem chama decide o fallback).
@@ -78,18 +96,6 @@ static func nine(tex: Texture2D, margins: Vector4, content := Vector4(-1, -1, -1
 	return sb
 
 
-static func bar_track() -> UiNinePatch:
-	return nine(BAR_TRACK, Vector4(32, 0, 32, 0))
-
-
-static func bar_fill() -> UiNinePatch:
-	return nine(BAR_FILL, Vector4(24, 0, 24, 0))
-
-
-static func bar_shine() -> UiNinePatch:
-	return nine(BAR_SHINE, Vector4(8, 0, 8, 0))
-
-
 ## Painel com moldura: conteúdo a 20 px da borda (26 embaixo).
 static func panel() -> UiNinePatch:
 	return nine(PANEL, Vector4(56, 56, 56, 68), Vector4(20, 20, 20, 26))
@@ -111,11 +117,42 @@ static func _button(tex: Texture2D, pressed: bool) -> UiNinePatch:
 		Vector4(UiTokens.SPACE_M, UiTokens.SPACE_S + dy, UiTokens.SPACE_M, UiTokens.SPACE_S + UiTokens.SHADOW_BASE - dy))
 
 
-## Pílula roxa "ONDA x/y" (altura ideal 48; estica na largura).
-static func pill_wave() -> UiNinePatch:
-	return nine(PILL_WAVE, Vector4(48, 40, 48, 48), Vector4(20, 6, 20, 12))
+## 9-patch holográfico 1:1 (px do PNG = px da tela). Margens (E, C, D, B) e `expand` (E, C, D, B) do brilho.
+static func nine1(tex: Texture2D, margins: Vector4, content := Vector4(0, 0, 0, 0), expand := Vector4.ZERO) -> UiNinePatch:
+	var sb := nine(tex, margins, content)
+	sb.art_scale = 1.0
+	sb.expand = expand
+	return sb
 
 
-## Pílula branca de Partículas: estrela à esquerda, número à direita (altura ideal 52).
-static func pill_particles() -> UiNinePatch:
-	return nine(PILL_PARTICLES, Vector4(48, 44, 48, 52), Vector4(10, 6, 20, 12))
+## Pílula "ONDA X/Y": corpo 96x64 em (8, 8) do PNG; estica na largura.
+static func hud_pill_wave() -> UiNinePatch:
+	return nine1(HUD_PILL_WAVE, Vector4(40, 28, 40, 28), Vector4(24, 8, 24, 8), Vector4(8, 8, 8, 8))
+
+
+## Pílula de Partículas (ícone 32 px à esquerda).
+static func hud_pill() -> UiNinePatch:
+	return nine1(HUD_PILL, Vector4(40, 28, 40, 28), Vector4(20, 8, 24, 8), Vector4(8, 8, 8, 8))
+
+
+## Bandeja: miolo opaco, linha ciano no topo com brilho de 12 px para cima. Conteúdo a 4 px do topo (a linha).
+static func hud_tray() -> UiNinePatch:
+	return nine1(HUD_TRAY, Vector4(8, 24, 8, 8), Vector4(0, 4, 0, 0), Vector4(0, 12, 0, 0))
+
+
+## Faixa dos upgrades (96 de altura com o filete de 4 px embaixo).
+static func hud_tray_band() -> UiNinePatch:
+	return nine1(HUD_TRAY_BAND, Vector4(4, 4, 4, 6), Vector4(0, 0, 0, 4))
+
+
+## Trilho (Energia ou chefe) e enchimento: corpo do trilho a 8 px da borda do PNG, margens 20 e 10.
+static func hud_bar_track(boss: bool) -> UiNinePatch:
+	return nine1(HUD_BAR_TRACK_BOSS if boss else HUD_BAR_TRACK, Vector4(20, 20, 20, 20), Vector4.ZERO, Vector4(8, 8, 8, 8))
+
+
+static func hud_bar_fill(boss: bool) -> UiNinePatch:
+	return nine1(HUD_BAR_FILL_BOSS if boss else HUD_BAR_FILL, Vector4(10, 10, 10, 10))
+
+
+static func hud_bar_flash() -> UiNinePatch:
+	return nine1(HUD_BAR_FLASH, Vector4(20, 20, 20, 20), Vector4.ZERO, Vector4(8, 8, 8, 8))

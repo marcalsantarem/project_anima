@@ -7,8 +7,9 @@
 [ext_resource type="Texture2D" path="res://assets/ui/ui_button_secondary_pressed.png" id="4_15hwa"]
 [ext_resource type="Texture2D" path="res://assets/ui/ui_button_big_pressed.png" id="4_sv10h"]
 [ext_resource type="Texture2D" path="res://assets/ui/ui_panel.png" id="5_fgp8q"]
-[ext_resource type="Texture2D" path="res://assets/ui/ui_pill_wave.png" id="8_y4jgv"]
-[ext_resource type="Texture2D" path="res://assets/ui/ui_pill_particles.png" id="9_avvtm"]
+[ext_resource type="Texture2D" path="res://assets/ui/ui_hud_pill_wave.png" id="8_15hwa"]
+[ext_resource type="Texture2D" path="res://assets/ui/ui_hud_pill.png" id="9_y4jgv"]
+[ext_resource type="Texture2D" path="res://assets/ui/ui_hud_tray.png" id="10_avvtm"]
 
 [sub_resource type="FontVariation" id="FontVariation_6vvky"]
 base_font = ExtResource("1_myato")
@@ -210,35 +211,50 @@ margin_bottom = 68.0
 [sub_resource type="StyleBox" id="StyleBox_um2se"]
 resource_local_to_scene = false
 resource_name = ""
-content_margin_left = 20.0
-content_margin_top = 6.0
-content_margin_right = 20.0
-content_margin_bottom = 12.0
+content_margin_left = 24.0
+content_margin_top = 8.0
+content_margin_right = 24.0
+content_margin_bottom = 8.0
 script = ExtResource("2_afni6")
-texture = ExtResource("8_y4jgv")
-margin_left = 48.0
-margin_top = 40.0
-margin_right = 48.0
-margin_bottom = 48.0
+texture = ExtResource("8_15hwa")
+margin_left = 40.0
+margin_top = 28.0
+margin_right = 40.0
+margin_bottom = 28.0
+art_scale = 1.0
+expand = Vector4(8, 8, 8, 8)
 
 [sub_resource type="StyleBox" id="StyleBox_0ccfw"]
 resource_local_to_scene = false
 resource_name = ""
-content_margin_left = 10.0
-content_margin_top = 6.0
-content_margin_right = 20.0
-content_margin_bottom = 12.0
+content_margin_left = 20.0
+content_margin_top = 8.0
+content_margin_right = 24.0
+content_margin_bottom = 8.0
 script = ExtResource("2_afni6")
-texture = ExtResource("9_avvtm")
-margin_left = 48.0
-margin_top = 44.0
-margin_right = 48.0
-margin_bottom = 52.0
+texture = ExtResource("9_y4jgv")
+margin_left = 40.0
+margin_top = 28.0
+margin_right = 40.0
+margin_bottom = 28.0
+art_scale = 1.0
+expand = Vector4(8, 8, 8, 8)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lj3pu"]
-bg_color = Color(0.3529412, 0.2901961, 0.6039216, 1)
-border_width_top = 4
-border_color = Color(0.22745098, 0.16470589, 0.33333334, 1)
+[sub_resource type="StyleBox" id="StyleBox_lj3pu"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = 0.0
+content_margin_top = 4.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+script = ExtResource("2_afni6")
+texture = ExtResource("10_avvtm")
+margin_left = 8.0
+margin_top = 24.0
+margin_right = 8.0
+margin_bottom = 8.0
+art_scale = 1.0
+expand = Vector4(0, 12, 0, 0)
 
 [sub_resource type="FontVariation" id="FontVariation_o5etp"]
 base_font = ExtResource("1_myato")
@@ -314,7 +330,7 @@ PanelPill/styles/panel = SubResource("StyleBox_um2se")
 PanelPillLight/base_type = &"PanelContainer"
 PanelPillLight/styles/panel = SubResource("StyleBox_0ccfw")
 PanelTray/base_type = &"PanelContainer"
-PanelTray/styles/panel = SubResource("StyleBoxFlat_lj3pu")
+PanelTray/styles/panel = SubResource("StyleBox_lj3pu")
 SkillButton/font_sizes/caption_size = 22
 SkillButton/font_sizes/font_size = 48
 SkillButton/fonts/font_bold = SubResource("FontVariation_6vvky")

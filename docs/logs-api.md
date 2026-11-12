@@ -42,3 +42,38 @@ Telemetria **só de teste**: o jogador aperta "Enviar log" no Resultado e o log 
 - **Neon (Postgres free):** SQL de verdade para consultar os logs, sem servidor para manter, driver HTTP serverless (sem pool de conexões em função efêmera). Não define o backend do jogo.
 - **Netlify Function, sem Render:** o site já fica no Netlify; a função é do mesmo domínio (sem CORS em produção) e não "dorme" como o plano free do Render, que atrasaria o 1º envio.
 - **Limites de segurança (aceitos):** a chave `X-Anima-Key` vai no cliente, então **não é segredo**: só barra robôs ingênuos. A defesa real é o conjunto: validação estrita, 200 KB por envio, 20 envios/h por hash de IP (um atacante com muitos IPs ainda pode encher o banco; o teto é o plano free do Neon, e a limpeza de 30 dias ajuda), mensagens de erro genéricas e conteúdo tratado só como texto (parâmetros do driver, nunca concatenado em SQL). Se houver abuso: trocar a chave e/ou desligar o botão no build. Dados guardados: sem IP, só hash com sal.
+
+## Consultas úteis
+
+O `log` enviado é JSON (`anima_log/1`), então `content::jsonb` abre os campos (lista em `docs/debug.md` §3). O contrato acima não muda.
+
+```sql
+-- 1) Partidas de um ensaio, pela tag (?tag=iphone11-x2-stress150)
+select id, created_at,
+       content::jsonb #>> '{header,run,run_index}' as partida,
+       content::jsonb #>> '{summary,fps_medio}' as fps_medio,
+       content::jsonb #>> '{summary,quadro_ms_p95}' as p95_ms
+from logs
+where content like '{%' and content::jsonb #>> '{header,run,tag}' = 'iphone11-x2-stress150'
+order by created_at;
+
+-- 2) fps médio e p95 do quadro: x1 vs x2 (velocidade inicial da partida)
+select content::jsonb #>> '{header,speed_initial}' as velocidade,
+       count(*) as partidas,
+       round(avg((content::jsonb #>> '{summary,fps_medio}')::numeric), 1) as fps_medio,
+       round(avg((content::jsonb #>> '{summary,quadro_ms_p95}')::numeric), 1) as p95_ms
+from logs
+where content like '{%' and content::jsonb ? 'summary'
+group by 1 order by 1;
+
+-- 3) Últimas 20 sessões (id da sessão, partidas, tag, aparelho)
+select content::jsonb #>> '{header,run,session_id}' as sessao,
+       max(created_at) as ultimo_envio, count(*) as partidas,
+       max(content::jsonb #>> '{header,run,tag}') as tag,
+       max(content::jsonb #>> '{header,os}') as aparelho
+from logs
+where content like '{%' and content::jsonb #>> '{header,run,session_id}' is not null
+group by 1 order by ultimo_envio desc limit 20;
+```
+
+Só o resumo em texto: `select content::jsonb -> 'resumo' from logs where content like '{%' order by id desc limit 5;`. Logs antigos eram texto puro e quebram o `::jsonb`, por isso o filtro `content like '{%'`. Em x2 a velocidade pode mudar no meio da partida: veja `summary.velocidades`.

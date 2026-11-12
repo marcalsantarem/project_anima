@@ -1,8 +1,30 @@
 extends GutTest
-## SceneFlow com as telas e a Arena reais: Título → Partida → Resultado → Partida ou Título.
+## SceneFlow com as telas e a Arena reais: Título → Menu → Partida → Resultado → Partida ou Menu.
+## Menu dummy enquanto a T-190 não entrega a tela; provedor do Backend sem disco (T-187).
+
+const DUMMY_MENU := "res://tests/integration/fixtures/dummy_menu.tscn"
+
+var _old_provider: BackendProvider
+var _old_menu := ""
+
+
+func before_all() -> void:
+	_old_provider = Backend.provider
+	Backend.provider = MemoryProvider.new()
+	_old_menu = SceneFlow.menu_scene_path
+	SceneFlow.menu_scene_path = DUMMY_MENU
+	SceneFlow.load_profile()
+
+
+class MemoryProvider extends BackendProvider:
+	func save_profile(_p: PlayerProfile) -> bool:
+		return true
 
 
 func after_all() -> void:
+	Backend.provider = _old_provider
+	SceneFlow.menu_scene_path = _old_menu
+	SceneFlow.profile = null
 	get_tree().paused = false
 	var current := get_tree().current_scene
 	if current != null and current.get_parent() == get_tree().root:
@@ -23,6 +45,10 @@ func test_full_flow_with_real_arena() -> void:
 		return
 
 	title.start_requested.emit()
+	await wait_for_signal(SceneFlow.scene_changed, 2)
+	var menu := get_tree().current_scene
+	assert_eq(menu.scene_file_path, DUMMY_MENU, "Título → Menu")
+	menu.play_pressed.emit()
 	await wait_for_signal(SceneFlow.scene_changed, 2)
 	var arena := SceneFlow.current_arena() as Arena
 	assert_not_null(arena, "partida montada com a Arena")
@@ -84,8 +110,8 @@ func test_restart_from_pause_starts_new_match() -> void:
 	assert_false(get_tree().paused, "jogo despausado")
 
 
-## T-155: Resultado → "Voltar ao título" → nova partida, sem vazar a partida anterior.
-func test_result_back_to_title_then_new_match() -> void:
+## T-155/T-187: Resultado → "Voltar" → Menu → nova partida, sem vazar a partida anterior.
+func test_result_back_to_menu_then_new_match() -> void:
 	SceneFlow.start_match()
 	await wait_for_signal(SceneFlow.scene_changed, 2)
 	var first := SceneFlow.current_arena() as Arena
@@ -104,20 +130,18 @@ func test_result_back_to_title_then_new_match() -> void:
 
 	result.title_requested.emit()
 	await wait_for_signal(SceneFlow.scene_changed, 2)
-	var title := get_tree().current_scene as TitleScreen
-	assert_not_null(title, "voltou ao Título")
+	var menu := get_tree().current_scene
+	assert_eq(menu.scene_file_path, DUMMY_MENU, "voltou ao Menu")
 	assert_false(is_instance_valid(first_root), "partida anterior liberada")
 	assert_false(is_instance_valid(first), "Arena anterior liberada")
 	assert_false(get_tree().paused, "jogo despausado")
 	assert_eq(get_tree().root.get_children().filter(func(n: Node) -> bool: return n.name == SceneFlow.MATCH_ROOT_NAME).size(), 0, "sem nó de partida órfão")
-	if title == null:
-		return
-	assert_eq(title.start_requested.get_connections().size(), 1, "start_requested ligado uma vez")
+	assert_eq(menu.play_pressed.get_connections().size(), 1, "play_pressed ligado uma vez")
 
-	title.start_requested.emit()
+	menu.play_pressed.emit()
 	await wait_for_signal(SceneFlow.scene_changed, 2)
 	var second := SceneFlow.current_arena() as Arena
-	assert_not_null(second, "nova partida a partir do Título")
+	assert_not_null(second, "nova partida a partir do Menu")
 	assert_ne(second, first)
 	var hud_count := get_tree().current_scene.get_children().filter(func(n: Node) -> bool: return n is Hud).size()
 	assert_eq(hud_count, 1, "um só HUD")

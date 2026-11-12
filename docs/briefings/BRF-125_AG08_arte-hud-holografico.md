@@ -1,0 +1,11 @@
+# BRF-125 — AG08 — T-289 arte do HUD holográfico da partida (decisão 64)
+**Leia:** `docs/decisoes.md` (48, 60, 64), `docs/arte.md` (§6 HUD atual, §11 menus holográficos e §11.6 botão de velocidade), `assets/ui/README.md` e as peças `ui_holo_*`/`ui_speed_*`, `docs/ui.md` (HUD, tamanhos de toque, layout em 720x1280), `src/ui/hud/hud.gd`/`.tscn` (lista dos elementos e tamanhos atuais), `assets/mockups/mockup_holo_*.png`. **Regra:** respostas curtas; sem commit/push/branches; sem copiar arte de outros jogos.
+**Fazer:** estender o estilo dos menus e do botão de velocidade a **todo o HUD da partida**, mantendo **posições, tamanhos de toque (>= 64 px) e comportamento atuais** (o AG02 aplica na T-290). Peças e estados:
+1. **Contagem de ondas** (pílula "ONDA X/Y"; espaço para texto da UI).
+2. **Botão de pausa** (normal/pressionado).
+3. **Barra de vida do Anima** ("ENERGIA", com diamante/ícone) e **barra de vida do chefe** (variante com destaque/perigo, ex.: magenta/vermelho holográfico): trilho, preenchimento, ponta/brilho, estado de dano (flash); reaproveite `ui_holo_bar_*` quando servir.
+4. **Contador de Partículas** (pílula com o ícone da estrela verde).
+5. **Bandeja:** painel de fundo, **3 slots de Módulo** (pronto/recarga/bloqueado com cadeado e "NV n"/vazio; anel de cooldown legível; badge da tecla 1-3) e **5 botões de upgrade** (normal/pressionado/sem Partículas suficientes; ícones atuais mantidos e recoloridos se preciso; nível "Nv n" e custo).
+Legibilidade acima de tudo sobre a arena colorida (contorno/fundo escuro semitransparente). Entregue PNGs em `assets/ui/` (prefixo `ui_hud_*`; 9-slice onde fizer sentido, informe as margens), fonte/script em `assets/ui/_src/`, registro em `assets/ui/README.md`, `assets/LICENSES.md` e uma seção nova em `docs/arte.md` (§12, com tamanhos e margens). **Mockup** do HUD completo em 720x1280 sobre uma arena de exemplo, com os estados (slot pronto, em recarga e bloqueado; chefe com barra; upgrade sem saldo): `docs/img/hud-holo-mockup.png` (+ versão 375x812).
+**Permitido:** `assets/ui/`, `assets/LICENSES.md`, `docs/arte.md`, `docs/img/`. **Proibido:** `src/`, `project.godot`, `assets/mockups/`.
+**Entrega:** até 5 linhas: arquivos, tamanhos/margens 9-slice, o que fica como texto da UI, pendências.

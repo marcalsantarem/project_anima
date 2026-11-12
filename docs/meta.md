@@ -1,6 +1,8 @@
 # Meta-jogo e economia (AG04)
 
 > Documento do AG04. Modelo geral em "Progressão" da [Bíblia](00_biblia_projeto.md). Por enquanto só tem os upgrades da partida (M1); Fragmentos, nível de conta, Núcleos (talentos) e economia de Moeda entram no M2.
+>
+> **Economia do M2 (XP, Moeda, níveis):** ver [economia.md](economia.md).
 
 ## Upgrades da partida
 
@@ -19,7 +21,7 @@ Base: decisão 35 (5 botões em tempo real, pagos com **Partículas**, valem só
 | `upgrade_cooldown` | cooldown de todas as skills | −4% | redução percentual | −40% | `cd = base × (1 − 0,04·L)`; vale a partir do próximo uso (não mexe no cooldown em curso) |
 
 - Os percentuais somam sobre o **valor base** (sem juros compostos entre níveis), o que deixa a curva previsível e fácil de exibir.
-- **M2 (Proposta):** quando houver Fragmentos, o "base" passa a ser o valor já com Fragmentos e Núcleos (vindo do `MatchConfig`); os upgrades multiplicam por cima.
+- **M2 (Proposta):** quando houver Componentes, o "base" passa a ser o valor já com Componentes e Núcleos (vindo do `MatchConfig`); os upgrades multiplicam por cima.
 - Tetos de segurança: cadência ≤ 3,6 tiros/s cabe no pool de 64 projéteis (vida do tiro ≈ 0,67 s → ~3 em voo); redução de dano e de cooldown nunca passam de 40%; dano mínimo recebido = 1.
 
 ### Custo
@@ -62,3 +64,11 @@ Calculada de `data/waves/stage_01.tres` com o drop atual (runner 2, swarm 2 por 
 - **MAX** em um upgrade custa 284 (agora cabe antes do chefe); os 5 no MAX custam 1420 (~2,8x o total da fase 1). O MAX em todos continua sendo meta de fases mais longas.
 - Ritmo: a 1ª compra sai já na onda 1 (10 Partículas); depois ~1 compra a cada 8–12 s de partida.
 - **Recomendação (sem mudança aplicada):** o total subiu ~80%. Se a fase 1 ficar fácil demais com upgrades, subir o multiplicador da curva (4 → 6, MAX ~426) ou reduzir o teto por upgrade para manter ~1 upgrade maximizável por partida; validar em simulação (BRF-051) antes de mexer nos `.tres`.
+
+### API da lógica pura do meta (T-186, `src/meta/`)
+
+- `MetaRewards.compute(result, rewards, first_win_today) -> {xp, coins, breakdown}`: soma `kills_by_type` × pesos (float), arredonda só no total, derrota ×0,7, bônus de 1ª vitória só em vitória. Usa `result.kills_by_type` (campo do `MatchResult`, T-287).
+- `MetaProgress.apply_xp(profile, xp, progression) -> {levels_gained, new_level, slots_unlocked}` (várias subidas; teto 30: o XP excedente é **descartado** e `xp` fica 0); `slots_for_level(level, progression)`.
+- `MetaDaily.is_first_win_today(profile, today)` / `mark_first_win(profile, today)`; `today` injetado (`YYYY-MM-DD`, data local); `PlayerProfile.last_first_win_date` ("" por padrão; save antigo carrega com "", sem subir o esquema).
+- `MetaFlow.settle(profile, result, rewards, progression, today) -> {xp, coins, levels_gained, new_level, slots_unlocked, first_win_bonus}`: aplica no perfil, **não salva** (quem chama salva pelo `Backend`).
+- Testes: `tests/unit/meta/test_meta_logic.gd` (195 / 295 XP, derrota onda 3 = 19, limites, teto, bônus do dia).

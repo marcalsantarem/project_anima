@@ -41,15 +41,11 @@ static func build() -> Theme:
 	# Painéis com moldura
 	theme.set_stylebox("panel", "PanelContainer", UiArt.panel()) # arte ui_panel (T-138)
 	theme.set_type_variation("PanelPill", "PanelContainer")
-	theme.set_stylebox("panel", "PanelPill", UiArt.pill_wave()) # ONDA x/y (T-153)
+	theme.set_stylebox("panel", "PanelPill", UiArt.hud_pill_wave()) # ONDA x/y (T-290)
 	theme.set_type_variation("PanelPillLight", "PanelContainer")
-	theme.set_stylebox("panel", "PanelPillLight", UiArt.pill_particles()) # Partículas (T-153)
+	theme.set_stylebox("panel", "PanelPillLight", UiArt.hud_pill()) # Partículas (T-290)
 	theme.set_type_variation("PanelTray", "PanelContainer")
-	var tray := StyleBoxFlat.new()
-	tray.bg_color = UiTokens.BG_PANEL_ALT
-	tray.border_color = UiTokens.INK
-	tray.border_width_top = UiTokens.BORDER
-	theme.set_stylebox("panel", "PanelTray", tray)
+	theme.set_stylebox("panel", "PanelTray", UiArt.hud_tray()) # bandeja opaca (T-290)
 
 	# Fontes extras para componentes desenhados à mão (SkillButton, UiBar)
 	theme.set_font("font_bold", "SkillButton", bold)

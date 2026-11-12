@@ -2,21 +2,34 @@
 class_name UiBar
 extends Control
 ## Barra de vida (Energia do Anima ou chefe). docs/ui.md §5.2.
-## Arte em assets/ui/ (ui_bar_*); trilho de `track_height` (36 px por padrão), centrado no controle.
+## Arte holográfica (T-290, ui_hud_bar_*, 1:1); trilho de `track_height` (40 px por padrão), centrado no controle.
+## Energia: enchimento branco tingido por `modulate` (core_hp_color). Chefe (`boss_art`): arte própria, sem tingir.
 ## O preenchimento vai direto ao valor; a "barra fantasma" vai atrás e mostra a perda.
 
 enum ColorMode { FIXED, CORE_HP }
 
 const GHOST_DELAY := 0.15
 const GHOST_TIME := 0.3
+const TRACK_HEIGHT := 40.0
+## Recuo do enchimento dentro do trilho (px).
+const FILL_INSET := 4.0
 
 @export var color_mode := ColorMode.CORE_HP:
 	set(v):
 		color_mode = v
 		queue_redraw()
-@export var fill_color := UiTokens.BOSS_HP:
+@export var fill_color := UiTokens.BOSS_HOLO:
 	set(v):
 		fill_color = v
+		queue_redraw()
+## Usa a arte do chefe (trilho magenta, enchimento já colorido, ponta a 80% da altura).
+@export var boss_art := false:
+	set(v):
+		boss_art = v
+		_track_box = UiArt.hud_bar_track(v)
+		_fill_box = UiArt.hud_bar_fill(v)
+		_ghost_box = UiArt.hud_bar_fill(v)
+		_ghost_box.modulate_color = Color(1, 1, 1, 0.45)
 		queue_redraw()
 ## Texto antes dos números (ex.: "ENERGIA ").
 @export var label_prefix := "":
@@ -28,7 +41,7 @@ const GHOST_TIME := 0.3
 		show_numbers = v
 		queue_redraw()
 ## Altura do trilho; preenchimento, folga e brilho acompanham na mesma proporção.
-@export var track_height := UiArt.BAR_TRACK_HEIGHT:
+@export var track_height := TRACK_HEIGHT:
 	set(v):
 		track_height = v
 		queue_redraw()
@@ -48,16 +61,17 @@ var _flash := 0.0
 var _ghost_tween: Tween
 var _flash_tween: Tween
 var _fill_tween: Tween
-var _track_box := UiArt.bar_track()
-var _fill_box := UiArt.bar_fill()
-var _ghost_box := UiArt.bar_fill()
-var _shine_box := UiArt.bar_shine()
+var _track_box := UiArt.hud_bar_track(false)
+var _fill_box := UiArt.hud_bar_fill(false)
+var _ghost_box := UiArt.hud_bar_fill(false)
+var _flash_box := UiArt.hud_bar_flash()
 
 
 func _init() -> void:
 	custom_minimum_size = Vector2(0, UiTokens.CORE_BAR_HEIGHT)
 	mouse_filter = MOUSE_FILTER_IGNORE
-	_ghost_box.modulate_color = Color(UiTokens.TEXT_PRIMARY, 0.45)
+	_ghost_box.modulate_color = Color(1, 1, 1, 0.45)
+	_flash_box.modulate_color = UiTokens.DANGER
 
 
 ## Liga direto a core_hp_changed(current, max) / boss_hp_changed(current, max).
@@ -109,27 +123,27 @@ func _play_flash() -> void:
 
 
 func _current_color() -> Color:
-	var c := UiTokens.core_hp_color(_fill) if color_mode == ColorMode.CORE_HP else fill_color
-	return c.lerp(UiTokens.DANGER, _flash * 0.6) if _flash > 0.0 else c
+	return UiTokens.core_hp_color(_fill) if color_mode == ColorMode.CORE_HP and not boss_art else (Color.WHITE if boss_art else fill_color)
 
 
 func _draw() -> void:
-	# Arte T-128: trilho (centrado), preenchimento branco tingido e brilho no topo, na escala de track_height.
-	var k := track_height / UiArt.BAR_TRACK_HEIGHT
+	# Trilho centrado, enchimento recuado, ponta e flash de dano por cima; sem alocação por quadro.
 	var y0 := (size.y - track_height) * 0.5
 	draw_style_box(_track_box, Rect2(0.0, y0, size.x, track_height))
-	var pad := UiArt.BAR_FILL_INSET * k
-	var h := UiArt.BAR_FILL_HEIGHT * k
-	var inner := Rect2(pad, y0 + pad, maxf(size.x - 2.0 * pad, 0.0), h)
+	var h := track_height - 2.0 * FILL_INSET
+	var inner := Rect2(FILL_INSET, y0 + FILL_INSET, maxf(size.x - 2.0 * FILL_INSET, 0.0), h)
 	if _ghost > _fill:
 		draw_style_box(_ghost_box, Rect2(inner.position, Vector2(maxf(inner.size.x * _ghost, h), h)))
 	if _fill > 0.0:
 		var fill_w := maxf(inner.size.x * _fill, h)
 		_fill_box.modulate_color = _current_color()
 		draw_style_box(_fill_box, Rect2(inner.position, Vector2(fill_w, h)))
-		var shine_w := fill_w - h * 0.5
-		if shine_w >= UiArt.BAR_SHINE_HEIGHT * k * 2.0:
-			draw_style_box(_shine_box, Rect2(inner.position + Vector2(h * 0.25, 2.0 * k), Vector2(shine_w, UiArt.BAR_SHINE_HEIGHT * k)))
+		var tip := UiArt.HUD_BAR_TIP
+		var ts := tip.get_size() * Vector2(1.0, 0.8 if boss_art else 1.0)
+		draw_texture_rect(tip, Rect2(Vector2(inner.position.x + fill_w - ts.x * 0.5, y0 + (track_height - ts.y) * 0.5), ts), false)
+	if _flash > 0.0:
+		_flash_box.modulate_color = Color(UiTokens.DANGER, _flash)
+		draw_style_box(_flash_box, Rect2(0.0, y0, size.x, track_height))
 	if not show_numbers and title.is_empty():
 		return
 	var font := get_theme_font("font", "UiBar")
@@ -147,5 +161,5 @@ func _draw() -> void:
 
 
 func _text(font: Font, at: Vector2, text: String, align: HorizontalAlignment, width: float, fs: int) -> void:
-	draw_string_outline(font, at, text, align, width, fs, UiTokens.TEXT_OUTLINE - 2, UiTokens.INK)
-	draw_string(font, at, text, align, width, fs, UiTokens.TEXT_PRIMARY)
+	draw_string_outline(font, at, text, align, width, fs, UiTokens.HOLO_OUTLINE, UiTokens.HOLO_BG)
+	draw_string(font, at, text, align, width, fs, UiTokens.HOLO_TEXT)

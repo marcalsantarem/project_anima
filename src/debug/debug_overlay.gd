@@ -11,6 +11,8 @@ var recorder: MatchRecorder
 ## Fornece o topo livre (abaixo do HUD de cima), em px da resolução base. Opcional.
 var top_provider: Callable
 var label: Label
+## Seção "Meta" (T-193): ações sobre o save; cada uma vai para o log da partida.
+var meta_panel: DebugMetaPanel
 
 var _panel: PanelContainer
 var _left := 0.0
@@ -39,7 +41,13 @@ func _ready() -> void:
 	label.add_theme_font_size_override("font_size", FONT_SIZE)
 	label.add_theme_color_override("font_color", Color(0.85, 1.0, 0.9))
 	label.add_theme_constant_override("outline_size", 0)
-	_panel.add_child(label)
+	var box_v := VBoxContainer.new()
+	box_v.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_panel.add_child(box_v)
+	box_v.add_child(label)
+	meta_panel = DebugMetaPanel.new()
+	meta_panel.action_done.connect(_on_meta_action)
+	box_v.add_child(meta_panel)
 	_apply_visibility()
 	refresh()
 
@@ -67,8 +75,15 @@ func _apply_visibility() -> void:
 		_panel.visible = on
 
 
+func _on_meta_action(action_name: String, before: Dictionary, after: Dictionary) -> void:
+	if recorder != null:
+		recorder.event("debug_meta", {"acao": action_name, "antes": before, "depois": after})
+
+
 ## Atualiza o texto e a posição (também chamado pelos testes).
 func refresh() -> void:
+	if meta_panel != null:
+		meta_panel.refresh()
 	var top := UiTokens.SPACE_S * 1.0
 	if top_provider.is_valid():
 		top = float(top_provider.call()) + UiTokens.SPACE_XS
