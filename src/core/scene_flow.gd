@@ -8,10 +8,17 @@ extends Node
 ## Montagem com a UI: ver `docs/ui.md` §10c.
 
 signal scene_changed(scene_path: String)
+## Hangar (T-200): destino atual mudou (inclusive ao entrar no hangar, sempre em Jogar).
+signal hangar_tab_changed(id: StringName)
+## Hangar: tela de um destino foi criada (1ª visita), para quem precisar configurá-la.
+signal hangar_tab_instanced(id: StringName, screen: Control)
 
 const TITLE_SCENE := "res://src/ui/screens/title_screen.tscn"
 const MENU_SCENE := "res://src/ui/screens/menu_screen.tscn"
 const RESULT_SCENE := "res://src/ui/screens/result_screen.tscn"
+const COMING_SOON_SCENE := "res://src/ui/screens/coming_soon_screen.tscn"
+## Barra de destinos do hangar (T-201). Se existir, entra no `HangarHost` acima do `content`.
+const HANGAR_BAR_SCENE := "res://src/ui/hangar/hangar_bar.tscn"
 const PROGRESSION_PATH := "res://data/meta/progression_m2.tres"
 const REWARDS_PATH := "res://data/meta/rewards_m2.tres"
 const HUD_SCENE := "res://src/ui/hud/hud.tscn"
@@ -37,6 +44,11 @@ var last_summary: Dictionary = {}
 var title_scene_path := TITLE_SCENE
 var menu_scene_path := MENU_SCENE
 var result_scene_path := RESULT_SCENE
+## Hangar (T-200): placeholder dos destinos sem tela e barra opcional (T-201; ausente = sem barra).
+var coming_soon_scene_path := COMING_SOON_SCENE
+var hangar_bar_scene_path := HANGAR_BAR_SCENE
+var hangar_nav := HangarNav.new()
+var _hangar: HangarHost
 ## Só testes: data fixa ("YYYY-MM-DD") no lugar da data local do sistema.
 var today_override := ""
 var progression: ProgressionData = load(PROGRESSION_PATH)
@@ -74,8 +86,9 @@ func go_to_title() -> void:
 	_swap(title, title_scene_path)
 
 
-## Menu: recebe a `view` do perfil por `setup(view)`; `play_pressed` → partida com o perfil.
-## Sem a cena do menu (ainda não entregue), vai direto para a partida.
+## Hangar (T-200): monta o `HangarHost` sempre no destino Jogar (também na volta da Partida/Resultado).
+## Jogar = o menu: recebe a `view` do perfil por `setup(view)`; `play_pressed` → partida com o perfil.
+## Sem a cena do menu, vai direto para a partida. `scene_changed` emite `menu_scene_path` (música do Menu).
 func go_to_menu() -> void:
 	if _changing:
 		return
@@ -83,10 +96,72 @@ func go_to_menu() -> void:
 		push_warning("SceneFlow: menu ausente (%s); indo direto para a partida" % menu_scene_path)
 		start_match(build_match_config())
 		return
-	var menu := _instantiate(menu_scene_path)
-	menu.setup(menu_view(_ensure_profile(), progression))
-	menu.play_pressed.connect(func() -> void: start_match(build_match_config()), CONNECT_ONE_SHOT)
-	_swap(menu, menu_scene_path)
+	hangar_nav.reset()
+	hangar_nav.paths[HangarNav.PLAY] = menu_scene_path
+	_hangar = HangarHost.new()
+	_hangar.show_screen(HangarNav.PLAY, _make_tab.bind(HangarNav.PLAY))
+	if ResourceLoader.exists(hangar_bar_scene_path):
+		_hangar.add_child(_instantiate(hangar_bar_scene_path))
+	_swap(_hangar, menu_scene_path)
+	hangar_tab_changed.emit(HangarNav.PLAY)
+
+
+## Destino atual do hangar (`HangarNav.PLAY` etc.).
+var current_tab: StringName:
+	get:
+		return hangar_nav.current
+
+
+## Abre o destino `id` do hangar (carrega a tela na 1ª visita; depois reaproveita a instância em cache).
+## Retorna `false` se o id é inválido, se já é o atual ou se o hangar não está aberto.
+func open_hangar_tab(id: StringName) -> bool:
+	if not _hangar_open() or not hangar_nav.open(id):
+		return false
+	_show_current_tab()
+	return true
+
+
+## Volta ao destino anterior (ou a Jogar). Retorna `false` se já está em Jogar sem histórico.
+func hangar_back() -> bool:
+	if not _hangar_open() or not hangar_nav.back():
+		return false
+	_show_current_tab()
+	return true
+
+
+## Tela em cache do destino (ou `null`). Para a barra do T-201 e para os testes.
+func hangar_tab_node(id: StringName) -> Control:
+	return _hangar.screen(id) if _hangar_open() else null
+
+
+func _hangar_open() -> bool:
+	return is_instance_valid(_hangar) and not _hangar.is_queued_for_deletion()
+
+
+func _show_current_tab() -> void:
+	var id := hangar_nav.current
+	_hangar.show_screen(id, _make_tab.bind(id))
+	hangar_tab_changed.emit(id)
+
+
+## Cria a tela do destino. Cena ausente → placeholder "Em breve". Telas com `back_requested` → `hangar_back`.
+func _make_tab(id: StringName) -> Control:
+	var path := hangar_nav.scene_path(id)
+	var node: Control
+	if path != "" and ResourceLoader.exists(path):
+		node = _instantiate(path)
+	else:
+		node = _instantiate(coming_soon_scene_path)
+		if node.has_method(&"setup_title"):
+			node.setup_title(HangarNav.title_of(id))
+	node.name = String(id).to_pascal_case()
+	if id == HangarNav.PLAY:
+		node.setup(menu_view(_ensure_profile(), progression))
+		node.play_pressed.connect(func() -> void: start_match(build_match_config()), CONNECT_ONE_SHOT)
+	if node.has_signal(&"back_requested"):
+		node.connect(&"back_requested", hangar_back)
+	hangar_tab_instanced.emit(id, node)
+	return node
 
 
 ## Dados do menu: {level, xp, xp_to_next (0 no teto), coins, is_max}.

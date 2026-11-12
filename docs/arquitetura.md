@@ -57,6 +57,12 @@ Boot (estresse) ─────────────────────�
 
 **`view` do Menu:** `{level, xp, xp_to_next (0 no teto), coins, is_max}` (`SceneFlow.menu_view`).
 
+**Hangar (T-200):** `go_to_menu()` monta um `HangarHost` (`src/core/hangar_host.gd`, nó `Hangar`, telas em `content`) sempre no destino Jogar (o Menu acima); a `current_scene` é o hangar, não o Menu.
+- Ids (`HangarNav`, `src/core/hangar_nav.gd`, lógica pura): `PLAY`, `CORES`, `MODULES`, `COMPONENTS`, `SETTINGS` (`&"play"` …), em `TABS` (ordem da barra), `TITLES` e `DEFAULT_PATHS` (id → cena). Cena ausente → `coming_soon_screen.tscn` (`setup_title(text)`, `back_requested`).
+- API no `SceneFlow`: `open_hangar_tab(id) -> bool`, `hangar_back() -> bool` (anterior, ou Jogar), `current_tab`, `hangar_tab_node(id)`; sinais `hangar_tab_changed(id)` e `hangar_tab_instanced(id, screen)`. Tela com `back_requested` → `hangar_back`.
+- Barra (T-201): se `src/ui/hangar/hangar_bar.tscn` existir, entra no `HangarHost` acima do `content`; chama `SceneFlow.open_hangar_tab` e ouve `hangar_tab_changed` (pode ajustar `content.offset_bottom`).
+- **Estado preservado = instância em cache:** cada tela é criada só na 1ª visita e depois fica oculta com `PROCESS_MODE_DISABLED`, sem cada tela ter de serializar o próprio estado. O cache é liberado ao ir à partida (menos memória no Safari); na volta, o hangar é recriado em Jogar com o perfil atualizado.
+
 **Recompensa (`settle_and_save`):** guarda nível/XP de antes, roda `MetaFlow.settle(profile, result, rewards, progression, today)` com `today = Time.get_date_string_from_system()` (data local), salva pelo `Backend` e monta o `summary`:
 `xp`, `coins`, `first_win_bonus` (bool), `levels_gained`, `slots_unlocked` (Array[int]), `level_before`, `xp_before`, `xp_to_next_before`, `level_after`, `xp_after`, `xp_to_next_after` (0 no teto), `result_outcome` (`"vitoria"`/`"derrota"`). Falha ao salvar: `push_warning` e o fluxo segue (a recompensa vale na sessão). Modo de estresse (nó `StressMode` na Arena ou `stress` no cabeçalho do log): sem `settle`, sem save, `last_summary = {}`. Dados: `data/meta/progression_m2.tres` e `rewards_m2.tres`. A partida continua sem falar com o `Backend`.
 

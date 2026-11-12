@@ -1,0 +1,128 @@
+<html><head><meta charset="utf-8">
+<!-- T-198 (BRF-143): mockup do hangar. Render: bash assets/ui/_src/hangar_render.sh. Telas: #a #b #a_child #wide -->
+<style>
+@font-face{font-family:Outfit;src:url(file:///C:/Repos/projectanima/assets/fonts/Outfit-Variable.ttf);font-weight:100 900}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{overflow:hidden;background:#021423;font-family:Outfit;color:#E6FFFF}
+.scr{position:absolute;left:0;top:0;width:375px;overflow:hidden;background:#021423}
+.a{position:absolute}
+.glow{text-shadow:0 0 8px rgba(63,232,245,.8),0 0 2px rgba(63,232,245,.9)}
+.pill{border-style:solid;border-width:10px;border-image:url(../ui_holo_pill.png) 20 fill stretch}
+.panel{border-style:solid;border-width:36px;border-image:url(../ui_holo_panel.png) 72 fill stretch}
+.lbl{position:absolute;left:0;right:0;text-align:center;font-size:11.5px;font-weight:700;letter-spacing:.3px}
+.lock-icon{filter:grayscale(1) brightness(.75);opacity:.45}
+.nv{position:absolute;height:18px;padding:0 6px;font-size:11px;font-weight:800;line-height:16px;color:#9FB8CC;background:#0E2233;border:1px solid #4A6A86;clip-path:polygon(4px 0,100% 0,100% calc(100% - 4px),calc(100% - 4px) 100%,0 100%,0 4px)}
+.note{position:absolute;font-size:10px;font-weight:600;color:#FFC93D;letter-spacing:.5px}
+</style></head><body>
+<script>
+const SVG_PLAY=(s,c)=>`<svg width="${s}" height="${s}" viewBox="0 0 32 32"><path d="M16 2 L29 16 L16 30 L3 16Z" fill="none" stroke="${c}" stroke-width="2.2" stroke-linejoin="round"/><path d="M13 10.5 L22 16 L13 21.5Z" fill="${c}" stroke="${c}" stroke-width="1.5" stroke-linejoin="round"/></svg>`;
+const SVG_BACK=c=>`<svg width="18" height="18" viewBox="0 0 18 18"><path d="M11.5 3 L5.5 9 L11.5 15" fill="none" stroke="${c}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const ICON={module:'../ui_icon_module.png',component:'../ui_icon_component.png',core:'../ui_icon_core.png',settings:'../ui_icon_settings.png'};
+// abas: ordem da barra (Jogar no centro)
+const TABS=[
+ {id:'module',name:'Módulos',nv:2},
+ {id:'component',name:'Componentes',nv:4},
+ {id:'play',name:'Jogar',nv:1},
+ {id:'core',name:'Núcleos',nv:3},
+ {id:'settings',name:'Ajustes',nv:1},
+];
+function icon(t,s,locked){
+ if(t.id==='play') return `<span style="display:inline-block;width:${s}px;height:${s}px">${SVG_PLAY(s,locked?'#5F7A92':'#3FE8F5')}</span>`;
+ return `<img src="${ICON[t.id]}" class="${locked?'lock-icon':''}" style="width:${s}px;height:${s}px">`;
+}
+// ---------- fundo e bloco Jogar ----------
+function bgAndPlay(H,jt,dim){
+ const sc=H<700?0.82:1, bw=399*sc, bh=714*sc, bt=jt-636*sc;
+ let h=`<div class="a" style="left:${(375-bw)/2}px;top:${bt}px;width:${bw}px;height:${bh}px;background:url(../title_bg_tech.webp) 0 0/100% 100%"></div>
+ <div class="a" style="left:0;right:0;top:${bt+bh-160*sc}px;height:${160*sc}px;background:linear-gradient(rgba(2,20,35,0),#021423)"></div>`;
+ if(dim) return h+`<div class="a" style="inset:0;background:rgba(2,20,35,${dim})"></div>`;
+ const big=H>=700, at=jt-(big?174:158), pt=at-22;
+ h+=`<div class="a glow" style="left:0;right:0;top:${pt}px;text-align:center;font-weight:700;font-size:22px;letter-spacing:4px">PROJECT:</div>
+ <div class="a glow" style="left:0;right:0;top:${at}px;text-align:center;font-weight:800;font-size:${big?58:44}px;letter-spacing:6px;line-height:1">ANIMA</div>`;
+ const r=jt-89; // linha nivel/Moeda
+ h+=`<img class="a" src="../ui_holo_level_badge.png" style="left:44px;top:${r}px;width:52px;height:58.5px">
+ <div class="a" style="left:44px;top:${r+11}px;width:52px;text-align:center;font-weight:800;font-size:26px">2</div>
+ <div class="a" style="left:106px;top:${r+6}px;font-weight:700;font-size:13px;letter-spacing:2px;color:#9FF6FF">NÍVEL 2</div>
+ <div class="a" style="left:106px;top:${r+25}px;width:124px;height:12px;border-style:solid;border-width:4px;border-image:url(../ui_holo_bar_track.png) 8 fill stretch"></div>
+ <div class="a" style="left:108px;top:${r+27}px;width:52px;height:8px;border-style:solid;border-width:3px;border-image:url(../ui_holo_bar_fill.png) 6 fill stretch"></div>
+ <img class="a" src="../ui_holo_bar_tip.png" style="left:156px;top:${r+21}px;width:8px;height:20px">
+ <div class="a" style="left:106px;top:${r+41}px;font-size:11px;font-weight:600;letter-spacing:1px;color:#7FA3B8">95 / 220 XP</div>
+ <div class="a pill" style="left:240px;top:${r+11}px;width:92px;height:38px"></div>
+ <img class="a" src="../ui_icon_coin_small.png" style="left:248px;top:${r+17}px;width:26px;height:26px">
+ <div class="a" style="left:276px;top:${r+19}px;width:50px;text-align:right;font-weight:800;font-size:18px;color:#FFE08A">340</div>
+ <div class="a" style="left:39px;top:${jt-8}px;width:297px;height:94px;border-style:solid;border-width:28px 24px;border-image:url(../ui_holo_btn_primary_normal.png) 56 48 fill stretch"></div>
+ <div class="a" style="left:47px;top:${jt}px;width:281px;height:78px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:30px;letter-spacing:2px;color:#03202E">JOGAR</div>`;
+ return h;
+}
+// ---------- celula de navegacao (A e B) ----------
+function cell(t,x,y,w,h,active,locked,top){
+ const cx=x+w/2; let s='';
+ if(active){
+  s+=`<div class="a" style="left:${x+4}px;top:${y+4}px;width:${w-8}px;height:${h-8}px;background:linear-gradient(${top?'0deg':'180deg'},rgba(63,232,245,.30),rgba(63,232,245,.06));border:1.5px solid #3FE8F5;box-shadow:0 0 14px rgba(63,232,245,.45);clip-path:polygon(10px 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%,0 10px)"></div>
+  <div class="a" style="left:${cx-20}px;top:${top?y+h-4:y}px;width:40px;height:4px;background:#E6FFFF;box-shadow:0 0 8px #3FE8F5,0 0 3px #fff"></div>`;
+ }
+ const is=active?32:28, iy=y+(active?9:12), ix=locked?cx-is/2-12:cx-is/2;
+ s+=`<div class="a" style="left:${ix}px;top:${iy}px;width:${is}px;height:${is}px${active?';filter:drop-shadow(0 0 6px rgba(63,232,245,.7))':''}">${icon(t,is,locked)}</div>`;
+ if(locked){
+  s+=`<div class="nv" style="left:${cx-12}px;top:${iy+14}px;padding-left:3px"><img src="../ui_icon_lock_holo.png" style="width:13px;height:13px;vertical-align:-2px;filter:grayscale(1) brightness(1.4)"> NV ${t.nv}</div>`;
+  s+=`<div class="lbl" style="left:${x}px;width:${w}px;top:${y+h-24}px;color:#6F8BA3">${t.name}</div>`;
+ } else {
+  s+=`<div class="lbl" style="left:${x}px;width:${w}px;top:${y+h-24}px;color:${active?'#E6FFFF':'#9FC4D6'}${active?';text-shadow:0 0 6px rgba(63,232,245,.8)':''}">${t.name}</div>`;
+ }
+ return s;
+}
+// ---------- Opcao A: barra inferior ----------
+function barA(H,sb,activeId,lvl){
+ const bh=76, by=H-sb-bh; let s='';
+ s+=`<div class="a" style="left:0;right:0;top:${by}px;height:${bh+sb}px;background:linear-gradient(#0A2A44,#041A2C 70%);opacity:.97"></div>
+ <div class="a" style="left:0;right:0;top:${by}px;height:1.5px;background:rgba(63,232,245,.38)"></div>
+ <div class="a" style="left:0;top:${by}px;width:22px;height:2px;background:#3FE8F5"></div><div class="a" style="right:0;top:${by}px;width:22px;height:2px;background:#3FE8F5"></div>`;
+ TABS.forEach((t,i)=>{ s+=cell(t,i*75,by,75,bh,t.id===activeId,lvl<t.nv,false); });
+ if(sb) s+=`<div class="a" style="left:121px;top:${H-13}px;width:134px;height:5px;border-radius:3px;background:rgba(230,255,255,.55)"></div>`;
+ return {html:s,top:by};
+}
+// ---------- Opcao B: abas no topo ----------
+function tabsB(st,activeId,lvl){
+ const y=st+6, h=68; let s='';
+ s+=`<div class="a" style="left:0;right:0;top:${y}px;height:${h}px;background:rgba(6,34,58,.82)"></div>
+ <div class="a" style="left:0;right:0;top:${y+h}px;height:1.5px;background:rgba(63,232,245,.38)"></div>`;
+ TABS.forEach((t,i)=>{ s+=cell(t,i*75,y,75,h,t.id===activeId,lvl<t.nv,true); });
+ return s;
+}
+function statusBar(){ // faixa segura do iPhone (notch) so como referencia
+ return `<div class="a" style="left:0;right:0;top:0;height:47px;background:linear-gradient(rgba(0,0,0,.35),rgba(0,0,0,0))"></div>
+ <div class="a" style="left:118px;top:10px;width:139px;height:30px;border-radius:16px;background:#000"></div>
+ <div class="a" style="left:32px;top:15px;font-size:15px;font-weight:700;color:#fff">9:41</div>`;
+}
+function screen(kind){
+ const wide=kind==='wide', H=wide?667:812, st=wide?0:47, sb=wide?0:34;
+ let h='';
+ if(kind==='a'||wide){ const b=barA(H,sb,'play',2); h+=bgAndPlay(H,b.top-16-78)+b.html; }
+ if(kind==='b'){ h+=bgAndPlay(H,636)+tabsB(st,'play',2); }
+ if(kind==='a_child'){
+  const b=barA(H,sb,'module',2);
+  h+=bgAndPlay(H,606,.62);
+  const y=st+8;
+  h+=`<div class="a pill" style="left:12px;top:${y+4}px;width:104px;height:56px"></div>
+  <div class="a" style="left:12px;top:${y}px;width:104px;height:64px;border:1px dashed rgba(255,201,61,.0)"></div>
+  <div class="a" style="left:28px;top:${y+23}px">${SVG_BACK('#9FF6FF')}</div>
+  <div class="a" style="left:50px;top:${y+20}px;font-size:17px;font-weight:800;letter-spacing:1px">Voltar</div>
+  <div class="a glow" style="left:0;right:0;top:${y+18}px;text-align:center;font-size:20px;font-weight:800;letter-spacing:4px;padding-left:40px">MÓDULOS</div>
+  <div class="a" style="left:24px;right:24px;top:${y+76}px;height:1.5px;background:linear-gradient(90deg,rgba(63,232,245,0),rgba(63,232,245,.6),rgba(63,232,245,0))"></div>
+  <div class="a panel" style="left:40px;top:250px;width:295px;height:240px"></div>
+  <img class="a" src="../ui_icon_module.png" style="left:155px;top:305px;width:64px;height:64px;filter:drop-shadow(0 0 10px rgba(63,232,245,.6))">
+  <div class="a glow" style="left:0;right:0;top:385px;text-align:center;font-size:30px;font-weight:800;letter-spacing:2px">Em breve</div>
+  <div class="a" style="left:0;right:0;top:428px;text-align:center;font-size:12px;font-weight:600;color:#7FA3B8">Seus Módulos vão aparecer aqui.</div>`+b.html;
+ }
+ return `<div class="scr" style="height:${H}px">${h}${wide?'':statusBar()}</div>`;
+}
+const k=(location.hash||'#a').slice(1);
+if(k==='wide'){
+ document.body.style.cssText='width:1280px;height:720px;background:#00101D';
+ const s=720/667, w=375*s;
+ document.body.innerHTML=`<div style="position:absolute;left:${(1280-w)/2/s}px;top:0;width:375px;height:667px;zoom:${s};outline:1px solid rgba(63,232,245,.12)">${screen('wide')}</div>`;
+}else{
+ document.body.style.cssText='width:375px;height:812px';
+ document.body.innerHTML=screen(k);
+}
+</script></body></html>
