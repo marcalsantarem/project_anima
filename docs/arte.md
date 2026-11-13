@@ -292,7 +292,7 @@ Formas exclusivas: círculo = Moeda, estrela = Partículas, hexágono = XP. Lara
 
 `ui_holo_toggle_{off,on}[_pressed]` e `ui_holo_toggle_disabled` (228×88, corpo igual ao secundário esticado). Rótulo à esquerda (texto da UI), chave chanfrada à direita (trilho 48×28). O estado não depende só da cor: **posição do botão** (esquerda = desligado, direita = ligado), **marca** no trilho (`O` desligado, `I` ligado) e **brilho** (só o ligado brilha). Desligado = moldura ciano escuro `#1C7F8E`; ligado = moldura `holo_line` + trilho ciano cheio; desabilitado = tokens `holo_dis_*`. Contorno `#021423`. Prévia: [`interruptor-holo.png`](img/interruptor-holo.png). Detalhes e margens em `assets/ui/README.md`.
 
-### 11.9 Hangar: navegação (T-198, BRF-143; proposta, aguarda escolha do dono)
+### 11.9 Hangar: navegação (T-198, BRF-143; opção A aprovada pelo dono)
 
 Prévias: [`hangar-opcao-a-375x812.png`](img/hangar-opcao-a-375x812.png) (barra inferior), [`hangar-opcao-b-375x812.png`](img/hangar-opcao-b-375x812.png) (abas no topo), [`hangar-opcao-a-tela-filha-375x812.png`](img/hangar-opcao-a-tela-filha-375x812.png) ("Em breve" + Voltar), [`hangar-1280x720.png`](img/hangar-1280x720.png). Fonte: `assets/ui/_src/hangar_mockup.html` (`bash assets/ui/_src/hangar_render.sh`). Conta nível 2 nas prévias.
 
