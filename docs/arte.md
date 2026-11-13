@@ -301,7 +301,18 @@ Prévias: [`hangar-opcao-a-375x812.png`](img/hangar-opcao-a-375x812.png) (barra 
 - **Tela filha:** topo com Voltar (pílula 104×56, alvo 64) e título 20/800; painel central com o ícone do conceito, "Em breve" 30/800 e legenda. A barra continua visível, com a aba da tela ativa. O bloco do Jogar sobe 30 px (Jogar termina 16 px acima da barra).
 - **Largura 1280×720:** mesma coluna em retrato centralizada (como o menu atual), sem faixa segura.
 
- (T-289, BRF-125; decisão 64)
+**Peças (T-199, BRF-145; PNG 2x, 1 px ≈ 1 px no viewport 720; fonte `assets/ui/_src/gen_ui_hangar.py`; prévia [`hangar-pecas.png`](img/hangar-pecas.png); uso no `assets/ui/README.md`):**
+
+| Arquivo | PNG | 9-slice E/D/C/B · `expand_margin` | Observação |
+|---|---|---|---|
+| `ui_nav_bar` | 128×120 | 48/48/16/8 · topo 8 | fundo, linha e colchetes do topo |
+| `ui_nav_tab_active` / `_pressed` | 166×168 | fixo · 8 | item 150×152; ativo com brilho e traço claro |
+| `ui_nav_lock_chip` | 80×40 | 38/12/12/12 · 0 | cadeado na arte; "NV n" da UI (`content_margin` 38/12) |
+| `ui_icon_nav_play` / `_modules` / `_components` / `_cores` / `_settings` | 64×64 | — | usados a 56 (normal) e 64 (ativo) |
+| `ui_icon_module_locked` / `_component_locked` / `_core_locked` | 64×64 | — | cinza a 45% na arte |
+| `ui_icon_back` | 36×36 | — | seta do Voltar, sobre a `ui_holo_pill` |
+
+## 12. HUD holográfico da partida (T-289, BRF-125; decisão 64)
 
 O estilo dos menus (§11) e do botão de velocidade vale para **todo o HUD da partida**; a arena (chão, inimigos, Anima) segue cartoon 3/4. **Posições, tamanhos de toque e comportamento não mudam** (`docs/ui.md` §4); a T-290 (AG02) só troca a arte.
 

@@ -111,9 +111,9 @@
 | T-196 | Validação do M2 (inclui o botão de velocidade, T-272 a T-276; inclui save persistindo no iPhone, no Safari e no modo app) | M2 | AG03 | feita (veredito: passa com ressalvas, ver docs/qa/qa-M2.md) |
 | T-197 | Fechar o M2 como v0.2.0: tag `v0.2.0` e deploy em `v0-2-0--projectanimagame.netlify.app` | M2 | AG00 + AG10 | feita (sem branch `alfa`, abandonada) |
 | T-198 | Mockup do hangar: navegação entre Jogar, Núcleos, Módulos, Componentes e Configurações (abas ou barra inferior) (tam. M) | M3 | AG08 | feita (opção A recomendada; dono escolheu a opção A) |
-| T-199 | Arte do hangar: fundo, ícones das abas, estados ativo/bloqueado (tam. M) | M3 | AG08 | a fazer |
+| T-199 | Arte do hangar: fundo, ícones das abas, estados ativo/bloqueado (tam. M) | M3 | AG08 | feita |
 | T-200 | Fluxo de cenas do hangar: telas filhas carregadas sob demanda, voltar, estado preservado (tam. P) | M3 | AG07 | feita |
-| T-201 | Hangar na UI: o menu vira hangar com abas; telas ainda vazias mostram "em breve" (tam. M) | M3 | AG02 | a fazer |
+| T-201 | Hangar na UI: o menu vira hangar com abas; telas ainda vazias mostram "em breve" (tam. M) | M3 | AG02 | feita (Ajustes abre "Em breve" até existir Configurações) |
 | T-202 | Validação e fechamento da v0.2.1 (tag) (tam. P) | M3 | AG03 + AG00 | a fazer |
 | T-203 | Design da árvore de Núcleos: 10 a 12 talentos, efeitos, custos em Moeda, pré-requisitos; dados em `.tres` (tam. M) | M4 | AG04 | a fazer |
 | T-204 | Lógica dos Núcleos: compra, pré-requisitos, soma dos efeitos; save; testes GUT (tam. M) | M4 | AG04 + AG05 | a fazer |

@@ -2,7 +2,7 @@ class_name MenuScreen
 extends Control
 ## Menu principal holográfico (T-190, BRF-113; docs/arte.md §11, docs/ui.md "Menu principal").
 ## Recebe os dados por `setup(view)` e emite `play_pressed`; não chama Backend nem SceneFlow (T-187).
-## `view`: {level: int, xp: int, xp_to_next: int, coins: int, is_max: bool}. A engrenagem não tem ação no M2.
+## `view`: {level: int, xp: int, xp_to_next: int, coins: int, is_max: bool}.
 
 signal play_pressed
 
@@ -15,7 +15,6 @@ const TXT_MAX := "MAX"
 
 ## Moeda provisória (T-162 troca): único ponto de troca do ícone.
 const COIN_ICON := preload("res://assets/ui/ui_icon_coin_small.png")
-const ICON_SETTINGS := preload("res://assets/ui/ui_icon_settings.png")
 const PANEL_PILL := preload("res://assets/ui/ui_holo_pill.png")
 const BTN_PRIMARY := preload("res://assets/ui/ui_holo_btn_primary_normal.png")
 const BTN_PRIMARY_PRESSED := preload("res://assets/ui/ui_holo_btn_primary_pressed.png")
@@ -46,8 +45,7 @@ const SUB_GAP := 6.0
 const TITLE_FONT := 60.0
 const SUB_FONT := 25.0
 const PLAY_FONT := 29.0
-const GEAR_SIZE := 44.0
-const GEAR_MARGIN := 16.0
+const BAR_CLEARANCE := 30.0 ## Jogar sobe para não encostar na barra do hangar (T-201)
 const BOTTOM_GAP_MAX := 98.0
 const BLOCK_H := 273.0 ## do topo de "PROJECT:" à base do Jogar, a 1x
 const PEDESTAL_END := 0.55 ## fração da altura até a base do pedestal da arte
@@ -58,7 +56,6 @@ var badge_label: Label
 var xp_label: Label
 var coins_label: Label
 var play_button: Button
-var settings_button: Button
 
 var _data := {"level": 1, "xp": 0, "xp_to_next": 1, "coins": 0, "is_max": false}
 var _art: Control
@@ -103,15 +100,6 @@ func _ready() -> void:
 	_style_play(play_button)
 	play_button.pressed.connect(func() -> void: play_pressed.emit())
 	root.add_child(play_button)
-
-	settings_button = Button.new() # sem ação no M2 (configurações no M8)
-	settings_button.name = "SettingsButton"
-	settings_button.focus_mode = FOCUS_NONE
-	settings_button.icon = ICON_SETTINGS
-	settings_button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	settings_button.expand_icon = false
-	_style_texture_all(settings_button, PANEL_PILL, 20, 0.0)
-	root.add_child(settings_button)
 
 	_built = true
 	_apply()
@@ -281,7 +269,7 @@ func _layout() -> void:
 
 	# Bloco único ancorado embaixo: Jogar → linha do nível → logotipo.
 	var gap := clampf(view.y * 0.12, UiTokens.SPACE_L, BOTTOM_GAP_MAX * k)
-	var bottom := view.y - float(safe.bottom) - gap
+	var bottom := view.y - float(safe.bottom) - gap - BAR_CLEARANCE * k
 	var play_w := minf(PLAY_SIZE.x * k, view.x - 2.0 * UiTokens.MARGIN_SCREEN)
 	var play_size := Vector2(play_w, maxf(PLAY_SIZE.y * k, UiTokens.TOUCH_MIN))
 	play_button.size = play_size
@@ -317,11 +305,6 @@ func _layout() -> void:
 	var sub_base := title_base - title_font * 0.7 - 6.0 * k
 	_place_label(_sub_title, sub_font, sub_base - sub_font * 0.7, view.x)
 
-	var gear := maxf(GEAR_SIZE * k, UiTokens.TOUCH_MIN)
-	settings_button.size = Vector2.ONE * gear
-	var col := column_rect(view)
-	var right := minf(col.end.x, view.x - float(safe.right))
-	settings_button.position = Vector2(right - GEAR_MARGIN * k - gear, float(safe.top) + UiTokens.SPACE_M)
 	_update_bar()
 
 

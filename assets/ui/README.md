@@ -194,3 +194,22 @@ Estilo holográfico (§11/§12 do `docs/arte.md`), contorno `#021423`, brilho pi
 | `ui_icon_module_fragment.png` | 128×128 | 28–64 | **Fragmento de Módulo**: cacos de cristal orquídea `#E07BFF` com o raio ciano do Módulo |
 
 Total ~55 KB. Use `TextureRect` com `expand_mode = EXPAND_IGNORE_SIZE` e `STRETCH_KEEP_ASPECT_CENTERED`.
+
+## Barra de navegação do hangar, opção A (T-199, BRF-145)
+
+Guia: `docs/arte.md` §11.9; mockup `_src/hangar_mockup.html`. Fonte: `_src/gen_ui_hangar.py` (`python assets/ui/_src/gen_ui_hangar.py`; Chrome e ffmpeg no PATH). PNG 2x do mockup de 375 px: **1 px do PNG ≈ 1 px de tela** no viewport 720, sem `scale`. Validação: `_src/hangar_sheet.png` = prévia `docs/img/hangar-pecas.png` (barra montada com as peças reais). Total: 13 PNG, **~37 KB**. Sem texto na arte: rótulos e "NV n" são da UI.
+
+| Arquivo | PNG | 9-slice E/D/C/B | `expand_margin` | Uso |
+|---|---|---|---|---|
+| `ui_nav_bar.png` | 128×120 | 48/48/16/8 | topo 8 | Fundo da barra (degradê `#0A2A44` → `#041A2C`, 97%), linha `holo_line_dim` no topo, colchetes ciano 44×4 nos dois cantos e brilho fraco para cima (os 8 px do `expand_margin`). Altura = 152 + faixa segura; a borda superior do retângulo = linha da barra |
+| `ui_nav_tab_active.png` | 166×168 | — (fixo) | 8 nos 4 lados | Aba ativa: placa chanfrada em cima (chanfro 20), degradê ciano 32% → 7%, moldura `holo_line`, brilho e traço claro 80×8 colado na borda de cima. Retângulo do item = 150×152 (célula); placa com 8 px de recuo. Atrás do ícone e do rótulo |
+| `ui_nav_tab_pressed.png` | 166×168 | — (fixo) | 8 nos 4 lados | Toque numa aba não ativa: mesma placa, miolo `#0E5A70`, moldura `holo_text2` a 75%, sem brilho nem traço |
+| `ui_nav_lock_chip.png` | 80×40 | 38/12/12/12 | 0 | Selo do bloqueado com o cadeado cinza na margem esquerda. **Área do texto:** `content_margin` esq 38 / dir 12 / topo 0 / base 0, "NV n" Outfit 22 px (11 a 1x) peso 800, cor `#9FB8CC`, centrado na vertical. Altura fixa 40; largura cresce com o texto (≈ 94 para "NV 4"). Posição: canto sup. esq. em (centro da célula − 24, topo do ícone + 28) |
+| `ui_icon_nav_play.png` | 64×64 | — | — | Jogar: losango com seta, ciano com brilho (o ícone mais forte da barra) |
+| `ui_icon_nav_modules.png` / `_components.png` / `_cores.png` | 64×64 | — | — | Mesmos desenhos do glossário (`ui_icon_module`/`_component`/`_core`) renderizados a 64 (mais nítidos a 56–64 do que o PNG de 128 reduzido) |
+| `ui_icon_nav_settings.png` | 64×64 | — | — | Ajustes: engrenagem `holo_text2` com contorno e brilho (o `ui_icon_settings` de 48 continua para o botão de ícone) |
+| `ui_icon_module_locked.png` / `ui_icon_component_locked.png` / `ui_icon_core_locked.png` | 64×64 | — | — | Bloqueado: cinza, sem brilho, **45% de opacidade já na arte** (não aplicar `modulate` de alfa) |
+| `ui_icon_back.png` | 36×36 | — | — | Seta do Voltar (`holo_text2`, contorno). O botão é a `ui_holo_pill` (104×56 a 1x = 208×112; 9-slice 20, alvo ≥ 128 de altura) com a seta à esquerda e "Voltar" 34 px |
+
+- **Geometria (viewport 720 ≈ 2× o mockup):** item 150×152; ícone 56 (normal, topo +24) e 64 (ativo, topo +18), centrado; no bloqueado o ícone desloca 24 px para a esquerda e o selo fica à direita. Rótulo 23 px/700 com topo em +104 (área livre x 0–150, y 100–148). Alvo de toque = o item inteiro (≥ 64 a 1x).
+- **Cores do rótulo:** ativo `holo_text` + brilho (sombra ciano), normal `#9FC4D6`, bloqueado `#6F8BA3`.
