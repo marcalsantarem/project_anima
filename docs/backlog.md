@@ -119,7 +119,7 @@
 | T-203 | Design da árvore de Núcleos: 10 a 12 talentos, efeitos, custos em Moeda, pré-requisitos; dados em `.tres` (tam. M) | M4 | AG04 | feita |
 | T-204 | Lógica dos Núcleos: compra, pré-requisitos, soma dos efeitos; save; testes GUT (tam. M) | M4 | AG04 + AG05 | em andamento |
 | T-205 | Partida aplica os Núcleos comprados (via `MatchConfig`) (tam. M) | M4 | AG01 | em andamento |
-| T-206 | Arte dos ícones dos Núcleos e das ligações da árvore (tam. M) | M4 | AG08 | a fazer |
+| T-206 | Arte dos ícones dos Núcleos e das ligações da árvore (tam. M) | M4 | AG08 | feita |
 | T-207 | Tela de Núcleos: árvore, detalhe do talento, compra e saldo (tam. G) | M4 | AG02 | a fazer |
 | T-208 | VFX de compra e desbloqueio de Núcleo (tam. P) | M4 | AG09 | a fazer |
 | T-209 | Balanceamento com Núcleos (simulação do bot) (tam. P) | M4 | AG04 | a fazer |
