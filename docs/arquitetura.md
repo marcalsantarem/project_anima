@@ -88,3 +88,11 @@ API:
 - `MatchResult`: `outcome` (`Outcome.VICTORY|DEFEAT`), `wave_reached`, `waves_total`, `coins` (= Partículas da partida; renomear depende do AG00/T-141), `enemies_killed`, `duration_s`.
 
 **Backend / save (T-185, [ADR 0002](adr/0002-save-local.md)):** autoload `Backend` (`src/backend/backend.gd`) delega a um `BackendProvider` (`LocalBackend`: `user://save.json`, com versão, `.bak` e escrita atômica). Perfil em `PlayerProfile` (`src/meta/`). O jogo só chama `Backend`; a partida continua sem conhecê-lo.
+
+## Localização (T-240, decisão 56)
+
+- **Sistema nativo:** `TranslationServer` + `data/i18n/strings.csv` (colunas `keys,pt_BR`; importado como `strings.pt_BR.translation`, registrado em `project.godot` › `internationalization/locale/translations`). Fallback `pt_BR`; o `SceneFlow` fixa o locale `pt_BR` no `_init` (o seletor de idioma, inglês e espanhol são da T-241, M8). Entra no export Web pelo `all_resources`.
+- **Uso:** `Loc.t("CHAVE")` ou `Loc.t("CHAVE", {"nome": valor})` (`src/core/loc.gd`). Placeholders **nomeados** `{nome}` (a ordem pode mudar entre idiomas); nada de `%s`/`%d` nem concatenação de frases. Frases com variação (ex.: bloqueada / bloqueada até o nível) viram chaves inteiras.
+- **Chaves:** `MAIÚSCULAS_COM_SUBLINHADO`, prefixo da tela ou domínio: `TITLE_`, `MENU_`, `HANGAR_`, `SOON_`, `HUD_`, `SKILL_`, `UPGRADE_`, `PAUSE_`, `RESULT_`; textos repetidos em `COMMON_`. Sufixo `_A11Y` para nomes de acessibilidade. Constantes `TXT_*` guardam a **chave**, não o texto.
+- **Regra:** toda tela nova nasce com chaves; nenhum texto visível fixo em `.gd` ou `.tscn` de `src/ui/` (exceto números e ícones). Fora: debug (`src/debug/`, `src/ui/demo/`), logs, `/api/log`, nomes de nós e ids.
+- **Teste:** `tests/unit/test_localization.gd` falha com chave usada inexistente, chave órfã, tradução não registrada e `text = "..."` fixo em cena de `src/ui/`.

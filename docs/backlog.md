@@ -152,7 +152,7 @@
 | T-237 | Configurações no save: volume de música e efeitos, sons ligados, efeitos reduzidos (sai do `debug.cfg`), idioma (tam. P) | M8 | AG05 + AG07 | a fazer |
 | T-238 | Barramentos de áudio Música e Efeitos ligados ao volume (tam. P) | M8 | AG11 + AG07 | a fazer |
 | T-239 | Tela de configurações (no hangar e na pausa) (tam. M) | M8 | AG02 | a fazer |
-| T-240 | Infra de localização: tradução por chaves em todos os textos, só pt-BR por enquanto (os outros idiomas ficam na T-241, M8); toda tela nova do M3 em diante já nasce com chaves (tam. G) | M3 | AG07 + AG02 | a fazer |
+| T-240 | Infra de localização: tradução por chaves em todos os textos, só pt-BR por enquanto (os outros idiomas ficam na T-241, M8); toda tela nova do M3 em diante já nasce com chaves (tam. G) | M3 | AG07 + AG02 | feita (botão "Enviar log" de debug fica para a T-241) |
 | T-241 | Tradução para inglês e espanhol, com glossário dos nomes oficiais (tam. M) | M8 | AG02 | a fazer |
 | T-242 | Layout com textos longos (espanhol) e fontes com acentos; teste de corte (tam. P) | M8 | AG02 | a fazer |
 | T-243 | Idioma do navegador como padrão (tam. P) | M8 | AG02 | a fazer |

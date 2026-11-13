@@ -57,6 +57,11 @@ var _changing := false
 var _recorder: MatchRecorder
 
 
+## Locale padrão pt-BR (T-240); o fallback do project.godot também é pt_BR. O seletor de idioma é da T-241.
+func _init() -> void:
+	TranslationServer.set_locale(Loc.DEFAULT_LOCALE)
+
+
 ## Boot: carrega o perfil (falha = perfil novo, tratado no provedor) e abre o Título. Com o modo de
 ## estresse pedido (`?debug=1&stress=N,M`), vai direto para a partida.
 func boot() -> void:

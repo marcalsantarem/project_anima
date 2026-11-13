@@ -9,16 +9,17 @@ enum State { NORMAL, ACTIVE, LOCKED }
 const ORDER: Array[StringName] = [
 	HangarNav.MODULES, HangarNav.COMPONENTS, HangarNav.PLAY, HangarNav.CORES, HangarNav.SETTINGS,
 ]
+## Chaves de tradução dos rótulos; `label_of` devolve o texto.
 const LABELS := {
-	HangarNav.MODULES: "Módulos", HangarNav.COMPONENTS: "Componentes", HangarNav.PLAY: "Jogar",
-	HangarNav.CORES: "Núcleos", HangarNav.SETTINGS: "Ajustes",
+	HangarNav.MODULES: "HANGAR_TAB_MODULES", HangarNav.COMPONENTS: "HANGAR_TAB_COMPONENTS",
+	HangarNav.PLAY: "HANGAR_TAB_PLAY", HangarNav.CORES: "HANGAR_TAB_CORES", HangarNav.SETTINGS: "HANGAR_TAB_SETTINGS",
 }
 ## Chave de `feature_unlock_levels` por destino; Módulos usa o slot 1; Jogar e Ajustes não bloqueiam.
 const FEATURE_KEYS := {HangarNav.COMPONENTS: &"components", HangarNav.CORES: &"nuclei"}
 
 
 static func label_of(id: StringName) -> String:
-	return LABELS.get(id, "")
+	return Loc.t(LABELS[id]) if LABELS.has(id) else ""
 
 
 ## Nível da conta que libera o destino (1 = sempre livre).
@@ -44,9 +45,9 @@ static func state_of(id: StringName, current: StringName, level: int, prog: Prog
 
 ## Selo do bloqueado: "NV 4".
 static func lock_text(id: StringName, prog: ProgressionData) -> String:
-	return "NV %d" % unlock_level(id, prog)
+	return Loc.t("COMMON_LOCK_LEVEL", {"level": unlock_level(id, prog)})
 
 
 ## Aviso curto ao tocar num item bloqueado.
 static func lock_hint(id: StringName, prog: ProgressionData) -> String:
-	return "%s libera no NV %d" % [label_of(id), unlock_level(id, prog)]
+	return Loc.t("HANGAR_LOCK_HINT", {"name": label_of(id), "level": unlock_level(id, prog)})

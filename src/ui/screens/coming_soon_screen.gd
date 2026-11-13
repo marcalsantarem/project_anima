@@ -6,9 +6,10 @@ extends Control
 
 signal back_requested
 
-const TXT_SOON := "Em breve"
-const TXT_BACK := "Voltar"
-const TXT_CAPTION := "Esta área chega numa próxima versão."
+## Chaves de tradução (Loc.t).
+const TXT_SOON := "SOON_TITLE"
+const TXT_BACK := "COMMON_BACK"
+const TXT_CAPTION := "SOON_CAPTION"
 const BASE_W := 375.0
 const HOLO_BG := Color("#021423")
 const HOLO_LINE := Color("#3FE8F5")
@@ -35,9 +36,9 @@ func setup_title(text: String) -> void:
 
 func _ready() -> void:
 	_title.text = title_text
-	%Soon.text = TXT_SOON
-	%Caption.text = TXT_CAPTION
-	_back.text = TXT_BACK
+	%Soon.text = Loc.t(TXT_SOON)
+	%Caption.text = Loc.t(TXT_CAPTION)
+	_back.text = Loc.t(TXT_BACK)
 	_back.pressed.connect(back_requested.emit)
 	var bold := ScreenKit.THEME.get_font(&"font", &"LabelDisplay")
 	_title.add_theme_font_override("font", bold)

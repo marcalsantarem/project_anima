@@ -6,12 +6,13 @@ extends Control
 
 signal play_pressed
 
-const TXT_SUBTITLE := "PROJECT:"
-const TXT_TITLE := "ANIMA"
-const TXT_PLAY := "JOGAR"
-const TXT_LEVEL := "NÍVEL %d"
-const TXT_XP := "%s / %s XP"
-const TXT_MAX := "MAX"
+## Chaves de tradução (Loc.t).
+const TXT_SUBTITLE := "TITLE_LOGO_SUB"
+const TXT_TITLE := "TITLE_LOGO_MAIN"
+const TXT_PLAY := "MENU_PLAY"
+const TXT_LEVEL := "COMMON_LEVEL"
+const TXT_XP := "COMMON_XP_PROGRESS"
+const TXT_MAX := "COMMON_MAX"
 
 ## Moeda provisória (T-162 troca): único ponto de troca do ícone.
 const COIN_ICON := preload("res://assets/ui/ui_icon_coin_small.png")
@@ -83,11 +84,11 @@ func _ready() -> void:
 	_art = TitleScreen.build_art(DebugSettings.reduced_effects())
 	root.add_child(_art)
 
-	_sub_title = TitleScreen.title_label(TXT_SUBTITLE)
+	_sub_title = TitleScreen.title_label(Loc.t(TXT_SUBTITLE))
 	_sub_title.name = "Subtitle"
 	_sub_title.add_theme_font_override("font", _spaced(6.0))
 	root.add_child(_sub_title)
-	_title = TitleScreen.title_label(TXT_TITLE)
+	_title = TitleScreen.title_label(Loc.t(TXT_TITLE))
 	_title.name = "Title"
 	root.add_child(_title)
 
@@ -95,7 +96,7 @@ func _ready() -> void:
 
 	play_button = Button.new()
 	play_button.name = "PlayButton"
-	play_button.text = TXT_PLAY
+	play_button.text = Loc.t(TXT_PLAY)
 	play_button.focus_mode = FOCUS_NONE
 	_style_play(play_button)
 	play_button.pressed.connect(func() -> void: play_pressed.emit())
@@ -219,11 +220,11 @@ func _apply() -> void:
 	var is_max := bool(_data.is_max)
 	var lvl := int(_data.level)
 	badge_label.text = str(lvl)
-	level_label.text = TXT_LEVEL % lvl
+	level_label.text = Loc.t(TXT_LEVEL, {"level": lvl})
 	if is_max:
-		xp_label.text = TXT_MAX
+		xp_label.text = Loc.t(TXT_MAX)
 	else:
-		xp_label.text = TXT_XP % [format_number(int(_data.xp)), format_number(int(_data.xp_to_next))]
+		xp_label.text = Loc.t(TXT_XP, {"xp": format_number(int(_data.xp)), "xp_to_next": format_number(int(_data.xp_to_next))})
 	coins_label.text = format_number(int(_data.coins))
 	_update_bar()
 

@@ -8,6 +8,7 @@ assets/          Arquivos de mídia brutos, sem lógica.
   sprites/  ui/  backgrounds/  audio/  fonts/  vfx/
 data/            Resources (.tres) de balanceamento e conteúdo. Nenhuma lógica aqui.
   skills/  cards/  enemies/  waves/  stats/
+  i18n/          Traduções: `strings.csv` (chaves → pt_BR; T-240). Convenção em docs/arquitetura.md, "Localização".
 src/
   core/          Autoloads e infraestrutura: estado global, config, troca de cenas.
   backend/       Interface `Backend` e suas implementações (local primeiro).

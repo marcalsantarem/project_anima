@@ -176,10 +176,10 @@ func is_locked() -> bool:
 
 
 func _update_accessibility() -> void:
-	var text := "Módulo %d" % slot
+	var key := "SKILL_A11Y"
 	if state == State.LOCKED:
-		text += ", bloqueada" + (" até o nível %d" % unlock_level if unlock_level > 0 else "")
-	accessibility_name = text
+		key = "SKILL_A11Y_LOCKED_LEVEL" if unlock_level > 0 else "SKILL_A11Y_LOCKED"
+	accessibility_name = Loc.t(key, {"slot": slot, "level": unlock_level})
 
 
 func _process(delta: float) -> void:
@@ -482,7 +482,7 @@ func _draw_lock(c: Vector2, r: float, font: Font) -> void:
 	draw_texture_rect(UiArt.LOCK_HOLO, Rect2(lc - Vector2(half, half), Vector2(LOCK_SIZE, LOCK_SIZE)), false)
 	if not has_level:
 		return
-	var text := "NV %d" % unlock_level
+	var text := Loc.t("COMMON_LOCK_LEVEL", {"level": unlock_level})
 	var y := c.y + r * 0.62
 	draw_string_outline(font, Vector2(0, y), text, HORIZONTAL_ALIGNMENT_CENTER, size.x, LOCK_TEXT_SIZE, UiTokens.HOLO_OUTLINE, UiTokens.HOLO_BG)
 	draw_string(font, Vector2(0, y), text, HORIZONTAL_ALIGNMENT_CENTER, size.x, LOCK_TEXT_SIZE, UiTokens.HOLO_MUTED)

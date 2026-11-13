@@ -76,6 +76,11 @@ debug_toggle={
 ]
 }
 
+[internationalization]
+
+locale/translations=PackedStringArray("res://data/i18n/strings.pt_BR.translation")
+locale/fallback="pt_BR"
+
 [layer_names]
 
 2d_physics/layer_1="anima"

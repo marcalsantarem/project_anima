@@ -46,13 +46,13 @@ func _ready() -> void:
 	_root = ScreenKit.root(self, VEIL)
 	_root.mouse_filter = Control.MOUSE_FILTER_STOP
 	var col := _holo_card(_root)
-	var title := ScreenKit.label("PAUSADO", &"LabelTitle", UiTokens.HOLO_TEXT)
+	var title := ScreenKit.label(Loc.t("PAUSE_TITLE"), &"LabelTitle", UiTokens.HOLO_TEXT)
 	_outline(title)
 	col.add_child(title)
-	_continue = _holo_button("Continuar", true, close)
+	_continue = _holo_button(Loc.t("PAUSE_CONTINUE"), true, close)
 	col.add_child(_continue)
-	col.add_child(_holo_button("Recomeçar", false, _on_restart))
-	menu_button = _holo_button("Voltar ao menu", false, _on_menu)
+	col.add_child(_holo_button(Loc.t("PAUSE_RESTART"), false, _on_restart))
+	menu_button = _holo_button(Loc.t("PAUSE_MENU"), false, _on_menu)
 	menu_button.name = "MenuButton"
 	col.add_child(menu_button)
 	var toggles := HBoxContainer.new()
@@ -186,7 +186,7 @@ func _toggle_button(node_name: String, cb: Callable) -> Button:
 ## Área do texto x 16-152 (margens esq. 16, dir. 76, base 4); pressionado soma 4 px ao topo.
 func _style_toggle(b: Button, on: bool, label: String, state_text: String) -> void:
 	b.text = label
-	b.tooltip_text = "%s: %s" % [label, state_text]
+	b.tooltip_text = Loc.t("PAUSE_TOGGLE_STATE", {"label": label, "state": state_text})
 	b.accessibility_name = b.tooltip_text
 	var up: Texture2D = T_TOGGLE_ON if on else T_TOGGLE_OFF
 	var down: Texture2D = T_TOGGLE_ON_DOWN if on else T_TOGGLE_OFF_DOWN
@@ -289,6 +289,6 @@ static func _holo_button(text: String, primary: bool, cb: Callable) -> Button:
 func _refresh_debug() -> void:
 	_apply_debug_visibility()
 	var dbg := DebugSettings.overlay_enabled()
-	_style_toggle(debug_toggle, dbg, "Debug", "ligado" if dbg else "desligado")
+	_style_toggle(debug_toggle, dbg, Loc.t("PAUSE_DEBUG"), Loc.t("COMMON_ON") if dbg else Loc.t("COMMON_OFF"))
 	var red := DebugSettings.reduced_effects()
-	_style_toggle(reduced_toggle, red, "Efeitos reduzidos", "sim" if red else "não")
+	_style_toggle(reduced_toggle, red, Loc.t("PAUSE_REDUCED_FX"), Loc.t("COMMON_YES") if red else Loc.t("COMMON_NO"))

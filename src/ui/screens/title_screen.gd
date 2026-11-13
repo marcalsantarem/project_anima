@@ -10,7 +10,7 @@ signal start_requested
 
 const BG_ART := preload("res://assets/ui/title_bg_tech.webp")
 const STUDIO_LOGO := preload("res://assets/ui/ui_studio_logo_h.png") ## Anima Games, 2x (BRF-068)
-const BUTTON_TEXT := "Toque para começar"
+const BUTTON_TEXT := "TITLE_TAP_TO_START" ## chave de tradução (Loc.t)
 const PULSE_TIME := 0.8
 const GLOW_TIME := 2.4
 const FADE_TIME := 0.3 ## véu escuro → partida
@@ -35,7 +35,7 @@ const SUB_GAP := 12.0
 const BUTTON_CENTER_Y := 1211.0 ## centro da barra do shell
 const BUTTON_SIZE := Vector2(495, 110)
 const BUTTON_FONT := 36.0
-const TXT_BUILD_TAG := "ALFA" ## vazio = sem subtítulo (T-283)
+const TXT_BUILD_TAG := "TITLE_BUILD_TAG" ## chave (texto "ALFA"); vazio = sem subtítulo (T-283)
 const TAG_FONT := 38.0 ## entre "PROJECT:" e "ANIMA" e o rodapé
 const TAG_COLOR := Color("#FF5A6E") ## vermelho `danger` da paleta
 const TAG_GLOW := Color(1.0, 0.25, 0.35, 0.7)
@@ -70,13 +70,13 @@ func _ready() -> void:
 	_art = build_art(reduced)
 	root.add_child(_art)
 
-	_sub_title = title_label("PROJECT:")
+	_sub_title = title_label(Loc.t("TITLE_LOGO_SUB"))
 	root.add_child(_sub_title)
-	_title = title_label("ANIMA")
+	_title = title_label(Loc.t("TITLE_LOGO_MAIN"))
 	root.add_child(_title)
 
 	if TXT_BUILD_TAG != "":
-		_build_tag = title_label(TXT_BUILD_TAG)
+		_build_tag = title_label(Loc.t(TXT_BUILD_TAG))
 		_build_tag.name = "BuildTag"
 		_build_tag.add_theme_color_override("font_color", TAG_COLOR)
 		_build_tag.add_theme_color_override("font_shadow_color", TAG_GLOW)
@@ -84,7 +84,7 @@ func _ready() -> void:
 
 	_button = Button.new()
 	_button.name = "StartButton"
-	_button.text = BUTTON_TEXT
+	_button.text = Loc.t(BUTTON_TEXT)
 	_button.focus_mode = FOCUS_NONE
 	_button.mouse_filter = MOUSE_FILTER_IGNORE # o gesto vale na tela toda (_input)
 	_style_holo(_button, false)

@@ -20,3 +20,6 @@ Thumbs.db
 # Segredos locais (nunca commitar)
 .env
 .env.*
+
+# Traduções geradas pelo import do Godot (T-240)
+data/i18n/*.translation

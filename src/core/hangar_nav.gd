@@ -10,8 +10,10 @@ const COMPONENTS := &"components"
 const SETTINGS := &"settings"
 ## Ordem dos destinos (a barra do T-201 segue esta ordem).
 const TABS: Array[StringName] = [PLAY, CORES, MODULES, COMPONENTS, SETTINGS]
+## Chaves de tradução dos títulos (docs/arquitetura.md, "Localização"); `title_of` devolve o texto.
 const TITLES := {
-	PLAY: "Jogar", CORES: "Núcleos", MODULES: "Módulos", COMPONENTS: "Componentes", SETTINGS: "Configurações",
+	PLAY: "HANGAR_TAB_PLAY", CORES: "HANGAR_TAB_CORES", MODULES: "HANGAR_TAB_MODULES",
+	COMPONENTS: "HANGAR_TAB_COMPONENTS", SETTINGS: "HANGAR_TITLE_SETTINGS",
 }
 ## Cenas previstas. Enquanto não existirem, o `SceneFlow` abre o placeholder "Em breve".
 ## O `PLAY` é trocado pelo `SceneFlow.menu_scene_path`.
@@ -36,7 +38,7 @@ static func is_valid(id: StringName) -> bool:
 
 
 static func title_of(id: StringName) -> String:
-	return TITLES.get(id, "")
+	return Loc.t(TITLES[id]) if TITLES.has(id) else ""
 
 
 func scene_path(id: StringName) -> String:
