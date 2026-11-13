@@ -8,8 +8,20 @@ const STAT_FIRE_RATE := &"stat_fire_rate"
 const STAT_DAMAGE_TAKEN := &"stat_damage_taken"
 const STAT_CORE_HP_MAX := &"stat_core_hp_max"
 const STAT_COOLDOWN := &"stat_cooldown"
+const STAT_SKILL_DAMAGE := &"stat_skill_damage"
+const STAT_PIERCE := &"stat_pierce"
+const STAT_WAVE_HEAL := &"stat_wave_heal"
+const STAT_PARTICLE_GAIN := &"stat_particle_gain"
+const STAT_START_PARTICLES := &"stat_start_particles"
 const MIN_DAMAGE_TAKEN := 1
+## Fator mínimo das reduções (Núcleos × upgrade): teto de -50% (T-205).
+const MIN_REDUCTION_FACTOR := 0.5
+## Teto final de cadência (tiros/s) com Núcleos: ~3 tiros em voo, cabe no pool de 64.
+const MAX_FIRE_RATE := 4.2
+const REDUCTION_STATS: Array[StringName] = [STAT_DAMAGE_TAKEN, STAT_COOLDOWN]
 
+## Bônus dos Núcleos (MatchConfig.talent_bonuses): `{ stat: valor }`. Vazio = sem Núcleos.
+var talents: Dictionary = {}
 var _data: Array[UpgradeData] = []
 var _levels: Dictionary = {} ## id -> nível
 
@@ -71,12 +83,31 @@ func level_up(id: StringName) -> int:
 	return cost
 
 
-## Valor do atributo `stat` sobre `base`, somando os upgrades que o afetam.
+## Bônus dos Núcleos para `stat` (0 se não houver).
+func talent(stat: StringName) -> float:
+	return maxf(float(talents.get(stat, 0.0)), 0.0)
+
+
+## Valor do atributo `stat` sobre `base`: `base × (1 + Σ Núcleos) × (1 + upgrade)`. Reduções:
+## `base × (1 − Núcleos) × (1 − upgrade)`, fator mínimo 0,5. Vida máxima: `round(base × (1 + Σ)) + flat`.
 func apply(stat: StringName, base: float) -> float:
-	var value := base
+	var t := talent(stat)
+	var reduction := REDUCTION_STATS.has(stat)
+	var value := base if reduction else base * (1.0 + t)
+	var factor := maxf(1.0 - t, 0.0)
 	for d in _data:
-		if d.stat == stat:
+		if d.stat != stat:
+			continue
+		if d.mode == UpgradeData.Mode.REDUCTION_PCT:
+			factor *= maxf(1.0 - d.per_level * _levels[d.id], 0.0)
+		else:
+			if d.mode == UpgradeData.Mode.ADD_FLAT and t > 0.0:
+				value = roundf(value) # arredonda os Núcleos antes do valor fixo
 			value = d.value_at(value, _levels[d.id])
+	if reduction:
+		value = base * maxf(factor, MIN_REDUCTION_FACTOR)
+	if stat == STAT_FIRE_RATE:
+		value = minf(value, maxf(MAX_FIRE_RATE, base))
 	return value
 
 

@@ -5,6 +5,8 @@ extends RefCounted
 var anima: Anima
 ## Inimigos vivos (mesma lista da arena).
 var enemies: Array[Enemy]
+## Multiplicador do dano dos Módulos (Núcleos, T-205). 1 = sem bônus.
+var skill_damage_scale := 1.0
 
 
 func _init(p_anima: Anima, p_enemies: Array[Enemy]) -> void:

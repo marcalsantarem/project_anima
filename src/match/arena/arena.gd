@@ -99,6 +99,7 @@ var _focus_marker := FocusMarker.new()
 var _skill_aim := SkillAim.new()
 var _shake_base := Vector2.ZERO
 var _last_core_hp := -1
+var _particle_carry := 0.0 ## fração de Partículas (Núcleos) acumulada entre drops
 
 @onready var anima: Anima = $Anima
 @onready var projectiles: ProjectilePool = $Projectiles
@@ -125,12 +126,17 @@ func _ready() -> void:
 		stage = load(StageData.path_for(config.stage_id))
 	waves = WaveRunner.new(stage)
 	waves.spawn_requested.connect(_on_spawn_requested)
-	waves.wave_started.connect(func(c: int, t: int) -> void: wave_changed.emit(c, t))
+	waves.wave_started.connect(_on_wave_started)
 	waves.stage_cleared.connect(func() -> void: _end(MatchResult.Outcome.VICTORY))
 
 	upgrades = MatchUpgrades.from_ids(UPGRADE_IDS)
+	upgrades.talents = config.talent_bonuses
 	anima.upgrades = upgrades
-	projectiles.build(anima.data.projectile_pool_size, anima.data.projectile)
+	var hp_bonus := roundi(upgrades.apply(MatchUpgrades.STAT_CORE_HP_MAX, anima.data.core_hp_max)) - anima.data.core_hp_max
+	if hp_bonus > 0: # Núcleos: HP máximo e inicial maiores (antes de ligar os sinais)
+		anima.core.raise_max(hp_bonus)
+	particles = roundi(upgrades.talent(MatchUpgrades.STAT_START_PARTICLES))
+	projectiles.build(anima.data.projectile_pool_size, anima.data.projectile, roundi(upgrades.talent(MatchUpgrades.STAT_PIERCE)))
 	enemy_projectiles.build(enemy_projectile_pool_size, enemy_projectile)
 	projectiles.projectile_fired.connect(projectile_fired.emit)
 	projectiles.projectile_hit.connect(projectile_hit.emit)
@@ -141,7 +147,10 @@ func _ready() -> void:
 	_last_core_hp = anima.core.current
 	anima.core_depleted.connect(func() -> void: _end(MatchResult.Outcome.DEFEAT))
 	skills.skills = _slot_skills()
-	skills.setup(SkillContext.new(anima, active_enemies))
+	skills.cooldown_scale = upgrades.apply(MatchUpgrades.STAT_COOLDOWN, 1.0)
+	var context := SkillContext.new(anima, active_enemies)
+	context.skill_damage_scale = upgrades.apply(MatchUpgrades.STAT_SKILL_DAMAGE, 1.0)
+	skills.setup(context)
 	skills.skill_used.connect(func(slot: int) -> void: skill_used.emit(slot))
 	skills.cooldown_changed.connect(func(slot: int, r: float, t: float) -> void: cooldown_changed.emit(slot, r, t))
 	skills.skill_ready.connect(func(slot: int) -> void: skill_ready.emit(slot))
@@ -448,15 +457,34 @@ func _on_enemy_died(enemy: Enemy, cause: Enemy.DeathCause) -> void:
 	if cause == Enemy.DeathCause.KILLED and not is_over:
 		enemies_killed += 1
 		kills_by_type[enemy.data.id] = int(kills_by_type.get(enemy.data.id, 0)) + 1
-		particles += enemy.data.particle_drop
+		var gained := _particles_for_drop(enemy.data.particle_drop)
+		particles += gained
 		_emit_particles()
-		if enemy.data.particle_drop > 0:
-			particles_gained.emit(enemy.position, enemy.data.particle_drop)
+		if gained > 0:
+			particles_gained.emit(enemy.position, gained)
 		if enemy is Boss:
 			shake.add(feel.shake_boss_death, feel.shake_boss_death_time)
 			start_hit_stop(feel.hit_stop_boss_death)
 			boss_defeated.emit()
 			_end(MatchResult.Outcome.VICTORY)
+
+
+## Partículas de um drop com o bônus dos Núcleos; a fração que sobra acumula para os próximos drops.
+func _particles_for_drop(drop: int) -> int:
+	if drop <= 0:
+		return 0
+	var exact := drop * (1.0 + upgrades.talent(MatchUpgrades.STAT_PARTICLE_GAIN)) + _particle_carry
+	var whole := floori(exact + 0.000001)
+	_particle_carry = maxf(exact - whole, 0.0)
+	return whole
+
+
+## Início de cada onda: avisa a UI e cura `stat_wave_heal` do HP máximo (sem passar dele).
+func _on_wave_started(current: int, total: int) -> void:
+	var heal := upgrades.talent(MatchUpgrades.STAT_WAVE_HEAL)
+	if heal > 0.0 and not is_over:
+		anima.core.heal(maxi(1, roundi(anima.core.max_hp * heal)))
+	wave_changed.emit(current, total)
 
 
 ## Encerra a partida por tempo (modo de estresse, BRF-090): mesmo caminho do fim normal.

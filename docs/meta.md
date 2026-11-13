@@ -106,11 +106,18 @@ Custo por nível = `base × 1,35^(n−1)` arredondado a 5 (base 50, 120 e 250 na
 - **Ordem:** `valor da partida = base × (1 + Σ Núcleos + Σ Componentes) × (1 + upgrade da partida)`. Núcleos e Componentes (futuros) somam no **mesmo termo aditivo**; os upgrades multiplicam por cima (coerente com "Upgrades da partida"). Arredondar só no fim.
 - **Reduções** (`stat_damage_taken`, `stat_cooldown`): fator `(1 − Σ Núcleos − Σ Componentes) × (1 − upgrade)`. **Teto de redução total: −50%** (fator mínimo 0,5); dano recebido mínimo 1.
 - **Vida máxima:** `round(base × (1 + Σ%)) + 10 × nível do upgrade` (o upgrade é fixo). Teto dos Núcleos: +40% (hoje +35%).
+- **Implementado (T-205, BRF-154):** regras acima em `MatchUpgrades.apply`; detalhes em [gameplay.md](gameplay.md) ("Núcleos na partida").
 - **Cadência:** teto final **4,2 tiros/s** (substitui o 3,6 quando há Núcleos: 2 × 1,15 × 1,8 = 4,14; ~3 tiros em voo, cabe no pool de 64). **O AG01 deve confirmar.**
 - **Tetos dos Núcleos sozinhos:** dano +20%, cadência +15%, dano de Módulos +25%, Partículas +15%, Moeda +15%. Dano com upgrade no MAX: ×2,4.
 - `stat_pierce`, `stat_start_particles` e `stat_wave_heal` são **aditivos puros**. `stat_coin_gain` é do meta (`MetaRewards`, T-204): multiplica o total de Moeda da partida (`round(total × (1 + g))`), depois do ×0,7 da derrota e antes do bônus do dia.
 - **Respec (Proposta, decisão do dono):** recomendo **grátis e com 100% de reembolso**, fora de partida. Justificativa: a árvore inteira é comprável (só a ordem importa), então o respec não vira sumidouro de Moeda nem exploit; evita compra "errada" frustrante e deixa testar builds. Reembolso = soma dos custos **da tabela atual** dos níveis comprados (o save guarda só níveis, então rebalancear custos não corrompe). Sem respec, a Moeda gasta se perde para sempre.
 - **Save (T-204):** `PlayerProfile.talents: Dictionary` `{id: nível}`; ausente = 0. Compra = transação (nível < máx, pré-requisitos ok, `coins >= custo`; tudo ou nada).
+- **Respec (decidido):** grátis, 100% de reembolso, só fora de partida. **Tetos finais:** redução de dano e de cooldown −50%, HP máx dos Núcleos +40% (a árvore dá +35%, sob o teto), cadência final 4,2 tiros/s (AG01).
+
+### API (T-204)
+- `MetaTalents` (`src/meta/meta_talents.gd`, estático): `level(profile, id)`, `next_cost(profile, tree, id)` (0 se máx), `prereq_status(profile, tree, id) -> [{id, need, have}]` (só o que falta), `can_buy(profile, tree, id) -> MetaTalents.Reason` (`OK, MAX, LOCKED_PREREQ, NO_COINS, FEATURE_LOCKED` [nível da conta < 3], `UNKNOWN`), `buy(...) -> {ok, reason, cost, level}` (tudo ou nada), `spent_coins`, `respec(profile, tree) -> reembolso`, `coin_gain(talents, tree)`. Quem chama salva pelo `Backend`.
+- `TalentBonuses.resolve(talents, tree) -> Dictionary` (`src/meta/talent_bonuses.gd`): `{&"stat_x": float}` só com valor > 0, tetos já aplicados (`CAPS`). Percentuais e reduções = fração positiva somada (0,12 = 12%); `stat_pierce`, `stat_start_particles` e `stat_wave_heal` = valor aditivo. Sem `stat_coin_gain`. Vai em `MatchConfig.talent_bonuses` (`SceneFlow.build_match_config`, só com `nuclei` liberado).
+- `MetaRewards.compute(..., coin_gain := 0.0)` e `MetaFlow.settle(..., today, tree := null)`: o ganho de Moeda multiplica depois do ×0,7 e antes do bônus do dia. `PlayerProfile.sanitize(tree := null)` satura níveis em 0..máx e remove ids desconhecidos (com a árvore).
 
 ### Custos × economia
 Renda do mediano: ~225 Moeda × 4 partidas + 115 do bônus do dia = **~1015 por dia**. Os Componentes também gastam Moeda, então assumo **50% da renda** para Núcleos (~507/dia).

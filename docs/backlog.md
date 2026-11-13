@@ -117,10 +117,10 @@
 | T-202 | Validação e fechamento da v0.2.1 (tag) (tam. P) | M3 | AG03 + AG00 | feita (tag v0.2.1) |
 | T-298 | Ressalvas do QA do M3: alfa dobrado do ícone bloqueado, selo "NV n" com 9-slice, barra sem esticar, aviso sem cobrir o JOGAR, Voltar com `ui_icon_back` e ícone do conceito no "Em breve", `docs/ui.md` com o hangar, comentário da ordem da barra (tam. P) | M3 | AG02 | feita (aviso sobe acima do JOGAR, não cabe entre ele e a barra) |
 | T-203 | Design da árvore de Núcleos: 10 a 12 talentos, efeitos, custos em Moeda, pré-requisitos; dados em `.tres` (tam. M) | M4 | AG04 | feita |
-| T-204 | Lógica dos Núcleos: compra, pré-requisitos, soma dos efeitos; save; testes GUT (tam. M) | M4 | AG04 + AG05 | em andamento |
-| T-205 | Partida aplica os Núcleos comprados (via `MatchConfig`) (tam. M) | M4 | AG01 | em andamento |
+| T-204 | Lógica dos Núcleos: compra, pré-requisitos, soma dos efeitos; save; testes GUT (tam. M) | M4 | AG04 + AG05 | feita |
+| T-205 | Partida aplica os Núcleos comprados (via `MatchConfig`) (tam. M) | M4 | AG01 | feita |
 | T-206 | Arte dos ícones dos Núcleos e das ligações da árvore (tam. M) | M4 | AG08 | feita |
-| T-207 | Tela de Núcleos: árvore, detalhe do talento, compra e saldo (tam. G) | M4 | AG02 | a fazer |
+| T-207 | Tela de Núcleos: árvore, detalhe do talento, compra e saldo (tam. G) | M4 | AG02 | em andamento |
 | T-208 | VFX de compra e desbloqueio de Núcleo (tam. P) | M4 | AG09 | a fazer |
 | T-209 | Balanceamento com Núcleos (simulação do bot) (tam. P) | M4 | AG04 | a fazer |
 | T-210 | Validação e fechamento da v0.2.2 (tag) (tam. P) | M4 | AG03 + AG00 | a fazer |

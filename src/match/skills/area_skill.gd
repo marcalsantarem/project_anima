@@ -85,7 +85,7 @@ func _on_finished() -> void:
 
 
 func _impact() -> void:
-	last_hits = apply_damage(_target, context.enemies, data.radius, data.damage)
+	last_hits = apply_damage(_target, context.enemies, data.radius, roundi(data.damage * context.skill_damage_scale))
 	_fx_left = _fx_time()
 	cast.emit(_target, data.radius)
 	queue_redraw()

@@ -23,6 +23,8 @@ var active := false
 var data: ProjectileData
 ## Dano deste disparo (data.damage, ou o valor com upgrades passado em fire()).
 var damage := 0
+## Perfuração extra dos Núcleos (T-205), somada a data.pierce em tempo de execução (o .tres não muda).
+var extra_pierce := 0
 
 var _direction := Vector2.ZERO ## no chão
 var _distance_left := 0.0
@@ -44,8 +46,9 @@ func _ready() -> void:
 
 
 ## Configura o tamanho uma vez, quando o pool é criado.
-func configure(p_data: ProjectileData) -> void:
+func configure(p_data: ProjectileData, p_extra_pierce: int = 0) -> void:
 	data = p_data
+	extra_pierce = maxi(p_extra_pierce, 0)
 	(_shape_node.shape as CircleShape2D).radius = data.radius
 	_shape_node.scale = GroundPlane.SHAPE_SCALE # círculo no chão
 	if _mid_shape == null:
@@ -58,7 +61,7 @@ func configure(p_data: ProjectileData) -> void:
 		_shadow = GroundShadow.new()
 		add_child(_shadow)
 	_shadow.radius = data.radius
-	_hit_ids.resize(data.pierce + 1)
+	_hit_ids.resize(data.pierce + extra_pierce + 1)
 	if _sprite == null:
 		_sprite = Sprite2D.new()
 		add_child(_sprite)
@@ -76,7 +79,7 @@ func fire(origin: Vector2, direction: Vector2, max_distance: float, p_data: Proj
 	position = origin
 	_direction = GroundPlane.to_ground(direction).normalized()
 	_distance_left = max_distance
-	_hits_left = data.pierce + 1
+	_hits_left = data.pierce + extra_pierce + 1
 	_hit_count = 0
 	_mid_delta = -1.0
 	_sprite.rotation = direction.angle() # sprite aponta para +X

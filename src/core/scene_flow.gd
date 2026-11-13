@@ -21,6 +21,7 @@ const COMING_SOON_SCENE := "res://src/ui/screens/coming_soon_screen.tscn"
 const HANGAR_BAR_SCENE := "res://src/ui/hangar/hangar_bar.tscn"
 const PROGRESSION_PATH := "res://data/meta/progression_m2.tres"
 const REWARDS_PATH := "res://data/meta/rewards_m2.tres"
+const TALENT_TREE_PATH := "res://data/talents/talent_tree.tres"
 const HUD_SCENE := "res://src/ui/hud/hud.tscn"
 const PAUSE_SCENE := "res://src/ui/screens/pause_screen.tscn"
 ## Nome do nó raiz que agrupa Arena, HUD e Pausa.
@@ -53,6 +54,7 @@ var _hangar: HangarHost
 var today_override := ""
 var progression: ProgressionData = load(PROGRESSION_PATH)
 var rewards: RewardData = load(REWARDS_PATH)
+var talent_tree: TalentTree = load(TALENT_TREE_PATH)
 var _changing := false
 var _recorder: MatchRecorder
 
@@ -184,7 +186,11 @@ static func xp_to_next_of(level: int, prog: ProgressionData) -> int:
 
 ## Config da partida a partir do perfil: slots de Módulo pelo nível da conta (T-188).
 func build_match_config() -> MatchConfig:
-	return MatchConfig.for_account(_ensure_profile().level, progression.slot_unlock_levels)
+	var p := _ensure_profile()
+	var c := MatchConfig.for_account(p.level, progression.slot_unlock_levels)
+	if progression.is_unlocked(&"nuclei", p.level):
+		c.talent_bonuses = TalentBonuses.resolve(p.talents, talent_tree)
+	return c
 
 
 func start_match(config: MatchConfig = null) -> void:
@@ -331,7 +337,7 @@ func settle_and_save(result: MatchResult) -> Dictionary:
 	var level_before := p.level
 	var xp_before := p.xp
 	var today := today_override if today_override != "" else Time.get_date_string_from_system()
-	var s := MetaFlow.settle(p, result, rewards, progression, today)
+	var s := MetaFlow.settle(p, result, rewards, progression, today, talent_tree)
 	if not Backend.save_profile(p):
 		push_warning("SceneFlow: falha ao salvar o perfil; a recompensa vale só nesta sessão")
 	var slots: Array[int] = []

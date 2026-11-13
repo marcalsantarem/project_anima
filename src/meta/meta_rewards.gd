@@ -4,7 +4,8 @@ extends RefCounted
 
 
 ## `result` precisa de `outcome` e `kills_by_type` (MatchResult). Retorna {xp, coins, breakdown}.
-static func compute(result: Object, rewards: RewardData, first_win_today: bool) -> Dictionary:
+static func compute(result: Object, rewards: RewardData, first_win_today: bool, coin_gain := 0.0) -> Dictionary:
+	## `coin_gain`: fração dos Núcleos (T-204); depois do ×0,7 da derrota e antes do bônus do dia.
 	var kills: Variant = result.get("kills_by_type")
 	if not (kills is Dictionary):
 		kills = {}
@@ -18,6 +19,8 @@ static func compute(result: Object, rewards: RewardData, first_win_today: bool) 
 	var mult := 1.0 if victory else rewards.defeat_multiplier
 	var xp := roundi(xp_raw * mult)
 	var coins := roundi(coins_raw * mult)
+	if coin_gain > 0.0:
+		coins = roundi(coins * (1.0 + coin_gain))
 	var bonus := victory and first_win_today
 	if bonus:
 		xp += rewards.first_win_bonus_xp
