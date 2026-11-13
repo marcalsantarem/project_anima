@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="TalentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/meta/talent_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"talent_arcane_burst"
+branch = &"attack"
+name_key = "TALENT_ARCANE_BURST_NAME"
+desc_key = "TALENT_ARCANE_BURST_DESC"
+grid_pos = Vector2i(0, 2)
+prereq_ids = Array[StringName]([&"talent_quick_pulse"])
+prereq_levels = PackedInt32Array(3)
+stat = &"stat_skill_damage"
+mode = 0
+values = PackedFloat32Array(0.05, 0.1, 0.15, 0.2, 0.25)
+costs = PackedInt32Array(250, 340, 455, 615, 830)

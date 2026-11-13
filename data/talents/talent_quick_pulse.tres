@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="TalentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/meta/talent_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"talent_quick_pulse"
+branch = &"attack"
+name_key = "TALENT_QUICK_PULSE_NAME"
+desc_key = "TALENT_QUICK_PULSE_DESC"
+grid_pos = Vector2i(0, 1)
+prereq_ids = Array[StringName]([&"talent_sharp_core"])
+prereq_levels = PackedInt32Array(1)
+stat = &"stat_fire_rate"
+mode = 0
+values = PackedFloat32Array(0.03, 0.06, 0.09, 0.12, 0.15)
+costs = PackedInt32Array(120, 160, 220, 295, 400)

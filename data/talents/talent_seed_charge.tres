@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="TalentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/meta/talent_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"talent_seed_charge"
+branch = &"economy"
+name_key = "TALENT_SEED_CHARGE_NAME"
+desc_key = "TALENT_SEED_CHARGE_DESC"
+grid_pos = Vector2i(2, 1)
+prereq_ids = Array[StringName]([&"talent_particle_magnet"])
+prereq_levels = PackedInt32Array(1)
+stat = &"stat_start_particles"
+mode = 1
+values = PackedFloat32Array(3, 6, 9, 12, 15)
+costs = PackedInt32Array(120, 160, 220, 295, 400)

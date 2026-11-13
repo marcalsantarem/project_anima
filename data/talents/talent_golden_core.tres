@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="TalentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/meta/talent_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"talent_golden_core"
+branch = &"economy"
+name_key = "TALENT_GOLDEN_CORE_NAME"
+desc_key = "TALENT_GOLDEN_CORE_DESC"
+grid_pos = Vector2i(2, 3)
+prereq_ids = Array[StringName]([&"talent_cool_mind", &"talent_quick_pulse"])
+prereq_levels = PackedInt32Array(3, 1)
+stat = &"stat_coin_gain"
+mode = 0
+values = PackedFloat32Array(0.05, 0.1, 0.15)
+costs = PackedInt32Array(600, 900, 1300)

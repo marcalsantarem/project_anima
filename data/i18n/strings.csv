@@ -62,3 +62,30 @@ RESULT_SLOT_UNLOCKED,SLOT {slot} LIBERADO
 RESULT_VICTORY,VITÓRIA
 RESULT_WAVE,ONDA {current}/{total}  ·  {time}
 RESULT_XP,XP
+TALENT_BRANCH_ATTACK,Ataque
+TALENT_BRANCH_DEFENSE,Defesa
+TALENT_BRANCH_ECONOMY,Economia
+TALENT_SHARP_CORE_NAME,Núcleo Afiado
+TALENT_SHARP_CORE_DESC,Aumenta o dano do ataque básico em 4% por nível.
+TALENT_QUICK_PULSE_NAME,Pulso Veloz
+TALENT_QUICK_PULSE_DESC,Aumenta a cadência de tiro em 3% por nível.
+TALENT_ARCANE_BURST_NAME,Surto Arcano
+TALENT_ARCANE_BURST_DESC,Aumenta o dano dos Módulos em 5% por nível.
+TALENT_PIERCING_RAY_NAME,Raio Perfurante
+TALENT_PIERCING_RAY_DESC,Os tiros atravessam 1 inimigo extra.
+TALENT_HARDENED_SHELL_NAME,Casca Reforçada
+TALENT_HARDENED_SHELL_DESC,Aumenta a vida máxima do Núcleo em 4% por nível.
+TALENT_DEFLECT_NAME,Desvio
+TALENT_DEFLECT_DESC,Reduz o dano recebido em 2% por nível.
+TALENT_WAVE_MEND_NAME,Reparo de Onda
+TALENT_WAVE_MEND_DESC,Cura 2% da vida máxima por nível no início de cada onda.
+TALENT_BASTION_NAME,Bastião
+TALENT_BASTION_DESC,Aumenta a vida máxima do Núcleo em 15%.
+TALENT_PARTICLE_MAGNET_NAME,Ímã de Partículas
+TALENT_PARTICLE_MAGNET_DESC,Aumenta as Partículas ganhas em 3% por nível.
+TALENT_SEED_CHARGE_NAME,Carga Inicial
+TALENT_SEED_CHARGE_DESC,Começa cada partida com 3 Partículas a mais por nível.
+TALENT_COOL_MIND_NAME,Mente Fria
+TALENT_COOL_MIND_DESC,Reduz a recarga das skills em 2% por nível.
+TALENT_GOLDEN_CORE_NAME,Núcleo Dourado
+TALENT_GOLDEN_CORE_DESC,Aumenta a Moeda ganha por partida em 5% por nível.

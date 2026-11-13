@@ -91,3 +91,7 @@ Partidas até cada nível (4 partidas por dia; com 5 por dia muda <= 3 partidas,
 **Ajuste:** só `progression_m2.tres` (curva); `rewards_m2.tres` não mudou. O modelo antigo subestimava o XP do bot (~120 a 160 por partida contra ~189 reais), então os níveis vinham cedo demais. Nova curva: acumulado 50 / 200 / 500 / 1000 (N5) / 1500 / 2000 / 2500 (N8) / 29450 (N30). Nível 2 continua na 1ª partida do mediano e na 2ª do fraco; N5 na 1ª sessão (5 partidas); N8 em 3 dias; N30 em ~5 semanas.
 
 **Risco:** o jogador fraco simulado leva ~30 partidas até o N5 (7 dias) e 74 até o N8: para ele a curva é lenta. O bot mediano vence sempre, então o mediano real (que perde parte das partidas) fica entre os dois perfis. Alavancas se o dono quiser acelerar o fraco sem mexer no mediano: subir `defeat_multiplier` (0,7) ou o XP por monstro das ondas 3 a 6 (runner/swarm/shooter).
+
+## Custos dos Núcleos (T-203, BRF-151)
+
+Árvore de 12 talentos, **18 355 Moeda** no total (tabela em [meta.md](meta.md), "Núcleos (talentos)"). Com ~1015 Moeda/dia do mediano e 50% da renda para Núcleos (o resto para Componentes): ~36 dias (~5 semanas); com 100%: ~18 dias. As raízes custam 50 Moeda no Nv 1 (compra na 1ª partida após o NV 3).

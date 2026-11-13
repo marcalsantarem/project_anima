@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="TalentTree" load_steps=14 format=3]
+
+[ext_resource type="Script" path="res://src/meta/talent_tree.gd" id="1"]
+[ext_resource type="Resource" path="res://data/talents/talent_sharp_core.tres" id="t0"]
+[ext_resource type="Resource" path="res://data/talents/talent_quick_pulse.tres" id="t1"]
+[ext_resource type="Resource" path="res://data/talents/talent_arcane_burst.tres" id="t2"]
+[ext_resource type="Resource" path="res://data/talents/talent_piercing_ray.tres" id="t3"]
+[ext_resource type="Resource" path="res://data/talents/talent_hardened_shell.tres" id="t4"]
+[ext_resource type="Resource" path="res://data/talents/talent_deflect.tres" id="t5"]
+[ext_resource type="Resource" path="res://data/talents/talent_wave_mend.tres" id="t6"]
+[ext_resource type="Resource" path="res://data/talents/talent_bastion.tres" id="t7"]
+[ext_resource type="Resource" path="res://data/talents/talent_particle_magnet.tres" id="t8"]
+[ext_resource type="Resource" path="res://data/talents/talent_seed_charge.tres" id="t9"]
+[ext_resource type="Resource" path="res://data/talents/talent_cool_mind.tres" id="t10"]
+[ext_resource type="Resource" path="res://data/talents/talent_golden_core.tres" id="t11"]
+
+[resource]
+script = ExtResource("1")
+talents = [ExtResource("t0"), ExtResource("t1"), ExtResource("t2"), ExtResource("t3"), ExtResource("t4"), ExtResource("t5"), ExtResource("t6"), ExtResource("t7"), ExtResource("t8"), ExtResource("t9"), ExtResource("t10"), ExtResource("t11")]
+branch_name_keys = {
+"attack": "TALENT_BRANCH_ATTACK",
+"defense": "TALENT_BRANCH_DEFENSE",
+"economy": "TALENT_BRANCH_ECONOMY"
+}

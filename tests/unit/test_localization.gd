@@ -81,6 +81,10 @@ func test_used_keys_exist_and_none_is_orphan() -> void:
 	var call := RegEx.create_from_string(CALL_RE)
 	var prefixes := _prefixes()
 	var used := {}
+	for tres in DirAccess.get_files_at("res://data/talents"):  # T-203: chaves usadas só pelos dados dos Núcleos
+		if tres.ends_with(".tres"):
+			for m in literal.search_all(FileAccess.get_file_as_string("res://data/talents/" + tres)):
+				used[m.get_string(1)] = true
 	for path in files:
 		var code := _code_without_comments(path)
 		for m in call.search_all(code):

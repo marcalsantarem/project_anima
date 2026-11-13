@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="TalentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/meta/talent_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"talent_deflect"
+branch = &"defense"
+name_key = "TALENT_DEFLECT_NAME"
+desc_key = "TALENT_DEFLECT_DESC"
+grid_pos = Vector2i(1, 1)
+prereq_ids = Array[StringName]([&"talent_hardened_shell"])
+prereq_levels = PackedInt32Array(1)
+stat = &"stat_damage_taken"
+mode = 2
+values = PackedFloat32Array(0.02, 0.04, 0.06, 0.08, 0.1)
+costs = PackedInt32Array(120, 160, 220, 295, 400)

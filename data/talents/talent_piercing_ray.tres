@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="TalentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/meta/talent_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"talent_piercing_ray"
+branch = &"attack"
+name_key = "TALENT_PIERCING_RAY_NAME"
+desc_key = "TALENT_PIERCING_RAY_DESC"
+grid_pos = Vector2i(0, 3)
+prereq_ids = Array[StringName]([&"talent_arcane_burst", &"talent_deflect"])
+prereq_levels = PackedInt32Array(3, 1)
+stat = &"stat_pierce"
+mode = 1
+values = PackedFloat32Array(1.0)
+costs = PackedInt32Array(1500)
