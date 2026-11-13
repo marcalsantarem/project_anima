@@ -95,3 +95,43 @@ Partidas até cada nível (4 partidas por dia; com 5 por dia muda <= 3 partidas,
 ## Custos dos Núcleos (T-203, BRF-151)
 
 Árvore de 12 talentos, **18 355 Moeda** no total (tabela em [meta.md](meta.md), "Núcleos (talentos)"). Com ~1015 Moeda/dia do mediano e 50% da renda para Núcleos (o resto para Componentes): ~36 dias (~5 semanas); com 100%: ~18 dias. As raízes custam 50 Moeda no Nv 1 (compra na 1ª partida após o NV 3).
+
+## Simulação com Núcleos (T-209, BRF-157)
+
+Ferramenta: `tests/tools/run_talents.gd` (bot x1, seeds 1 a 100, mesmos perfis de `run_progression.gd`; bônus via `MatchConfig.talent_bonuses`, `stat_coin_gain` via `MetaRewards`). Modos: `--mode=bench --states=none,first,p25,p50,p100` (estados fixos) e `--mode=campaign --share=0.5|1.0 --per-day=4` (joga em sequência, compra e mede os dias).
+
+**Política do bot:** reserva `share` da Moeda de cada partida (50% referência, o resto iria para Componentes; variante 100%) e compra, enquanto der, o próximo nível **mais barato** disponível; empate = alterna ramos (Ataque → Defesa → Economia). A ordem só depende da Moeda: raízes, camada 1, camada 2, Núcleo Dourado e por fim os capstones. Marcos = prefixo da ordem até gastar 25% (4 635), 50% (9 435) e 100% (18 355) da árvore.
+
+| Perfil | Estado | Vitórias | Onda média da derrota | Duração média (mín.) | XP/partida | Moeda/partida |
+|---|---|---|---|---|---|---|
+| Mediano | sem Núcleos | 100% | — | 221 s (210) | 189 | 225 |
+| Mediano | 1º talento (Núcleo Afiado Nv 1) | 100% | — | 218 s (208) | 189 | 226 |
+| Mediano | 25% | 100% | — | 207 s (198) | 194 | 231 |
+| Mediano | 50% | 100% | — | 205 s (197) | 195 | 243 |
+| Mediano | 100% | 100% | — | 200 s (193) | 195 | 267 |
+| Fraco | sem Núcleos | 0% | 5,0 | 87 s (65) | 34 | 34 |
+| Fraco | 1º talento | 0% | 5,0 | 87 s (65) | 34 | 34 |
+| Fraco | 25% | 0% | 6,1 | 115 s (80) | 50 | 51 |
+| Fraco | 50% | 0% | 6,2 | 117 s (80) | 51 | 54 |
+| Fraco | 100% | 0% | 7,5 | 149 s (103) | 77 | 93 |
+
+Medido com o Nv 1 antigo das raízes (+4%); com o Nv 1 novo (+8%) o 1º talento dá o mesmo resultado no bot (mediano 218 s; fraco 5,0 a 5,1). Os marcos de 25% em diante têm as raízes no máximo, que não mudou.
+
+**Dias até a árvore (campanha, 4 partidas/dia, bônus do dia):**
+
+| Perfil | Share | 1º talento | 25% | 50% | 100% |
+|---|---|---|---|---|---|
+| Mediano | 50% | partida 1 (NV 3) | dia 9 | dia 19 | **dia 34** (NV 30) |
+| Mediano | 100% | partida 1 | dia 5 | dia 10 | dia 17 (NV 20) |
+| Fraco | 50% | partida 6 (dia 2) | dia 56 | dia 104 | dia 178 |
+| Fraco | 100% | partida 6 | dia 28 | dia 52 | dia 89 |
+
+**Avaliação:**
+- **Fase 1 não fica trivial:** com a árvore inteira o mediano termina em ~200 s (mín. 193 s), acima dos 3 min. A duração quase não cai porque o ritmo é das ondas, não do dano.
+- **Fraco não fica travado:** a árvore leva a queda da onda 5 para a 7,5 e a renda de 34 para 93 Moeda por partida (×2,7), mas ele **nunca vence** (passivo com 15% do HP é o piso artificial). As vitórias dele dependem de skills e upgrades, não dos Núcleos.
+- **1º talento:** 50 Moeda (0,3% da árvore) não muda métrica de bot em nenhum perfil. Para ficar perceptível no número mostrado, as 3 raízes passaram a ter o **Nv 1 dobrado** (o máximo não mudou).
+- Custos confirmados: os ~36/18 dias estimados no T-203 deram 34/17 na simulação. **Custos sem mudança.**
+
+**Ajustes (só `data/talents/`):** `talent_sharp_core` e `talent_hardened_shell` 4·8·12·16·20% → **8·11·14·17·20%**; `talent_particle_magnet` 3·6·9·12·15% → **6·8·10·13·15%**. Total da árvore continua 18 355.
+
+**Riscos:** as descrições `TALENT_*_DESC` das 3 raízes ("4% por nível", "3% por nível") ficaram desatualizadas (`data/i18n/`, fora do escopo do AG04). O bot mediano vence sempre, então os Núcleos não mudam a taxa de vitória dele; o efeito no jogador real (que perde) fica entre os dois perfis.

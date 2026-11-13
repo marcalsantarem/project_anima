@@ -88,7 +88,7 @@ func test_detail_no_coins() -> void:
 	s.select(&"talent_sharp_core")
 	assert_eq(s.detail_name.text, "Núcleo Afiado")
 	assert_eq(s.detail_sub.text, "ATAQUE · NV 0/5")
-	assert_eq(s.detail_effect.text, "Atual: nenhum  ·  Próximo: +4%")
+	assert_eq(s.detail_effect.text, "Atual: nenhum  ·  Próximo: +8%")  # raiz com Nv 1 dobrado (T-209)
 	assert_eq(s.buy_button.text, "COMPRAR · 50")
 	assert_true(s.buy_button.disabled)
 	assert_eq(s.detail_need.text, "Faltam 20 Moedas")

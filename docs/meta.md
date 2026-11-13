@@ -87,20 +87,20 @@ Pré-requisito = `talento >= nível`. Camadas 1 e 2 exigem o nó acima; a **cama
 
 | id | Nome | Ramo | (col,lin) | Efeito (acumulado) | Níveis | Custo por nível | Total | Pré-requisitos |
 |---|---|---|---|---|---|---|---|---|
-| `talent_sharp_core` | Núcleo Afiado | Ataque | (0,0) | `stat_damage` +4%/nível → +20% | 5 | 50·70·90·125·165 | 500 | — |
+| `talent_sharp_core` | Núcleo Afiado | Ataque | (0,0) | `stat_damage` 8·11·14·17·20% | 5 | 50·70·90·125·165 | 500 | — |
 | `talent_quick_pulse` | Pulso Veloz | Ataque | (0,1) | `stat_fire_rate` +3%/nível → +15% | 5 | 120·160·220·295·400 | 1195 | sharp_core 1 |
 | `talent_arcane_burst` | Surto Arcano | Ataque | (0,2) | `stat_skill_damage` +5%/nível → +25% | 5 | 250·340·455·615·830 | 2490 | quick_pulse 3 |
 | `talent_piercing_ray` | Raio Perfurante | Ataque | (0,3) | `stat_pierce` +1 (compra única) | 1 | 1500 | 1500 | arcane_burst 3, deflect 1 |
-| `talent_hardened_shell` | Casca Reforçada | Defesa | (1,0) | `stat_core_hp_max` +4%/nível → +20% | 5 | 50·70·90·125·165 | 500 | — |
+| `talent_hardened_shell` | Casca Reforçada | Defesa | (1,0) | `stat_core_hp_max` 8·11·14·17·20% | 5 | 50·70·90·125·165 | 500 | — |
 | `talent_deflect` | Desvio | Defesa | (1,1) | `stat_damage_taken` −2%/nível → −10% | 5 | 120·160·220·295·400 | 1195 | hardened_shell 1 |
 | `talent_wave_mend` | Reparo de Onda | Defesa | (1,2) | `stat_wave_heal` +2% do HP máx/nível → 10% | 5 | 250·340·455·615·830 | 2490 | deflect 3 |
 | `talent_bastion` | Bastião | Defesa | (1,3) | `stat_core_hp_max` +15% (compra única) | 1 | 1500 | 1500 | wave_mend 3, seed_charge 1 |
-| `talent_particle_magnet` | Ímã de Partículas | Economia | (2,0) | `stat_particle_gain` +3%/nível → +15% | 5 | 50·70·90·125·165 | 500 | — |
+| `talent_particle_magnet` | Ímã de Partículas | Economia | (2,0) | `stat_particle_gain` 6·8·10·13·15% | 5 | 50·70·90·125·165 | 500 | — |
 | `talent_seed_charge` | Carga Inicial | Economia | (2,1) | `stat_start_particles` +3/nível → +15 | 5 | 120·160·220·295·400 | 1195 | particle_magnet 1 |
 | `talent_cool_mind` | Mente Fria | Economia | (2,2) | `stat_cooldown` −2%/nível → −10% | 5 | 250·340·455·615·830 | 2490 | seed_charge 3 |
 | `talent_golden_core` | Núcleo Dourado | Economia | (2,3) | `stat_coin_gain` +5%/nível → +15% | 3 | 600·900·1300 | 2800 | cool_mind 3, quick_pulse 1 |
 
-Custo por nível = `base × 1,35^(n−1)` arredondado a 5 (base 50, 120 e 250 nas camadas 0, 1 e 2); capstones com preço fixo. **Total da árvore: 18 355 Moeda** (82 níveis).
+Raízes com o **Nv 1 dobrado** (T-209: o 1º talento precisa ser perceptível; o máximo não mudou). Custo por nível = `base × 1,35^(n−1)` arredondado a 5 (base 50, 120 e 250 nas camadas 0, 1 e 2); capstones com preço fixo. **Total da árvore: 18 355 Moeda** (82 níveis).
 
 ### Regras de soma
 - **Ordem:** `valor da partida = base × (1 + Σ Núcleos + Σ Componentes) × (1 + upgrade da partida)`. Núcleos e Componentes (futuros) somam no **mesmo termo aditivo**; os upgrades multiplicam por cima (coerente com "Upgrades da partida"). Arredondar só no fim.
@@ -131,6 +131,7 @@ Renda do mediano: ~225 Moeda × 4 partidas + 115 do bônus do dia = **~1015 por 
 
 - **1º talento:** o mediano chega ao NV 3 na 1ª partida (200 XP) com ~340 Moeda (225 + 115): compra a raiz (50) e ainda sobram níveis. O fraco chega ao NV 3 em ~4 partidas com ~140 Moeda e também compra. Toda raiz custa 50 no Nv 1 (teste: <= 60).
 - **Raízes completas** (3 × 500 = 1500): ~3 dias do mediano a 100%. Camada 1 completa (3 × 1195): mais ~4 dias. Os capstones ficam para as semanas 4 a 6.
+- **Medido (T-209):** árvore inteira no dia 34 (50%) e 17 (100%) do mediano; fraco 178 e 89 dias. Ver [economia.md](economia.md), "Simulação com Núcleos".
 - Risco: a Moeda tem outros sumidouros (Componentes, M13); recalibrar quando a economia deles existir.
 
 ### Lista para o AG08 (ícones)

@@ -123,7 +123,7 @@ func test_resolve_empty_and_two_branches() -> void:
 	assert_eq(TalentBonuses.resolve({}, tree), {})
 	var b := TalentBonuses.resolve({&"talent_sharp_core": 3, &"talent_quick_pulse": 2, &"talent_hardened_shell": 5,
 			&"talent_piercing_ray": 1, &"talent_seed_charge": 2, &"talent_golden_core": 3}, tree)
-	assert_almost_eq(float(b[&"stat_damage"]), 0.12, 0.0001)
+	assert_almost_eq(float(b[&"stat_damage"]), 0.14, 0.0001) # raiz com Nv 1 dobrado (T-209)
 	assert_almost_eq(float(b[&"stat_fire_rate"]), 0.06, 0.0001)
 	assert_almost_eq(float(b[&"stat_core_hp_max"]), 0.2, 0.0001)
 	assert_almost_eq(float(b[&"stat_pierce"]), 1.0, 0.0001)

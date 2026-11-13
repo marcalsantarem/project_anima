@@ -13,5 +13,5 @@ prereq_ids = Array[StringName]([])
 prereq_levels = PackedInt32Array()
 stat = &"stat_damage"
 mode = 0
-values = PackedFloat32Array(0.04, 0.08, 0.12, 0.16, 0.2)
+values = PackedFloat32Array(0.08, 0.11, 0.14, 0.17, 0.2)
 costs = PackedInt32Array(50, 70, 90, 125, 165)
