@@ -8,6 +8,21 @@ COMMON_OFF,desligado
 COMMON_ON,ligado
 COMMON_XP_PROGRESS,{xp} / {xp_to_next} XP
 COMMON_YES,sim
+CORES_BUY,COMPRAR · {cost}
+CORES_CANCEL,Cancelar
+CORES_CHIP,{level}/{max}
+CORES_CONFIRM,Confirmar
+CORES_EFFECT_NEXT,Próximo: {value}
+CORES_EFFECT_NONE,nenhum
+CORES_EFFECT_NOW,Atual: {value}
+CORES_FEATURE_LOCKED,Núcleos liberam no NV {level}
+CORES_LEVEL,{branch} · NV {level}/{max}
+CORES_MAXED,Nível máximo
+CORES_NEEDS,Requer {name} NV {level}
+CORES_NEEDS_SEP," e "
+CORES_NO_COINS,Faltam {coins} Moedas
+CORES_RESPEC,Redistribuir
+CORES_RESPEC_ASK,Devolve {coins} Moedas e zera os Núcleos.
 TITLE_BUILD_TAG,ALFA
 TITLE_LOGO_MAIN,ANIMA
 TITLE_LOGO_SUB,PROJECT:
