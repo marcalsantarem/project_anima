@@ -8,7 +8,7 @@ const CORES := &"cores"
 const MODULES := &"modules"
 const COMPONENTS := &"components"
 const SETTINGS := &"settings"
-## Ordem dos destinos (a barra do T-201 segue esta ordem).
+## Lista dos destinos válidos. A ordem visual da barra é `HangarBarLogic.ORDER` (src/ui/hangar/hangar_bar_logic.gd).
 const TABS: Array[StringName] = [PLAY, CORES, MODULES, COMPONENTS, SETTINGS]
 ## Chaves de tradução dos títulos (docs/arquitetura.md, "Localização"); `title_of` devolve o texto.
 const TITLES := {

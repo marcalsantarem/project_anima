@@ -16,7 +16,17 @@ const ICON := 28.0
 const ICON_ACTIVE := 32.0
 const FONT_LABEL := 11.5
 const FONT_CHIP := 11.0
+const FONT_HINT := 11.0
 const HINT_TIME := 1.6
+## 9-slice das peças (px do PNG 2x ≈ px de tela no viewport 720; assets/ui/README.md, barra do hangar).
+const BAR_SLICE := [48, 48, 16, 8] # esq/dir/topo/base
+const BAR_GLOW := 8.0 # expand_margin do topo (brilho para cima)
+const CHIP_SLICE := [38, 12, 12, 12]
+const CHIP_H := 20.0 ## a 1x (40 no PNG)
+const CHIP_TEXT_L := 21.0 ## content_margin esq a 1x (38 no PNG + folga de 2), texto à direita do cadeado
+const CHIP_TEXT_R := 6.0
+const LOCK_SHIFT := 12.0 ## ícone bloqueado desloca para a esquerda; o selo fica à direita
+const HINT_GAP := 2.0 ## aviso entre o JOGAR e a barra (o menu deixa ~22 px a 1x)
 
 const HOLO_BG := Color("#06182A")
 const HOLO_LINE := Color("#3FE8F5")
@@ -129,7 +139,7 @@ func refresh() -> void:
 		icon.visible = tex != null
 		fb.visible = tex == null
 		fb.self_modulate = Color(0.45, 0.5, 0.55, 0.6) if locked else Color.WHITE
-		icon.modulate = Color(1, 1, 1, 0.45) if locked else Color.WHITE
+		icon.modulate = Color.WHITE # a arte do bloqueado já vem a 45% (README); sem alfa extra
 		var label: Label = p.label
 		label.add_theme_color_override("font_color",
 			HOLO_TEXT if active else (LABEL_LOCKED if locked else LABEL_NORMAL))
@@ -145,8 +155,8 @@ func _build() -> void:
 	_bg.mouse_filter = MOUSE_FILTER_STOP # a barra não deixa o toque passar para a tela
 	var bg_tex := _tex("ui_nav_bar")
 	if bg_tex:
-		var sb := StyleBoxTexture.new()
-		sb.texture = bg_tex
+		var sb := _nine(bg_tex, BAR_SLICE)
+		sb.expand_margin_top = BAR_GLOW
 		_bg.add_theme_stylebox_override("panel", sb)
 	else:
 		var sbf := StyleBoxFlat.new()
@@ -178,13 +188,11 @@ func _build() -> void:
 		var label := _label(HangarBarLogic.label_of(id))
 		b.add_child(label)
 		var chip := _label("")
-		chip.add_theme_color_override("font_color", HOLO_TEXT)
+		chip.add_theme_color_override("font_color", Color("#9FB8CC"))
 		var chip_tex := _tex("ui_nav_lock_chip")
 		var csb: StyleBox
 		if chip_tex:
-			var t := StyleBoxTexture.new()
-			t.texture = chip_tex
-			csb = t
+			csb = _nine(chip_tex, CHIP_SLICE)
 		else:
 			var f := StyleBoxFlat.new()
 			f.bg_color = Color("#0B2A3F")
@@ -210,11 +218,20 @@ func _build() -> void:
 	hsb.bg_color = Color("#021423E6")
 	hsb.border_color = HOLO_LINE
 	hsb.set_border_width_all(1)
-	hsb.set_corner_radius_all(12)
-	hsb.set_content_margin_all(10)
+	hsb.set_corner_radius_all(8)
 	hint_label.add_theme_stylebox_override("normal", hsb)
 	add_child(hint_label)
 	_built = true
+
+
+static func _nine(tex: Texture2D, m: Array) -> StyleBoxTexture:
+	var sb := StyleBoxTexture.new()
+	sb.texture = tex
+	sb.texture_margin_left = m[0]
+	sb.texture_margin_right = m[1]
+	sb.texture_margin_top = m[2]
+	sb.texture_margin_bottom = m[3]
+	return sb
 
 
 func _label(text: String) -> Label:
@@ -296,7 +313,8 @@ func _layout() -> void:
 		var p: Dictionary = _parts[id]
 		var active := id == current and not HangarBarLogic.is_locked(id, level, progression)
 		var isz := (ICON_ACTIVE if active else ICON) * k
-		var ipos := Vector2((item_w - isz) / 2.0, 10.0 * k)
+		var locked := HangarBarLogic.is_locked(id, level, progression)
+		var ipos := Vector2((item_w - isz) / 2.0 - (LOCK_SHIFT * k if locked else 0.0), 10.0 * k)
 		for c: Control in [p.icon, p.fb]:
 			c.position = ipos
 			c.size = Vector2(isz, isz)
@@ -306,13 +324,41 @@ func _layout() -> void:
 		lab.size = Vector2(item_w, 16.0 * k)
 		var chip: Label = p.chip
 		chip.add_theme_font_size_override("font_size", roundi(FONT_CHIP * k))
-		chip.size = Vector2(36.0 * k, 16.0 * k)
-		chip.position = Vector2(item_w / 2.0 - 4.0 * k, ipos.y + isz - 14.0 * k)
+		var csb := chip.get_theme_stylebox(&"normal")
+		csb.content_margin_left = CHIP_TEXT_L * k # texto à direita do cadeado da arte
+		csb.content_margin_right = CHIP_TEXT_R * k
+		csb.content_margin_top = 0
+		csb.content_margin_bottom = 0
+		chip.custom_minimum_size = Vector2(0, CHIP_H * k)
+		chip.reset_size()
+		chip.position = Vector2(item_w / 2.0 - LOCK_SHIFT * k, ipos.y + 14.0 * k)
 	var ai := HangarBarLogic.ORDER.find(current)
 	_mark.visible = ai >= 0 and not HangarBarLogic.is_locked(current, level, progression)
 	if _mark.visible:
 		_mark.size = Vector2(40.0 * k, 4.0 * k)
 		_mark.position = Vector2(x0 + ai * item_w + (item_w - _mark.size.x) / 2.0, top)
-	hint_label.add_theme_font_size_override("font_size", roundi(14.0 * k))
+	# Aviso compacto na faixa entre o JOGAR e a barra (não cobre o botão; T-298).
+	var hsb := hint_label.get_theme_stylebox(&"normal")
+	hsb.content_margin_left = 8.0 * k
+	hsb.content_margin_right = 8.0 * k
+	hsb.content_margin_top = 1.0 * k
+	hsb.content_margin_bottom = 1.0 * k
+	hint_label.add_theme_font_size_override("font_size", roundi(FONT_HINT * k))
 	hint_label.reset_size()
-	hint_label.position = Vector2((view.x - hint_label.size.x) / 2.0, top - hint_label.size.y - 10.0 * k)
+	hint_label.position = Vector2((view.x - hint_label.size.x) / 2.0, top - hint_label.size.y - HINT_GAP * k)
+	# Se a faixa não couber (tela baixa), o aviso sobe para logo acima do JOGAR, sem cobri-lo.
+	var play := _play_button()
+	if play != null:
+		var pr := play.get_global_rect().grow(play.size.y * 0.03) # margem do pulso (1,03)
+		var hr := Rect2(hint_label.global_position, hint_label.size)
+		if hr.intersects(pr):
+			hint_label.global_position.y = pr.position.y - hint_label.size.y - HINT_GAP * k
+
+
+## Botão JOGAR visível na tela atual do hangar (o aviso desvia dele). Nulo fora do hangar.
+func _play_button() -> Control:
+	var scene := get_tree().current_scene if is_inside_tree() else null
+	if scene == null:
+		return null
+	var b := scene.find_child("PlayButton", true, false) as Control
+	return b if b != null and b.is_visible_in_tree() else null

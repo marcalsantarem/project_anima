@@ -252,10 +252,18 @@ Boot/Loading (HTML shell) → Toque para começar → Partida ⇄ Pausa → Resu
 | **Resultado** | "Vitória" (`gold`) ou "Derrota" (`danger`) em `font_display`, num cartão com moldura; "Onda wave_reached/waves_total", ícone verde + "Partículas: N", inimigos derrotados, tempo (mm:ss); botões **Jogar de novo** (primário, foco inicial) e **Voltar ao título** (secundário, abaixo; T-155) | Jogar de novo → nova Partida (`play_again_requested`); Voltar ao título → Toque para começar (`title_requested`) |
 
 - **Perda de foco** (troca de aba ou app, `NOTIFICATION_APPLICATION_FOCUS_OUT` / `visibilitychange`): abre a Pausa automaticamente. A volta **não** retoma sozinha; o jogador toca em Continuar.
-- **Sem menu/hangar no M1** (meta-jogo fora do escopo). "Jogar de novo" volta direto à partida.
+- **Sem menu/hangar no M1** (meta-jogo fora do escopo). "Jogar de novo" volta direto à partida. Do M3 em diante, ver §8b.
 - **Voltar ao título (T-155):** o `SceneFlow` troca a cena inteira (a partida, com Arena, HUD, Pausa e efeitos, é liberada como em "Jogar de novo") e abre o Título novo. O Título **pede o toque de novo**, por simplicidade: o áudio já está liberado e o gesto só confirma o início.
 - Transições entre telas: fade de 200 ms.
 - Textos em pt-BR, guardados em um só lugar (prontos para `tr()` no futuro) **[Proposta]**.
+
+## 8b. Hangar (M3; T-201, T-298)
+
+Spec visual em `docs/arte.md` §11.9; navegação em `docs/arquitetura.md` ("Hangar").
+- **Barra inferior** (`src/ui/hangar/hangar_bar.gd`): Módulos · Componentes · **Jogar** · Núcleos · Ajustes (ordem em `HangarBarLogic.ORDER`). Itens 75×76 a 1x + faixa segura (34 ou a safe area). Fundo `ui_nav_bar` em 9-slice 48/48/16/8 e `expand_margin` 8 no topo (brilho), sem esticar os colchetes.
+- **Estados:** ativo = `ui_nav_tab_active` + traço ciano no topo; normal = ícone `ui_icon_nav_*`; pressionado = `ui_nav_tab_pressed`; **bloqueado** = `ui_icon_*_locked` (45% já na arte, sem alfa no código), deslocado 12 px à esquerda, com o selo `ui_nav_lock_chip` (9-slice 38/12/12/12; "NV n" à direita do cadeado) e rótulo `#6F8BA3`.
+- **Bloqueios** (decisão 63, `HangarBarLogic`): Módulos NV 2, Núcleos NV 3, Componentes NV 4; Jogar e Ajustes livres. Tocar no bloqueado não navega: mostra o aviso "{nome} libera no NV {n}" (1,6 s + fade) acima da barra; se a faixa até o JOGAR não couber, o aviso sobe para logo acima do JOGAR, nunca por cima dele.
+- **"Em breve"** (`coming_soon_screen`): destinos sem cena. Topo com Voltar (`ui_holo_pill` + `ui_icon_back`, alvo ≥ 64) e título; painel `ui_holo_panel` com o ícone do conceito da aba, "Em breve" e legenda. A barra continua visível com a aba ativa; Voltar → `SceneFlow.hangar_back`.
 
 ## 9. Safe area
 

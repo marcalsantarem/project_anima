@@ -58,7 +58,7 @@ Boot (estresse) ─────────────────────�
 **`view` do Menu:** `{level, xp, xp_to_next (0 no teto), coins, is_max}` (`SceneFlow.menu_view`).
 
 **Hangar (T-200):** `go_to_menu()` monta um `HangarHost` (`src/core/hangar_host.gd`, nó `Hangar`, telas em `content`) sempre no destino Jogar (o Menu acima); a `current_scene` é o hangar, não o Menu.
-- Ids (`HangarNav`, `src/core/hangar_nav.gd`, lógica pura): `PLAY`, `CORES`, `MODULES`, `COMPONENTS`, `SETTINGS` (`&"play"` …), em `TABS` (ordem da barra), `TITLES` e `DEFAULT_PATHS` (id → cena). Cena ausente → `coming_soon_screen.tscn` (`setup_title(text)`, `back_requested`).
+- Ids (`HangarNav`, `src/core/hangar_nav.gd`, lógica pura): `PLAY`, `CORES`, `MODULES`, `COMPONENTS`, `SETTINGS` (`&"play"` …), em `TABS` (destinos válidos; a ordem da barra é `HangarBarLogic.ORDER`, `src/ui/hangar/hangar_bar_logic.gd`), `TITLES` e `DEFAULT_PATHS` (id → cena). Cena ausente → `coming_soon_screen.tscn` (`setup_title(text)`, `back_requested`).
 - API no `SceneFlow`: `open_hangar_tab(id) -> bool`, `hangar_back() -> bool` (anterior, ou Jogar), `current_tab`, `hangar_tab_node(id)`; sinais `hangar_tab_changed(id)` e `hangar_tab_instanced(id, screen)`. Tela com `back_requested` → `hangar_back`.
 - Barra (T-201): se `src/ui/hangar/hangar_bar.tscn` existir, entra no `HangarHost` acima do `content`; chama `SceneFlow.open_hangar_tab` e ouve `hangar_tab_changed` (pode ajustar `content.offset_bottom`).
 - **Estado preservado = instância em cache:** cada tela é criada só na 1ª visita e depois fica oculta com `PROCESS_MODE_DISABLED`, sem cada tela ter de serializar o próprio estado. O cache é liberado ao ir à partida (menos memória no Safari); na volta, o hangar é recriado em Jogar com o perfil atualizado.

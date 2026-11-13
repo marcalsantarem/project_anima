@@ -115,7 +115,7 @@
 | T-200 | Fluxo de cenas do hangar: telas filhas carregadas sob demanda, voltar, estado preservado (tam. P) | M3 | AG07 | feita |
 | T-201 | Hangar na UI: o menu vira hangar com abas; telas ainda vazias mostram "em breve" (tam. M) | M3 | AG02 | feita (Ajustes abre "Em breve" até existir Configurações) |
 | T-202 | Validação e fechamento da v0.2.1 (tag) (tam. P) | M3 | AG03 + AG00 | a fazer |
-| T-298 | Ressalvas do QA do M3: alfa dobrado do ícone bloqueado, selo "NV n" com 9-slice, barra sem esticar, aviso sem cobrir o JOGAR, Voltar com `ui_icon_back` e ícone do conceito no "Em breve", `docs/ui.md` com o hangar, comentário da ordem da barra (tam. P) | M3 | AG02 | a fazer |
+| T-298 | Ressalvas do QA do M3: alfa dobrado do ícone bloqueado, selo "NV n" com 9-slice, barra sem esticar, aviso sem cobrir o JOGAR, Voltar com `ui_icon_back` e ícone do conceito no "Em breve", `docs/ui.md` com o hangar, comentário da ordem da barra (tam. P) | M3 | AG02 | feita (aviso sobe acima do JOGAR, não cabe entre ele e a barra) |
 | T-203 | Design da árvore de Núcleos: 10 a 12 talentos, efeitos, custos em Moeda, pré-requisitos; dados em `.tres` (tam. M) | M4 | AG04 | a fazer |
 | T-204 | Lógica dos Núcleos: compra, pré-requisitos, soma dos efeitos; save; testes GUT (tam. M) | M4 | AG04 + AG05 | a fazer |
 | T-205 | Partida aplica os Núcleos comprados (via `MatchConfig`) (tam. M) | M4 | AG01 | a fazer |

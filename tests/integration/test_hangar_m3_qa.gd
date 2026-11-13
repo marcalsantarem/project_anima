@@ -115,3 +115,41 @@ func test_state_kept_and_back_chain() -> void:
 	bar.press(HangarNav.PLAY)
 	assert_same(SceneFlow.hangar_tab_node(HangarNav.PLAY), play, "Jogar em cache")
 	assert_true(SceneFlow.hangar_nav.history.is_empty(), "Jogar limpa o histórico")
+
+
+func test_qa_fixes_t298() -> void:
+	# T-298 (BRF-149): ressalvas do QA do M3.
+	var bar := await _open(1)
+	if bar == null:
+		return
+	var bg := bar._bg.get_theme_stylebox(&"panel") as StyleBoxTexture
+	assert_eq(bg.texture_margin_left, 48.0, "ui_nav_bar 9-slice esq")
+	assert_eq(bg.texture_margin_top, 16.0, "ui_nav_bar 9-slice topo")
+	assert_eq(bg.expand_margin_top, 8.0, "ui_nav_bar expand topo")
+	var p: Dictionary = bar._parts[HangarNav.CORES]
+	assert_eq(p.icon.modulate.a, 1.0, "bloqueado sem alfa extra (a arte já vem a 45%)")
+	var chip := p.chip as Label
+	var csb := chip.get_theme_stylebox(&"normal") as StyleBoxTexture
+	assert_eq(csb.texture_margin_left, 38.0, "selo 9-slice esq")
+	assert_gt(csb.content_margin_left, 0.0, "texto do selo à direita do cadeado")
+	assert_gt(chip.get_global_rect().position.x, p.icon.get_global_rect().position.x, "selo à direita do ícone")
+	var root := get_tree().root
+	var old_size := root.size
+	root.size = Vector2i(375, 812) # retrato do iPhone (base 720 → viewport 720×1559)
+	await wait_process_frames(3)
+	bar.press(HangarNav.CORES)
+	await wait_process_frames(1)
+	var play := get_tree().current_scene.find_child("PlayButton", true, false) as Control
+	assert_not_null(play, "JOGAR no hangar")
+	if play != null:
+		assert_false(bar.hint_label.get_global_rect().intersects(play.get_global_rect()), "aviso não cobre o JOGAR")
+	assert_lt(bar.hint_label.get_global_rect().end.y, bar._bg.get_global_rect().position.y + 0.5, "aviso acima da barra")
+	root.size = old_size
+	await wait_process_frames(2)
+	bar.press(HangarNav.SETTINGS)
+	var soon := SceneFlow.hangar_tab_node(HangarNav.SETTINGS) as ComingSoonScreen
+	assert_not_null(soon, "Em breve")
+	if soon != null:
+		assert_eq(soon.tab_id, HangarNav.SETTINGS, "aba deduzida do título")
+		assert_not_null(soon.get_node("%ConceptIcon").texture, "ícone do conceito no painel")
+		assert_not_null(soon.get_node("%Back").icon, "Voltar com ui_icon_back")
