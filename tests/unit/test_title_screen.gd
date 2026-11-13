@@ -46,7 +46,7 @@ func test_build_tag_shows_alfa_in_red() -> void:
 		return
 	assert_not_null(tag)
 	if tag != null:
-		assert_eq(TitleScreen.TXT_BUILD_TAG, "ALFA")
+		assert_eq(Loc.t(TitleScreen.TXT_BUILD_TAG), "ALFA")
 		assert_eq(tag.text, "ALFA")
 		assert_eq(tag.get_theme_color("font_color"), TitleScreen.TAG_COLOR)
 		var b := title.find_child("StartButton", true, false) as Button

@@ -2,20 +2,20 @@ class_name MenuScreen
 extends Control
 ## Menu principal holográfico (T-190, BRF-113; docs/arte.md §11, docs/ui.md "Menu principal").
 ## Recebe os dados por `setup(view)` e emite `play_pressed`; não chama Backend nem SceneFlow (T-187).
-## `view`: {level: int, xp: int, xp_to_next: int, coins: int, is_max: bool}. A engrenagem não tem ação no M2.
+## `view`: {level: int, xp: int, xp_to_next: int, coins: int, is_max: bool}.
 
 signal play_pressed
 
-const TXT_SUBTITLE := "PROJECT:"
-const TXT_TITLE := "ANIMA"
-const TXT_PLAY := "JOGAR"
-const TXT_LEVEL := "NÍVEL %d"
-const TXT_XP := "%s / %s XP"
-const TXT_MAX := "MAX"
+## Chaves de tradução (Loc.t).
+const TXT_SUBTITLE := "TITLE_LOGO_SUB"
+const TXT_TITLE := "TITLE_LOGO_MAIN"
+const TXT_PLAY := "MENU_PLAY"
+const TXT_LEVEL := "COMMON_LEVEL"
+const TXT_XP := "COMMON_XP_PROGRESS"
+const TXT_MAX := "COMMON_MAX"
 
 ## Moeda provisória (T-162 troca): único ponto de troca do ícone.
 const COIN_ICON := preload("res://assets/ui/ui_icon_coin_small.png")
-const ICON_SETTINGS := preload("res://assets/ui/ui_icon_settings.png")
 const PANEL_PILL := preload("res://assets/ui/ui_holo_pill.png")
 const BTN_PRIMARY := preload("res://assets/ui/ui_holo_btn_primary_normal.png")
 const BTN_PRIMARY_PRESSED := preload("res://assets/ui/ui_holo_btn_primary_pressed.png")
@@ -46,8 +46,7 @@ const SUB_GAP := 6.0
 const TITLE_FONT := 60.0
 const SUB_FONT := 25.0
 const PLAY_FONT := 29.0
-const GEAR_SIZE := 44.0
-const GEAR_MARGIN := 16.0
+const BAR_CLEARANCE := 30.0 ## Jogar sobe para não encostar na barra do hangar (T-201)
 const BOTTOM_GAP_MAX := 98.0
 const BLOCK_H := 273.0 ## do topo de "PROJECT:" à base do Jogar, a 1x
 const PEDESTAL_END := 0.55 ## fração da altura até a base do pedestal da arte
@@ -58,7 +57,6 @@ var badge_label: Label
 var xp_label: Label
 var coins_label: Label
 var play_button: Button
-var settings_button: Button
 
 var _data := {"level": 1, "xp": 0, "xp_to_next": 1, "coins": 0, "is_max": false}
 var _art: Control
@@ -86,11 +84,11 @@ func _ready() -> void:
 	_art = TitleScreen.build_art(DebugSettings.reduced_effects())
 	root.add_child(_art)
 
-	_sub_title = TitleScreen.title_label(TXT_SUBTITLE)
+	_sub_title = TitleScreen.title_label(Loc.t(TXT_SUBTITLE))
 	_sub_title.name = "Subtitle"
 	_sub_title.add_theme_font_override("font", _spaced(6.0))
 	root.add_child(_sub_title)
-	_title = TitleScreen.title_label(TXT_TITLE)
+	_title = TitleScreen.title_label(Loc.t(TXT_TITLE))
 	_title.name = "Title"
 	root.add_child(_title)
 
@@ -98,20 +96,11 @@ func _ready() -> void:
 
 	play_button = Button.new()
 	play_button.name = "PlayButton"
-	play_button.text = TXT_PLAY
+	play_button.text = Loc.t(TXT_PLAY)
 	play_button.focus_mode = FOCUS_NONE
 	_style_play(play_button)
 	play_button.pressed.connect(func() -> void: play_pressed.emit())
 	root.add_child(play_button)
-
-	settings_button = Button.new() # sem ação no M2 (configurações no M8)
-	settings_button.name = "SettingsButton"
-	settings_button.focus_mode = FOCUS_NONE
-	settings_button.icon = ICON_SETTINGS
-	settings_button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	settings_button.expand_icon = false
-	_style_texture_all(settings_button, PANEL_PILL, 20, 0.0)
-	root.add_child(settings_button)
 
 	_built = true
 	_apply()
@@ -231,11 +220,11 @@ func _apply() -> void:
 	var is_max := bool(_data.is_max)
 	var lvl := int(_data.level)
 	badge_label.text = str(lvl)
-	level_label.text = TXT_LEVEL % lvl
+	level_label.text = Loc.t(TXT_LEVEL, {"level": lvl})
 	if is_max:
-		xp_label.text = TXT_MAX
+		xp_label.text = Loc.t(TXT_MAX)
 	else:
-		xp_label.text = TXT_XP % [format_number(int(_data.xp)), format_number(int(_data.xp_to_next))]
+		xp_label.text = Loc.t(TXT_XP, {"xp": format_number(int(_data.xp)), "xp_to_next": format_number(int(_data.xp_to_next))})
 	coins_label.text = format_number(int(_data.coins))
 	_update_bar()
 
@@ -281,7 +270,7 @@ func _layout() -> void:
 
 	# Bloco único ancorado embaixo: Jogar → linha do nível → logotipo.
 	var gap := clampf(view.y * 0.12, UiTokens.SPACE_L, BOTTOM_GAP_MAX * k)
-	var bottom := view.y - float(safe.bottom) - gap
+	var bottom := view.y - float(safe.bottom) - gap - BAR_CLEARANCE * k
 	var play_w := minf(PLAY_SIZE.x * k, view.x - 2.0 * UiTokens.MARGIN_SCREEN)
 	var play_size := Vector2(play_w, maxf(PLAY_SIZE.y * k, UiTokens.TOUCH_MIN))
 	play_button.size = play_size
@@ -317,11 +306,6 @@ func _layout() -> void:
 	var sub_base := title_base - title_font * 0.7 - 6.0 * k
 	_place_label(_sub_title, sub_font, sub_base - sub_font * 0.7, view.x)
 
-	var gear := maxf(GEAR_SIZE * k, UiTokens.TOUCH_MIN)
-	settings_button.size = Vector2.ONE * gear
-	var col := column_rect(view)
-	var right := minf(col.end.x, view.x - float(safe.right))
-	settings_button.position = Vector2(right - GEAR_MARGIN * k - gear, float(safe.top) + UiTokens.SPACE_M)
 	_update_bar()
 
 

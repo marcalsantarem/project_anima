@@ -46,7 +46,7 @@ func test_full_flow_with_real_arena() -> void:
 
 	title.start_requested.emit()
 	await wait_for_signal(SceneFlow.scene_changed, 2)
-	var menu := get_tree().current_scene
+	var menu := SceneFlow.hangar_tab_node(HangarNav.PLAY)
 	assert_eq(menu.scene_file_path, DUMMY_MENU, "Título → Menu")
 	menu.play_pressed.emit()
 	await wait_for_signal(SceneFlow.scene_changed, 2)
@@ -130,7 +130,7 @@ func test_result_back_to_menu_then_new_match() -> void:
 
 	result.title_requested.emit()
 	await wait_for_signal(SceneFlow.scene_changed, 2)
-	var menu := get_tree().current_scene
+	var menu := SceneFlow.hangar_tab_node(HangarNav.PLAY)
 	assert_eq(menu.scene_file_path, DUMMY_MENU, "voltou ao Menu")
 	assert_false(is_instance_valid(first_root), "partida anterior liberada")
 	assert_false(is_instance_valid(first), "Arena anterior liberada")

@@ -12,24 +12,25 @@ extends Control
 signal play_again_requested
 signal title_requested
 
-const TXT_VICTORY := "VITÓRIA"
-const TXT_DEFEAT := "DERROTA"
-const TXT_WAVE := "ONDA %d/%d  ·  %s"
-const TXT_ENEMIES := "Inimigos: %d"
-const TXT_PARTICLES := "Partículas: %s"
-const TXT_REWARDS := "RECOMPENSAS"
-const TXT_XP := "XP"
-const TXT_COIN := "MOEDA"
-const TXT_FIRST_WIN := "1ª VITÓRIA DO DIA  (+BÔNUS)"
-const TXT_LEVEL := "NÍVEL %d"
-const TXT_LEVEL_UP := "NÍVEL %d!"
-const TXT_LEVEL_FROM_TO := "NÍVEL %d → %d"
-const TXT_XP_PROGRESS := "%s / %s XP"
-const TXT_MAX := "MAX"
-const TXT_SLOT := "SLOT %d LIBERADO"
-const TXT_SLOT_SUB := "Disponível na próxima partida"
-const TXT_PLAY := "Jogar de novo"
-const TXT_BACK := "Voltar"
+## Chaves de tradução (Loc.t; placeholders `{nome}`).
+const TXT_VICTORY := "RESULT_VICTORY"
+const TXT_DEFEAT := "RESULT_DEFEAT"
+const TXT_WAVE := "RESULT_WAVE"
+const TXT_ENEMIES := "RESULT_ENEMIES"
+const TXT_PARTICLES := "RESULT_PARTICLES"
+const TXT_REWARDS := "RESULT_REWARDS"
+const TXT_XP := "RESULT_XP"
+const TXT_COIN := "RESULT_COIN"
+const TXT_FIRST_WIN := "RESULT_FIRST_WIN"
+const TXT_LEVEL := "COMMON_LEVEL"
+const TXT_LEVEL_UP := "RESULT_LEVEL_UP"
+const TXT_LEVEL_FROM_TO := "RESULT_LEVEL_FROM_TO"
+const TXT_XP_PROGRESS := "COMMON_XP_PROGRESS"
+const TXT_MAX := "COMMON_MAX"
+const TXT_SLOT := "RESULT_SLOT_UNLOCKED"
+const TXT_SLOT_SUB := "RESULT_SLOT_SUB"
+const TXT_PLAY := "RESULT_PLAY_AGAIN"
+const TXT_BACK := "COMMON_BACK"
 
 const BG_ART := preload("res://assets/backgrounds/result_tech_bg_dim.webp")
 const T_PANEL := preload("res://assets/ui/ui_holo_panel.png")
@@ -181,10 +182,10 @@ func _ready() -> void:
 	_slots_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	content.add_child(_slots_box)
 
-	var play := _button(TXT_PLAY, true, func() -> void: play_again_requested.emit())
+	var play := _button(Loc.t(TXT_PLAY), true, func() -> void: play_again_requested.emit())
 	play.name = "PlayAgain"
 	col.add_child(play)
-	var back := _button(TXT_BACK, false, func() -> void: title_requested.emit())
+	var back := _button(Loc.t(TXT_BACK), false, func() -> void: title_requested.emit())
 	back.name = "BackToTitle"
 	col.add_child(back)
 	# Teclado: foco inicial no principal; setas/Tab levam ao secundário e a action de aceitar confirma.
@@ -256,11 +257,11 @@ func _refresh() -> void:
 		_stats_tail.text = ""
 	else:
 		var won := _result.outcome == MatchResult.Outcome.VICTORY
-		_title.text = TXT_VICTORY if won else TXT_DEFEAT
+		_title.text = Loc.t(TXT_VICTORY if won else TXT_DEFEAT)
 		_title.add_theme_color_override("font_color", UiTokens.GOLD if won else UiTokens.DANGER)
-		_stats.text = TXT_WAVE % [_result.wave_reached, _result.waves_total, ScreenKit.format_time(_result.duration_s)]
-		_particles_label.text = TXT_PARTICLES % UiTokens.format_int(_result.particles)
-		_stats_tail.text = TXT_ENEMIES % _result.enemies_killed
+		_stats.text = Loc.t(TXT_WAVE, {"current": _result.wave_reached, "total": _result.waves_total, "time": ScreenKit.format_time(_result.duration_s)})
+		_particles_label.text = Loc.t(TXT_PARTICLES, {"amount": UiTokens.format_int(_result.particles)})
+		_stats_tail.text = Loc.t(TXT_ENEMIES, {"count": _result.enemies_killed})
 	var has := has_reward()
 	_reward_panel.visible = has
 	_level_panel.visible = has
@@ -325,19 +326,19 @@ func _apply(t: float, fx: bool) -> void:
 	var b := 1.0 if seg < n - 1 else (1.0 if to1 <= 0 else _frac(xp1, to1))
 	var txt := ""
 	if seg == n - 1 and to1 <= 0:
-		txt = TXT_MAX
+		txt = Loc.t(TXT_MAX)
 	elif seg == n - 1:
 		var from_xp := 0.0 if n > 1 else float(xp0)
-		txt = TXT_XP_PROGRESS % [UiTokens.format_int(roundi(lerpf(from_xp, xp1, local))), UiTokens.format_int(to1)]
+		txt = Loc.t(TXT_XP_PROGRESS, {"xp": UiTokens.format_int(roundi(lerpf(from_xp, xp1, local))), "xp_to_next": UiTokens.format_int(to1)})
 	elif seg == 0:
-		txt = TXT_XP_PROGRESS % [UiTokens.format_int(roundi(lerpf(xp0, to0, local))), UiTokens.format_int(to0)]
+		txt = Loc.t(TXT_XP_PROGRESS, {"xp": UiTokens.format_int(roundi(lerpf(xp0, to0, local))), "xp_to_next": UiTokens.format_int(to0)})
 	var lv := mini(lv0 + seg, maxi(lv1, lv0))
 	var gained := n > 1
 	shown_level = lv
 	_badge_num.text = str(lv)
-	_heading.text = TXT_LEVEL_UP % lv if gained else TXT_LEVEL % lv
+	_heading.text = Loc.t(TXT_LEVEL_UP if gained else TXT_LEVEL, {"level": lv})
 	_sub.visible = gained
-	_sub.text = TXT_LEVEL_FROM_TO % [lv0, lv]
+	_sub.text = Loc.t(TXT_LEVEL_FROM_TO, {"from": lv0, "to": lv})
 	_xp_text.text = txt
 	_set_bar(lerpf(a, b, local))
 	if fx and seg > _last_seg:
@@ -458,20 +459,20 @@ func _build_reward_panel(parent: Control) -> void:
 	var v := _panel(parent)
 	_reward_panel = v.get_parent()
 	_reward_panel.name = "RewardPanel"
-	v.add_child(_lbl(TXT_REWARDS, UiTokens.FONT_CAPTION + 2, HOLO_TEXT2))
+	v.add_child(_lbl(Loc.t(TXT_REWARDS), UiTokens.FONT_CAPTION + 2, HOLO_TEXT2))
 	var row := HBoxContainer.new()
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
 	row.add_theme_constant_override("separation", UiTokens.SPACE_M)
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	v.add_child(row)
-	_xp_value = _reward_cell(row, TXT_XP, HOLO_VIOLET, _icon(T_XP, 76))
-	_coin_value = _reward_cell(row, TXT_COIN, UiTokens.GOLD, _coin_icon())
+	_xp_value = _reward_cell(row, Loc.t(TXT_XP), HOLO_VIOLET, _icon(T_XP, 76))
+	_coin_value = _reward_cell(row, Loc.t(TXT_COIN), UiTokens.GOLD, _coin_icon())
 	var seal := PanelContainer.new()
 	seal.name = "FirstWinSeal"
 	seal.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	seal.add_theme_stylebox_override("panel", _tex_box(T_PILL, 20, Vector2(UiTokens.SPACE_S, 4)))
 	seal.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	var seal_label := _lbl(TXT_FIRST_WIN, UiTokens.FONT_CAPTION, UiTokens.GOLD)
+	var seal_label := _lbl(Loc.t(TXT_FIRST_WIN), UiTokens.FONT_CAPTION, UiTokens.GOLD)
 	seal_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	seal.add_child(seal_label)
 	v.add_child(seal)
@@ -632,10 +633,10 @@ func _slot_notice(slot: int) -> Control:
 	txt.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	txt.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	row.add_child(txt)
-	var head := _lbl(TXT_SLOT % slot, 40, UiTokens.GOLD)
+	var head := _lbl(Loc.t(TXT_SLOT, {"slot": slot}), 40, UiTokens.GOLD)
 	head.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	txt.add_child(head)
-	var sub := _lbl(TXT_SLOT_SUB, UiTokens.FONT_CAPTION, HOLO_TEXT)
+	var sub := _lbl(Loc.t(TXT_SLOT_SUB), UiTokens.FONT_CAPTION, HOLO_TEXT)
 	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	txt.add_child(sub)
 	return holder

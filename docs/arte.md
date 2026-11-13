@@ -292,6 +292,26 @@ Formas exclusivas: círculo = Moeda, estrela = Partículas, hexágono = XP. Lara
 
 `ui_holo_toggle_{off,on}[_pressed]` e `ui_holo_toggle_disabled` (228×88, corpo igual ao secundário esticado). Rótulo à esquerda (texto da UI), chave chanfrada à direita (trilho 48×28). O estado não depende só da cor: **posição do botão** (esquerda = desligado, direita = ligado), **marca** no trilho (`O` desligado, `I` ligado) e **brilho** (só o ligado brilha). Desligado = moldura ciano escuro `#1C7F8E`; ligado = moldura `holo_line` + trilho ciano cheio; desabilitado = tokens `holo_dis_*`. Contorno `#021423`. Prévia: [`interruptor-holo.png`](img/interruptor-holo.png). Detalhes e margens em `assets/ui/README.md`.
 
+### 11.9 Hangar: navegação (T-198, BRF-143; opção A aprovada pelo dono)
+
+Prévias: [`hangar-opcao-a-375x812.png`](img/hangar-opcao-a-375x812.png) (barra inferior), [`hangar-opcao-b-375x812.png`](img/hangar-opcao-b-375x812.png) (abas no topo), [`hangar-opcao-a-tela-filha-375x812.png`](img/hangar-opcao-a-tela-filha-375x812.png) ("Em breve" + Voltar), [`hangar-1280x720.png`](img/hangar-1280x720.png). Fonte: `assets/ui/_src/hangar_mockup.html` (`bash assets/ui/_src/hangar_render.sh`). Conta nível 2 nas prévias.
+
+- **Recomendada: A (barra inferior).** Ordem Módulos · Componentes · **Jogar (centro)** · Núcleos · Ajustes. Cada item 75×76 (+ 34 da faixa segura embaixo); ícone 28 (32 ativo) e rótulo 11,5/700 sob o ícone. A engrenagem sai do topo e vira o item "Ajustes" (tela "Configurações").
+- **Estados:** ativo = placa chanfrada com degradê ciano, moldura `holo_line`, brilho e traço claro 40×4 na borda da barra; rótulo `holo_text`. Normal = ícone na cor do conceito, rótulo `#9FC4D6`. Bloqueado = ícone cinza a 45% + selo chanfrado (cadeado + "NV n", 11/800) sobre o canto do ícone; rótulo `#6F8BA3`. Um toque no bloqueado só mostra o aviso (sem trocar de tela).
+- **Tela filha:** topo com Voltar (pílula 104×56, alvo 64) e título 20/800; painel central com o ícone do conceito, "Em breve" 30/800 e legenda. A barra continua visível, com a aba da tela ativa. O bloco do Jogar sobe 30 px (Jogar termina 16 px acima da barra).
+- **Largura 1280×720:** mesma coluna em retrato centralizada (como o menu atual), sem faixa segura.
+
+**Peças (T-199, BRF-145; PNG 2x, 1 px ≈ 1 px no viewport 720; fonte `assets/ui/_src/gen_ui_hangar.py`; prévia [`hangar-pecas.png`](img/hangar-pecas.png); uso no `assets/ui/README.md`):**
+
+| Arquivo | PNG | 9-slice E/D/C/B · `expand_margin` | Observação |
+|---|---|---|---|
+| `ui_nav_bar` | 128×120 | 48/48/16/8 · topo 8 | fundo, linha e colchetes do topo |
+| `ui_nav_tab_active` / `_pressed` | 166×168 | fixo · 8 | item 150×152; ativo com brilho e traço claro |
+| `ui_nav_lock_chip` | 80×40 | 38/12/12/12 · 0 | cadeado na arte; "NV n" da UI (`content_margin` 38/12) |
+| `ui_icon_nav_play` / `_modules` / `_components` / `_cores` / `_settings` | 64×64 | — | usados a 56 (normal) e 64 (ativo) |
+| `ui_icon_module_locked` / `_component_locked` / `_core_locked` | 64×64 | — | cinza a 45% na arte |
+| `ui_icon_back` | 36×36 | — | seta do Voltar, sobre a `ui_holo_pill` |
+
 ## 12. HUD holográfico da partida (T-289, BRF-125; decisão 64)
 
 O estilo dos menus (§11) e do botão de velocidade vale para **todo o HUD da partida**; a arena (chão, inimigos, Anima) segue cartoon 3/4. **Posições, tamanhos de toque e comportamento não mudam** (`docs/ui.md` §4); a T-290 (AG02) só troca a arte.

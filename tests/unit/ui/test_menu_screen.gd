@@ -70,14 +70,6 @@ func test_play_pressed_emitted() -> void:
 	assert_signal_emit_count(m, "play_pressed", 1)
 
 
-func test_settings_button_does_nothing() -> void:
-	var m := await _menu({"level": 1, "xp": 0, "xp_to_next": 100, "coins": 0, "is_max": false})
-	watch_signals(m)
-	m.settings_button.pressed.emit()
-	assert_signal_not_emitted(m, "play_pressed")
-	assert_eq(m.settings_button.get_signal_connection_list("pressed").size(), 0)
-
-
 func test_no_module_slot_alfa_or_version_text() -> void:
 	var m := await _menu({"level": 4, "xp": 320, "xp_to_next": 500, "coins": 1250, "is_max": false})
 	for t: String in _texts(m, []):
@@ -116,20 +108,4 @@ func test_play_text_centered_on_face_in_two_viewports() -> void:
 		var p: StyleBoxTexture = m.play_button.get_theme_stylebox("pressed")
 		assert_almost_eq(p.content_margin_top - n.content_margin_top, 6.0, 0.5, "texto desce 6 px")
 		assert_eq(n.content_margin_left, n.content_margin_right)
-	win.size = old
-
-
-func test_gear_anchored_to_column_in_two_viewports() -> void:
-	var win := get_tree().root
-	var old := win.size
-	for sz in [Vector2i(375, 812), Vector2i(1280, 720)]:
-		win.size = sz
-		var m := await _menu({"level": 3, "xp": 10, "xp_to_next": 100, "coins": 5, "is_max": false})
-		await wait_process_frames(2)
-		var col := MenuScreen.column_rect(m.get_viewport_rect().size)
-		var g := m.settings_button
-		var c := g.position + g.size / 2.0
-		assert_true(col.has_point(c), "centro na coluna %s" % [sz])
-		assert_lte(col.end.x - (g.position.x + g.size.x), 24.0 * 2.0, "perto do canto direito da coluna %s" % [sz])
-		assert_lt(g.position.y, 40.0, "no topo %s" % [sz])
 	win.size = old

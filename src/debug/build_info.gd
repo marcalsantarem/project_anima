@@ -4,8 +4,8 @@ extends RefCounted
 ## (web/inject_build.sh); fora dele (export local, editor) não há objeto e o build vale "dev local".
 
 ## Versão usada quando `application/config/version` não existe no project.godot. Guardada e enviada
-## sem o `v` (ex. `0.2.0`, contrato de docs/logs-api.md); o `v` só entra na exibição (pause_text).
-const DEFAULT_VERSION := "0.2.0"
+## sem o `v` (ex. `0.2.1`, contrato de docs/logs-api.md); o `v` só entra na exibição (pause_text).
+const DEFAULT_VERSION := "0.2.1"
 const LOCAL_LABEL := "dev local"
 const KEYS := ["sha", "sha_full", "branch", "built_at", "run"]
 const JS_READ := "JSON.stringify(window.ANIMA_BUILD || null)"
@@ -58,6 +58,6 @@ static func summary_line(b: Dictionary) -> String:
 		b.get("run", "?")]
 
 
-## Texto da tela inicial e da pausa: `v0.2.0 · <sha>` (ou `v0.2.0 · dev local`).
+## Texto da tela inicial e da pausa: `v0.2.1 · <sha>` (ou `v0.2.1 · dev local`).
 static func pause_text(b: Dictionary, ver: String) -> String:
 	return "v%s · %s" % [ver, label(b)]

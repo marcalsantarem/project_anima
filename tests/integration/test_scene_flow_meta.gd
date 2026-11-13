@@ -87,7 +87,7 @@ func test_full_flow_title_menu_match_result_menu() -> void:
 		return
 	title.start_requested.emit()
 	await wait_for_signal(SceneFlow.scene_changed, 2)
-	var menu := get_tree().current_scene
+	var menu := SceneFlow.hangar_tab_node(HangarNav.PLAY)
 	assert_eq(menu.scene_file_path, DUMMY_MENU, "Título → Menu")
 	assert_eq(menu.view, {"level": 2, "xp": 10, "xp_to_next": SceneFlow.progression.xp_to_next[1], "coins": 7, "is_max": false})
 
@@ -110,7 +110,7 @@ func test_full_flow_title_menu_match_result_menu() -> void:
 
 	screen.menu_requested.emit()
 	await wait_for_signal(SceneFlow.scene_changed, 2)
-	menu = get_tree().current_scene
+	menu = SceneFlow.hangar_tab_node(HangarNav.PLAY)
 	assert_eq(menu.scene_file_path, DUMMY_MENU, "Resultado → Menu")
 	assert_eq(menu.view.coins, SceneFlow.profile.coins, "menu com o perfil atualizado")
 
@@ -195,7 +195,7 @@ func test_save_failure_does_not_block_flow() -> void:
 	assert_eq(_fake.saves, 0)
 	screen.menu_requested.emit()
 	await wait_for_signal(SceneFlow.scene_changed, 2)
-	assert_eq(get_tree().current_scene.scene_file_path, DUMMY_MENU, "segue para o Menu")
+	assert_eq(SceneFlow.hangar_tab_node(HangarNav.PLAY).scene_file_path, DUMMY_MENU, "segue para o Menu")
 
 
 func test_stress_match_gives_no_reward_and_does_not_save() -> void:

@@ -1,0 +1,64 @@
+keys,pt_BR
+COMMON_BACK,Voltar
+COMMON_LEVEL,NÍVEL {level}
+COMMON_LOCK_LEVEL,NV {level}
+COMMON_MAX,MAX
+COMMON_NO,não
+COMMON_OFF,desligado
+COMMON_ON,ligado
+COMMON_XP_PROGRESS,{xp} / {xp_to_next} XP
+COMMON_YES,sim
+TITLE_BUILD_TAG,ALFA
+TITLE_LOGO_MAIN,ANIMA
+TITLE_LOGO_SUB,PROJECT:
+TITLE_TAP_TO_START,Toque para começar
+MENU_PLAY,JOGAR
+HANGAR_LOCK_HINT,{name} libera no NV {level}
+HANGAR_TAB_COMPONENTS,Componentes
+HANGAR_TAB_CORES,Núcleos
+HANGAR_TAB_MODULES,Módulos
+HANGAR_TAB_PLAY,Jogar
+HANGAR_TAB_SETTINGS,Ajustes
+HANGAR_TITLE_SETTINGS,Configurações
+SOON_CAPTION,Esta área chega numa próxima versão.
+SOON_TITLE,Em breve
+HUD_BOSS,Boss
+HUD_ENERGY,ENERGIA
+HUD_PARTICLES_A11Y,Partículas
+HUD_PAUSE_A11Y,Pausa
+HUD_SPEED_A11Y,Velocidade
+HUD_WAVE,ONDA {current}/{total}
+SKILL_A11Y,Módulo {slot}
+SKILL_A11Y_LOCKED,"Módulo {slot}, bloqueada"
+SKILL_A11Y_LOCKED_LEVEL,"Módulo {slot}, bloqueada até o nível {level}"
+UPGRADE_A11Y,"{name}, nível {level}"
+UPGRADE_A11Y_COST,"{name}, nível {level}, custa {cost} Partículas"
+UPGRADE_A11Y_MAX,"{name}, nível {level}, máximo"
+UPGRADE_A11Y_POOR,"{name}, nível {level}, faltam Partículas ({cost})"
+UPGRADE_ATK_POWER,Atk power
+UPGRADE_ATK_SPD,Atk spd
+UPGRADE_COOLDOWN,Cooldown
+UPGRADE_DEFENSE,Defesa
+UPGRADE_LEVEL,Nv {level}
+UPGRADE_MAX_HP,Vida máxima
+PAUSE_CONTINUE,Continuar
+PAUSE_DEBUG,Debug
+PAUSE_MENU,Voltar ao menu
+PAUSE_REDUCED_FX,Efeitos reduzidos
+PAUSE_RESTART,Recomeçar
+PAUSE_TITLE,PAUSADO
+PAUSE_TOGGLE_STATE,{label}: {state}
+RESULT_COIN,MOEDA
+RESULT_DEFEAT,DERROTA
+RESULT_ENEMIES,Inimigos: {count}
+RESULT_FIRST_WIN,1ª VITÓRIA DO DIA  (+BÔNUS)
+RESULT_LEVEL_FROM_TO,NÍVEL {from} → {to}
+RESULT_LEVEL_UP,NÍVEL {level}!
+RESULT_PARTICLES,Partículas: {amount}
+RESULT_PLAY_AGAIN,Jogar de novo
+RESULT_REWARDS,RECOMPENSAS
+RESULT_SLOT_SUB,Disponível na próxima partida
+RESULT_SLOT_UNLOCKED,SLOT {slot} LIBERADO
+RESULT_VICTORY,VITÓRIA
+RESULT_WAVE,ONDA {current}/{total}  ·  {time}
+RESULT_XP,XP

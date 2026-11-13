@@ -168,7 +168,7 @@ func _build_top() -> void:
 	row1.add_child(left)
 	_pause_button = TextureButton.new()
 	_pause_button.name = "Pause"
-	_pause_button.accessibility_name = "Pausa"
+	_pause_button.accessibility_name = Loc.t("HUD_PAUSE_A11Y")
 	# Arte ui_hud_btn_pause (96x96, corpo 68); o alvo de toque continua com 88 px.
 	_pause_button.texture_normal = UiArt.HUD_PAUSE
 	_pause_button.texture_pressed = UiArt.HUD_PAUSE_PRESSED
@@ -199,7 +199,7 @@ func _build_top() -> void:
 	row1.add_child(right)
 	particles_pill = _panel(&"PanelPillLight")
 	particles_pill.name = "ParticlesPill"
-	particles_pill.accessibility_name = "Partículas"
+	particles_pill.accessibility_name = Loc.t("HUD_PARTICLES_A11Y")
 	particles_pill.custom_minimum_size = Vector2(184, 64)
 	particles_pill.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	right.add_child(particles_pill)
@@ -222,7 +222,7 @@ func _build_top() -> void:
 	row2.add_child(_icon(CORE_ICON_SIZE, _draw_icon_tex.bind(UiArt.HUD_ICON_ENERGY)))
 	_core_bar = UiBar.new()
 	_core_bar.color_mode = UiBar.ColorMode.CORE_HP
-	_core_bar.label_prefix = "ENERGIA "
+	_core_bar.label_prefix = Loc.t("HUD_ENERGY") + " "
 	_core_bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_core_bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row2.add_child(_core_bar)
@@ -239,7 +239,7 @@ func _build_top() -> void:
 	_boss_bar.color_mode = UiBar.ColorMode.FIXED
 	_boss_bar.fill_color = UiTokens.BOSS_HOLO
 	_boss_bar.boss_art = true
-	_boss_bar.title = "Boss"
+	_boss_bar.title = Loc.t("HUD_BOSS")
 	_boss_bar.track_height = BOSS_TRACK_HEIGHT
 	_boss_bar.fill_time = BOSS_FILL_TIME
 	_boss_bar.custom_minimum_size.y = BOSS_BAR_HEIGHT
@@ -251,7 +251,7 @@ func _build_top() -> void:
 func _build_speed_button(parent: Control) -> void:
 	_speed_button = TextureButton.new()
 	_speed_button.name = "Speed"
-	_speed_button.accessibility_name = "Velocidade"
+	_speed_button.accessibility_name = Loc.t("HUD_SPEED_A11Y")
 	_speed_button.ignore_texture_size = true
 	_speed_button.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
 	_speed_button.custom_minimum_size = Vector2(UiTokens.TOUCH_MIN, UiTokens.TOUCH_MIN)
@@ -459,7 +459,7 @@ func _on_core_hp_changed(current: int, max_hp: int) -> void:
 
 
 func _on_wave_changed(current: int, total: int) -> void:
-	_wave_label.text = "ONDA %d/%d" % [current, total]
+	_wave_label.text = Loc.t("HUD_WAVE", {"current": current, "total": total})
 	_wave_label.pivot_offset = _wave_label.size * 0.5
 	if _wave_tween:
 		_wave_tween.kill()

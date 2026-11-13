@@ -16,12 +16,13 @@ enum State { AFFORDABLE, POOR, MAX, DISABLED }
 const IDS: Array[StringName] = [
 	&"upgrade_atk_power", &"upgrade_atk_spd", &"upgrade_defense", &"upgrade_max_hp", &"upgrade_cooldown",
 ]
+## Chaves de tradução dos nomes (Loc.t); `display_name()` devolve o texto.
 const NAMES := {
-	&"upgrade_atk_power": "Atk power",
-	&"upgrade_atk_spd": "Atk spd",
-	&"upgrade_defense": "Defesa",
-	&"upgrade_max_hp": "Vida máxima",
-	&"upgrade_cooldown": "Cooldown",
+	&"upgrade_atk_power": "UPGRADE_ATK_POWER",
+	&"upgrade_atk_spd": "UPGRADE_ATK_SPD",
+	&"upgrade_defense": "UPGRADE_DEFENSE",
+	&"upgrade_max_hp": "UPGRADE_MAX_HP",
+	&"upgrade_cooldown": "UPGRADE_COOLDOWN",
 }
 ## Ações de gameplay que nunca acionam o botão pelo teclado (Espaço = skill_4 e também ui_accept).
 const GAME_ACTIONS: Array[StringName] = [&"skill_1", &"skill_2", &"skill_3", &"skill_4", &"pause"]
@@ -128,7 +129,7 @@ func reject() -> void:
 
 
 func display_name() -> String:
-	return NAMES.get(upgrade_id, String(upgrade_id))
+	return Loc.t(NAMES[upgrade_id]) if NAMES.has(upgrade_id) else String(upgrade_id)
 
 
 func _set_held(on: bool) -> void:
@@ -157,15 +158,15 @@ func _refresh_state() -> void:
 
 
 func _update_accessibility() -> void:
-	var text := "%s, nível %d" % [display_name(), level]
+	var key := "UPGRADE_A11Y"
 	match state:
 		State.MAX:
-			text += ", máximo"
+			key = "UPGRADE_A11Y_MAX"
 		State.AFFORDABLE:
-			text += ", custa %s Partículas" % UiTokens.format_int(next_cost)
+			key = "UPGRADE_A11Y_COST"
 		State.POOR:
-			text += ", faltam Partículas (%s)" % UiTokens.format_int(next_cost)
-	accessibility_name = text
+			key = "UPGRADE_A11Y_POOR"
+	accessibility_name = Loc.t(key, {"name": display_name(), "level": level, "cost": UiTokens.format_int(next_cost)})
 
 
 # --- Entrada ---
@@ -278,7 +279,7 @@ func _draw() -> void:
 	# "Nv N" (à direita do ícone)
 	var lv_x := ICON_C.x + ICON_R + 4.0
 	var lv_w := size.x - lv_x - 4.0
-	var lv := "Nv %d" % level
+	var lv := Loc.t("UPGRADE_LEVEL", {"level": level})
 	var lv_fs := LEVEL_SIZE
 	while lv_fs > 14 and font.get_string_size(lv, HORIZONTAL_ALIGNMENT_LEFT, -1, lv_fs).x > lv_w - 2.0:
 		lv_fs -= 2 # "Nv 10" encolhe para caber
@@ -290,9 +291,9 @@ func _draw() -> void:
 	# Custo (a faixa vem na arte): estrela + número, ou "MAX"
 	var cy := PILL.get_center().y + (font.get_ascent(COST_SIZE) - font.get_descent(COST_SIZE)) * 0.5
 	if state == State.MAX:
-		draw_string_outline(font, Vector2(PILL.position.x, cy), "MAX", HORIZONTAL_ALIGNMENT_CENTER, PILL.size.x, COST_SIZE,
+		draw_string_outline(font, Vector2(PILL.position.x, cy), Loc.t("COMMON_MAX"), HORIZONTAL_ALIGNMENT_CENTER, PILL.size.x, COST_SIZE,
 			UiTokens.HOLO_OUTLINE, UiTokens.HOLO_BG)
-		draw_string(font, Vector2(PILL.position.x, cy), "MAX", HORIZONTAL_ALIGNMENT_CENTER, PILL.size.x, COST_SIZE, UiTokens.GOLD)
+		draw_string(font, Vector2(PILL.position.x, cy), Loc.t("COMMON_MAX"), HORIZONTAL_ALIGNMENT_CENTER, PILL.size.x, COST_SIZE, UiTokens.GOLD)
 	else:
 		var star := Rect2(PILL.position + Vector2(4.0, (PILL.size.y - PILL_STAR) * 0.5), Vector2(PILL_STAR, PILL_STAR))
 		draw_texture_rect(UiArt.PARTICLE_OFF if state == State.DISABLED else UiArt.PARTICLE, star, false)
