@@ -121,7 +121,7 @@
 | T-205 | Partida aplica os Núcleos comprados (via `MatchConfig`) (tam. M) | M4 | AG01 | feita |
 | T-206 | Arte dos ícones dos Núcleos e das ligações da árvore (tam. M) | M4 | AG08 | feita |
 | T-207 | Tela de Núcleos: árvore, detalhe do talento, compra e saldo (tam. G) | M4 | AG02 | feita |
-| T-208 | VFX de compra e desbloqueio de Núcleo (tam. P) | M4 | AG09 | em andamento |
+| T-208 | VFX de compra e desbloqueio de Núcleo (tam. P) | M4 | AG09 | feita |
 | T-209 | Balanceamento com Núcleos (simulação do bot) (tam. P) | M4 | AG04 | em andamento |
 | T-210 | Validação e fechamento da v0.2.2 (tag) (tam. P) | M4 | AG03 + AG00 | a fazer |
 | T-211 | Design dos Módulos: congelamento, escudo e choque; níveis, efeito por nível e custos em Moeda (tam. M) | M5 | AG04 | a fazer |

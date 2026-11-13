@@ -1,6 +1,6 @@
 # VFX — Project: Anima
 
-> Dono: AG09. Estado: **T-130** (pool + `FxDirector`, ligado na partida pelo `SceneFlow`), **T-131** (meteoro e chefe ogro), **T-132** (modo reduzido) e **T-117 parte AG09** (flash de acerto, Módulo pronto/usado).
+> Dono: AG09. Estado: **T-130** (pool + `FxDirector`, ligado na partida pelo `SceneFlow`), **T-131** (meteoro e chefe ogro), **T-132** (modo reduzido) e **T-117 parte AG09** (flash de acerto, Módulo pronto/usado), **T-208** (UI dos Núcleos).
 > Estilo: 2D cartoon casual (docs/arte.md, variação A): formas sólidas com contorno (tom da cor −55%), cores vivas, **poucas gotas grandes** em vez de muitas partículas. Ciano (`#2FE6D2`) só no que é do jogador.
 
 ## 1. Pool de efeitos (`src/fx/`)
@@ -63,6 +63,18 @@ Custo = gotas desenhadas no pico (cada gota = 2 círculos) + arcos. "Sinal exist
 Tempos repetidos no `FxDirector` (fx/ não lê data/): `BOSS_LAUNCH_TIME` 0,6, `BOSS_STUN_TIME` 2, `METEOR_FALL_HEIGHT` 360, `METEOR_BASE_RADIUS` 160; se os dados mudarem, atualizar. `boss_phase_changed` saiu (não existe mais). O aviso no chão e a cratera do meteoro continuam desenhados pelo `match/` (`meteor_skill.gd`).
 
 Os sinais marcados T-148 estão sendo criados pelo AG01; o `FxDirector` só conecta os que existirem.
+
+**T-208 — UI da tela de Núcleos** (`src/fx/ui/cores_fx.gd`, `CoresFx`, estático; ligado em `cores_screen.gd`). `Tween` + `CPUParticles2D` com gota radial e material aditivo gerados uma vez; nós temporários (prefixo `Fx`) criados por ação do jogador e liberados por timer; nada bloqueia o toque. Reduzido (`CoresFx.reduced_effects`, a tela lê `DebugSettings`): só a troca de estado; na falha, tom vermelho sem tremida.
+
+| Chamada | Efeito | Gatilho na tela | Duração | Cor | Pico |
+|---|---|---|---|---|---|
+| `play_buy(node, cor)` | pulso 1,12 + brilho, anel, gotas; selo n/máx pula | compra de nível | 0,45 s | ramo (`BRANCH_COLORS`) | 8 partículas + 1 arco |
+| `play_max(node, tex_max)` | brilho dourado, anel, gotas; moldura `_max` entra (1,35 → 1) | compra que chega ao máximo | 0,55 s | `#FFD34D` | 12 partículas + 1 arco + 1 textura |
+| `play_unlock(line, alvo, cor)` | ligação acende, ponto de luz corre origem → destino com rastro; alvo pisca | link com `need` = nível comprado (alvo só se deixou de ser LOCKED) | 0,32 + 0,24 s | ramo | 1 sprite + 10 partículas |
+| `play_respec(nós, label, de, até, fmt)` | nós comprados apagam em sequência (≤ 0,3 s de escalonamento) e o saldo conta (para se outro código mudar o texto) | confirmar Redistribuir | ≤ 0,55 s | — | só tweens |
+| `play_fail(botão)` | tremida horizontal 8 px + tom vermelho | Comprar falha (sem Moeda / bloqueado / Núcleos travados; não no máximo), inclusive toque no botão desabilitado | 0,3 s | `#FF8080` | só tween |
+
+Custo estimado: ≤ ~25 partículas e 2 arcos vivos no pior caso (compra que desbloqueia 2 ligações), só enquanto o efeito dura; fora da partida. Testes: `tests/unit/fx/test_cores_fx.gd`. Não medido no iPhone.
 
 ## 3. Orçamento por quadro (iPhone, WebGL 2)
 

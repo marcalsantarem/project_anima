@@ -237,11 +237,35 @@ func select(id: StringName) -> void:
 func buy_selected() -> bool:
 	if selected == &"":
 		return false
+	CoresFx.reduced_effects = DebugSettings.reduced_effects()
 	var res := MetaTalents.buy(profile, tree, selected)
 	if not bool(res["ok"]):
+		if int(res["reason"]) != MetaTalents.Reason.MAX:
+			CoresFx.play_fail(buy_button)
 		return false
 	_after_change()
+	_play_buy_fx(selected, int(res["level"]))
 	return true
+
+
+## T-208: pulso (ou máximo) no nó comprado e trilho de luz nas ligações que acabaram de acender.
+func _play_buy_fx(id: StringName, lv: int) -> void:
+	var color: Color = BRANCH_COLORS.get(tree.get_talent(id).branch, HOLO_TEXT2)
+	if node_state(profile, tree, id) == NodeState.MAX:
+		CoresFx.play_max(_nodes.get(id), T_NODE_MAX)
+	else:
+		CoresFx.play_buy(_nodes.get(id), color)
+	for link in _links:
+		if link["from"] == id and int(link["need"]) == lv:
+			var to: StringName = link["to"]
+			CoresFx.play_unlock(link["line"], null if node_state(profile, tree, to) == NodeState.LOCKED else _nodes.get(to), color)
+
+
+## T-208: toque no Comprar desabilitado (sem Moeda / bloqueado) → tremida.
+func _on_buy_input(event: InputEvent) -> void:
+	var mb := event as InputEventMouseButton
+	if buy_button.disabled and mb != null and mb.pressed and mb.button_index == MOUSE_BUTTON_LEFT:
+		buy_selected()
 
 
 ## Abre a confirmação do respec (nada acontece sem Núcleos comprados).
@@ -264,8 +288,12 @@ func cancel_respec() -> void:
 ## Aplica o respec (100% de reembolso) e salva. Retorna o reembolso.
 func confirm_respec() -> int:
 	confirm_box.visible = false
+	CoresFx.reduced_effects = DebugSettings.reduced_effects()
+	var coins_before := profile.coins
+	var owned: Array = tree.talents.filter(func(d: TalentData) -> bool: return MetaTalents.level(profile, d.id) > 0).map(func(d: TalentData) -> Variant: return _nodes.get(d.id))
 	var refund := MetaTalents.respec(profile, tree)
 	_after_change()
+	CoresFx.play_respec(owned, coins_label, coins_before, profile.coins, func(v: int) -> String: return MenuScreen.format_number(v))
 	_focus_selected()
 	return refund
 
@@ -522,6 +550,7 @@ func _build() -> void:
 	buy_button.name = "Buy"
 	buy_button.size_flags_horizontal = SIZE_EXPAND_FILL
 	buy_button.pressed.connect(buy_selected)
+	buy_button.gui_input.connect(_on_buy_input)
 	_style_primary(buy_button)
 	row.add_child(buy_button)
 
