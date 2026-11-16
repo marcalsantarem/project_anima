@@ -1,7 +1,7 @@
 extends SceneTree
 ## Balanceamento com Núcleos (BRF-157, T-209; ferramenta manual, não é teste do GUT).
 ## Política do bot: guarda `--share` (0,5 ou 1,0) da Moeda de cada partida para Núcleos e compra,
-## enquanto der, o próximo nível mais barato disponível; empate = alterna ramos (Ataque, Defesa, Economia).
+## enquanto der, o próximo Núcleo mais barato disponível; empate = alterna ramos (Ataque, Defesa, Economia).
 ## A ordem de compra só depende da Moeda, então os marcos (1º talento, 25%, 50%, 100% do custo) são prefixos fixos.
 ## Uso:
 ##   bench:    godot --headless --path . --fixed-fps 60 -s tests/tools/run_talents.gd -- --mode=bench --states=none,first,p25,p50,p100 --only=mid
@@ -63,8 +63,7 @@ func _run() -> void:
 func _total() -> int:
 	var s := 0
 	for t in tree.talents:
-		for c in t.costs:
-			s += c
+		s += t.cost
 	return s
 
 
@@ -80,7 +79,7 @@ func _pick(talents: Dictionary, ptr: int) -> StringName:
 	for t in tree.talents:
 		if MetaTalents.can_buy(p, tree, t.id) != MetaTalents.Reason.OK:
 			continue
-		var cost := MetaTalents.next_cost(p, tree, t.id)
+		var cost := t.cost
 		var rank := posmod(BRANCHES.find(t.branch) - ptr, BRANCHES.size())
 		if best == &"" or cost < best_cost or (cost == best_cost and rank < best_rank):
 			best = t.id
@@ -100,8 +99,8 @@ func _order() -> Array[Dictionary]:
 		if id == &"":
 			break
 		var t := tree.get_talent(id)
-		var cost: int = t.costs[int(talents.get(id, 0))]
-		talents[id] = int(talents.get(id, 0)) + 1
+		var cost: int = t.cost
+		talents[id] = 1
 		spent += cost
 		ptr = (BRANCHES.find(t.branch) + 1) % BRANCHES.size()
 		out.append({"id": id, "cost": cost, "spent": spent})
@@ -127,7 +126,7 @@ func _state(name: String) -> Dictionary:
 		return talents
 	var goal := 1 if name == "first" else ceili(float(MILESTONES[name]) * _total())
 	for o in _order():
-		talents[o.id] = int(talents.get(o.id, 0)) + 1
+		talents[o.id] = 1
 		if name == "first" or int(o.spent) >= goal:
 			break
 	return talents

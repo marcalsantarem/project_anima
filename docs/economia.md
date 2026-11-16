@@ -94,13 +94,13 @@ Partidas até cada nível (4 partidas por dia; com 5 por dia muda <= 3 partidas,
 
 ## Custos dos Núcleos (T-203, BRF-151)
 
-Árvore de 12 talentos, **18 355 Moeda** no total (tabela em [meta.md](meta.md), "Núcleos (talentos)"). Com ~1015 Moeda/dia do mediano e 50% da renda para Núcleos (o resto para Componentes): ~36 dias (~5 semanas); com 100%: ~18 dias. As raízes custam 50 Moeda no Nv 1 (compra na 1ª partida após o NV 3).
+Árvore de 12 talentos, **18 355 Moeda** no total (tabela em [meta.md](meta.md), "Núcleos (talentos)"). Com ~1015 Moeda/dia do mediano e 50% da renda para Núcleos (o resto para Componentes): ~36 dias (~5 semanas); com 100%: ~18 dias. As raízes custam 500 Moeda (compra única, T-299; antes 50 no Nv 1).
 
 ## Simulação com Núcleos (T-209, BRF-157)
 
 Ferramenta: `tests/tools/run_talents.gd` (bot x1, seeds 1 a 100, mesmos perfis de `run_progression.gd`; bônus via `MatchConfig.talent_bonuses`, `stat_coin_gain` via `MetaRewards`). Modos: `--mode=bench --states=none,first,p25,p50,p100` (estados fixos) e `--mode=campaign --share=0.5|1.0 --per-day=4` (joga em sequência, compra e mede os dias).
 
-**Política do bot:** reserva `share` da Moeda de cada partida (50% referência, o resto iria para Componentes; variante 100%) e compra, enquanto der, o próximo nível **mais barato** disponível; empate = alterna ramos (Ataque → Defesa → Economia). A ordem só depende da Moeda: raízes, camada 1, camada 2, Núcleo Dourado e por fim os capstones. Marcos = prefixo da ordem até gastar 25% (4 635), 50% (9 435) e 100% (18 355) da árvore.
+**Política do bot:** reserva `share` da Moeda de cada partida (50% referência, o resto iria para Componentes; variante 100%) e compra, enquanto der, o próximo Núcleo **mais barato** disponível; empate = alterna ramos (Ataque → Defesa → Economia). A ordem só depende da Moeda: raízes, camada 1, camada 2, Núcleo Dourado e por fim os capstones. Marcos = prefixo da ordem até gastar 25% (4 635), 50% (9 435) e 100% (18 355) da árvore.
 
 | Perfil | Estado | Vitórias | Onda média da derrota | Duração média (mín.) | XP/partida | Moeda/partida |
 |---|---|---|---|---|---|---|
@@ -135,3 +135,6 @@ Medido com o Nv 1 antigo das raízes (+4%); com o Nv 1 novo (+8%) o 1º talento 
 **Ajustes (só `data/talents/`):** `talent_sharp_core` e `talent_hardened_shell` 4·8·12·16·20% → **8·11·14·17·20%**; `talent_particle_magnet` 3·6·9·12·15% → **6·8·10·13·15%**. Total da árvore continua 18 355.
 
 **Riscos:** as descrições `TALENT_*_DESC` das 3 raízes ("4% por nível", "3% por nível") ficaram desatualizadas (`data/i18n/`, fora do escopo do AG04). O bot mediano vence sempre, então os Núcleos não mudam a taxa de vitória dele; o efeito no jogador real (que perde) fica entre os dois perfis.
+
+### Núcleos de nível único (T-299, BRF-158, decisão 65)
+Cada Núcleo virou compra única: valor = teto antigo, custo = soma dos níveis antigos. **Total da árvore igual (18 355 Moeda)** e tetos iguais, então o estado "100%" é idêntico ao medido no T-209 (a ordem de compra do bot só muda no detalhe). Mudou só o ritmo inicial: a 1ª raiz agora custa 500 (antes 50), então o mediano (~340 Moeda na 1ª partida com o bônus do dia) compra o 1º Núcleo na 2ª partida; a ordem do bot passa a ser raízes (3 x 500), camada 1 (3 x 1195), camada 2 e capstones. Os marcos de dias (25%, 50%, 100%) não mudam, pois dependem só do total.

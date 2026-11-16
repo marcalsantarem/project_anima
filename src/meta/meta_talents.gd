@@ -1,75 +1,80 @@
 class_name MetaTalents
 extends RefCounted
-## Lógica de compra dos Núcleos (T-204). Pura: sem cena e sem rede. Quem chama salva pelo `Backend`.
+## Lógica de compra dos Núcleos (T-204, T-299: compra única, sem níveis). Pura: sem cena e sem rede.
+## Quem chama salva pelo `Backend`. Save: `profile.talents = {id: 1}` (só os comprados; save antigo com nível >= 1 vale 1).
+## API para a UI: `owned(profile, id) -> bool`, `cost(tree, id) -> int`, `prereq_status(profile, tree, id)`,
+## `can_buy(profile, tree, id) -> Reason`, `buy(...)`, `spent_coins`, `respec`.
 
 const NUCLEI_LEVEL := 3  ## nível da conta que libera os Núcleos (decisão 63)
 
-enum Reason { OK, MAX, LOCKED_PREREQ, NO_COINS, FEATURE_LOCKED, UNKNOWN }
+enum Reason { OK, OWNED, LOCKED_PREREQ, NO_COINS, FEATURE_LOCKED, UNKNOWN }
 
 
+static func owned(profile: PlayerProfile, id: StringName) -> bool:
+	return int(profile.talents.get(id, 0)) >= 1
+
+
+## 0 ou 1. Compatibilidade com a UI antiga; prefira `owned`.
 static func level(profile: PlayerProfile, id: StringName) -> int:
-	return int(profile.talents.get(id, 0))
+	return 1 if owned(profile, id) else 0
 
 
-## Custo do próximo nível (0 se desconhecido ou já no máximo).
-static func next_cost(profile: PlayerProfile, tree: TalentTree, id: StringName) -> int:
+## Custo do Núcleo (0 se desconhecido).
+static func cost(tree: TalentTree, id: StringName) -> int:
 	var t := tree.get_talent(id)
-	if t == null:
-		return 0
-	var lv := level(profile, id)
-	return t.costs[lv] if lv < t.max_level() else 0
+	return t.cost if t != null else 0
 
 
-## Pré-requisitos que faltam: `[{id, need, have}]` (vazio = todos ok).
+## Custo ainda a pagar (0 se desconhecido ou já comprado). Compatibilidade com a UI antiga.
+static func next_cost(profile: PlayerProfile, tree: TalentTree, id: StringName) -> int:
+	return 0 if owned(profile, id) else cost(tree, id)
+
+
+## Pré-requisitos não comprados: `[{id}]` (vazio = todos ok).
 static func prereq_status(profile: PlayerProfile, tree: TalentTree, id: StringName) -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
 	var t := tree.get_talent(id)
 	if t == null:
 		return out
-	for i in t.prereq_ids.size():
-		var need := t.prereq_levels[i]
-		var have := level(profile, t.prereq_ids[i])
-		if have < need:
-			out.append({"id": t.prereq_ids[i], "need": need, "have": have})
+	for p in t.prereq_ids:
+		if not owned(profile, p):
+			out.append({"id": p})
 	return out
 
 
-## Motivo da compra: `Reason.OK` se pode comprar o próximo nível agora.
+## Motivo da compra: `Reason.OK` se pode comprar agora.
 static func can_buy(profile: PlayerProfile, tree: TalentTree, id: StringName, min_level := NUCLEI_LEVEL) -> Reason:
 	var t := tree.get_talent(id)
 	if t == null:
 		return Reason.UNKNOWN
 	if profile.level < min_level:
 		return Reason.FEATURE_LOCKED
-	if level(profile, id) >= t.max_level():
-		return Reason.MAX
+	if owned(profile, id):
+		return Reason.OWNED
 	if not prereq_status(profile, tree, id).is_empty():
 		return Reason.LOCKED_PREREQ
-	if profile.coins < next_cost(profile, tree, id):
+	if profile.coins < t.cost:
 		return Reason.NO_COINS
 	return Reason.OK
 
 
-## Compra +1 nível, tudo ou nada. Retorna `{ok, reason, cost, level}`.
+## Compra o Núcleo, tudo ou nada. Retorna `{ok, reason, cost}`.
 static func buy(profile: PlayerProfile, tree: TalentTree, id: StringName, min_level := NUCLEI_LEVEL) -> Dictionary:
 	var r := can_buy(profile, tree, id, min_level)
 	if r != Reason.OK:
-		return {"ok": false, "reason": r, "cost": 0, "level": level(profile, id)}
-	var cost := next_cost(profile, tree, id)
-	profile.coins -= cost
-	profile.talents[id] = level(profile, id) + 1
-	return {"ok": true, "reason": Reason.OK, "cost": cost, "level": level(profile, id)}
+		return {"ok": false, "reason": r, "cost": 0}
+	var c := cost(tree, id)
+	profile.coins -= c
+	profile.talents[id] = 1
+	return {"ok": true, "reason": Reason.OK, "cost": c}
 
 
-## Moeda gasta nos níveis comprados, pelos custos da tabela atual.
+## Moeda gasta nos Núcleos comprados, pelos custos da tabela atual.
 static func spent_coins(profile: PlayerProfile, tree: TalentTree) -> int:
 	var s := 0
 	for id in profile.talents:
-		var t := tree.get_talent(id)
-		if t == null:
-			continue
-		for i in mini(level(profile, id), t.max_level()):
-			s += t.costs[i]
+		if owned(profile, id):
+			s += cost(tree, id)
 	return s
 
 

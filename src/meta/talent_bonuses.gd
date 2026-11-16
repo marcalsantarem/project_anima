@@ -17,7 +17,7 @@ static func sum_stat(talents: Dictionary, tree: TalentTree, stat: StringName) ->
 	var s := 0.0
 	for t in tree.talents:
 		if t.stat == stat:
-			s += t.value_at(clampi(int(talents.get(t.id, 0)), 0, t.max_level()))
+			s += t.value_at(int(talents.get(t.id, 0)))
 	return snappedf(s, 0.000001)
 
 

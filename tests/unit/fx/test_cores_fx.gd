@@ -119,7 +119,7 @@ func test_ignores_nodes_outside_tree() -> void:
 func test_cores_screen_hooks() -> void:
 	var p := PlayerProfile.new()
 	p.level = 3
-	p.coins = 60
+	p.coins = 600
 	var s: CoresScreen = preload("res://src/ui/screens/cores_screen.tscn").instantiate()
 	s.setup(p, preload("res://data/talents/talent_tree.tres"), func(_p: PlayerProfile) -> bool: return true)
 	add_child_autofree(s)
@@ -128,6 +128,7 @@ func test_cores_screen_hooks() -> void:
 	assert_true(s.buy_selected())
 	assert_gt(_count(s._nodes[&"talent_sharp_core"]), 0, "compra: pulso no nó")
 	assert_gt(_count(s._tree_root), 0, "desbloqueio: trilho na ligação")
+	s.select(&"talent_quick_pulse")
 	var x := s.buy_button.position.x
 	var click := InputEventMouseButton.new()
 	click.button_index = MOUSE_BUTTON_LEFT

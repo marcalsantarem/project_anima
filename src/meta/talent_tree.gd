@@ -14,16 +14,15 @@ func get_talent(id: StringName) -> TalentData:
 	return null
 
 
-## Soma dos custos de todos os níveis (Moeda para completar a árvore).
+## Soma dos custos de todos os Núcleos (Moeda para completar a árvore).
 func total_cost() -> int:
 	var s := 0
 	for t in talents:
-		for c in t.costs:
-			s += c
+		s += t.cost
 	return s
 
 
-## Lista de erros (vazia = válido): ids únicos, pré-requisitos existentes e dentro do nível máximo, sem ciclos.
+## Lista de erros (vazia = válido): ids únicos, pré-requisitos existentes, sem ciclos.
 func validate() -> PackedStringArray:
 	var errors := PackedStringArray()
 	var by_id := {}
@@ -40,11 +39,8 @@ func validate() -> PackedStringArray:
 			errors.append("%s: ramo %s sem nome" % [t.id, t.branch])
 	for t in talents:
 		for i in t.prereq_ids.size():
-			var p: TalentData = by_id.get(t.prereq_ids[i])
-			if p == null:
+			if not by_id.has(t.prereq_ids[i]):
 				errors.append("%s: pré-requisito %s não existe" % [t.id, t.prereq_ids[i]])
-			elif i < t.prereq_levels.size() and (t.prereq_levels[i] < 1 or t.prereq_levels[i] > p.max_level()):
-				errors.append("%s: nível %d fora de 1..%d em %s" % [t.id, t.prereq_levels[i], p.max_level(), p.id])
 	if _has_cycle(by_id):
 		errors.append("ciclo nos pré-requisitos")
 	return errors

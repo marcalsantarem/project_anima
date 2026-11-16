@@ -108,7 +108,7 @@ static func is_valid_date(s: String) -> bool:
 	re.compile("^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])$")
 	return re.search(s) != null
 
-## Níveis negativos viram 0; com a árvore, ids desconhecidos saem e o nível fica em 0..máx.
+## Núcleo de compra única: nível >= 1 (save antigo) vira 1 (comprado); <= 0 sai. Com a árvore, ids desconhecidos saem.
 func _sanitize_talents(tree: TalentTree) -> void:
 	var clean := {}
 	for k in talents:
@@ -117,7 +117,6 @@ func _sanitize_talents(tree: TalentTree) -> void:
 			var t := tree.get_talent(StringName(k))
 			if t == null:
 				continue
-			lv = mini(lv, t.max_level())
 		if lv > 0:
-			clean[StringName(k)] = lv
+			clean[StringName(k)] = 1
 	talents = clean

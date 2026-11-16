@@ -1,8 +1,8 @@
 class_name CoresScreen
 extends Control
 ## Tela do destino Núcleos do hangar (T-207, BRF-155; docs/ui.md §8c, arte §11.10, assets/ui/README.md).
-## Topo com Voltar, título e saldo de Moeda; árvore 3 × 4 (molduras por estado, selos "n/máx", ligações
-## `Line2D` acesas quando o pré-requisito está cumprido); painel de detalhe com Comprar e Redistribuir
+## Topo com Voltar, título e saldo de Moeda; árvore 3 × 4 (molduras por estado, sem níveis: cada Núcleo é
+## uma compra única; ligações `Line2D` acesas quando o pré-requisito está comprado); detalhe com Comprar e Redistribuir
 ## (com confirmação). A lógica é do `MetaTalents`; a tela só chama a API e salva pelo `Backend`.
 ## Dados por `setup(profile, tree, save)` (testes) ou, sem setup, do `SceneFlow` ao entrar na árvore.
 ## Teclado: Input Actions de UI (`ui_up/down/left/right` navegam, `ui_accept` num nó vai ao Comprar).
@@ -11,19 +11,14 @@ signal back_requested
 ## Compra ou respec aplicados (e salvos).
 signal profile_changed
 
-enum NodeState { LOCKED, NORMAL, OWNED, MAX }
+enum NodeState { LOCKED, NORMAL, NO_COINS, OWNED }
 
 ## Chaves de tradução (Loc.t).
 const TXT_BACK := "COMMON_BACK"
 const TXT_TITLE := "HANGAR_TAB_CORES"
-const TXT_MAX := "COMMON_MAX"
 const TXT_BUY := "CORES_BUY"
-const TXT_CHIP := "CORES_CHIP"
-const TXT_LEVEL := "CORES_LEVEL"
-const TXT_NOW := "CORES_EFFECT_NOW"
-const TXT_NEXT := "CORES_EFFECT_NEXT"
-const TXT_NONE := "CORES_EFFECT_NONE"
-const TXT_MAXED := "CORES_MAXED"
+const TXT_OWNED := "CORES_OWNED"
+const TXT_EFFECT := "CORES_EFFECT"
 const TXT_NO_COINS := "CORES_NO_COINS"
 const TXT_NEEDS := "CORES_NEEDS"
 const TXT_NEEDS_SEP := "CORES_NEEDS_SEP"
@@ -39,7 +34,6 @@ const HOLO_TEXT := Color("#E6FFFF")
 const HOLO_TEXT2 := Color("#9FF6FF")
 const HOLO_MUTED := Color("#7FA3B8")
 const HOLO_INK := Color("#03202E")
-const CHIP_LOCKED := Color("#5F7A92")
 const WARN := Color("#FFB86B")
 const BRANCH_COLORS := {&"attack": Color("#FF9F43"), &"defense": Color("#4F8DFF"), &"economy": Color("#E07BFF")}
 ## Atributos com valor aditivo puro (o resto é percentual, em fração).
@@ -54,9 +48,8 @@ const ROW_STEP := 200.0
 const BTN := 128.0 ## alvo de toque do nó (moldura 112 centrada)
 const FRAME := 112.0
 const ICON := 64.0
-const CHIP := Vector2(68.0, 28.0)
 const ROUTE_DX := 112.0 ## meio passo: rota por fora da ligação que cortaria um nó
-const ROUTE_DY := 92.0 ## abaixo do selo
+const ROUTE_DY := 92.0 ## abaixo do nó
 const TREE_H := ROW0_Y + 3.0 * ROW_STEP + ROUTE_DY + 16.0
 const LINK_W := 24.0
 
@@ -72,9 +65,7 @@ const ASSET_DIR := "res://assets/ui/"
 const T_NODE := preload("res://assets/ui/ui_talent_node.png")
 const T_NODE_SELECTED := preload("res://assets/ui/ui_talent_node_selected.png")
 const T_NODE_OWNED := preload("res://assets/ui/ui_talent_node_owned.png")
-const T_NODE_MAX := preload("res://assets/ui/ui_talent_node_max.png")
 const T_NODE_LOCKED := preload("res://assets/ui/ui_talent_node_locked.png")
-const T_CHIP := preload("res://assets/ui/ui_talent_level_chip.png")
 const T_LINK_ON := preload("res://assets/ui/ui_talent_link_h_on.png")
 const T_LINK_OFF := preload("res://assets/ui/ui_talent_link_h_off.png")
 const T_COIN := preload("res://assets/ui/ui_icon_coin_small.png")
@@ -107,7 +98,7 @@ var confirm_button: Button
 
 var _built := false
 var _nodes: Dictionary = {}  # StringName -> Button
-var _links: Array[Dictionary] = []  # {from, to, need, line}
+var _links: Array[Dictionary] = []  # {from, to, line}
 var _column: VBoxContainer
 var _top: HBoxContainer
 var _back: Button
@@ -124,6 +115,7 @@ var _gap: Control
 var _confirm_panel: PanelContainer
 var _cancel_button: Button
 var _bold: Font
+var _blocked_bar: Node
 var _margins: Array[MarginContainer] = []
 
 
@@ -158,52 +150,54 @@ func _ready() -> void:
 # --- Estado (estático, testável) ---------------------------------------------------------------
 
 static func node_state(p: PlayerProfile, t: TalentTree, id: StringName) -> NodeState:
-	var data := t.get_talent(id)
-	var lv := MetaTalents.level(p, id)
-	if data != null and lv >= data.max_level():
-		return NodeState.MAX
-	if lv >= 1:
+	if is_owned(p, id):
 		return NodeState.OWNED
 	if not MetaTalents.prereq_status(p, t, id).is_empty():
 		return NodeState.LOCKED
+	if p.coins < cost_of(p, t, id):
+		return NodeState.NO_COINS
 	return NodeState.NORMAL
 
 
-## Efeito acumulado no nível dado, em texto ("+8%", "−4%", "+6"); nível 0 = "nenhum".
-static func effect_text(data: TalentData, level: int) -> String:
-	if level <= 0:
-		return Loc.t(TXT_NONE)
-	var v := data.value_at(level)
+static func is_owned(p: PlayerProfile, id: StringName) -> bool:
+	return MetaTalents.owned(p, id)
+
+
+static func cost_of(p: PlayerProfile, t: TalentTree, id: StringName) -> int:
+	return MetaTalents.cost(t, id)
+
+
+## Efeito do Núcleo, em texto ("+8%", "−4%", "+6").
+static func effect_text(data: TalentData) -> String:
+	var v := data.value
 	if data.stat in FLAT_STATS:
 		return "+%d" % roundi(v)
 	var pct := roundi(v * 100.0)
 	return ("−%d%%" if data.mode == TalentData.Mode.REDUCTION_PCT else "+%d%%") % pct
 
 
-## Texto do motivo de não poder comprar ("" se pode).
+## Texto do motivo de não poder comprar ("" se pode ou se já é dono).
 static func reason_text(p: PlayerProfile, t: TalentTree, id: StringName) -> String:
+	if is_owned(p, id):
+		return ""
 	match MetaTalents.can_buy(p, t, id):
-		MetaTalents.Reason.OK:
-			return ""
-		MetaTalents.Reason.MAX:
-			return Loc.t(TXT_MAXED)
 		MetaTalents.Reason.FEATURE_LOCKED:
 			return Loc.t(TXT_FEATURE, {"level": MetaTalents.NUCLEI_LEVEL})
 		MetaTalents.Reason.NO_COINS:
-			return Loc.t(TXT_NO_COINS, {"coins": MenuScreen.format_number(MetaTalents.next_cost(p, t, id) - p.coins)})
+			return Loc.t(TXT_NO_COINS, {"coins": MenuScreen.format_number(cost_of(p, t, id) - p.coins)})
 		MetaTalents.Reason.LOCKED_PREREQ:
 			var parts := PackedStringArray()
 			for miss: Dictionary in MetaTalents.prereq_status(p, t, id):
 				var pd := t.get_talent(StringName(miss["id"]))
 				var pname := Loc.t(pd.name_key) if pd != null else String(miss["id"])
-				parts.append(Loc.t(TXT_NEEDS, {"name": pname, "level": int(miss["need"])}))
+				parts.append(Loc.t(TXT_NEEDS, {"name": pname}))
 			return Loc.t(TXT_NEEDS_SEP).join(parts)
 	return ""
 
 
 static func has_any_talent(p: PlayerProfile, t: TalentTree) -> bool:
 	for data in t.talents:
-		if MetaTalents.level(p, data.id) > 0:
+		if is_owned(p, data.id):
 			return true
 	return false
 
@@ -233,30 +227,27 @@ func select(id: StringName) -> void:
 	refresh()
 
 
-## Compra +1 nível do nó selecionado. Retorna `true` se comprou (e salvou).
+## Compra o Núcleo selecionado. Retorna `true` se comprou (e salvou).
 func buy_selected() -> bool:
 	if selected == &"":
 		return false
 	CoresFx.reduced_effects = DebugSettings.reduced_effects()
 	var res := MetaTalents.buy(profile, tree, selected)
 	if not bool(res["ok"]):
-		if int(res["reason"]) != MetaTalents.Reason.MAX:
+		if not is_owned(profile, selected):
 			CoresFx.play_fail(buy_button)
 		return false
 	_after_change()
-	_play_buy_fx(selected, int(res["level"]))
+	_play_buy_fx(selected)
 	return true
 
 
-## T-208: pulso (ou máximo) no nó comprado e trilho de luz nas ligações que acabaram de acender.
-func _play_buy_fx(id: StringName, lv: int) -> void:
+## T-208: pulso no nó comprado e trilho de luz nas ligações que acabaram de acender.
+func _play_buy_fx(id: StringName) -> void:
 	var color: Color = BRANCH_COLORS.get(tree.get_talent(id).branch, HOLO_TEXT2)
-	if node_state(profile, tree, id) == NodeState.MAX:
-		CoresFx.play_max(_nodes.get(id), T_NODE_MAX)
-	else:
-		CoresFx.play_buy(_nodes.get(id), color)
+	CoresFx.play_buy(_nodes.get(id), color)
 	for link in _links:
-		if link["from"] == id and int(link["need"]) == lv:
+		if link["from"] == id:
 			var to: StringName = link["to"]
 			CoresFx.play_unlock(link["line"], null if node_state(profile, tree, to) == NodeState.LOCKED else _nodes.get(to), color)
 
@@ -274,11 +265,13 @@ func request_respec() -> void:
 		return
 	confirm_label.text = Loc.t(TXT_RESPEC_ASK, {"coins": MenuScreen.format_number(MetaTalents.spent_coins(profile, tree))})
 	confirm_box.visible = true
+	_block_bar(true)
 	_cancel_button.grab_focus()
 
 
 func cancel_respec() -> void:
 	confirm_box.visible = false
+	_block_bar(false)
 	if respec_button.focus_mode != FOCUS_NONE and not respec_button.disabled:
 		respec_button.grab_focus()
 	else:
@@ -288,14 +281,32 @@ func cancel_respec() -> void:
 ## Aplica o respec (100% de reembolso) e salva. Retorna o reembolso.
 func confirm_respec() -> int:
 	confirm_box.visible = false
+	_block_bar(false)
 	CoresFx.reduced_effects = DebugSettings.reduced_effects()
 	var coins_before := profile.coins
-	var owned: Array = tree.talents.filter(func(d: TalentData) -> bool: return MetaTalents.level(profile, d.id) > 0).map(func(d: TalentData) -> Variant: return _nodes.get(d.id))
+	var owned: Array = tree.talents.filter(func(d: TalentData) -> bool: return is_owned(profile, d.id)).map(func(d: TalentData) -> Variant: return _nodes.get(d.id))
 	var refund := MetaTalents.respec(profile, tree)
 	_after_change()
 	CoresFx.play_respec(owned, coins_label, coins_before, profile.coins, func(v: int) -> String: return MenuScreen.format_number(v))
 	_focus_selected()
 	return refund
+
+
+## Enquanto a confirmação está aberta, a barra do hangar (irmã desta tela, acima dela) não recebe toque.
+func _block_bar(on: bool) -> void:
+	if _blocked_bar != null and is_instance_valid(_blocked_bar):
+		_blocked_bar.process_mode = Node.PROCESS_MODE_INHERIT
+	_blocked_bar = null
+	if not on or get_parent() == null:
+		return
+	for sib in get_parent().get_children():
+		if sib is HangarBar:
+			sib.process_mode = Node.PROCESS_MODE_DISABLED
+			_blocked_bar = sib
+
+
+func _exit_tree() -> void:
+	_block_bar(false)
 
 
 func _after_change() -> void:
@@ -336,8 +347,7 @@ func refresh() -> void:
 	for id: StringName in _nodes:
 		_apply_node(id, _nodes[id])
 	for link in _links:
-		var parent_lv := MetaTalents.level(profile, link["from"])
-		(link["line"] as Line2D).texture = T_LINK_ON if parent_lv >= int(link["need"]) else T_LINK_OFF
+		(link["line"] as Line2D).texture = T_LINK_ON if is_owned(profile, link["from"]) else T_LINK_OFF
 	respec_button.disabled = not has_any_talent(profile, tree)
 	_apply_detail()
 
@@ -349,9 +359,9 @@ func _apply_node(id: StringName, b: Button) -> void:
 	frame.texture = T_NODE_SELECTED if id == selected else _frame_tex(st)
 	var icon: TextureRect = b.get_node(^"Icon")
 	icon.texture = _icon_tex(data, st == NodeState.LOCKED)
-	var chip_label: Label = b.get_node(^"Chip/Text")
-	chip_label.text = Loc.t(TXT_CHIP, {"level": MetaTalents.level(profile, id), "max": data.max_level()})
-	chip_label.add_theme_color_override("font_color", CHIP_LOCKED if st == NodeState.LOCKED else HOLO_TEXT)
+	var dim := Color(1, 1, 1, 0.6) if st == NodeState.NO_COINS else Color.WHITE
+	frame.modulate = dim
+	icon.modulate = dim
 	b.tooltip_text = Loc.t(data.name_key)
 
 
@@ -361,23 +371,19 @@ func _apply_detail() -> void:
 	if data == null:
 		return
 	var st := node_state(profile, tree, selected)
-	var lv := MetaTalents.level(profile, selected)
 	_detail_frame.texture = _frame_tex(st)
 	_detail_icon.texture = _icon_tex(data, st == NodeState.LOCKED)
 	detail_name.text = Loc.t(data.name_key)
 	var branch_key: String = str(tree.branch_name_keys.get(String(data.branch), ""))
-	detail_sub.text = Loc.t(TXT_LEVEL, {"branch": Loc.t(branch_key).to_upper(), "level": lv, "max": data.max_level()})
+	detail_sub.text = Loc.t(branch_key).to_upper()
 	detail_sub.add_theme_color_override("font_color", BRANCH_COLORS.get(data.branch, HOLO_TEXT2) as Color)
 	detail_desc.text = Loc.t(data.desc_key)
-	var effect := Loc.t(TXT_NOW, {"value": effect_text(data, lv)})
-	if lv < data.max_level():
-		effect += "  ·  " + Loc.t(TXT_NEXT, {"value": effect_text(data, lv + 1)})
-	detail_effect.text = effect
+	detail_effect.text = Loc.t(TXT_EFFECT, {"value": effect_text(data)})
 	var reason := reason_text(profile, tree, selected)
 	detail_need.text = reason
-	var maxed := lv >= data.max_level()
-	buy_button.text = Loc.t(TXT_MAX) if maxed else Loc.t(TXT_BUY, {"cost": MenuScreen.format_number(MetaTalents.next_cost(profile, tree, selected))})
-	buy_button.disabled = reason != ""
+	var owned := st == NodeState.OWNED
+	buy_button.text = Loc.t(TXT_OWNED) if owned else Loc.t(TXT_BUY, {"cost": MenuScreen.format_number(cost_of(profile, tree, selected))})
+	buy_button.disabled = owned or reason != ""
 	buy_button.focus_mode = FOCUS_NONE if buy_button.disabled else FOCUS_ALL
 
 
@@ -387,8 +393,6 @@ func _frame_tex(st: NodeState) -> Texture2D:
 			return T_NODE_LOCKED
 		NodeState.OWNED:
 			return T_NODE_OWNED
-		NodeState.MAX:
-			return T_NODE_MAX
 	return T_NODE
 
 
@@ -648,8 +652,7 @@ func _rebuild_tree() -> void:
 			line.begin_cap_mode = Line2D.LINE_CAP_NONE
 			line.end_cap_mode = Line2D.LINE_CAP_NONE
 			_tree_root.add_child(line)
-			var need := data.prereq_levels[i] if i < data.prereq_levels.size() else 1
-			_links.append({"from": parent.id, "to": data.id, "need": need, "line": line})
+			_links.append({"from": parent.id, "to": data.id, "line": line})
 	for data in tree.talents:
 		var b := _make_node(data)
 		_tree_root.add_child(b)
@@ -676,24 +679,6 @@ func _make_node(data: TalentData) -> Button:
 	var icon := _rect(Vector2((BTN - ICON) / 2.0, (BTN - ICON) / 2.0 - 4.0), Vector2(ICON, ICON))
 	icon.name = "Icon"
 	b.add_child(icon)
-	var chip := NinePatchRect.new()
-	chip.name = "Chip"
-	chip.texture = T_CHIP
-	chip.patch_margin_left = 12
-	chip.patch_margin_right = 12
-	chip.patch_margin_top = 12
-	chip.patch_margin_bottom = 12
-	chip.mouse_filter = MOUSE_FILTER_IGNORE
-	chip.position = Vector2((BTN - CHIP.x) / 2.0, off + 8.0 + 96.0 - CHIP.y / 2.0)
-	chip.size = CHIP
-	b.add_child(chip)
-	var text := _label("", HOLO_TEXT, true)
-	text.name = "Text"
-	text.set_anchors_preset(PRESET_FULL_RECT)
-	text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	text.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	text.add_theme_font_size_override("font_size", 20)
-	chip.add_child(text)
 	var id := data.id
 	b.focus_entered.connect(select.bind(id))
 	b.pressed.connect(select.bind(id))

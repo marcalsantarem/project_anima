@@ -14,27 +14,25 @@ enum Mode { ADD_PCT_BASE, ADD_FLAT, REDUCTION_PCT }
 @export var icon: Texture2D
 ## Posição na grade da UI: x = coluna, y = linha (0 = camada raiz, no topo).
 @export var grid_pos: Vector2i = Vector2i.ZERO
-## Pré-requisitos: `prereq_ids[i]` precisa estar no nível `prereq_levels[i]` ou mais.
+## Pré-requisitos: todos os `prereq_ids` precisam estar comprados.
 @export var prereq_ids: Array[StringName] = []
-@export var prereq_levels: PackedInt32Array = PackedInt32Array()
 ## Atributo afetado e como o valor entra (ver docs/meta.md).
 @export var stat: StringName = &""
 @export var mode: Mode = Mode.ADD_PCT_BASE
-## Efeito **acumulado** em cada nível (índice 0 = nível 1). Percentuais em fração (0,04 = 4%).
-@export var values: PackedFloat32Array = PackedFloat32Array()
-## Custo em Moeda para comprar cada nível (índice 0 = nível 1).
-@export var costs: PackedInt32Array = PackedInt32Array()
+## Efeito do Núcleo comprado (compra única, sem níveis). Percentuais em fração (0,25 = 25%).
+@export var value: float = 0.0
+## Custo único em Moeda.
+@export var cost: int = 0
 
 
+## Sempre 1 (compra única). Mantido só por compatibilidade com a UI antiga.
 func max_level() -> int:
-	return costs.size()
+	return 1
 
 
-## Efeito acumulado no nível `level` (0 = sem efeito).
+## Efeito com o Núcleo `owned` (comprado) ou 0.
 func value_at(level: int) -> float:
-	if level <= 0 or values.is_empty():
-		return 0.0
-	return values[mini(level, values.size()) - 1]
+	return value if level >= 1 else 0.0
 
 
 ## Lista de erros do próprio talento (vazia = válido). Referências entre talentos: `TalentTree.validate()`.
@@ -46,18 +44,10 @@ func validate() -> PackedStringArray:
 		errors.append("%s sem ramo" % id)
 	if name_key == "" or desc_key == "":
 		errors.append("%s sem name_key/desc_key" % id)
-	if costs.is_empty():
-		errors.append("%s sem níveis" % id)
-	if values.size() != costs.size():
-		errors.append("%s: values e costs com tamanhos diferentes" % id)
-	for c in costs:
-		if c <= 0:
-			errors.append("%s: custo <= 0" % id)
-	for i in range(1, costs.size()):
-		if costs[i] < costs[i - 1]:
-			errors.append("%s: custo cai no nível %d" % [id, i + 1])
-	if prereq_ids.size() != prereq_levels.size():
-		errors.append("%s: prereq_ids e prereq_levels com tamanhos diferentes" % id)
+	if cost <= 0:
+		errors.append("%s: custo <= 0" % id)
+	if value <= 0.0:
+		errors.append("%s: valor <= 0" % id)
 	if grid_pos.x < 0 or grid_pos.y < 0:
 		errors.append("%s: grid_pos negativa" % id)
 	return errors

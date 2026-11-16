@@ -1,5 +1,5 @@
 extends GutTest
-## T-207 (BRF-155): tela de Núcleos. Estados do nó por perfil, detalhe, compra (atualiza a UI e salva),
+## T-207/T-299 (BRF-155, BRF-159): tela de Núcleos (compra única, sem níveis). Estados do nó por perfil, detalhe, compra (atualiza a UI e salva),
 ## respec com confirmação e navegação por Input Actions de UI.
 
 const SCREEN := preload("res://src/ui/screens/cores_screen.tscn")
@@ -38,37 +38,34 @@ func _frame(s: CoresScreen, id: StringName) -> Texture2D:
 	return (b.get_node(^"Frame") as TextureRect).texture
 
 
-func _chip(s: CoresScreen, id: StringName) -> String:
-	var b: Button = s._nodes[id]
-	return (b.get_node(^"Chip/Text") as Label).text
-
-
 func test_node_states_by_profile() -> void:
-	var p := _profile(3, 0, {&"talent_sharp_core": 2, &"talent_hardened_shell": 5})
+	var p := _profile(3, 600, {&"talent_sharp_core": 1, &"talent_hardened_shell": 1})
 	assert_eq(CoresScreen.node_state(p, TREE, &"talent_sharp_core"), CoresScreen.NodeState.OWNED)
-	assert_eq(CoresScreen.node_state(p, TREE, &"talent_hardened_shell"), CoresScreen.NodeState.MAX)
+	assert_eq(CoresScreen.node_state(p, TREE, &"talent_hardened_shell"), CoresScreen.NodeState.OWNED)
 	assert_eq(CoresScreen.node_state(p, TREE, &"talent_particle_magnet"), CoresScreen.NodeState.NORMAL)
 	assert_eq(CoresScreen.node_state(p, TREE, &"talent_arcane_burst"), CoresScreen.NodeState.LOCKED)
-	assert_eq(CoresScreen.node_state(p, TREE, &"talent_quick_pulse"), CoresScreen.NodeState.NORMAL)
+	assert_eq(CoresScreen.node_state(p, TREE, &"talent_quick_pulse"), CoresScreen.NodeState.NO_COINS, "disponível, mas 1195 > 600")
 
 
-func test_tree_frames_chips_and_links() -> void:
-	var s := await _screen(_profile(3, 0, {&"talent_sharp_core": 2, &"talent_hardened_shell": 5}))
+func test_tree_frames_and_links() -> void:
+	var s := await _screen(_profile(3, 600, {&"talent_sharp_core": 1, &"talent_hardened_shell": 1}))
 	assert_eq(s._nodes.size(), 12)
 	assert_eq(s.selected, &"talent_sharp_core", "1º nó selecionado ao abrir")
 	assert_eq(_frame(s, &"talent_sharp_core"), CoresScreen.T_NODE_SELECTED)
-	assert_eq(_frame(s, &"talent_hardened_shell"), CoresScreen.T_NODE_MAX)
+	assert_eq(_frame(s, &"talent_hardened_shell"), CoresScreen.T_NODE_OWNED)
 	assert_eq(_frame(s, &"talent_particle_magnet"), CoresScreen.T_NODE)
 	assert_eq(_frame(s, &"talent_wave_mend"), CoresScreen.T_NODE_LOCKED)
-	assert_eq(_chip(s, &"talent_sharp_core"), "2/5")
-	assert_eq(_chip(s, &"talent_golden_core"), "0/3")
+	var dim: float = (s._nodes[&"talent_quick_pulse"].get_node(^"Frame") as TextureRect).modulate.a
+	assert_lt(dim, 1.0, "sem Moeda fica apagado")
+	assert_eq((s._nodes[&"talent_particle_magnet"].get_node(^"Frame") as TextureRect).modulate.a, 1.0)
+	assert_null(s._nodes[&"talent_sharp_core"].get_node_or_null(^"Chip"), "sem selo de nível")
 	var icon: TextureRect = (s._nodes[&"talent_wave_mend"] as Button).get_node(^"Icon")
 	assert_string_contains(icon.texture.resource_path, "_off")
-	# 9 ligações verticais + 3 entre ramos; acesa = pré-requisito cumprido.
+	# Ligações por pré-requisito; acesa = pai comprado.
 	assert_eq(s._links.size(), 12)
 	for link in s._links:
 		var line: Line2D = link["line"]
-		var on: bool = MetaTalents.level(s.profile, link["from"]) >= int(link["need"])
+		var on := MetaTalents.owned(s.profile, link["from"])
 		assert_eq(line.texture, CoresScreen.T_LINK_ON if on else CoresScreen.T_LINK_OFF, "ligação %s" % line.name)
 	var route := CoresScreen.link_points(Vector2i(0, 1), Vector2i(2, 3))
 	assert_eq(route.size(), 5, "quick_pulse → golden_core contorna por fora")
@@ -87,34 +84,34 @@ func test_detail_no_coins() -> void:
 	var s := await _screen(_profile(3, 30))
 	s.select(&"talent_sharp_core")
 	assert_eq(s.detail_name.text, "Núcleo Afiado")
-	assert_eq(s.detail_sub.text, "ATAQUE · NV 0/5")
-	assert_eq(s.detail_effect.text, "Atual: nenhum  ·  Próximo: +8%")  # raiz com Nv 1 dobrado (T-209)
-	assert_eq(s.buy_button.text, "COMPRAR · 50")
+	assert_eq(s.detail_sub.text, "ATAQUE")
+	assert_eq(s.detail_effect.text, "Efeito: +20%")
+	assert_eq(s.buy_button.text, "COMPRAR · 500")
 	assert_true(s.buy_button.disabled)
-	assert_eq(s.detail_need.text, "Faltam 20 Moedas")
+	assert_eq(s.detail_need.text, "Faltam 470 Moedas")
 
 
-func test_detail_prereq_and_max() -> void:
-	var s := await _screen(_profile(3, 5000, {&"talent_arcane_burst": 3}))
+func test_detail_prereq_and_owned() -> void:
+	var s := await _screen(_profile(3, 5000, {&"talent_arcane_burst": 1}))
 	s.select(&"talent_piercing_ray")
 	assert_true(s.buy_button.disabled)
-	assert_eq(s.detail_need.text, "Requer Desvio NV 1")
+	assert_eq(s.detail_need.text, "Requer Desvio")
 	s.select(&"talent_deflect")
-	assert_eq(s.detail_need.text, "Requer Casca Reforçada NV 1")
+	assert_eq(s.detail_need.text, "Requer Casca Reforçada")
 	var p := _profile(3, 0, {&"talent_bastion": 1})
 	s.setup(p, TREE, _save)
 	s.select(&"talent_bastion")
-	assert_eq(s.buy_button.text, "MAX")
+	assert_eq(s.buy_button.text, "COMPRADO")
 	assert_true(s.buy_button.disabled)
-	assert_eq(s.detail_need.text, "Nível máximo")
-	assert_eq(s.detail_effect.text, "Atual: +15%")
+	assert_eq(s.detail_need.text, "")
+	assert_eq(s.detail_effect.text, "Efeito: +15%")
 
 
 func test_effect_text_formats() -> void:
-	assert_eq(CoresScreen.effect_text(TREE.get_talent(&"talent_deflect"), 2), "−4%")
-	assert_eq(CoresScreen.effect_text(TREE.get_talent(&"talent_seed_charge"), 3), "+9")
-	assert_eq(CoresScreen.effect_text(TREE.get_talent(&"talent_piercing_ray"), 1), "+1")
-	assert_eq(CoresScreen.effect_text(TREE.get_talent(&"talent_wave_mend"), 5), "+10%")
+	assert_eq(CoresScreen.effect_text(TREE.get_talent(&"talent_deflect")), "−10%")
+	assert_eq(CoresScreen.effect_text(TREE.get_talent(&"talent_seed_charge")), "+15")
+	assert_eq(CoresScreen.effect_text(TREE.get_talent(&"talent_piercing_ray")), "+1")
+	assert_eq(CoresScreen.effect_text(TREE.get_talent(&"talent_wave_mend")), "+10%")
 
 
 func test_feature_locked_below_level_3() -> void:
@@ -126,22 +123,23 @@ func test_feature_locked_below_level_3() -> void:
 
 
 func test_buy_updates_ui_and_saves() -> void:
-	var p := _profile(3, 200)
+	var p := _profile(3, 700)
 	var s := await _screen(p)
 	watch_signals(s)
 	s.select(&"talent_sharp_core")
 	assert_false(s.buy_button.disabled)
 	s.buy_button.pressed.emit()
-	assert_eq(MetaTalents.level(p, &"talent_sharp_core"), 1)
-	assert_eq(p.coins, 150)
+	assert_true(MetaTalents.owned(p, &"talent_sharp_core"))
+	assert_eq(p.coins, 200)
 	assert_eq(_saves.size(), 1, "salvou uma vez")
-	assert_eq(s.coins_label.text, "150")
-	assert_eq(_chip(s, &"talent_sharp_core"), "1/5")
-	assert_eq(s.detail_sub.text, "ATAQUE · NV 1/5")
-	assert_eq(s.buy_button.text, "COMPRAR · 70")
+	assert_eq(s.coins_label.text, "200")
+	assert_eq(s.buy_button.text, "COMPRADO")
+	assert_true(s.buy_button.disabled)
+	assert_false(s.buy_selected(), "comprar de novo não faz nada")
+	assert_eq(_saves.size(), 1)
 	assert_signal_emitted(s, "profile_changed")
-	# Pré-requisito cumprido: Pulso Veloz desbloqueia e a ligação acende.
-	assert_eq(_frame(s, &"talent_quick_pulse"), CoresScreen.T_NODE)
+	# Pré-requisito comprado: Pulso Veloz desbloqueia (sem Moeda: 1195 > 200) e a ligação acende.
+	assert_eq(CoresScreen.node_state(p, TREE, &"talent_quick_pulse"), CoresScreen.NodeState.NO_COINS)
 	for link in s._links:
 		if link["from"] == &"talent_sharp_core" and link["to"] == &"talent_quick_pulse":
 			assert_eq((link["line"] as Line2D).texture, CoresScreen.T_LINK_ON)
@@ -150,24 +148,24 @@ func test_buy_updates_ui_and_saves() -> void:
 
 
 func test_respec_confirm_refunds_and_saves() -> void:
-	var p := _profile(3, 10, {&"talent_sharp_core": 2, &"talent_quick_pulse": 1})
+	var p := _profile(3, 10, {&"talent_sharp_core": 1, &"talent_quick_pulse": 1})
 	var s := await _screen(p)
 	assert_false(s.respec_button.disabled)
 	s.respec_button.pressed.emit()
 	assert_true(s.confirm_box.visible)
-	assert_eq(s.confirm_label.text, "Devolve 240 Moedas e zera os Núcleos.")
+	assert_eq(s.confirm_label.text, "Devolve 1.695 Moedas e zera os Núcleos.")
 	s.cancel_respec()
 	assert_false(s.confirm_box.visible)
 	assert_eq(_saves.size(), 0, "cancelar não salva")
 	s.respec_button.pressed.emit()
 	s.confirm_button.pressed.emit()
 	assert_false(s.confirm_box.visible)
-	assert_eq(p.coins, 250)
+	assert_eq(p.coins, 1705)
 	assert_true(p.talents.is_empty())
 	assert_eq(_saves.size(), 1)
-	assert_eq(s.coins_label.text, "250")
+	assert_eq(s.coins_label.text, "1.705")
 	assert_true(s.respec_button.disabled, "sem Núcleos comprados")
-	assert_eq(_chip(s, &"talent_sharp_core"), "0/5")
+	assert_eq(CoresScreen.node_state(p, TREE, &"talent_sharp_core"), CoresScreen.NodeState.NORMAL)
 
 
 func test_respec_disabled_without_talents() -> void:
@@ -200,3 +198,18 @@ func test_state_preserved_across_visibility() -> void:
 	assert_eq(s.selected, &"talent_particle_magnet")
 	assert_same(s._nodes[&"talent_particle_magnet"], first, "não recria a árvore")
 	assert_eq(s.coins_label.text, "42", "atualiza ao voltar")
+
+
+func test_respec_confirm_blocks_hangar_bar() -> void:
+	var host := Control.new()
+	add_child_autofree(host)
+	var s: CoresScreen = SCREEN.instantiate()
+	s.setup(_profile(3, 0, {&"talent_sharp_core": 1}), TREE, _save)
+	host.add_child(s)
+	var bar := HangarBar.new()
+	host.add_child(bar)
+	await wait_process_frames(2)
+	s.request_respec()
+	assert_eq(bar.process_mode, Node.PROCESS_MODE_DISABLED, "barra bloqueada com a confirmação aberta")
+	s.cancel_respec()
+	assert_eq(bar.process_mode, Node.PROCESS_MODE_INHERIT)

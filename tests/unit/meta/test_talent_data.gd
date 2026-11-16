@@ -29,9 +29,8 @@ func test_ids_unique_and_prereqs_exist() -> void:
 func test_costs_positive_and_total() -> void:
 	var t := _tree()
 	for d in t.talents:
-		assert_gt(d.max_level(), 0)
-		for c in d.costs:
-			assert_gt(c, 0, d.id)
+		assert_gt(d.cost, 0, d.id)
+		assert_gt(d.value, 0.0, d.id)
 	assert_eq(t.total_cost(), 18355)
 
 
@@ -39,7 +38,7 @@ func test_roots_are_cheap() -> void:
 	var t := _tree()
 	for d in t.talents:
 		if d.prereq_ids.is_empty():
-			assert_lte(d.costs[0], 60, "raiz %s deve ser barata (1ª ou 2ª partida)" % d.id)
+			assert_lte(d.cost, 600, "raiz %s deve ser barata (1ª ou 2ª partida)" % d.id)
 
 
 func test_text_keys_exist_in_csv() -> void:
@@ -64,15 +63,13 @@ func test_validate_detects_cycle_and_missing() -> void:
 	a.branch = &"x"
 	a.name_key = "A"
 	a.desc_key = "B"
-	a.costs = PackedInt32Array([10])
-	a.values = PackedFloat32Array([1.0])
+	a.cost = 10
+	a.value = 1.0
 	var b := a.duplicate() as TalentData
 	b.id = &"talent_b"
 	b.grid_pos = Vector2i(1, 0)
 	a.prereq_ids = [&"talent_b"]
-	a.prereq_levels = PackedInt32Array([1])
 	b.prereq_ids = [&"talent_a"]
-	b.prereq_levels = PackedInt32Array([1])
 	var tree := TalentTree.new()
 	tree.branch_name_keys = {"x": "K"}
 	tree.talents = [a, b]
