@@ -17,8 +17,12 @@ O trabalho é dividido entre **agentes especialistas**, cada um dono de uma áre
 | AG07 (Arquiteto) | Estrutura, configuração do projeto, núcleo compartilhado, versão | `project.godot`, `src/core/` |
 | AG08 (Arte) | Assets 2D, ícones, guia visual | `assets/` |
 | AG09 (VFX) | Efeitos visuais | `src/fx/` |
+| AG06 (Narrativa) | História, mundo, diálogos, glossário | `docs/narrativa.md`, `data/dialogue/` |
 | AG10 (Plataforma) | Build, export, CI, hosting | `.github/`, `web/` |
-| AG11 (Áudio), AG12 (Conteúdo)… | Conforme a necessidade | |
+| AG11 (Áudio), AG12 (Conteúdo) | Som; fases e itens em volume | `assets/audio/`, `data/` |
+| AG13 (Monetização) | Anúncios, compras, loja, ofertas | `src/monetization/`, `data/store/` |
+
+Quais começam ativos e quais ficam reservados: [Time_inicial.md](Time_inicial.md).
 
 Em outro tipo de projeto (ex.: site estático) os papéis mudam (ex.: Conteúdo, Front-end, Design, SEO, QA), mas a regra é a mesma: **uma área, um dono, arquivos sem sobreposição**.
 
@@ -51,4 +55,4 @@ Crie um agente novo, separando uma área, quando:
 - os arquivos dele se dividem naturalmente em duas pastas que raramente mudam juntas;
 - o documento do agente fica grande demais para ler em cada sessão.
 
-Exemplos: VFX saiu da UI; Áudio e Conteúdo ganharam agentes próprios. Um agente que deixou de ser útil é **arquivado** (ex.: o de backlog, cujo trabalho voltou para o líder), sem reaproveitar o número.
+Exemplos: VFX saiu da UI; Áudio e Conteúdo ganharam agentes próprios. Um agente que deixou de ser útil é **arquivado** (ex.: o de backlog, cujo trabalho voltou para o líder). O número só é reaproveitado por decisão do dono e passa a valer para todos os projetos (ex.: o AG06 vago virou Narrativa).

@@ -6,6 +6,7 @@ Método usado no Project: Anima, escrito para ser copiado em projetos novos. Cad
 |---|---|
 | [Delegacao.md](Delegacao.md) | O dono fala só com o líder (AG00); como o líder conversa com os agentes |
 | [Distribuicao_agents.md](Distribuicao_agents.md) | Agentes especialistas: tipos, definição e quando dividir um agente |
+| [Time_inicial.md](Time_inicial.md) | Time base de qualquer projeto de jogo e agentes reservados |
 | [Briefings.md](Briefings.md) | Como o líder escreve o pedido para cada agente |
 | [Tasks.md](Tasks.md) | Marcos de entrega quebrados em tasks menores, uma por agente |
 | [Listagem_tasks.md](Listagem_tasks.md) | Modelo visual obrigatório para listar tasks |
