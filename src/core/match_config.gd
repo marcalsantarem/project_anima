@@ -14,6 +14,8 @@ var account_level := 0
 var unlocked_slots := 1
 ## Módulo de cada slot (índice 0 = slot 1). Vazio = os Módulos da cena da Arena (hoje só o meteoro no slot 1).
 var slot_modules: Array[SkillData] = []
+## Bônus dos Núcleos (T-205): `{ &"stat_x": valor }` só com chaves > 0 (fração somada; `stat_pierce` e `stat_start_particles` aditivos). Vazio = partida padrão.
+var talent_bonuses: Dictionary = {}
 
 
 ## Config da conta: slot n liberado só se `level >= unlock_levels[n-1]` (slots em ordem).

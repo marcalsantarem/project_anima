@@ -312,6 +312,13 @@ Prévias: [`hangar-opcao-a-375x812.png`](img/hangar-opcao-a-375x812.png) (barra 
 | `ui_icon_module_locked` / `_component_locked` / `_core_locked` | 64×64 | — | cinza a 45% na arte |
 | `ui_icon_back` | 36×36 | — | seta do Voltar, sobre a `ui_holo_pill` |
 
+### 11.10 Árvore de Núcleos (T-206, BRF-152)
+
+Prévia: [`nucleos-pecas.png`](img/nucleos-pecas.png) (nível 3, 2 nós comprados). Fonte `assets/ui/_src/gen_ui_talents.py`; tamanhos, 9-slice e encaixe das ligações no `assets/ui/README.md`.
+- **Ícones** `ui_icon_talent_<nome>` (64) + `_off` (cinza a 45% na arte). O ramo se lê pela **forma da placa** e pela cor: Ataque = losango laranja `#FF9F43`, Defesa = escudo azul `#4F8DFF`, Economia = quadrado arredondado orquídea `#E07BFF` (o `meta.md` sugeria verde/dourado; segui a paleta do hangar do BRF-152; verde e dourado aparecem só dentro dos glifos: Partículas e Moeda).
+- **Nó** `ui_talent_node` (112, corpo 96 chanfrado): normal, `_selected` (colchetes), `_owned` (miolo ciano + brilho), `_max` (dourado, borda dupla, losangos), `_locked` (tracejado). O estado não depende só da cor.
+- **Ligações** `ui_talent_link_{v,h}_{off,on}`: acesa = ciano com brilho; apagada = tracejada cinza. A ligação `quick_pulse → golden_core` contorna a árvore por fora (a reta cortaria `wave_mend`).
+
 ## 12. HUD holográfico da partida (T-289, BRF-125; decisão 64)
 
 O estilo dos menus (§11) e do botão de velocidade vale para **todo o HUD da partida**; a arena (chão, inimigos, Anima) segue cartoon 3/4. **Posições, tamanhos de toque e comportamento não mudam** (`docs/ui.md` §4); a T-290 (AG02) só troca a arte.

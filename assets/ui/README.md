@@ -213,3 +213,27 @@ Guia: `docs/arte.md` §11.9; mockup `_src/hangar_mockup.html`. Fonte: `_src/gen_
 
 - **Geometria (viewport 720 ≈ 2× o mockup):** item 150×152; ícone 56 (normal, topo +24) e 64 (ativo, topo +18), centrado; no bloqueado o ícone desloca 24 px para a esquerda e o selo fica à direita. Rótulo 23 px/700 com topo em +104 (área livre x 0–150, y 100–148). Alvo de toque = o item inteiro (≥ 64 a 1x).
 - **Cores do rótulo:** ativo `holo_text` + brilho (sombra ciano), normal `#9FC4D6`, bloqueado `#6F8BA3`.
+
+## Árvore de Núcleos (T-206, BRF-152)
+
+Guia: `docs/arte.md` §11.10. Fonte: `_src/gen_ui_talents.py` (`python assets/ui/_src/gen_ui_talents.py`; Chrome e ffmpeg no PATH). **1 px do PNG ≈ 1 px de tela** no viewport 720 (como o hangar). Prévia: `docs/img/nucleos-pecas.png` (árvore no nível 3, 2 nós comprados); folha de estados: `_src/talent_sheet.png`. 34 PNG, **~105 KB**. Sem texto na arte.
+
+| Arquivo | PNG | 9-slice E/D/C/B | `expand_margin` | Uso |
+|---|---|---|---|---|
+| `ui_icon_talent_<nome>.png` (12) | 64×64 | — | — | Usar a 64 (1:1). Ramo = cor **e forma da placa**: Ataque losango laranja `#FF9F43`, Defesa escudo azul `#4F8DFF`, Economia quadrado arredondado orquídea `#E07BFF` |
+| `ui_icon_talent_<nome>_off.png` (12) | 64×64 | — | — | Bloqueado/indisponível: cinza, sem brilho, **45% já na arte** (não aplicar `modulate` de alfa) |
+| `ui_talent_node.png` | 112×112 | 28/28/28/28 | 8 nos 4 lados | Disponível (não comprado): corpo chanfrado 96×96 (chanfro 16) em (8,8), moldura `holo_line_dim` |
+| `ui_talent_node_selected.png` | 112×112 | idem | 8 | Selecionado: moldura ciano 3 px + brilho + colchetes claros nos cantos sup. esq./inf. dir. (vão até a borda do canvas) |
+| `ui_talent_node_owned.png` | 112×112 | idem | 8 | Comprado (Nv ≥ 1): miolo ciano, moldura `holo_line`, filete interno e brilho |
+| `ui_talent_node_max.png` | 112×112 | idem | 8 | Nível máximo: dourado, borda dupla, 4 losangos nos chanfros, brilho dourado |
+| `ui_talent_node_locked.png` | 112×112 | idem | 8 | Pré-requisito faltando: `holo_dis_*`, moldura **tracejada**, sem brilho (usar com o ícone `_off`) |
+| `ui_talent_level_chip.png` | 56×28 | 12/12/12/12 | 0 | Selo "n/5" (texto da UI: Outfit 20 px/800, `holo_text`; bloqueado `#5F7A92`). Tamanho na prévia 68×28; centro em (centro do nó, base do corpo) |
+| `ui_talent_link_v_off.png` / `_on.png` | 24×16 | — | — | Ligação vertical, tileável no eixo Y (`TextureRect` `stretch_mode = TILE`, largura 24) |
+| `ui_talent_link_h_off.png` / `_on.png` | 16×24 | — | — | Mesmo perfil deitado: horizontal e **qualquer ângulo** via `Line2D` |
+
+- **Nó:** retângulo do botão 112×112 centrado no ponto da grade (corpo 96 = alvo de toque 48 a 1x; para alvo 64 a 1x, o `Button` pode ter 128×128 com a moldura centrada). Ícone 64×64 centrado no corpo, 4 px acima do centro; selo por cima da borda de baixo. Desenhar **ligações → molduras → ícones → selos**.
+- **Estado da ligação:** `_on` = o pré-requisito daquela ligação já está cumprido (`nível do pai >= exigido`); senão `_off` (tracejada, sem brilho; não depende só da cor).
+- **Ligações com `Line2D`** (recomendado para todas): `texture = ui_talent_link_h_*`, `texture_mode = LINE_TEXTURE_TILE`, `width = 24`, `texture_repeat = ENABLED` no CanvasItem, `joint_mode = SHARP`, `begin/end_cap = NONE`. Pontos = **centros dos nós** (os nós cobrem as pontas); o perfil é uniforme no comprimento, então diagonais e quinas não distorcem. Atrás dos nós (`z_index` menor ou nó irmão anterior).
+- **Grade de referência (viewport 720, prévia ×2):** colunas x = 150, 375, 600 (passo 225); linhas y = topo + 0/200/400/600. As segundas dependências dos capstones:
+  - `deflect (1,1) → piercing_ray (0,3)` e `seed_charge (2,1) → bastion (1,3)`: **reta diagonal** centro a centro (passa no vão entre colunas, sem tocar nós).
+  - `quick_pulse (0,1) → golden_core (2,3)`: a reta cortaria `wave_mend`, então **rota por fora**: `Line2D` com 4 pontos `(x0, y1) → (x0 − 112, y1) → (x0 − 112, y3 + 92) → (x2, y3 + 92) → (x2, y3)` (x0/x2 = colunas 0 e 2; y1/y3 = linhas 1 e 3; 112 = meio passo; 92 = abaixo do selo). Sem cruzamentos.

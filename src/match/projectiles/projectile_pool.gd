@@ -12,11 +12,11 @@ var _items: Array[Projectile] = []
 var _free: Array[Projectile] = []
 
 
-func build(size: int, data: ProjectileData) -> void:
+func build(size: int, data: ProjectileData, extra_pierce: int = 0) -> void:
 	for i in size:
 		var p: Projectile = projectile_scene.instantiate()
 		add_child(p)
-		p.configure(data)
+		p.configure(data, extra_pierce)
 		p.expired.connect(_on_expired)
 		p.fired.connect(projectile_fired.emit)
 		p.hit.connect(projectile_hit.emit)

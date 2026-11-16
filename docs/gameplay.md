@@ -52,7 +52,7 @@ Arquivos de dados: `data/anima/anima_default.tres` (`AnimaData`) e `data/project
 
 | Campo | Valor | Notas |
 |---|---|---|
-| `AnimaData.core_hp_max` | 100 | HP do Núcleo |
+| `AnimaData.core_hp_max` | 160 | HP do Núcleo |
 | `AnimaData.hurtbox_radius` | 40 px | hurtbox circular |
 | `AnimaData.fire_rate` | 2 tiros/s | |
 | `AnimaData.attack_range` | 600 px | fora do alcance, não atira; também é a distância máxima do projétil |
@@ -418,6 +418,12 @@ Botão de velocidade no HUD da partida (T-275). Controlador implementado na T-27
 | Foco manual do ataque, mira manual do meteoro (API) | protótipo | T-176, T-177 |
 | Game feel: tremor, hit-stop, números de dano, efeitos reduzidos | protótipo | T-117 |
 | Aceleração x1/x2 (design) | proposta | T-272 (código: T-273) |
+
+## Núcleos na partida (T-205, BRF-154)
+`MatchConfig.talent_bonuses` = `{ &"stat_x": valor }` (só chaves > 0; o AG04 preenche). A partida não conhece talentos, só esses bônus; vazio = partida idêntica à anterior. Lógica em `MatchUpgrades.apply` (`talents`): `valor = base × (1 + Σ Núcleos) × (1 + upgrade)`; reduções `base × (1 − Núcleos) × (1 − upgrade)` com fator mínimo 0,5 (dano recebido mínimo 1); HP máx = `round(base × (1 + Σ)) + 10 × nível` (HP inicial = máximo); cadência com teto 4,2 tiros/s.
+- `stat_skill_damage`: `SkillContext.skill_damage_scale` multiplica o dano de área dos Módulos (meteoro). `stat_wave_heal`: a cada início de onda cura essa fração do HP máx (mín. 1, sem passar do máximo; só emite `core_hp_changed` se curou). `stat_start_particles`: Partículas iniciais. `stat_particle_gain`: multiplica o drop, com a fração acumulada entre drops (`_particle_carry`).
+- `stat_pierce`: `Projectile.extra_pierce`, definido no `build` do pool (tempo de execução; o `.tres` não muda).
+- Pool: no teto 4,2 tiros/s × (600/900 s) = 2,8 tiros em voo (pior caso ~3, mais alguns com perfuração) para 64 no pool.
 
 ## Slots de Módulo pelo nível da conta (T-188)
 `MatchConfig.for_account(nível, ProgressionData.slot_unlock_levels)` define `unlocked_slots`: slot n ativo só se `nível >= slot_unlock_levels[n-1]`. A Arena zera os slots não liberados (`slot_modules` vazio = Módulos da cena; hoje só o meteoro no slot 1). Nível 1 = só ataque básico; teclas e botões de slot bloqueado são ignorados (sem skill, sem erro). `MatchConfig.new()` (bot, testes, demo) mantém o slot 1 liberado.

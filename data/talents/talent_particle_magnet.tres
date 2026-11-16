@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="TalentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/meta/talent_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"talent_particle_magnet"
+branch = &"economy"
+name_key = "TALENT_PARTICLE_MAGNET_NAME"
+desc_key = "TALENT_PARTICLE_MAGNET_DESC"
+grid_pos = Vector2i(2, 0)
+prereq_ids = Array[StringName]([])
+stat = &"stat_particle_gain"
+mode = 0
+value = 0.15
+cost = 500

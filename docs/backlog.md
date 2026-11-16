@@ -114,16 +114,18 @@
 | T-199 | Arte do hangar: fundo, ícones das abas, estados ativo/bloqueado (tam. M) | M3 | AG08 | feita |
 | T-200 | Fluxo de cenas do hangar: telas filhas carregadas sob demanda, voltar, estado preservado (tam. P) | M3 | AG07 | feita |
 | T-201 | Hangar na UI: o menu vira hangar com abas; telas ainda vazias mostram "em breve" (tam. M) | M3 | AG02 | feita (Ajustes abre "Em breve" até existir Configurações) |
-| T-202 | Validação e fechamento da v0.2.1 (tag) (tam. P) | M3 | AG03 + AG00 | a fazer |
+| T-202 | Validação e fechamento da v0.2.1 (tag) (tam. P) | M3 | AG03 + AG00 | feita (tag v0.2.1) |
 | T-298 | Ressalvas do QA do M3: alfa dobrado do ícone bloqueado, selo "NV n" com 9-slice, barra sem esticar, aviso sem cobrir o JOGAR, Voltar com `ui_icon_back` e ícone do conceito no "Em breve", `docs/ui.md` com o hangar, comentário da ordem da barra (tam. P) | M3 | AG02 | feita (aviso sobe acima do JOGAR, não cabe entre ele e a barra) |
-| T-203 | Design da árvore de Núcleos: 10 a 12 talentos, efeitos, custos em Moeda, pré-requisitos; dados em `.tres` (tam. M) | M4 | AG04 | a fazer |
-| T-204 | Lógica dos Núcleos: compra, pré-requisitos, soma dos efeitos; save; testes GUT (tam. M) | M4 | AG04 + AG05 | a fazer |
-| T-205 | Partida aplica os Núcleos comprados (via `MatchConfig`) (tam. M) | M4 | AG01 | a fazer |
-| T-206 | Arte dos ícones dos Núcleos e das ligações da árvore (tam. M) | M4 | AG08 | a fazer |
-| T-207 | Tela de Núcleos: árvore, detalhe do talento, compra e saldo (tam. G) | M4 | AG02 | a fazer |
-| T-208 | VFX de compra e desbloqueio de Núcleo (tam. P) | M4 | AG09 | a fazer |
-| T-209 | Balanceamento com Núcleos (simulação do bot) (tam. P) | M4 | AG04 | a fazer |
-| T-210 | Validação e fechamento da v0.2.2 (tag) (tam. P) | M4 | AG03 + AG00 | a fazer |
+| T-299 | Núcleos de nível único (decisão 65): dados, lógica e textos (AG04) e tela sem níveis (AG02); BRF-158 e BRF-159 (tam. M) | M4 | AG04 + AG02 | feita |
+| T-203 | Design da árvore de Núcleos: 10 a 12 talentos, efeitos, custos em Moeda, pré-requisitos; dados em `.tres` (tam. M) | M4 | AG04 | feita |
+| T-204 | Lógica dos Núcleos: compra, pré-requisitos, soma dos efeitos; save; testes GUT (tam. M) | M4 | AG04 + AG05 | feita |
+| T-205 | Partida aplica os Núcleos comprados (via `MatchConfig`) (tam. M) | M4 | AG01 | feita |
+| T-206 | Arte dos ícones dos Núcleos e das ligações da árvore (tam. M) | M4 | AG08 | feita |
+| T-207 | Tela de Núcleos: árvore, detalhe do talento, compra e saldo (tam. G) | M4 | AG02 | feita |
+| T-208 | VFX de compra e desbloqueio de Núcleo (tam. P) | M4 | AG09 | feita |
+| T-209 | Balanceamento com Núcleos (simulação do bot) (tam. P) | M4 | AG04 | feita |
+| T-210 | Validação e fechamento da v0.2.2 (tag) (tam. P) | M4 | AG03 + AG00 | feita (QA: passa com ressalvas após a T-300; falta a tag após o merge) |
+| T-300 | Ressalvas do QA do M4: barra bloqueada no Redistribuir (grave), botões >= 64 px, árvore abre no topo, capturas com a barra; BRF-161 (tam. P) | M4 | AG02 | feita |
 | T-211 | Design dos Módulos: congelamento, escudo e choque; níveis, efeito por nível e custos em Moeda (tam. M) | M5 | AG04 | a fazer |
 | T-212 | Módulo de ataque: choque que se espalha entre inimigos (tam. M) | M5 | AG01 | a fazer |
 | T-213 | Evolução dos Módulos com Moeda: lógica, save e testes (tam. M) | M5 | AG04 + AG05 | a fazer |

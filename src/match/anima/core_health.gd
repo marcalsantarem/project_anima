@@ -37,3 +37,14 @@ func raise_max(amount: int) -> void:
 	max_hp += amount
 	current += amount
 	changed.emit(current, max_hp)
+
+
+## Cura até o máximo (nunca passa dele). Devolve o quanto curou; só emite `changed` se curou.
+func heal(amount: int) -> int:
+	if amount <= 0 or is_depleted():
+		return 0
+	var healed := mini(amount, max_hp - current)
+	if healed > 0:
+		current += healed
+		changed.emit(current, max_hp)
+	return healed

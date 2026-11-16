@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="TalentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/meta/talent_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"talent_cool_mind"
+branch = &"economy"
+name_key = "TALENT_COOL_MIND_NAME"
+desc_key = "TALENT_COOL_MIND_DESC"
+grid_pos = Vector2i(2, 2)
+prereq_ids = Array[StringName]([&"talent_seed_charge"])
+stat = &"stat_cooldown"
+mode = 2
+value = 0.1
+cost = 2490
