@@ -59,7 +59,7 @@ const PILL_H := 56.0
 const TOUCH := 64.0
 const BAR_H := 110.0
 const BACK_ICON := 18.0
-const BTN_H := 104.0 ## botões do painel (px do viewport, >= 88)
+const BTN_H := 124.0 ## botões do painel (px do viewport; >= 64 px de tela a 375x812, escala 0,52)
 
 const ASSET_DIR := "res://assets/ui/"
 const T_NODE := preload("res://assets/ui/ui_talent_node.png")
@@ -292,17 +292,17 @@ func confirm_respec() -> int:
 	return refund
 
 
-## Enquanto a confirmação está aberta, a barra do hangar (irmã desta tela, acima dela) não recebe toque.
+## Enquanto a confirmação está aberta, a barra do hangar (localizada na árvore: no hangar real fica em /root/Hangar) não recebe toque.
 func _block_bar(on: bool) -> void:
 	if _blocked_bar != null and is_instance_valid(_blocked_bar):
 		_blocked_bar.process_mode = Node.PROCESS_MODE_INHERIT
 	_blocked_bar = null
 	if not on or get_parent() == null:
 		return
-	for sib in get_parent().get_children():
-		if sib is HangarBar:
-			sib.process_mode = Node.PROCESS_MODE_DISABLED
-			_blocked_bar = sib
+	var bars := get_tree().root.find_children("*", "HangarBar", true, false)
+	if bars.size() > 0:
+		_blocked_bar = bars[0]
+		_blocked_bar.process_mode = Node.PROCESS_MODE_DISABLED
 
 
 func _exit_tree() -> void:
@@ -415,6 +415,23 @@ func _focus_selected() -> void:
 	var b: Button = _nodes.get(selected) as Button
 	if b != null:
 		b.grab_focus()
+		_scroll_if_hidden.call_deferred(b)
+
+
+## Abre no topo; só rola se o nó selecionado estiver fora da vista.
+func _scroll_if_hidden(b: Control) -> void:
+	if _scroll == null:
+		return
+	if not is_instance_valid(b) or not b.is_inside_tree():
+		return
+	var view := _scroll.get_global_rect()
+	if view.size.y < 8.0:
+		return
+	var r := b.get_global_rect()
+	if r.position.y < view.position.y:
+		_scroll.scroll_vertical += int(r.position.y - view.position.y)
+	elif r.end.y > view.end.y:
+		_scroll.scroll_vertical += int(r.end.y - view.end.y)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -487,7 +504,7 @@ func _build() -> void:
 	_scroll.name = "Scroll"
 	_scroll.size_flags_vertical = SIZE_EXPAND_FILL
 	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	_scroll.follow_focus = true
+	_scroll.follow_focus = false
 	_column.add_child(_scroll)
 	var center := CenterContainer.new()
 	center.size_flags_horizontal = SIZE_EXPAND_FILL

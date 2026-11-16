@@ -124,7 +124,8 @@
 | T-207 | Tela de Núcleos: árvore, detalhe do talento, compra e saldo (tam. G) | M4 | AG02 | feita |
 | T-208 | VFX de compra e desbloqueio de Núcleo (tam. P) | M4 | AG09 | feita |
 | T-209 | Balanceamento com Núcleos (simulação do bot) (tam. P) | M4 | AG04 | feita |
-| T-210 | Validação e fechamento da v0.2.2 (tag) (tam. P) | M4 | AG03 + AG00 | a fazer |
+| T-210 | Validação e fechamento da v0.2.2 (tag) (tam. P) | M4 | AG03 + AG00 | feita (QA: passa com ressalvas após a T-300; falta a tag após o merge) |
+| T-300 | Ressalvas do QA do M4: barra bloqueada no Redistribuir (grave), botões >= 64 px, árvore abre no topo, capturas com a barra; BRF-161 (tam. P) | M4 | AG02 | feita |
 | T-211 | Design dos Módulos: congelamento, escudo e choque; níveis, efeito por nível e custos em Moeda (tam. M) | M5 | AG04 | a fazer |
 | T-212 | Módulo de ataque: choque que se espalha entre inimigos (tam. M) | M5 | AG01 | a fazer |
 | T-213 | Evolução dos Módulos com Moeda: lógica, save e testes (tam. M) | M5 | AG04 + AG05 | a fazer |
