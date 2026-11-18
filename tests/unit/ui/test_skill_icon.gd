@@ -37,3 +37,20 @@ func test_skill_data_icon_is_the_same_png() -> void:
 	# Contrato com o AG01: SkillData.icon do meteoro aponta para o mesmo PNG do HUD.
 	var data: Resource = load("res://data/skills/skill_meteor.tres")
 	assert_eq(data.get("icon").resource_path, UiArt.SKILL_METEOR_PATH)
+
+
+## QA-M5-1: ícone do Módulo equipado por slot; slot vazio = moldura vazia, sem ícone.
+func test_apply_slot_modules_icons_and_empty() -> void:
+	var hud := _hud()
+	hud.set_slot_unlock_levels([0, 0, 0])
+	var shield := load("res://data/skills/skill_shield.tres") as SkillData
+	var meteor := load("res://data/skills/skill_meteor.tres") as SkillData
+	var mods: Array = [shield, null, meteor]
+	hud.apply_slot_modules(mods)
+	assert_eq(hud._skill(1).icon_texture, shield.icon)
+	assert_eq(hud._skill(1).icon_texture.resource_path, "res://assets/ui/ui_icon_skill_shield.png")
+	assert_false(hud._skill(1).empty)
+	assert_null(hud._skill(2).icon_texture)
+	assert_true(hud._skill(2).empty)
+	assert_eq(hud._skill(3).icon_texture.resource_path, UiArt.SKILL_METEOR_PATH)
+	assert_false(hud._skill(3).empty)

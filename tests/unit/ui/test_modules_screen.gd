@@ -210,5 +210,10 @@ func test_empty_slot_gives_null_in_match() -> void:
 func test_touch_targets_at_375() -> void:
 	var s := await _screen(_profile(8, 5000))
 	var k := 375.0 / 720.0
-	for b: Button in [s.upgrade_button, s.slot_buttons[0], s._rows[METEOR]]:
+	for b: Button in [s.upgrade_button, s.slot_buttons[0]]:
 		assert_gte(b.custom_minimum_size.y * k, 64.0, "alvo de toque %s" % b.name)
+	# Linha da lista: em retrato 126 px (>= 64 de tela); em janela larga (desktop, mouse) 108 px para caberem as 4 (BRF-174).
+	var view := s.get_viewport_rect().size
+	var row_h: float = s._rows[METEOR].custom_minimum_size.y
+	assert_eq(row_h, ModulesScreen.ROW_H_WIDE if view.x > view.y else ModulesScreen.BTN_H)
+	assert_gte(ModulesScreen.BTN_H * k, 64.0, "linha em retrato")

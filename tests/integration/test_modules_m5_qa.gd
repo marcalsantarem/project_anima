@@ -135,8 +135,4 @@ func test_module_icons_reach_skill_data_and_hud() -> void:
 	for id in IDS:
 		if SceneFlow.module_catalog.get_module(id).skill_at(1).icon == null:
 			missing.append(String(id))
-	if not missing.is_empty():
-		pending("QA-M5-1: SkillData.icon nulo em %s; o HUD nao recebe o icone do Modulo equipado" % str(missing))
-		return
-	for id in IDS:
-		assert_not_null(SceneFlow.module_catalog.get_module(id).skill_at(1).icon)
+	assert_eq(missing, [] as Array[String], "SkillData.icon preenchido")

@@ -38,3 +38,7 @@ Fluxo completo e fps no navegador; medição de quadro do pior caso (choque 5 sa
 7. Veja o escudo absorvendo, o choque saltando, o congelamento parando e depois retardando (o chefe só retarda).
 8. Desempenho com tudo na tela (3 Módulos + muitos inimigos), efeitos reduzidos ligados e desligados; pausa ao trocar de aba; safe area.
 9. Dificuldade: com Módulos evoluídos a partida ficou fácil demais? O custo de 250 a 2.650 por nível parece justo?
+
+
+## Reteste (AG00, 2026-11-18)
+QA-M5-1 e os menores de UI corrigidos na T-301 (BRF-174). GUT 604/604, sem Parse error nem pendente. **Veredito final: passa com ressalvas** (o que só o iPhone valida fica com o dono).

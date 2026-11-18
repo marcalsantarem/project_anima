@@ -67,6 +67,7 @@ const TOUCH := 64.0
 const BAR_H := 110.0
 const BACK_ICON := 18.0
 const BTN_H := 126.0 ## alvos do painel e da lista (px do viewport; >= 64 px de tela a 375x812, escala 0,52)
+const ROW_H_WIDE := 108.0 ## linha da lista em janela larga (2 colunas)
 const ROW_ICON := 96.0
 
 const ASSET_DIR := "res://assets/ui/"
@@ -110,7 +111,7 @@ var _coin_icon: TextureRect
 var _title: Label
 var _slots_row: HBoxContainer
 var _scroll: ScrollContainer
-var _list: VBoxContainer
+var _list: GridContainer
 var _panel: PanelContainer
 var _detail_frame: TextureRect
 var _detail_icon: TextureRect
@@ -511,7 +512,8 @@ func _build() -> void:
 	lm.mouse_filter = MOUSE_FILTER_IGNORE
 	_margins.append(lm)
 	_scroll.add_child(lm)
-	_list = VBoxContainer.new()
+	_list = GridContainer.new()
+	_list.columns = 1
 	_list.name = "List"
 	_list.mouse_filter = MOUSE_FILTER_IGNORE
 	lm.add_child(_list)
@@ -603,6 +605,7 @@ func _make_row(m: ModuleLevelData) -> Button:
 	b.name = String(m.module_id).to_pascal_case()
 	b.focus_mode = FOCUS_ALL
 	b.custom_minimum_size = Vector2(0, BTN_H)
+	b.size_flags_horizontal = SIZE_EXPAND_FILL
 	_style_secondary(b)
 	var h := HBoxContainer.new()
 	h.name = "H"
@@ -662,7 +665,8 @@ func _layout() -> void:
 	var view := get_viewport_rect().size
 	var k := minf(view.x, 720.0) / BASE_W
 	var safe := ScreenKit.safe_area(get_viewport())
-	var col_w := minf(view.x, 720.0)
+	var wide := view.x > view.y ## janela larga (desktop): lista em 2 colunas para as 4 linhas caberem
+	var col_w := minf(view.x, 1000.0 if wide else 720.0)
 	var x0 := (view.x - col_w) / 2.0
 	_column.offset_left = x0
 	_column.offset_right = -x0
@@ -691,10 +695,13 @@ func _layout() -> void:
 	hint_label.add_theme_font_size_override("font_size", roundi(11.5 * k))
 	hint_label.custom_minimum_size.y = roundf(30.0 * k)
 	hint_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_list.add_theme_constant_override("separation", roundi(8.0 * k))
+	_list.columns = 2 if wide else 1
+	_list.add_theme_constant_override("h_separation", roundi(8.0 * k))
+	_list.add_theme_constant_override("v_separation", roundi(8.0 * k))
 	_list.get_parent().add_theme_constant_override("margin_top", 8)
 	_list.get_parent().add_theme_constant_override("margin_bottom", 8)
 	for row: Button in _rows.values():
+		row.custom_minimum_size.y = ROW_H_WIDE if wide else BTN_H ## desktop (mouse): linha mais baixa para as 4 caberem
 		row.add_theme_font_size_override("font_size", roundi(12.0 * k))
 		(row.get_node(^"H/Texts/Name") as Label).add_theme_font_size_override("font_size", roundi(16.0 * k))
 		(row.get_node(^"H/Texts/Info") as Label).add_theme_font_size_override("font_size", roundi(11.0 * k))

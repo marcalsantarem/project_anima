@@ -43,7 +43,7 @@ const DEFAULT_UNLOCK_LEVELS: Array[int] = [0, 5, 8]
 ## Ícone por slot (índice 0 = slot 1), caminho do PNG = `SkillData.icon` da skill do slot (decisão 37).
 ## Vazio ou inexistente = arte padrão do SkillButton (meteoro no `Icon.CIRCLE`). Troque em tempo
 ## de execução com set_slot_icon(slot, textura) — o HUD não lê src/match/.
-@export var slot_icon_paths: Array[String] = [UiArt.SKILL_METEOR_PATH, "", ""]
+@export var slot_icon_paths: Array[String] = ["", "", ""]
 ## Nível de desbloqueio por slot (índice 0 = slot 1). 0 = liberado; > 0 = bloqueado com "NV x".
 ## No M2 o meta-jogo passa a lista conforme o nível da conta (set_slot_unlock_levels).
 @export var slot_unlock_levels: Array[int] = DEFAULT_UNLOCK_LEVELS.duplicate()
@@ -104,6 +104,31 @@ func bind(arena: Node) -> void:
 	_connect(&"boss_hp_changed", _on_boss_hp_changed)
 	_connect(&"boss_defeated", _on_boss_defeated)
 	_connect(&"match_ended", _on_match_ended)
+	# QA-M5-1: ícone do Módulo equipado por slot (a Arena monta `skills.skills` no `_ready`).
+	if arena is Node and not (arena as Node).is_node_ready():
+		(arena as Node).ready.connect(_apply_arena_modules, CONNECT_ONE_SHOT)
+	else:
+		_apply_arena_modules()
+
+
+func _apply_arena_modules() -> void:
+	var ctl: Object = _arena.get("skills") if _arena else null
+	if ctl and ctl.get("skills") != null:
+		apply_slot_modules(ctl.get("skills"))
+
+
+## Ícone de cada slot = `SkillData.icon` do Módulo equipado; `null` = moldura vazia (se o slot estiver liberado).
+func apply_slot_modules(modules: Array) -> void:
+	for i in SKILL_COUNT:
+		var sb := _skill(i + 1)
+		if sb == null:
+			continue
+		var m: SkillData = modules[i] if i < modules.size() else null
+		sb.icon_texture = m.icon if m else null
+		if m == null and not sb.is_locked():
+			sb.set_empty(true)
+		elif m != null:
+			sb.set_empty(false)
 
 
 func _connect(sig: StringName, cb: Callable) -> void:
