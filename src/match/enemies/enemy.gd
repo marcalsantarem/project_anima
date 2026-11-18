@@ -23,6 +23,10 @@ var hp: int
 var target_position: Vector2
 
 var _fire_timer := 0.0
+## Estados do Congelamento (T-109): parado por `frozen_left`; lento (velocidade e tiro x `slow_mult`) por `slow_left`.
+var frozen_left := 0.0
+var slow_left := 0.0
+var slow_mult := 1.0
 var _ring: Sprite2D
 var health_bar: HealthBar
 var _body: Sprite2D
@@ -63,6 +67,9 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	delta = status_delta(delta)
+	if delta <= 0.0:
+		return
 	match state:
 		State.ADVANCE:
 			var before := position
@@ -79,6 +86,42 @@ func _physics_process(delta: float) -> void:
 			if _fire_timer <= 0.0:
 				_fire_timer += 1.0 / data.fire_rate
 				shoot()
+
+
+## Congela por `time` s e depois deixa lento (`slow_time` s, velocidade x `mult`). Reaplicar renova (não soma).
+func freeze(time: float, slow_time: float, mult: float) -> void:
+	if state == State.DEAD:
+		return
+	frozen_left = maxf(frozen_left, time)
+	slow_left = maxf(slow_left, slow_time)
+	slow_mult = mult
+
+
+## Lento por `time` s (velocidade x `mult`), sem parar. Usado no chefe.
+func slow(time: float, mult: float) -> void:
+	if state == State.DEAD:
+		return
+	slow_left = maxf(slow_left, time)
+	slow_mult = mult
+
+
+func is_frozen() -> bool:
+	return frozen_left > 0.0
+
+
+func is_slowed() -> bool:
+	return frozen_left <= 0.0 and slow_left > 0.0
+
+
+## Consome o tempo dos estados e devolve o delta efetivo: 0 congelado, x slow_mult lento, igual sem estado.
+func status_delta(delta: float) -> float:
+	if frozen_left > 0.0:
+		frozen_left = maxf(frozen_left - delta, 0.0)
+		return 0.0
+	if slow_left > 0.0:
+		slow_left = maxf(slow_left - delta, 0.0)
+		return delta * slow_mult
+	return delta
 
 
 func is_shooter() -> bool:
@@ -121,6 +164,13 @@ func take_skill_damage(amount: int) -> void:
 	_skill_hit = false
 
 
+## Dano do Choque: conta como dano de skill (número), mas nunca lança o chefe.
+func take_chain_damage(amount: int) -> void:
+	_skill_hit = true
+	take_damage(amount)
+	_skill_hit = false
+
+
 func die(cause: DeathCause) -> void:
 	if state == State.DEAD:
 		return
@@ -149,6 +199,9 @@ func recycle(spawn_position: Vector2, target: Vector2) -> void:
 	_fire_timer = 0.0
 	_skill_hit = false
 	_flash_left = 0.0
+	frozen_left = 0.0
+	slow_left = 0.0
+	slow_mult = 1.0
 	if _body:
 		_body.self_modulate = Color.WHITE
 	if health_bar:

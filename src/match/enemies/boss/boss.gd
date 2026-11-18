@@ -60,6 +60,9 @@ func _physics_process(delta: float) -> void:
 	if state == State.DEAD:
 		return
 	_immune_left = maxf(_immune_left - delta, 0.0)
+	delta = status_delta(delta)
+	if delta <= 0.0:
+		return
 	match mode:
 		Mode.ADVANCE:
 			var before := position

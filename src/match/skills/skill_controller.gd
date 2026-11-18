@@ -13,6 +13,9 @@ signal skill_fizzled(slot: int, at: Vector2)
 ## Início da queda do meteoro: ponto de impacto (tela, chão) e s até o impacto.
 signal skill_fall_started(slot: int, at: Vector2, fall_time: float)
 
+## Salto do Choque: de (tela, chão) para (tela, chão), dano e índice do salto (0 = Anima para o 1º alvo).
+signal skill_chain_hit(slot: int, from: Vector2, to: Vector2, damage: int, index: int)
+
 const ACTIONS: Array[StringName] = [&"skill_1", &"skill_2", &"skill_3"]
 const COOLDOWN_EMIT_INTERVAL := 0.1 ## s; no máximo ~10 emissões/s por slot
 
@@ -39,6 +42,8 @@ func setup(context: SkillContext) -> void:
 			behavior.fizzled.connect(_on_fizzled.bind(_slots.size()))
 			if behavior.has_signal(&"fall_started"):
 				behavior.connect(&"fall_started", _on_fall_started.bind(_slots.size()))
+			if behavior.has_signal(&"chain_hit"):
+				behavior.connect(&"chain_hit", _on_chain_hit.bind(_slots.size()))
 			add_child(behavior)
 
 
@@ -50,7 +55,13 @@ static func behavior_for(data: SkillData) -> SkillBehavior:
 		SkillData.Type.AREA:
 			if data.delivery == SkillData.Delivery.METEOR:
 				return MeteorSkill.new()
+			if data.effect_params.has("jumps"):
+				return ShockSkill.new()
 			return AreaSkill.new()
+		SkillData.Type.CONTROL:
+			return FreezeSkill.new()
+		SkillData.Type.DEFENSE:
+			return ShieldSkill.new()
 		_:
 			push_warning("Skill sem comportamento: %s" % data.id)
 			return null
@@ -58,6 +69,10 @@ static func behavior_for(data: SkillData) -> SkillBehavior:
 
 func _on_cast(at: Vector2, radius: float, slot: int) -> void:
 	skill_cast.emit(slot, at, radius)
+
+
+func _on_chain_hit(from: Vector2, to: Vector2, damage: int, index: int, slot: int) -> void:
+	skill_chain_hit.emit(slot, from, to, damage, index)
 
 
 func _on_fall_started(at: Vector2, fall_time: float, slot: int) -> void:

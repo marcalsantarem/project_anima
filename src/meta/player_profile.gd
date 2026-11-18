@@ -5,6 +5,8 @@ extends RefCounted
 
 const MAX_LEVEL := 30  # teto da conta (BRF-108)
 const MAX_AMOUNT := 2000000000
+## Módulos equipáveis (ids das skills; catálogo em data/skills/module_catalog.tres).
+const MODULE_IDS: Array[StringName] = [&"skill_meteor", &"skill_shock", &"skill_freeze", &"skill_shield"]
 
 var level := 1
 var xp := 0
@@ -12,6 +14,10 @@ var coins := 0  ## Moeda (meta)
 var last_first_win_date := ""  ## "YYYY-MM-DD" (data local) da última 1ª vitória do dia, ou ""
 ## Núcleos comprados {id: nível} (T-204); ausente = nível 0.
 var talents := {}
+## Módulos {id: nível 1..5} (T-213); ausente = Nv 1 se a conta já liberou o Módulo.
+var module_levels := {}
+## Módulo por slot (índice 0 = slot 1; &"" = vazio). `[]` = nunca personalizado (padrão automático, `MetaModules`).
+var module_slots: Array = []
 var settings := {"sound_on": true, "music_volume": 1.0, "sfx_volume": 1.0}
 ## Espaco para crescer (Modulos, Componentes, Nucleos): chaves desconhecidas do save ficam aqui.
 var extra := {}
@@ -25,6 +31,8 @@ func to_dict() -> Dictionary:
 	d["last_first_win_date"] = last_first_win_date
 	d["settings"] = settings.duplicate()
 	d["talents"] = talents.duplicate()
+	d["module_levels"] = module_levels.duplicate()
+	d["module_slots"] = module_slots.duplicate()
 	return d
 
 
@@ -44,8 +52,16 @@ static func from_dict(d: Dictionary) -> PlayerProfile:
 	if tl is Dictionary:
 		for k in tl:
 			p.talents[StringName(k)] = int(tl[k]) if (tl[k] is int or tl[k] is float) else 0
+	var ml: Variant = d.get("module_levels", {})
+	if ml is Dictionary:
+		for k in ml:
+			p.module_levels[StringName(k)] = int(ml[k]) if (ml[k] is int or ml[k] is float) else 1
+	var ms: Variant = d.get("module_slots", [])
+	if ms is Array:
+		for v in ms:
+			p.module_slots.append(StringName(v) if (v is String or v is StringName) else &"")
 	for k in d:
-		if not (k in ["level", "xp", "coins", "settings", "last_first_win_date", "talents"]):
+		if not (k in ["level", "xp", "coins", "settings", "last_first_win_date", "talents", "module_levels", "module_slots"]):
 			p.extra[k] = d[k]
 	return p
 
@@ -89,6 +105,7 @@ static func is_valid_dict(d: Dictionary) -> bool:
 ## Corrige valores invalidos (negativos, acima do maximo, volumes fora de 0..1).
 func sanitize(tree: TalentTree = null) -> void:
 	_sanitize_talents(tree)
+	_sanitize_modules()
 	level = clampi(level, 1, MAX_LEVEL)
 	xp = clampi(xp, 0, MAX_AMOUNT)
 	coins = clampi(coins, 0, MAX_AMOUNT)
@@ -107,6 +124,20 @@ static func is_valid_date(s: String) -> bool:
 	var re := RegEx.new()
 	re.compile("^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])$")
 	return re.search(s) != null
+
+## Módulos (T-213): só ids conhecidos, níveis em 1..5, no máximo 3 slots sem repetir Módulo.
+func _sanitize_modules() -> void:
+	var levels := {}
+	for k in module_levels:
+		if StringName(k) in MODULE_IDS:
+			levels[StringName(k)] = clampi(int(module_levels[k]), 1, 5)
+	module_levels = levels
+	var slots: Array = []
+	for i in mini(module_slots.size(), 3):
+		var id := StringName(module_slots[i])
+		slots.append(id if (id in MODULE_IDS and not (id in slots)) else &"")
+	module_slots = slots
+
 
 ## Núcleo de compra única: nível >= 1 (save antigo) vira 1 (comprado); <= 0 sai. Com a árvore, ids desconhecidos saem.
 func _sanitize_talents(tree: TalentTree) -> void:

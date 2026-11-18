@@ -22,6 +22,7 @@ const HANGAR_BAR_SCENE := "res://src/ui/hangar/hangar_bar.tscn"
 const PROGRESSION_PATH := "res://data/meta/progression_m2.tres"
 const REWARDS_PATH := "res://data/meta/rewards_m2.tres"
 const TALENT_TREE_PATH := "res://data/talents/talent_tree.tres"
+const MODULE_CATALOG_PATH := "res://data/skills/module_catalog.tres"
 const HUD_SCENE := "res://src/ui/hud/hud.tscn"
 const PAUSE_SCENE := "res://src/ui/screens/pause_screen.tscn"
 ## Nome do nó raiz que agrupa Arena, HUD e Pausa.
@@ -55,6 +56,7 @@ var today_override := ""
 var progression: ProgressionData = load(PROGRESSION_PATH)
 var rewards: RewardData = load(REWARDS_PATH)
 var talent_tree: TalentTree = load(TALENT_TREE_PATH)
+var module_catalog: ModuleCatalog = load(MODULE_CATALOG_PATH)
 var _changing := false
 var _recorder: MatchRecorder
 
@@ -188,6 +190,7 @@ static func xp_to_next_of(level: int, prog: ProgressionData) -> int:
 func build_match_config() -> MatchConfig:
 	var p := _ensure_profile()
 	var c := MatchConfig.for_account(p.level, progression.slot_unlock_levels)
+	c.slot_modules = MetaModules.match_skills(p, module_catalog, progression.slot_unlock_levels)
 	if progression.is_unlocked(&"nuclei", p.level):
 		c.talent_bonuses = TalentBonuses.resolve(p.talents, talent_tree)
 	return c
@@ -230,7 +233,7 @@ func _link_slot_levels(hud: Hud, config: MatchConfig) -> void:
 	hud.set_slot_unlock_levels(MatchConfig.hud_lock_levels(config.account_level, progression.slot_unlock_levels))
 	hud.ready.connect(func() -> void:
 		for slot in range(1, MatchConfig.SLOT_COUNT + 1):
-			hud.set_slot_empty(slot, slot <= config.unlocked_slots and slot > maxi(config.slot_modules.size(), 1)),
+			hud.set_slot_empty(slot, slot <= config.unlocked_slots and (slot > config.slot_modules.size() or config.slot_modules[slot - 1] == null)),
 		CONNECT_ONE_SHOT)
 
 

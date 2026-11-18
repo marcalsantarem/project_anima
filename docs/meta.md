@@ -201,10 +201,22 @@ Slots: 1 no NV 2, 2 no NV 5, 3 no NV 8. No NV 5 há 3 Módulos para 2 slots (esc
 
 **Pulso:** `skill_pulse` **não é Módulo equipável** (saiu da partida; `.tres` só para testes do `AreaSkill`). Os 4 do T-219: meteoro, choque, congelamento, escudo.
 
-**Dados:** os `.tres` em `data/skills/` guardam só o **Nv 1**. Os valores dos níveis 2 a 5 ficam nesta tabela até o T-213 criar o dado por nível.
+**Dados (T-213, feito):** `data/skills/skill_*.tres` guardam só o Nv 1 (só leitura). Os níveis ficam em `data/skills/levels_{meteor,shock,freeze,shield}.tres` (`ModuleLevelData`: `module_id`, `unlock_level`, `base`, `cost_to_next` 250/600/1300/2650, `levels[5]` com `damage/radius/cooldown/duration/params`) e `data/skills/module_catalog.tres` (`ModuleCatalog`, ordem meteoro, choque, congelamento, escudo). Carregado em `SceneFlow.module_catalog`. Teste garante Nv 1 igual ao `.tres` base; se o AG01 mudar o Nv 1 de um `.tres`, atualizar a linha do Nv 1 no `levels_*`.
+
+**Save (sem mudar `SCHEMA_VERSION`; campos opcionais):** `module_levels: {id: 1..5}` (ausente = Nv 1 se a conta já liberou) e `module_slots: [id|"", ...]` (índice 0 = slot 1; `[]` = nunca personalizado: slots liberados recebem os Módulos liberados na ordem do catálogo, então o save atual vira meteoro Nv 1 no slot 1). `sanitize` remove ids desconhecidos, limita níveis a 1..5 e slots a 3 sem repetição.
+
+**API `MetaModules` (estática, `cat = SceneFlow.module_catalog`, `slot_levels = progression.slot_unlock_levels`):**
+- `unlocked(p, cat, id)`, `level(p, cat, id)` (0 = bloqueado), `next_cost(p, cat, id)` (0 no Nv 5), `spent_coins(p, cat)`.
+- `can_upgrade(p, cat, id) -> Reason {OK, MAX, NO_COINS, LOCKED, UNKNOWN}`; `upgrade(...) -> {ok, reason, cost, level}` (tudo ou nada; Moeda gasta não volta: sem respec de Módulos, o respec dos Núcleos não toca neles).
+- `equipped(p, cat, slot_levels) -> Array[StringName]` (3 itens, `&""` = vazio); `equip(p, cat, slot_levels, slot, id) -> EquipReason {OK, UNKNOWN, LOCKED, BAD_SLOT, SLOT_LOCKED, ALREADY_EQUIPPED}` (1-based; trocar = `unequip` e `equip`); `unequip(...) -> bool`.
+- `match_skills(...)`: `SkillData` copiados com os valores do nível (`ModuleLevelData.skill_at(level)`); `null` = slot vazio.
+- Quem muda o perfil salva com `Backend.save_profile`.
+
+**`MatchConfig`/`SceneFlow`:** `build_match_config` preenche `slot_modules` com 3 itens (`null` = vazio) via `MetaModules.match_skills`; o HUD marca slot vazio quando liberado e `null`.
+
+**Para o AG02:** T-216 (tela de Módulos: lista, nível, custo, evoluir) e T-217 (equipar nos slots) usam a API acima; textos `MODULE_*` abaixo.
 
 **Pendências**
-- **AG04 (T-213):** dado de níveis (ex.: `ModuleLevelData`: valores por nível + `cost_to_next`), nível por Módulo e Módulo por slot no save (com AG05), compra de nível como transação, `MatchConfig` entregar o `SkillData` com os valores do nível.
 - **AG01:** T-109 (estado congelado/lento nos inimigos; chefe só lento), T-110 (absorção no Núcleo + sinal para a HUD), T-212 (cadeia de saltos com `effect_params.jumps`/`falloff`), aplicar `stat_skill_damage` só onde há `damage`.
 - **AG01 + AG02 (T-218):** mira manual do congelamento.
 - **AG08/AG09/AG11:** `icon` vazio nos 3 `.tres`; `fx_freeze/shield/shock` e `sfx_freeze/shield/shock` ainda sem assets.
