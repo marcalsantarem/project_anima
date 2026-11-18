@@ -5,6 +5,7 @@ const RUNNER := preload("res://data/enemies/enemy_runner.tres")
 const TANK := preload("res://data/enemies/enemy_tank.tres")
 const BOSS := preload("res://data/enemies/boss_warden.tres")
 const FREEZE := preload("res://data/skills/skill_freeze.tres")
+const METEOR_AIM := preload("res://data/skills/skill_meteor.tres")
 const SHIELD := preload("res://data/skills/skill_shield.tres")
 const SHOCK := preload("res://data/skills/skill_shock.tres")
 const ARENA_SCENE := preload("res://src/match/arena/arena.tscn")
@@ -47,6 +48,7 @@ func test_behavior_by_module() -> void:
 	var f := SkillController.behavior_for(FREEZE)
 	var s := SkillController.behavior_for(SHIELD)
 	var k := SkillController.behavior_for(SHOCK)
+	f.data = FREEZE
 	assert_true(f is FreezeSkill and f.can_aim())
 	assert_true(s is ShieldSkill and not s.can_aim())
 	assert_true(k is ShockSkill and not k.can_aim())
@@ -282,3 +284,40 @@ func test_cooldown_scale_applies_to_all_three() -> void:
 	assert_eq(arena.skills.get_slot(1).total, FREEZE.cooldown * 0.5)
 	assert_eq(arena.skills.get_slot(2).total, SHIELD.cooldown * 0.5)
 	assert_eq(arena.skills.get_slot(3).total, SHOCK.cooldown * 0.5)
+
+
+# --- T-218: mira manual por Módulo ---
+
+func test_manual_aim_flag_per_module() -> void:
+	assert_true(METEOR_AIM.manual_aim)
+	assert_true(FREEZE.manual_aim)
+	assert_false(SHIELD.manual_aim)
+	assert_false(SHOCK.manual_aim)
+	assert_true(FREEZE.duplicate().manual_aim, "a cópia por nível mantém o campo")
+
+
+func test_skill_supports_aim_and_freeze_preview() -> void:
+	var arena := _arena([METEOR_AIM, FREEZE, SHOCK] as Array[SkillData])
+	await wait_physics_frames(1)
+	assert_true(arena.skill_supports_aim(1))
+	assert_true(arena.skill_supports_aim(2))
+	assert_false(arena.skill_supports_aim(3))
+	assert_false(arena.skill_supports_aim(4), "slot vazio")
+	var at := arena.anima.position + Vector2(100, 100)
+	arena.show_skill_aim(2, at)
+	assert_true(arena._skill_aim.visible)
+	assert_eq(arena._skill_aim.radius, FREEZE.radius)
+	assert_eq(arena._skill_aim.fill, SkillAim.ICE_FILL)
+	arena.show_skill_aim(3, at)
+	assert_false(arena._skill_aim.visible, "choque não tem prévia")
+	arena.hide_skill_aim()
+
+
+func test_freeze_out_of_area_fails_without_cooldown() -> void:
+	var arena := _arena([METEOR_AIM, FREEZE, SHOCK] as Array[SkillData])
+	await wait_physics_frames(1)
+	var bad := Vector2(arena.free_rect().get_center().x, arena.free_rect().end.y + 10.0)
+	assert_false(arena.use_skill(2, bad))
+	assert_true(arena.skills.get_slot(2).is_ready())
+	assert_true(arena.use_skill(2, arena.anima.position), "manual sem inimigo dispara")
+	assert_false(arena.skills.get_slot(2).is_ready())

@@ -44,11 +44,11 @@ func test_level1_equals_base_tres() -> void:
 
 func test_values_per_level() -> void:
 	var meteor := cat.get_module(M)
-	assert_eq(meteor.skill_at(5).damage, 80)
+	assert_eq(meteor.skill_at(5).damage, 76)
 	assert_eq(meteor.skill_at(5).cooldown, 8.0)
 	var shock := cat.get_module(SH).skill_at(5)
-	assert_eq(shock.effect_params["jumps"], 6)
-	assert_eq(shock.effect_params["falloff"], 0.9)
+	assert_eq(shock.effect_params["jumps"], 5)
+	assert_eq(shock.effect_params["falloff"], 0.88)
 	var freeze := cat.get_module(FR).skill_at(3)
 	assert_eq(freeze.duration, 2.6)
 	assert_eq(freeze.effect_params["boss_frozen"], false)
@@ -164,7 +164,7 @@ func test_match_skills_have_level_values() -> void:
 	assert_eq(skills[0].id, M)
 	assert_eq(skills[0].damage, 57)
 	assert_eq(skills[1].id, SH)
-	assert_eq(skills[1].damage, 52)
+	assert_eq(skills[1].damage, 46)
 	assert_null(skills[2])
 	assert_ne(skills[0], cat.get_module(M).base, "copia, nao o recurso carregado")
 
@@ -227,7 +227,7 @@ func test_scene_flow_match_config_uses_levels() -> void:
 	assert_eq(c.slot_modules[0].id, M)
 	assert_eq(c.slot_modules[0].damage, 40)
 	assert_eq(c.slot_modules[1].id, SH)
-	assert_eq(c.slot_modules[1].damage, 43)
+	assert_eq(c.slot_modules[1].damage, 41)
 	assert_eq(c.slot_modules[1].effect_params["jumps"], 5)
 	assert_null(c.slot_modules[2])
 	assert_eq(cat.get_module(SH).base.damage, 25, ".tres carregado intacto")

@@ -9,4 +9,4 @@ module_id = &"skill_meteor"
 unlock_level = 2
 base = ExtResource("2")
 cost_to_next = PackedInt32Array(250, 600, 1300, 2650)
-levels = [{"damage": 40, "radius": 160.0, "cooldown": 10.0}, {"damage": 48, "radius": 166.0, "cooldown": 10.0}, {"damage": 57, "radius": 172.0, "cooldown": 10.0}, {"damage": 68, "radius": 178.0, "cooldown": 9.0}, {"damage": 80, "radius": 185.0, "cooldown": 8.0}]
+levels = [{"damage": 40, "radius": 160.0, "cooldown": 10.0}, {"damage": 48, "radius": 166.0, "cooldown": 10.0}, {"damage": 57, "radius": 172.0, "cooldown": 10.0}, {"damage": 68, "radius": 178.0, "cooldown": 9.0}, {"damage": 76, "radius": 185.0, "cooldown": 8.0}]

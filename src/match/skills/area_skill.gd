@@ -24,7 +24,7 @@ func _ready() -> void:
 
 
 func can_aim() -> bool:
-	return true
+	return data.manual_aim
 
 
 ## Mira manual sempre aciona (escolha do jogador); automático exige inimigo ao alcance.

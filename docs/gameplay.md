@@ -339,6 +339,8 @@ API da `Arena` para a UI (AG02, T-178). `at` em coordenadas da Arena = as do vie
 **Bot (100 seeds) antes → depois do chefe dentro do alcance:** vitória 100% → 100%; Energia de quem vence 40% → 40%; luta 27 s → 26 s. O lançamento de 600 px já era cortado pela borda visível na maioria dos casos; vida e dano do chefe mantidos. O bot não usa foco nem mira manual.
 Testes: `tests/unit/match/test_focus_and_aim.gd`.
 
+**T-218 (BRF-169): mira por Módulo.** `SkillData.manual_aim: bool` (true em `skill_meteor` e `skill_freeze`; falso nos demais) define `can_aim()` da `AreaSkill`. `Arena.skill_supports_aim(slot) -> bool` (via `SkillController.supports_aim`). `show_skill_aim(slot, at)` serve o congelamento: círculo no `radius` do Módulo em cor de gelo (`SkillAim.ICE_FILL`, `SkillController.aim_color`), sem telégrafo de queda. `use_skill(slot, at)` com `at` fora de `can_aim_at` devolve `false` sem gastar recarga (meteoro e congelamento); choque e escudo ignoram `at`.
+
 ### Upgrades da partida (T-134)
 
 Valores e curva de custo em [meta.md](meta.md). Lógica em `src/match/upgrades/`, dados em `data/upgrades/<id>.tres` (`UpgradeData`).

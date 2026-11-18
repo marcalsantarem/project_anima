@@ -186,8 +186,8 @@ Slots: 1 no NV 2, 2 no NV 5, 3 no NV 8. No NV 5 há 3 Módulos para 2 slots (esc
 
 | Módulo | Dano | Raio (px) | Recarga (s) | Efeito próprio |
 |---|---|---|---|---|
-| Meteoro | 40 / 48 / 57 / 68 / 80 | 160 / 166 / 172 / 178 / 185 | 10 / 10 / 10 / 9 / 8 | telegraph 0,6 s (igual) |
-| Choque | 25 / 30 / 36 / 43 / 52 | salto 130 / 135 / 140 / 150 / 160 | 8 / 8 / 8 / 7 / 7 | saltos 3 / 4 / 4 / 5 / 6; cada salto mantém 0,80 / 0,80 / 0,85 / 0,85 / 0,90 do dano anterior |
+| Meteoro | 40 / 48 / 57 / 68 / 76 | 160 / 166 / 172 / 178 / 185 | 10 / 10 / 10 / 9 / 8 | telegraph 0,6 s (igual) |
+| Choque | 25 / 30 / 36 / 41 / 46 | salto 130 / 135 / 140 / 150 / 160 | 8 / 8 / 8 / 7 / 7 | saltos 3 / 4 / 4 / 5 / 5; cada salto mantém 0,80 / 0,80 / 0,85 / 0,85 / 0,88 do dano anterior |
 | Congelamento | 0 | 200 / 205 / 210 / 220 / 230 | 15 / 15 / 14 / 14 / 12 | congela 2,0 / 2,3 / 2,6 / 2,9 / 3,2 s; depois lentidão 50% por 1,5 s |
 | Escudo | 0 | no Núcleo | 20 / 20 / 19 / 18 / 16 | absorve 50 / 65 / 80 / 100 / 125; dura 4 / 4 / 4,5 / 4,5 / 5 s |
 
@@ -222,3 +222,28 @@ Slots: 1 no NV 2, 2 no NV 5, 3 no NV 8. No NV 5 há 3 Módulos para 2 slots (esc
 - **AG08/AG09/AG11:** `icon` vazio nos 3 `.tres`; `fx_freeze/shield/shock` e `sfx_freeze/shield/shock` ainda sem assets.
 
 **Textos (i18n):** o teste `test_localization` reprova chave sem uso no código (órfã), então as chaves não entram no CSV agora. Quem criar a tela de Módulos (T-214) adiciona: `MODULE_METEOR_NAME` Meteoro / `MODULE_METEOR_DESC` "Um meteoro cai e causa dano em área." · `MODULE_FREEZE_NAME` Congelamento / `_DESC` "Congela os inimigos na área; depois eles ficam lentos." · `MODULE_SHIELD_NAME` Escudo / `_DESC` "Cria um escudo no Núcleo que absorve dano por um tempo." · `MODULE_SHOCK_NAME` Choque / `_DESC` "Uma descarga salta entre inimigos próximos, perdendo força a cada salto."
+
+## Balanceamento dos Módulos (T-219, BRF-171)
+
+**Níveis na partida real:** `tests/integration/test_modules_levels_match.gd` monta a partida por `SceneFlow.build_match_config` para os 4 Módulos nos Nv 1 a 5 e confere dano, raio, recarga, `jumps`/`falloff` (dano de cada salto), congelamento (duração, raio) e escudo (`absorb`, `duration`). **Tudo chega ao comportamento; nenhuma chave de `effect_params` sem uso** (`slow_after`/`slow_time`/`boss_frozen` ficam fixos no Nv 1, só são lidos em `freeze_skill.gd`).
+
+**Bot (`tests/tools/sim_bot.gd`, `use_modules`) e `tests/tools/run_modules.gd`:** `--load=MSFH` (M meteoro, S choque, F congelamento, H escudo, 1 letra por slot), `--lv=1..5`, `--tree=1` (árvore inteira), `--hp=` (fração do HP do Núcleo, para simular jogador pior que o bot), `--seeds=`. Regras: meteoro quando há alvo; choque com grupo (>= 2 no raio de salto) ou chefe; congelamento com >= 4 inimigos a 250 px do Núcleo ou chefe a 350 px; escudo com Núcleo < 60% ou chefe perto.
+
+**Resultados (100 seeds, Núcleo a 10% do HP = jogador pior que o bot; HP final = Núcleo no fim):**
+
+| Equipamento | Sem Núcleos: vence / HP final | Árvore inteira: vence / HP final |
+|---|---|---|
+| Meteoro Nv 1 (antes do T-219) | 61% / 11% | 100% / 100% |
+| + Choque Nv 1 (2 slots) | 100% / 43% | 100% / 100% |
+| + Congelamento Nv 1 | 95% / 33% | 100% / 100% |
+| + Escudo Nv 1 | 91% / 26% | 100% / 100% |
+| Meteoro + Choque + Congelamento Nv 1 | 100% / 62% | 100% / 100% |
+| Meteoro + Choque + Escudo Nv 1 | 100% / 60% | 100% / 100% |
+| Meteoro + Congelamento + Escudo Nv 1 | 100% / 42% | 100% / 100% |
+| Choque + Congelamento + Escudo Nv 1 (sem meteoro) | 0% / 0% | 100% / 43% |
+
+Sem handicap (Núcleo normal) o bot vence 100% em todos; o HP final vai de 65% (só meteoro Nv 1) a 98% (Nv 5), e com a árvore inteira fica em 100%. Cada Módulo acrescenta de forma distinta (choque +32 pontos de HP final, congelamento +22, escudo +15 sobre o meteoro sozinho), nenhum é obrigatório (sem choque, congelamento ou escudo ainda se vence), mas sem o meteoro no Nv 1 o bot perde sempre sem Núcleos.
+
+**Conclusão e limite:** o bot mediano **já vence 100% sem nada** (T-209) e a árvore de Núcleos sozinha o deixa com 100% de HP: o teto de dificuldade não é calibrado pelos Módulos. Com tudo no Nv 5 a partida fica sem risco para o bot, mas isso vem do bot e dos Núcleos, não dos Módulos. Recomendação (AG00): decidir o dano do chefe/ondas (AG01/AG12) com um bot mais fraco como referência.
+
+**Ajustes de números (só `data/skills/levels_*.tres`, Nv 1 e custos intactos, total 19 200):** choque Nv 4 dano 43 → 41, Nv 5 dano 52 → 46, saltos 6 → 5, falloff 0,90 → 0,88 (era o Módulo que mais pesava: +33 pontos de HP final no Nv 5, mais que o meteoro); meteoro Nv 5 dano 80 → 76 (mantém o choque como complemento, não substituto).

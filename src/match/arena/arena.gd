@@ -221,6 +221,11 @@ func aim_rect() -> Rect2:
 	return free_rect()
 
 
+## O Módulo do slot aceita mira manual (meteoro e congelamento). Choque, escudo e vazio: false.
+func skill_supports_aim(slot: int) -> bool:
+	return skills.supports_aim(slot)
+
+
 func can_aim_at(at: Vector2) -> bool:
 	return at.is_finite() and aim_rect().has_point(at)
 
@@ -232,7 +237,7 @@ func show_skill_aim(slot: int, at: Vector2) -> void:
 		hide_skill_aim()
 		return
 	var rect := aim_rect()
-	_skill_aim.show_at(at.clamp(rect.position, rect.end), r)
+	_skill_aim.show_at(at.clamp(rect.position, rect.end), r, skills.aim_color(slot))
 
 
 func hide_skill_aim() -> void:

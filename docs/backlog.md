@@ -133,8 +133,8 @@
 | T-215 | VFX do congelamento, do escudo e do choque (tam. M) | M5 | AG09 | feita |
 | T-216 | Tela de Módulos: lista, detalhe e evolução (tam. M) | M5 | AG02 | feita |
 | T-217 | Seleção de Módulos por slot: equipar, salvar e levar ao `MatchConfig` (tam. M) | M5 | AG02 + AG07 | feita |
-| T-218 | Mira manual (arrastar) para os Módulos novos que precisarem (tam. P) | M5 | AG01 + AG02 | em andamento |
-| T-219 | Balanceamento dos 4 Módulos e bot que usa todos (tam. M) | M5 | AG04 | em andamento |
+| T-218 | Mira manual (arrastar) para os Módulos novos que precisarem (tam. P) | M5 | AG01 + AG02 | feita |
+| T-219 | Balanceamento dos 4 Módulos e bot que usa todos (tam. M) | M5 | AG04 | feita |
 | T-220 | Validação e fechamento da v0.2.3 (tag) (tam. P) | M5 | AG03 + AG00 | a fazer |
 | T-221 | Design das recompensas na partida: quando aparecem, cura × baú, conteúdo do baú (Moeda) (tam. P) | M6 | AG04 | a fazer |
 | T-222 | Lógica: escolha entre ondas, cura aplicada, Moeda do baú somada ao resultado (tam. M) | M6 | AG01 | a fazer |

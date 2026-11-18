@@ -9,4 +9,4 @@ module_id = &"skill_shock"
 unlock_level = 5
 base = ExtResource("2")
 cost_to_next = PackedInt32Array(250, 600, 1300, 2650)
-levels = [{"damage": 25, "radius": 130.0, "cooldown": 8.0, "params": {"jumps": 3, "falloff": 0.8}}, {"damage": 30, "radius": 135.0, "cooldown": 8.0, "params": {"jumps": 4, "falloff": 0.8}}, {"damage": 36, "radius": 140.0, "cooldown": 8.0, "params": {"jumps": 4, "falloff": 0.85}}, {"damage": 43, "radius": 150.0, "cooldown": 7.0, "params": {"jumps": 5, "falloff": 0.85}}, {"damage": 52, "radius": 160.0, "cooldown": 7.0, "params": {"jumps": 6, "falloff": 0.9}}]
+levels = [{"damage": 25, "radius": 130.0, "cooldown": 8.0, "params": {"jumps": 3, "falloff": 0.8}}, {"damage": 30, "radius": 135.0, "cooldown": 8.0, "params": {"jumps": 4, "falloff": 0.8}}, {"damage": 36, "radius": 140.0, "cooldown": 8.0, "params": {"jumps": 4, "falloff": 0.85}}, {"damage": 41, "radius": 150.0, "cooldown": 7.0, "params": {"jumps": 5, "falloff": 0.85}}, {"damage": 46, "radius": 160.0, "cooldown": 7.0, "params": {"jumps": 5, "falloff": 0.88}}]

@@ -94,6 +94,20 @@ func aim_radius(slot: int) -> float:
 	return b.data.radius if b != null and b.can_aim() else 0.0
 
 
+## O slot aceita mira manual (Módulo de área/controle com `manual_aim`).
+func supports_aim(slot: int) -> bool:
+	var b := get_behavior(slot)
+	return b != null and b.can_aim()
+
+
+## Cor da prévia da mira do slot (gelo no congelamento, padrão nos demais).
+func aim_color(slot: int) -> Color:
+	var b := get_behavior(slot)
+	if b != null and b.data.type == SkillData.Type.CONTROL:
+		return SkillAim.ICE_FILL
+	return SkillAim.FILL
+
+
 func slot_count() -> int:
 	return _slots.size()
 

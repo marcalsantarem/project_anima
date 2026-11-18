@@ -339,6 +339,7 @@ func _build_tray() -> void:
 		sb.icon_texture = UiArt.load_icon(slot_icon_paths[i] if i < slot_icon_paths.size() else "")
 		sb.inject_action = false
 		sb.drag_aim = true
+		sb.aim_check = slot_aims.bind(sb.slot)
 		sb.activated.connect(_on_skill_pressed)
 		sb.aim_moved.connect(_on_aim_moved)
 		sb.aim_ended.connect(_on_aim_ended)
@@ -595,6 +596,15 @@ func aim_supported() -> bool:
 	return _arena != null and _arena.has_method(&"show_skill_aim") and _arena.has_method(&"hide_skill_aim") 		and _arena.has_method(&"can_aim_at")
 
 
+## T-218: o Módulo do slot aceita mira? Sem `skill_supports_aim` na Arena, vale a mira geral (comportamento antigo).
+func slot_aims(slot: int) -> bool:
+	if not aim_supported():
+		return false
+	if _arena.has_method(&"skill_supports_aim"):
+		return _arena.skill_supports_aim(slot)
+	return true
+
+
 func _on_aim_moved(slot: int, at: Vector2) -> void:
 	_show_aim(slot, at)
 
@@ -645,7 +655,7 @@ func _input(event: InputEvent) -> void:
 		return
 	for i in _skills.size():
 		var sb := _skills[i]
-		if event.is_action_pressed(sb.action) and not event.is_echo() and sb.state == SkillButton.State.READY 				and not sb.aiming:
+		if event.is_action_pressed(sb.action) and not event.is_echo() and sb.state == SkillButton.State.READY 				and not sb.aiming and slot_aims(i + 1):
 			_key_slot = i + 1
 			_key_fired = false
 			sb.set_aiming(true)

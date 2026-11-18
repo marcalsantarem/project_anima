@@ -15,6 +15,8 @@ enum Delivery { INSTANT, METEOR }
 @export var duration: float = 0.0 ## s (controle/defesa)
 @export var windup: float = 0.1 ## s de antecipação entre o acionamento e o efeito (INSTANT)
 @export var target_range: float = 600.0 ## px; alcance da busca de alvo automática
+## O jogador escolhe o ponto do efeito (arrastar/tecla). Só área e controle (meteoro, congelamento).
+@export var manual_aim: bool = false
 @export var effect_params: Dictionary = {}
 @export var fx_id: StringName
 @export var sfx_id: StringName
