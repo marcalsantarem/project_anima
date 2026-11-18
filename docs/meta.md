@@ -168,3 +168,45 @@ Entram no `MatchConfig` já resolvidos pelo AG04 (o gameplay não conhece talent
 | seed_charge | `stat_start_particles` | +15 (ADD_FLAT) | +15 | Partículas ao iniciar a partida (hoje 0); **atributo novo** |
 | cool_mind | `stat_cooldown` | −10% (REDUCTION_PCT) | −10% | com o upgrade, teto −50% |
 | golden_core | `stat_coin_gain` | +15% (ADD_PCT_BASE) | +15% | **só no meta** (AG04, `MetaRewards`); não vai para a partida |
+
+## Módulos: evolução por Moeda (T-211, BRF-163)
+
+Módulos (skills ativas) têm **níveis 1 a 5** (os Núcleos são compra única, decisão 65). O Módulo nasce no **Nv 1 ao ser liberado** pelo nível da conta (sem custo). Evoluir custa Moeda, **mesma curva para os 4**: Nv 2 = **250**, Nv 3 = **600**, Nv 4 = **1300**, Nv 5 = **2650** (4800 por Módulo; **19 200** para os 4; Núcleos = 18 355). Ver [economia.md](economia.md).
+
+| Módulo | Libera (conta) | Tipo / entrega | Mira manual (T-218) |
+|---|---|---|---|
+| `skill_meteor` | NV 2 | área, METEOR | já tem (decisão 46) |
+| `skill_shock` | NV 5 | área, instantâneo, salta | não (alvo automático) |
+| `skill_freeze` | NV 5 | controle, área instantânea | **sim** (mesma mira do meteoro) |
+| `skill_shield` | NV 8 | defesa, no Núcleo | não |
+
+Slots: 1 no NV 2, 2 no NV 5, 3 no NV 8. No NV 5 há 3 Módulos para 2 slots (escolha real); no NV 8, 4 para 3.
+
+**Efeito por nível** (Nv 1 / 2 / 3 / 4 / 5):
+
+| Módulo | Dano | Raio (px) | Recarga (s) | Efeito próprio |
+|---|---|---|---|---|
+| Meteoro | 40 / 48 / 57 / 68 / 80 | 160 / 166 / 172 / 178 / 185 | 10 / 10 / 10 / 9 / 8 | telegraph 0,6 s (igual) |
+| Choque | 25 / 30 / 36 / 43 / 52 | salto 130 / 135 / 140 / 150 / 160 | 8 / 8 / 8 / 7 / 7 | saltos 3 / 4 / 4 / 5 / 6; cada salto mantém 0,80 / 0,80 / 0,85 / 0,85 / 0,90 do dano anterior |
+| Congelamento | 0 | 200 / 205 / 210 / 220 / 230 | 15 / 15 / 14 / 14 / 12 | congela 2,0 / 2,3 / 2,6 / 2,9 / 3,2 s; depois lentidão 50% por 1,5 s |
+| Escudo | 0 | no Núcleo | 20 / 20 / 19 / 18 / 16 | absorve 50 / 65 / 80 / 100 / 125; dura 4 / 4 / 4,5 / 4,5 / 5 s |
+
+**Comportamento na partida**
+- **Choque:** 1º alvo = inimigo ao alcance com mais vizinhos no raio de salto (empate: o mais próximo do Anima). Salta para o inimigo vivo mais próximo ainda não atingido, dentro do raio de salto; para quando acabam os saltos ou os alvos. Dano do salto k = `damage × falloff^k`. Pode acertar o chefe. Sem inimigo ao alcance: não dispara e não gasta recarga.
+- **Congelamento:** inimigos no raio ficam parados por `duration` e depois lentos (`slow_after`, `slow_time`). Sem dano. **Chefe não congela** (`boss_frozen = false`): só fica lento (`slow_after`) durante o tempo do congelamento. Sem inimigo ao alcance: não dispara.
+- **Escudo:** absorve até `absorb` de dano no Núcleo ou até `duration` s (o que vier primeiro); reacionar renova (não acumula). Sempre dispara.
+- **Mira:** meteoro e congelamento usam `use_skill(slot, at)`; choque e escudo ignoram `at`.
+
+**Núcleos:** `stat_cooldown` reduz a recarga dos 4. `stat_skill_damage` multiplica o dano de **meteoro e choque**; congelamento e escudo **ignoram** (não escala `absorb` nem duração; decisão de design).
+
+**Pulso:** `skill_pulse` **não é Módulo equipável** (saiu da partida; `.tres` só para testes do `AreaSkill`). Os 4 do T-219: meteoro, choque, congelamento, escudo.
+
+**Dados:** os `.tres` em `data/skills/` guardam só o **Nv 1**. Os valores dos níveis 2 a 5 ficam nesta tabela até o T-213 criar o dado por nível.
+
+**Pendências**
+- **AG04 (T-213):** dado de níveis (ex.: `ModuleLevelData`: valores por nível + `cost_to_next`), nível por Módulo e Módulo por slot no save (com AG05), compra de nível como transação, `MatchConfig` entregar o `SkillData` com os valores do nível.
+- **AG01:** T-109 (estado congelado/lento nos inimigos; chefe só lento), T-110 (absorção no Núcleo + sinal para a HUD), T-212 (cadeia de saltos com `effect_params.jumps`/`falloff`), aplicar `stat_skill_damage` só onde há `damage`.
+- **AG01 + AG02 (T-218):** mira manual do congelamento.
+- **AG08/AG09/AG11:** `icon` vazio nos 3 `.tres`; `fx_freeze/shield/shock` e `sfx_freeze/shield/shock` ainda sem assets.
+
+**Textos (i18n):** o teste `test_localization` reprova chave sem uso no código (órfã), então as chaves não entram no CSV agora. Quem criar a tela de Módulos (T-214) adiciona: `MODULE_METEOR_NAME` Meteoro / `MODULE_METEOR_DESC` "Um meteoro cai e causa dano em área." · `MODULE_FREEZE_NAME` Congelamento / `_DESC` "Congela os inimigos na área; depois eles ficam lentos." · `MODULE_SHIELD_NAME` Escudo / `_DESC` "Cria um escudo no Núcleo que absorve dano por um tempo." · `MODULE_SHOCK_NAME` Choque / `_DESC` "Uma descarga salta entre inimigos próximos, perdendo força a cada salto."

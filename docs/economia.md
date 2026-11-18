@@ -138,3 +138,7 @@ Medido com o Nv 1 antigo das raízes (+4%); com o Nv 1 novo (+8%) o 1º talento 
 
 ### Núcleos de nível único (T-299, BRF-158, decisão 65)
 Cada Núcleo virou compra única: valor = teto antigo, custo = soma dos níveis antigos. **Total da árvore igual (18 355 Moeda)** e tetos iguais, então o estado "100%" é idêntico ao medido no T-209 (a ordem de compra do bot só muda no detalhe). Mudou só o ritmo inicial: a 1ª raiz agora custa 500 (antes 50), então o mediano (~340 Moeda na 1ª partida com o bônus do dia) compra o 1º Núcleo na 2ª partida; a ordem do bot passa a ser raízes (3 x 500), camada 1 (3 x 1195), camada 2 e capstones. Os marcos de dias (25%, 50%, 100%) não mudam, pois dependem só do total.
+
+## Custos dos Módulos (T-211, BRF-163)
+
+Níveis 1 a 5 por Módulo; o Nv 1 é grátis ao liberar. Evolução em Moeda: **250 / 600 / 1300 / 2650** (4800 por Módulo, **19 200** para os 4, ~5% acima dos Núcleos, 18 355). Com ~1015 Moeda/dia e 50% para Módulos: Nv 2 do 1º Módulo no dia 1, Nv 2 dos 4 em ~2 dias, tudo no máximo em ~38 dias (Núcleos: ~34). Os outros 50% disputam com Componentes (M7). Efeitos por nível em [meta.md](meta.md). **Não simulado** (balanceamento no T-219).

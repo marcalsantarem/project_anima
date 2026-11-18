@@ -15,6 +15,9 @@ Fonte: `_src/gen_ui.py` (SVG por código → Chrome headless). Para regenerar, r
 | `ui_icon_upgrade_cooldown.png` | 128×128 | 64×64 | Cooldown: ampulheta, círculo verde-água |
 | `ui_icon_skill_pulse.png` | 128×128 | 64×64 (~88 na moldura) | Skill de área atual (pulso). **Provisório até a T-125**: para trocar, edite só `G_SKILL_PULSE` no script |
 | `ui_icon_skill_meteor.png` | 128×128 | 64×64 (~88 na moldura) | Skill do slot 1: meteoro de fogo (BRF-047). Substitui o `ui_icon_skill_pulse.png`, mantido até o AG02 trocar o uso. Fonte: `G_SKILL_METEOR` |
+| `ui_icon_skill_freeze.png` | 128×128 | 64×64 (~88 na moldura) | Módulo Congelamento (BRF-164): cluster de cristais de gelo, ciano-gelo. Fonte: `_src/gen_ui_modules.py` |
+| `ui_icon_skill_shield.png` | 128×128 | 64×64 (~88 na moldura) | Módulo Escudo: domo com favos hexagonais sobre base, azul-energia |
+| `ui_icon_skill_shock.png` | 128×128 | 64×64 (~88 na moldura) | Módulo Choque: raio amarelo entre dois nós violeta. Sem variante bloqueada (como pulso/meteoro: usa `ui_skill_frame_locked`). Folha: `docs/img/modulos-icones.png` |
 | `ui_icon_lock.png` | 128×128 | 64×64 | Cadeado dos slots bloqueados (acima do texto "NV 7"/"NV 12") |
 | `ui_icon_particles.png` | 128×128 | 64×64 (24–32 no HUD/pílula) | **Partículas** (decisão 40, BRF-061): estrela verde de 4 pontas com facetas tipo "chip", núcleo claro e brilho. Fonte: `g_particles(P_GREEN)` |
 | `ui_icon_particles_off.png` | 128×128 | 64×64 | Variante apagada (cinza-lilás) para custo sem Partículas (alternativa ao `modulate.a`) |

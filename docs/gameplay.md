@@ -80,8 +80,11 @@ O comportamento fica em um script por `type` (`SkillBehavior` → `AreaSkill`, .
 | Slot | Input Action | Skill (M1) | Tipo | Cooldown | Raio | Efeito |
 |---|---|---|---|---|---|---|
 | 1 | `skill_1` (`1`) | `skill_meteor` | area (METEOR) | 10 s | 160 px | 40 de dano no impacto, 0,6 s após o acionamento |
-| 2 | `skill_2` (`2`) | `skill_stasis` | control | 15 s | 220 px | congela por 2,5 s; `effect_params.slow_after` = 0,5 por 1,5 s |
-| 3 | `skill_3` (`3`) | `skill_aegis` | defense | 20 s | — | escudo no Núcleo por 4 s, absorve até 50 de dano |
+| 2 | `skill_2` (`2`) | `skill_freeze` (T-109) | control | 15 s | 200 px | congela 2,0 s e depois lentidão 50% por 1,5 s (`effect_params`); chefe só fica lento; mira manual |
+| 3 | `skill_3` (`3`) | `skill_shield` (T-110) | defense | 20 s | — | escudo no Núcleo por 4 s, absorve até 50 (`effect_params.absorb`) |
+| — | qualquer slot | `skill_shock` (T-212) | area (INSTANT) | 8 s | salto 130 px | 25 de dano, salta 3 vezes entre inimigos próximos, 80% do dano por salto (`effect_params.jumps`, `falloff`) |
+
+No M5 o jogador escolhe o Módulo de cada slot. Níveis (1 a 5), valores por nível, custos e liberação: [meta.md](meta.md), "Módulos: evolução por Moeda". Os ids `skill_stasis`/`skill_aegis` viraram `skill_freeze`/`skill_shield`.
 
 - **Ao acionar:** valida o cooldown → aplica o efeito → emite `skill_used(slot)` e passa a emitir `cooldown_changed`. Acionar em cooldown não faz nada (a UI pode dar feedback de "indisponível").
 - **Sem alvo:** se não há inimigo ao alcance, a skill de área não dispara e **não gasta o cooldown**.

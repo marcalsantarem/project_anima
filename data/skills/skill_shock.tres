@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/match/skills/skill_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"skill_shock"
+type = 0
+delivery = 0
+cooldown = 8.0
+radius = 130.0
+damage = 25
+duration = 0.0
+windup = 0.1
+target_range = 600.0
+effect_params = {
+"falloff": 0.8,
+"jumps": 3
+}
+fx_id = &"fx_shock"
+sfx_id = &"sfx_shock"

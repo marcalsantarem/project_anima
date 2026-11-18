@@ -22,8 +22,8 @@
 | T-106 | Tema base e componentes de UI | M1 | AG02 | feita |
 | T-107 | Overlay de debug Web (FPS, logs) | M1 | AG02 | feita (com gravador de logs e botão Logs) |
 | T-108 | Base de skills + skill de área | M1 | AG01 | feita |
-| T-109 | Módulo de controle: congelamento | M5 | AG01 | a fazer |
-| T-110 | Módulo de defesa: escudo | M5 | AG01 | a fazer |
+| T-109 | Módulo de controle: congelamento | M5 | AG01 | em andamento |
+| T-110 | Módulo de defesa: escudo | M5 | AG01 | em andamento |
 | T-111 | Arquétipos: tanque, atirador, enxame | M1 | AG01 | feita |
 | T-112 | HUD ligado aos sinais | M1 | AG02 | feita |
 | T-113 | Telas: toque para começar, pausa, resultado | M1 | AG02 | feita |
@@ -126,10 +126,10 @@
 | T-209 | Balanceamento com Núcleos (simulação do bot) (tam. P) | M4 | AG04 | feita |
 | T-210 | Validação e fechamento da v0.2.2 (tag) (tam. P) | M4 | AG03 + AG00 | feita (QA: passa com ressalvas após a T-300; falta a tag após o merge) |
 | T-300 | Ressalvas do QA do M4: barra bloqueada no Redistribuir (grave), botões >= 64 px, árvore abre no topo, capturas com a barra; BRF-161 (tam. P) | M4 | AG02 | feita |
-| T-211 | Design dos Módulos: congelamento, escudo e choque; níveis, efeito por nível e custos em Moeda (tam. M) | M5 | AG04 | a fazer |
-| T-212 | Módulo de ataque: choque que se espalha entre inimigos (tam. M) | M5 | AG01 | a fazer |
-| T-213 | Evolução dos Módulos com Moeda: lógica, save e testes (tam. M) | M5 | AG04 + AG05 | a fazer |
-| T-214 | Ícones dos 3 Módulos novos (tam. P) | M5 | AG08 | a fazer |
+| T-211 | Design dos Módulos: congelamento, escudo e choque; níveis, efeito por nível e custos em Moeda (tam. M) | M5 | AG04 | feita |
+| T-212 | Módulo de ataque: choque que se espalha entre inimigos (tam. M) | M5 | AG01 | em andamento |
+| T-213 | Evolução dos Módulos com Moeda: lógica, save e testes (tam. M) | M5 | AG04 + AG05 | em andamento |
+| T-214 | Ícones dos 3 Módulos novos (tam. P) | M5 | AG08 | feita |
 | T-215 | VFX do congelamento, do escudo e do choque (tam. M) | M5 | AG09 | a fazer |
 | T-216 | Tela de Módulos: lista, detalhe e evolução (tam. M) | M5 | AG02 | a fazer |
 | T-217 | Seleção de Módulos por slot: equipar, salvar e levar ao `MatchConfig` (tam. M) | M5 | AG02 + AG07 | a fazer |
