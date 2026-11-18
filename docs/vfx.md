@@ -1,6 +1,6 @@
 # VFX — Project: Anima
 
-> Dono: AG09. Estado: **T-130** (pool + `FxDirector`, ligado na partida pelo `SceneFlow`), **T-131** (meteoro e chefe ogro), **T-132** (modo reduzido) e **T-117 parte AG09** (flash de acerto, Módulo pronto/usado), **T-208** (UI dos Núcleos).
+> Dono: AG09. Estado: **T-130** (pool + `FxDirector`, ligado na partida pelo `SceneFlow`), **T-131** (meteoro e chefe ogro), **T-132** (modo reduzido) e **T-117 parte AG09** (flash de acerto, Módulo pronto/usado), **T-208** (UI dos Núcleos), **T-215** (VFX do Congelamento, Escudo e Choque).
 > Estilo: 2D cartoon casual (docs/arte.md, variação A): formas sólidas com contorno (tom da cor −55%), cores vivas, **poucas gotas grandes** em vez de muitas partículas. Ciano (`#2FE6D2`) só no que é do jogador.
 
 ## 1. Pool de efeitos (`src/fx/`)
@@ -59,6 +59,16 @@ Custo = gotas desenhadas no pico (cada gota = 2 círculos) + arcos. "Sinal exist
 | `fx_hit` (flash maior) | flash branco de acerto (T-117): `flash_scale` 0,9 nos primeiros 35% (~0,08 s) | `projectile_hit` | 0,22 s | branco | 24 | +0 (mesma gota) | sem flash |
 | `fx_module_used` (BURST) | flash no Anima ao usar o Módulo | `skill_used(slot)` | 0,25 s | `accent` | 2 | flash + 2 arcos | só o anel |
 | `fx_module_ready` (SPARKLE) | brilho subindo no Anima quando o Módulo fica pronto | `skill_ready(slot)` | 0,5 s | `accent` | 2 | 6 gotas | 3 gotas |
+
+**T-215 (Módulos novos).** Subclasses de `FxEffect` desenhadas por código (mesmo atlas, sem alocação por quadro, arrays pré-dimensionados; `style = GLOW` só para o `z_index = 1`). O `FxDirector` descobre qual Módulo é o `skill_cast` por `arena.skills.get_slot(slot).data.fx_id` (duck typing; sem isso cai no meteoro como antes). Choque: o `skill_cast` do 1º alvo **não** toca a explosão do meteoro.
+
+| Tipo | Efeito | Sinal | Duração | Cor | Inst. | Pico | Reduzido |
+|---|---|---|---|---|---|---|---|
+| `fx_freeze` (`FxFreeze`) | onda de gelo no raio (0,5 s) + película e 3 cristais em cada inimigo parado (até 20; segue o inimigo) + 5 estilhaços (0,3 s) ao descongelar ou morrer; lento (chefe): brilho pulsando | `skill_cast` do slot com `fx_freeze`; lê `active_enemies` (`frozen_left`/`slow_left`) | `duration` do Módulo + 0,4 s | gelo `#7FE8FF` | 2 | onda 4 células + por inimigo 2 + 6 (cristais) = ~124 células com 20 inimigos | onda + película; sem cristais e estilhaços |
+| `fx_shield` (`FxShield`) | domo hexagonal holográfico (2 hexágonos + 6 arestas + preenchimento leve), azul `#4DA3FF` que avermelha com a absorção; ondulação (anel + flash, até 3) a cada absorção; quebra em 8 estilhaços (0,5 s) ou some em 0,3 s | `shield_started(absorb, duration)`, `shield_absorbed`, `shield_ended(broken)` | `duration` do escudo + fim | azul | 1 | ~11 chamadas de desenho + 3 ondulações | domo estático; sem ondulação nem estilhaços; some em 0,1 s |
+| `fx_shock` (`FxShock`) | arco irregular (8 pontos, 3 camadas: contorno, amarelo `#FFE04D`, núcleo branco; pisca 3x) + flash e 4 faíscas no impacto; atraso 0,05 s × `index` (máx. 0,4 s) | `skill_chain_hit(slot, from, to, damage, index)` | 0,15 s por salto | amarelo | 10 | 6 saltos: 18 polilinhas + ~30 células | só as 3 linhas |
+
+Custo: `fx_freeze` cada inimigo parado = 2 células (película) + 6 (cristais) por quadro enquanto dura (2 s); `fx_shock` e `fx_shield` são polilinhas (1 chamada cada). Nenhuma partícula/nó novo por evento. Testes: `tests/unit/fx/test_modules_fx.gd`; demo (`fx_demo.tscn`) passos 12 (choque), 24 (congelamento) e 30–34 (escudo). Capturas: `docs/img/vfx-modulos-*.png`. **Não medido no iPhone nem no build Web.**
 
 Tempos repetidos no `FxDirector` (fx/ não lê data/): `BOSS_LAUNCH_TIME` 0,6, `BOSS_STUN_TIME` 2, `METEOR_FALL_HEIGHT` 360, `METEOR_BASE_RADIUS` 160; se os dados mudarem, atualizar. `boss_phase_changed` saiu (não existe mais). O aviso no chão e a cratera do meteoro continuam desenhados pelo `match/` (`meteor_skill.gd`).
 
