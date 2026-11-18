@@ -135,7 +135,8 @@
 | T-217 | Seleção de Módulos por slot: equipar, salvar e levar ao `MatchConfig` (tam. M) | M5 | AG02 + AG07 | feita |
 | T-218 | Mira manual (arrastar) para os Módulos novos que precisarem (tam. P) | M5 | AG01 + AG02 | feita |
 | T-219 | Balanceamento dos 4 Módulos e bot que usa todos (tam. M) | M5 | AG04 | feita |
-| T-220 | Validação e fechamento da v0.2.3 (tag) (tam. P) | M5 | AG03 + AG00 | a fazer |
+| T-220 | Validação e fechamento da v0.2.3 (tag) (tam. P) | M5 | AG03 + AG00 | em andamento |
+| T-301 | Ressalvas do QA do M5: ícone do Módulo equipado no HUD (grave), lista de Módulos em 1280×720, capturas atualizadas; BRF-174 (tam. P) | M5 | AG02 | em andamento |
 | T-221 | Design das recompensas na partida: quando aparecem, cura × baú, conteúdo do baú (Moeda) (tam. P) | M6 | AG04 | a fazer |
 | T-222 | Lógica: escolha entre ondas, cura aplicada, Moeda do baú somada ao resultado (tam. M) | M6 | AG01 | a fazer |
 | T-223 | Janela de escolha na partida (pausa, 2 cartões, toque e teclado) (tam. M) | M6 | AG02 | a fazer |
