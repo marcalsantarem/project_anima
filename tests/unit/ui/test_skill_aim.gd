@@ -11,6 +11,7 @@ class FakeArena:
 	var shown := 0
 	var hidden := 0
 	var last_aim := Vector2.INF
+	var aim_slots: Array = [1, 2, 3] ## T-218: slots cujo Módulo suporta mira
 	func use_skill(slot: int, at: Vector2 = Vector2.INF) -> bool:
 		used.append([slot, at])
 		return true
@@ -19,6 +20,8 @@ class FakeArena:
 		last_aim = at
 	func hide_skill_aim() -> void:
 		hidden += 1
+	func skill_supports_aim(slot: int) -> bool:
+		return slot in aim_slots
 	func can_aim_at(at: Vector2) -> bool:
 		return at.y < VALID_MAX_Y
 
@@ -187,3 +190,41 @@ func test_key_ignored_while_cooldown() -> void:
 	hud._input(_action(true))
 	assert_eq(hud._key_slot, 0)
 	assert_false(hud._skill(1).aiming)
+
+
+func test_slot_without_aim_is_simple_tap() -> void:
+	arena.aim_slots = [2]
+	var sb := hud._skill(1)
+	watch_signals(sb)
+	_touch(sb, _center(sb), true)
+	assert_eq(arena.used.size(), 1, "sem mira: dispara ao apertar")
+	assert_eq(arena.used[0], [1, Vector2.INF])
+	_drag(sb, _up_by(sb, 300.0))
+	_touch(sb, _up_by(sb, 300.0), false)
+	assert_signal_not_emitted(sb, "aim_started")
+	assert_false(sb.aiming)
+	assert_eq(arena.shown, 0)
+	assert_eq(arena.used.size(), 1)
+
+
+func test_slot_without_aim_key_fires_on_press() -> void:
+	arena.aim_slots = []
+	hud._input(_action(true))
+	assert_eq(hud._key_slot, 0, "sem modo mira pela tecla")
+	assert_false(hud._skill(1).aiming)
+	assert_eq(arena.shown, 0)
+
+
+func test_module_swap_between_matches() -> void:
+	var sb := hud._skill(1)
+	arena.aim_slots = []
+	assert_false(hud.slot_aims(1))
+	arena.aim_slots = [1]
+	assert_true(hud.slot_aims(1))
+	_touch(sb, _center(sb), true)
+	_drag(sb, _up_by(sb, 300.0))
+	assert_true(sb.aiming, "novo Módulo com mira volta a arrastar")
+	_drag(sb, _center(sb))
+	_touch(sb, _center(sb), false)
+	assert_eq(arena.used.size(), 0, "cancelado")
+	assert_false(sb.aiming)

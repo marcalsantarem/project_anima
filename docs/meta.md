@@ -168,3 +168,82 @@ Entram no `MatchConfig` já resolvidos pelo AG04 (o gameplay não conhece talent
 | seed_charge | `stat_start_particles` | +15 (ADD_FLAT) | +15 | Partículas ao iniciar a partida (hoje 0); **atributo novo** |
 | cool_mind | `stat_cooldown` | −10% (REDUCTION_PCT) | −10% | com o upgrade, teto −50% |
 | golden_core | `stat_coin_gain` | +15% (ADD_PCT_BASE) | +15% | **só no meta** (AG04, `MetaRewards`); não vai para a partida |
+
+## Módulos: evolução por Moeda (T-211, BRF-163)
+
+Módulos (skills ativas) têm **níveis 1 a 5** (os Núcleos são compra única, decisão 65). O Módulo nasce no **Nv 1 ao ser liberado** pelo nível da conta (sem custo). Evoluir custa Moeda, **mesma curva para os 4**: Nv 2 = **250**, Nv 3 = **600**, Nv 4 = **1300**, Nv 5 = **2650** (4800 por Módulo; **19 200** para os 4; Núcleos = 18 355). Ver [economia.md](economia.md).
+
+| Módulo | Libera (conta) | Tipo / entrega | Mira manual (T-218) |
+|---|---|---|---|
+| `skill_meteor` | NV 2 | área, METEOR | já tem (decisão 46) |
+| `skill_shock` | NV 5 | área, instantâneo, salta | não (alvo automático) |
+| `skill_freeze` | NV 5 | controle, área instantânea | **sim** (mesma mira do meteoro) |
+| `skill_shield` | NV 8 | defesa, no Núcleo | não |
+
+Slots: 1 no NV 2, 2 no NV 5, 3 no NV 8. No NV 5 há 3 Módulos para 2 slots (escolha real); no NV 8, 4 para 3.
+
+**Efeito por nível** (Nv 1 / 2 / 3 / 4 / 5):
+
+| Módulo | Dano | Raio (px) | Recarga (s) | Efeito próprio |
+|---|---|---|---|---|
+| Meteoro | 40 / 48 / 57 / 68 / 76 | 160 / 166 / 172 / 178 / 185 | 10 / 10 / 10 / 9 / 8 | telegraph 0,6 s (igual) |
+| Choque | 25 / 30 / 36 / 41 / 46 | salto 130 / 135 / 140 / 150 / 160 | 8 / 8 / 8 / 7 / 7 | saltos 3 / 4 / 4 / 5 / 5; cada salto mantém 0,80 / 0,80 / 0,85 / 0,85 / 0,88 do dano anterior |
+| Congelamento | 0 | 200 / 205 / 210 / 220 / 230 | 15 / 15 / 14 / 14 / 12 | congela 2,0 / 2,3 / 2,6 / 2,9 / 3,2 s; depois lentidão 50% por 1,5 s |
+| Escudo | 0 | no Núcleo | 20 / 20 / 19 / 18 / 16 | absorve 50 / 65 / 80 / 100 / 125; dura 4 / 4 / 4,5 / 4,5 / 5 s |
+
+**Comportamento na partida**
+- **Choque:** 1º alvo = inimigo ao alcance com mais vizinhos no raio de salto (empate: o mais próximo do Anima). Salta para o inimigo vivo mais próximo ainda não atingido, dentro do raio de salto; para quando acabam os saltos ou os alvos. Dano do salto k = `damage × falloff^k`. Pode acertar o chefe. Sem inimigo ao alcance: não dispara e não gasta recarga.
+- **Congelamento:** inimigos no raio ficam parados por `duration` e depois lentos (`slow_after`, `slow_time`). Sem dano. **Chefe não congela** (`boss_frozen = false`): só fica lento (`slow_after`) durante o tempo do congelamento. Sem inimigo ao alcance: não dispara.
+- **Escudo:** absorve até `absorb` de dano no Núcleo ou até `duration` s (o que vier primeiro); reacionar renova (não acumula). Sempre dispara.
+- **Mira:** meteoro e congelamento usam `use_skill(slot, at)`; choque e escudo ignoram `at`.
+
+**Núcleos:** `stat_cooldown` reduz a recarga dos 4. `stat_skill_damage` multiplica o dano de **meteoro e choque**; congelamento e escudo **ignoram** (não escala `absorb` nem duração; decisão de design).
+
+**Pulso:** `skill_pulse` **não é Módulo equipável** (saiu da partida; `.tres` só para testes do `AreaSkill`). Os 4 do T-219: meteoro, choque, congelamento, escudo.
+
+**Dados (T-213, feito):** `data/skills/skill_*.tres` guardam só o Nv 1 (só leitura). Os níveis ficam em `data/skills/levels_{meteor,shock,freeze,shield}.tres` (`ModuleLevelData`: `module_id`, `unlock_level`, `base`, `cost_to_next` 250/600/1300/2650, `levels[5]` com `damage/radius/cooldown/duration/params`) e `data/skills/module_catalog.tres` (`ModuleCatalog`, ordem meteoro, choque, congelamento, escudo). Carregado em `SceneFlow.module_catalog`. Teste garante Nv 1 igual ao `.tres` base; se o AG01 mudar o Nv 1 de um `.tres`, atualizar a linha do Nv 1 no `levels_*`.
+
+**Save (sem mudar `SCHEMA_VERSION`; campos opcionais):** `module_levels: {id: 1..5}` (ausente = Nv 1 se a conta já liberou) e `module_slots: [id|"", ...]` (índice 0 = slot 1; `[]` = nunca personalizado: slots liberados recebem os Módulos liberados na ordem do catálogo, então o save atual vira meteoro Nv 1 no slot 1). `sanitize` remove ids desconhecidos, limita níveis a 1..5 e slots a 3 sem repetição.
+
+**API `MetaModules` (estática, `cat = SceneFlow.module_catalog`, `slot_levels = progression.slot_unlock_levels`):**
+- `unlocked(p, cat, id)`, `level(p, cat, id)` (0 = bloqueado), `next_cost(p, cat, id)` (0 no Nv 5), `spent_coins(p, cat)`.
+- `can_upgrade(p, cat, id) -> Reason {OK, MAX, NO_COINS, LOCKED, UNKNOWN}`; `upgrade(...) -> {ok, reason, cost, level}` (tudo ou nada; Moeda gasta não volta: sem respec de Módulos, o respec dos Núcleos não toca neles).
+- `equipped(p, cat, slot_levels) -> Array[StringName]` (3 itens, `&""` = vazio); `equip(p, cat, slot_levels, slot, id) -> EquipReason {OK, UNKNOWN, LOCKED, BAD_SLOT, SLOT_LOCKED, ALREADY_EQUIPPED}` (1-based; trocar = `unequip` e `equip`); `unequip(...) -> bool`.
+- `match_skills(...)`: `SkillData` copiados com os valores do nível (`ModuleLevelData.skill_at(level)`); `null` = slot vazio.
+- Quem muda o perfil salva com `Backend.save_profile`.
+
+**`MatchConfig`/`SceneFlow`:** `build_match_config` preenche `slot_modules` com 3 itens (`null` = vazio) via `MetaModules.match_skills`; o HUD marca slot vazio quando liberado e `null`.
+
+**Para o AG02:** T-216 (tela de Módulos: lista, nível, custo, evoluir) e T-217 (equipar nos slots) usam a API acima; textos `MODULE_*` abaixo.
+
+**Pendências**
+- **AG01:** T-109 (estado congelado/lento nos inimigos; chefe só lento), T-110 (absorção no Núcleo + sinal para a HUD), T-212 (cadeia de saltos com `effect_params.jumps`/`falloff`), aplicar `stat_skill_damage` só onde há `damage`.
+- **AG01 + AG02 (T-218):** mira manual do congelamento.
+- **AG08/AG09/AG11:** `icon` vazio nos 3 `.tres`; `fx_freeze/shield/shock` e `sfx_freeze/shield/shock` ainda sem assets.
+
+**Textos (i18n):** o teste `test_localization` reprova chave sem uso no código (órfã), então as chaves não entram no CSV agora. Quem criar a tela de Módulos (T-214) adiciona: `MODULE_METEOR_NAME` Meteoro / `MODULE_METEOR_DESC` "Um meteoro cai e causa dano em área." · `MODULE_FREEZE_NAME` Congelamento / `_DESC` "Congela os inimigos na área; depois eles ficam lentos." · `MODULE_SHIELD_NAME` Escudo / `_DESC` "Cria um escudo no Núcleo que absorve dano por um tempo." · `MODULE_SHOCK_NAME` Choque / `_DESC` "Uma descarga salta entre inimigos próximos, perdendo força a cada salto."
+
+## Balanceamento dos Módulos (T-219, BRF-171)
+
+**Níveis na partida real:** `tests/integration/test_modules_levels_match.gd` monta a partida por `SceneFlow.build_match_config` para os 4 Módulos nos Nv 1 a 5 e confere dano, raio, recarga, `jumps`/`falloff` (dano de cada salto), congelamento (duração, raio) e escudo (`absorb`, `duration`). **Tudo chega ao comportamento; nenhuma chave de `effect_params` sem uso** (`slow_after`/`slow_time`/`boss_frozen` ficam fixos no Nv 1, só são lidos em `freeze_skill.gd`).
+
+**Bot (`tests/tools/sim_bot.gd`, `use_modules`) e `tests/tools/run_modules.gd`:** `--load=MSFH` (M meteoro, S choque, F congelamento, H escudo, 1 letra por slot), `--lv=1..5`, `--tree=1` (árvore inteira), `--hp=` (fração do HP do Núcleo, para simular jogador pior que o bot), `--seeds=`. Regras: meteoro quando há alvo; choque com grupo (>= 2 no raio de salto) ou chefe; congelamento com >= 4 inimigos a 250 px do Núcleo ou chefe a 350 px; escudo com Núcleo < 60% ou chefe perto.
+
+**Resultados (100 seeds, Núcleo a 10% do HP = jogador pior que o bot; HP final = Núcleo no fim):**
+
+| Equipamento | Sem Núcleos: vence / HP final | Árvore inteira: vence / HP final |
+|---|---|---|
+| Meteoro Nv 1 (antes do T-219) | 61% / 11% | 100% / 100% |
+| + Choque Nv 1 (2 slots) | 100% / 43% | 100% / 100% |
+| + Congelamento Nv 1 | 95% / 33% | 100% / 100% |
+| + Escudo Nv 1 | 91% / 26% | 100% / 100% |
+| Meteoro + Choque + Congelamento Nv 1 | 100% / 62% | 100% / 100% |
+| Meteoro + Choque + Escudo Nv 1 | 100% / 60% | 100% / 100% |
+| Meteoro + Congelamento + Escudo Nv 1 | 100% / 42% | 100% / 100% |
+| Choque + Congelamento + Escudo Nv 1 (sem meteoro) | 0% / 0% | 100% / 43% |
+
+Sem handicap (Núcleo normal) o bot vence 100% em todos; o HP final vai de 65% (só meteoro Nv 1) a 98% (Nv 5), e com a árvore inteira fica em 100%. Cada Módulo acrescenta de forma distinta (choque +32 pontos de HP final, congelamento +22, escudo +15 sobre o meteoro sozinho), nenhum é obrigatório (sem choque, congelamento ou escudo ainda se vence), mas sem o meteoro no Nv 1 o bot perde sempre sem Núcleos.
+
+**Conclusão e limite:** o bot mediano **já vence 100% sem nada** (T-209) e a árvore de Núcleos sozinha o deixa com 100% de HP: o teto de dificuldade não é calibrado pelos Módulos. Com tudo no Nv 5 a partida fica sem risco para o bot, mas isso vem do bot e dos Núcleos, não dos Módulos. Recomendação (AG00): decidir o dano do chefe/ondas (AG01/AG12) com um bot mais fraco como referência.
+
+**Ajustes de números (só `data/skills/levels_*.tres`, Nv 1 e custos intactos, total 19 200):** choque Nv 4 dano 43 → 41, Nv 5 dano 52 → 46, saltos 6 → 5, falloff 0,90 → 0,88 (era o Módulo que mais pesava: +33 pontos de HP final no Nv 5, mais que o meteoro); meteoro Nv 5 dano 80 → 76 (mantém o choque como complemento, não substituto).

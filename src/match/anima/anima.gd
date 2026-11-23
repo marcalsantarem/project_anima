@@ -10,6 +10,8 @@ signal core_depleted
 @export var auto_attack_enabled := true
 
 var core: CoreHealth
+## Escudo do Módulo Escudo (T-110): absorve dano antes do HP do Núcleo.
+var shield := CoreShield.new()
 var target: Enemy
 ## Foco manual (T-176): mirado enquanto vivo e no alcance; fora dele vale a regra automática.
 var focus: Enemy:
@@ -50,6 +52,7 @@ func setup_attack(enemies: Array[Enemy], pool: ProjectilePool) -> void:
 
 
 func _physics_process(delta: float) -> void:
+	shield.tick(delta)
 	if not auto_attack_enabled or _pool == null or core.is_depleted():
 		return
 	_scan_timer -= delta
@@ -85,11 +88,11 @@ func fire_rate() -> float:
 	return upgrades.apply(MatchUpgrades.STAT_FIRE_RATE, data.fire_rate) if upgrades else data.fire_rate
 
 
-## Dano no Núcleo com a defesa aplicada (antes do escudo, quando houver).
+## Dano no Núcleo: defesa, depois o escudo; devolve o HP perdido.
 func take_core_damage(amount: int) -> int:
 	if upgrades:
 		amount = upgrades.damage_taken(amount)
-	return core.take_damage(amount)
+	return core.take_damage(shield.absorb(amount))
 
 
 func _is_target_valid() -> bool:

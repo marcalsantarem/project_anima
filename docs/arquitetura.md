@@ -85,6 +85,7 @@ API:
 
 **Tipos** (`src/core/`, `RefCounted`):
 - `MatchConfig`: `stage_id`, `match_scene_path` (padrão: `res://src/match/arena/arena.tscn`). O AG04 adiciona `anima_data` e `skills`.
+- **Módulos da partida (BRF-165):** `SkillController.behavior_for` escolhe o script por `SkillData` (`MeteorSkill`, `ShockSkill`, `FreezeSkill`, `ShieldSkill`, `AreaSkill`). Estados de partida: congelado/lento em `Enemy` (`status_delta`); escudo em `CoreShield` (`Anima.shield`, absorve em `take_core_damage`). A `Arena` repassa `skill_chain_hit` e `shield_*`. Detalhe em [gameplay.md](gameplay.md).
 - `MatchResult`: `outcome` (`Outcome.VICTORY|DEFEAT`), `wave_reached`, `waves_total`, `coins` (= Partículas da partida; renomear depende do AG00/T-141), `enemies_killed`, `duration_s`.
 
 **Backend / save (T-185, [ADR 0002](adr/0002-save-local.md)):** autoload `Backend` (`src/backend/backend.gd`) delega a um `BackendProvider` (`LocalBackend`: `user://save.json`, com versão, `.bak` e escrita atômica). Perfil em `PlayerProfile` (`src/meta/`). O jogo só chama `Backend`; a partida continua sem conhecê-lo.

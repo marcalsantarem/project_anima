@@ -24,7 +24,7 @@ func _ready() -> void:
 
 
 func can_aim() -> bool:
-	return true
+	return data.manual_aim
 
 
 ## Mira manual sempre aciona (escolha do jogador); automático exige inimigo ao alcance.
@@ -85,10 +85,15 @@ func _on_finished() -> void:
 
 
 func _impact() -> void:
-	last_hits = apply_damage(_target, context.enemies, data.radius, roundi(data.damage * context.skill_damage_scale))
+	last_hits = _apply_effect()
 	_fx_left = _fx_time()
 	cast.emit(_target, data.radius)
 	queue_redraw()
+
+
+## Efeito no ponto `_target`; devolve quantos inimigos atingiu. Subclasses trocam o efeito.
+func _apply_effect() -> int:
+	return apply_damage(_target, context.enemies, data.radius, roundi(data.damage * context.skill_damage_scale))
 
 
 ## Aplica dano a quem toca o círculo. Itera de trás para frente: mortes tiram da lista.

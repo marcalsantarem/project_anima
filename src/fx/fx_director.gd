@@ -23,6 +23,10 @@ const BOSS_LAUNCH_TIME := 0.6 ## BossData.launch_time
 const BOSS_STUN_TIME := 2.0 ## BossData.stun_time
 const METEOR_FALL_HEIGHT := 360.0 ## SkillData.fall_height do skill_meteor
 const METEOR_BASE_RADIUS := 160.0 ## raio do skill_meteor: tamanho 1 da explosão
+const FREEZE_EXTRA := 0.4 ## s a mais que a duração do congelamento (estilhaços do fim)
+const FREEZE_PICK_MARGIN := 60.0 ## folga (px) do raio ao escolher os inimigos atingidos
+const SHOCK_JUMP_DELAY := 0.05 ## s de atraso por índice do salto (limitado a SHOCK_MAX_DELAY)
+const SHOCK_MAX_DELAY := 0.4
 const BOSS_DEATH_EXPLOSION_SIZE := 1.8
 const METEOR_TRAIL_TAIL := 0.15 ## cauda do rastro se desfazendo depois do impacto
 
@@ -45,6 +49,11 @@ const SIGNALS := {
 	&"boss_defeated": &"_on_boss_defeated",
 	&"core_hp_changed": &"_on_core_hp_changed",
 	&"upgrade_changed": &"_on_upgrade_changed",
+	# T-215: Módulos Congelamento, Escudo e Choque
+	&"skill_chain_hit": &"_on_skill_chain_hit",
+	&"shield_started": &"_on_shield_started",
+	&"shield_absorbed": &"_on_shield_absorbed",
+	&"shield_ended": &"_on_shield_ended",
 }
 
 @export var pool: FxPool
@@ -71,6 +80,8 @@ var _upgrade_levels := {}
 var _boss_strike_pending := false
 var _windup_fx: FxEffect
 var _stun_fx: FxEffect
+var _shield_fx: FxShield
+var _shield_absorb := 1
 
 
 ## Conecta os sinais existentes em `arena`. Devolve os nomes conectados.
@@ -83,6 +94,7 @@ func bind(arena: Node) -> Array[StringName]:
 	_boss_strike_pending = false
 	_windup_fx = null
 	_stun_fx = null
+	_shield_fx = null
 	_upgrade_levels.clear()
 	for sig: StringName in SIGNALS:
 		if arena.has_signal(sig):
@@ -151,7 +163,13 @@ func _on_particles_gained(at: Vector2, amount: int) -> void:
 
 
 ## Impacto do meteoro: onda no chão (quente) + explosão; cratera fumegando fora do reduzido.
-func _on_skill_cast(_slot: int, at: Vector2, radius: float) -> void:
+func _on_skill_cast(slot: int, at: Vector2, radius: float) -> void:
+	var fx_id := _slot_fx_id(slot)
+	if fx_id == &"fx_freeze":
+		_play_freeze(slot, at, radius)
+		return
+	if fx_id == &"fx_shock":
+		return # os saltos têm o próprio efeito (skill_chain_hit)
 	var p := _to_pool(at)
 	_play(&"fx_skill_cast", p, NO_COLOR, _radius_scale(&"fx_skill_cast", radius))
 	_play(&"fx_meteor_explosion", p, NO_COLOR, radius / METEOR_BASE_RADIUS if radius > 0.0 else 1.0)
@@ -272,6 +290,54 @@ func _on_upgrade_changed(id: StringName, level: int, _max_level: int, _next_cost
 	_upgrade_levels[id] = level
 
 
+## Congelamento: onda de gelo no raio + película/cristais nos inimigos parados (ou brilho no lento).
+func _play_freeze(slot: int, at: Vector2, radius: float) -> void:
+	var fx := _play(&"fx_freeze", _to_pool(at), NO_COLOR, _radius_scale(&"fx_freeze", radius)) as FxFreeze
+	if fx == null:
+		return
+	var hit: Array = []
+	var list: Variant = _arena.get("active_enemies") if _arena else null
+	if list is Array:
+		var reach := radius + FREEZE_PICK_MARGIN
+		for e: Variant in list:
+			if not is_instance_valid(e) or (float(e.get("frozen_left")) <= 0.0 and float(e.get("slow_left")) <= 0.0):
+				continue
+			var d: Vector2 = Vector2(e.get("position")) - at
+			if Vector2(d.x, d.y / FxEffect.Y_SCALE).length_squared() <= reach * reach:
+				hit.append(e)
+	fx.set_enemies(at, hit)
+	var time := _slot_duration(slot)
+	if time > 0.0:
+		fx.duration = time + FREEZE_EXTRA
+
+
+## Salto do Choque: arco de `from` a `to`, escalonado pelo índice.
+func _on_skill_chain_hit(_slot: int, from: Vector2, to: Vector2, _damage: int, index: int) -> void:
+	var p_from := _to_pool(from)
+	var fx := _play(&"fx_shock", p_from)
+	if fx:
+		fx.target = _to_pool(to) - p_from
+		fx.delay = minf(maxi(index, 0) * SHOCK_JUMP_DELAY, SHOCK_MAX_DELAY)
+
+
+func _on_shield_started(absorb: int, duration: float) -> void:
+	_shield_absorb = maxi(absorb, 1)
+	_shield_fx = _play(&"fx_shield", _to_pool(_core_anchor())) as FxShield
+	if _shield_fx and duration > 0.0:
+		_shield_fx.duration = duration
+
+
+func _on_shield_absorbed(_amount: int, remaining: int) -> void:
+	if _shield_fx and is_instance_valid(_shield_fx) and _shield_fx.active:
+		_shield_fx.ripple(float(remaining) / _shield_absorb)
+
+
+func _on_shield_ended(broken: bool) -> void:
+	if _shield_fx and is_instance_valid(_shield_fx) and _shield_fx.active:
+		_shield_fx.end(broken)
+	_shield_fx = null
+
+
 # --- apoio ---------------------------------------------------------------------------------
 
 func _play(type: StringName, at: Vector2, color := NO_COLOR, size := 1.0) -> FxEffect:
@@ -299,6 +365,25 @@ func _core_anchor() -> Vector2:
 
 func _boss_anchor() -> Vector2:
 	return _last_boss_at if _has_boss_at else _core_anchor() + Vector2(0, -360)
+
+
+## Id de efeito do Módulo no slot (`arena.skills.get_slot(slot).data.fx_id`, duck typing) ou &"".
+func _slot_fx_id(slot: int) -> StringName:
+	var data: Variant = _slot_data(slot)
+	return data.get("fx_id") if data else &""
+
+
+func _slot_duration(slot: int) -> float:
+	var data: Variant = _slot_data(slot)
+	return float(data.get("duration")) if data else 0.0
+
+
+func _slot_data(slot: int) -> Variant:
+	var skills: Variant = _arena.get("skills") if _arena else null
+	if skills == null or not skills.has_method(&"get_slot"):
+		return null
+	var s: Variant = skills.get_slot(slot)
+	return s.get("data") if s else null
 
 
 func _radius_scale(type: StringName, radius: float) -> float:

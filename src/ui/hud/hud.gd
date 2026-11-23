@@ -43,7 +43,7 @@ const DEFAULT_UNLOCK_LEVELS: Array[int] = [0, 5, 8]
 ## Ícone por slot (índice 0 = slot 1), caminho do PNG = `SkillData.icon` da skill do slot (decisão 37).
 ## Vazio ou inexistente = arte padrão do SkillButton (meteoro no `Icon.CIRCLE`). Troque em tempo
 ## de execução com set_slot_icon(slot, textura) — o HUD não lê src/match/.
-@export var slot_icon_paths: Array[String] = [UiArt.SKILL_METEOR_PATH, "", ""]
+@export var slot_icon_paths: Array[String] = ["", "", ""]
 ## Nível de desbloqueio por slot (índice 0 = slot 1). 0 = liberado; > 0 = bloqueado com "NV x".
 ## No M2 o meta-jogo passa a lista conforme o nível da conta (set_slot_unlock_levels).
 @export var slot_unlock_levels: Array[int] = DEFAULT_UNLOCK_LEVELS.duplicate()
@@ -104,6 +104,31 @@ func bind(arena: Node) -> void:
 	_connect(&"boss_hp_changed", _on_boss_hp_changed)
 	_connect(&"boss_defeated", _on_boss_defeated)
 	_connect(&"match_ended", _on_match_ended)
+	# QA-M5-1: ícone do Módulo equipado por slot (a Arena monta `skills.skills` no `_ready`).
+	if arena is Node and not (arena as Node).is_node_ready():
+		(arena as Node).ready.connect(_apply_arena_modules, CONNECT_ONE_SHOT)
+	else:
+		_apply_arena_modules()
+
+
+func _apply_arena_modules() -> void:
+	var ctl: Object = _arena.get("skills") if _arena else null
+	if ctl and ctl.get("skills") != null:
+		apply_slot_modules(ctl.get("skills"))
+
+
+## Ícone de cada slot = `SkillData.icon` do Módulo equipado; `null` = moldura vazia (se o slot estiver liberado).
+func apply_slot_modules(modules: Array) -> void:
+	for i in SKILL_COUNT:
+		var sb := _skill(i + 1)
+		if sb == null:
+			continue
+		var m: SkillData = modules[i] if i < modules.size() else null
+		sb.icon_texture = m.icon if m else null
+		if m == null and not sb.is_locked():
+			sb.set_empty(true)
+		elif m != null:
+			sb.set_empty(false)
 
 
 func _connect(sig: StringName, cb: Callable) -> void:
@@ -339,6 +364,7 @@ func _build_tray() -> void:
 		sb.icon_texture = UiArt.load_icon(slot_icon_paths[i] if i < slot_icon_paths.size() else "")
 		sb.inject_action = false
 		sb.drag_aim = true
+		sb.aim_check = slot_aims.bind(sb.slot)
 		sb.activated.connect(_on_skill_pressed)
 		sb.aim_moved.connect(_on_aim_moved)
 		sb.aim_ended.connect(_on_aim_ended)
@@ -595,6 +621,15 @@ func aim_supported() -> bool:
 	return _arena != null and _arena.has_method(&"show_skill_aim") and _arena.has_method(&"hide_skill_aim") 		and _arena.has_method(&"can_aim_at")
 
 
+## T-218: o Módulo do slot aceita mira? Sem `skill_supports_aim` na Arena, vale a mira geral (comportamento antigo).
+func slot_aims(slot: int) -> bool:
+	if not aim_supported():
+		return false
+	if _arena.has_method(&"skill_supports_aim"):
+		return _arena.skill_supports_aim(slot)
+	return true
+
+
 func _on_aim_moved(slot: int, at: Vector2) -> void:
 	_show_aim(slot, at)
 
@@ -645,7 +680,7 @@ func _input(event: InputEvent) -> void:
 		return
 	for i in _skills.size():
 		var sb := _skills[i]
-		if event.is_action_pressed(sb.action) and not event.is_echo() and sb.state == SkillButton.State.READY 				and not sb.aiming:
+		if event.is_action_pressed(sb.action) and not event.is_echo() and sb.state == SkillButton.State.READY 				and not sb.aiming and slot_aims(i + 1):
 			_key_slot = i + 1
 			_key_fired = false
 			sb.set_aiming(true)

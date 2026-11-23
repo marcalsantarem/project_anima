@@ -31,6 +31,10 @@ const DEFAULT_TYPES := {
 	# T-117: Módulo pronto / usado (no Anima)
 	&"fx_module_ready": [preload("res://src/fx/fx_module_ready.tscn"), 2],
 	&"fx_module_used": [preload("res://src/fx/fx_module_used.tscn"), 2],
+	# T-215: Módulos novos (Congelamento, Escudo, Choque)
+	&"fx_freeze": [preload("res://src/fx/fx_freeze.tscn"), 2],
+	&"fx_shield": [preload("res://src/fx/fx_shield.tscn"), 1],
+	&"fx_shock": [preload("res://src/fx/fx_shock.tscn"), 10],
 }
 
 ## Modo de efeitos reduzidos (T-132): metade das gotas, sem flash, sem brasas/fumaça na explosão.

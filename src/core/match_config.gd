@@ -12,7 +12,8 @@ var match_scene_path: String = DEFAULT_MATCH_SCENE
 var account_level := 0
 ## Slots de Módulo liberados (os `unlocked_slots` primeiros; 0 = só o ataque básico). Padrão explícito: slot 1.
 var unlocked_slots := 1
-## Módulo de cada slot (índice 0 = slot 1). Vazio = os Módulos da cena da Arena (hoje só o meteoro no slot 1).
+## Módulo de cada slot (índice 0 = slot 1; `null` = slot vazio), já com os valores do nível (T-213).
+## Vazio = os Módulos da cena da Arena (hoje só o meteoro no slot 1).
 var slot_modules: Array[SkillData] = []
 ## Bônus dos Núcleos (T-205): `{ &"stat_x": valor }` só com chaves > 0 (fração somada; `stat_pierce` e `stat_start_particles` aditivos). Vazio = partida padrão.
 var talent_bonuses: Dictionary = {}

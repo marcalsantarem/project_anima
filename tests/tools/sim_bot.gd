@@ -26,6 +26,10 @@ var damage_by_source := {}
 var horde_casts := 0
 var horde_zero_hits := 0
 var fizzles := 0
+## true = usa os Módulos de todos os slots com regras simples (BRF-171); false = só o slot 1 ao ficar pronto.
+var use_modules := false
+## Usos por id de Módulo (só com use_modules).
+var module_uses := {}
 
 var _next := 0
 
@@ -42,16 +46,82 @@ func attach(p_arena: Arena) -> void:
 	arena.match_ended.connect(func(r: MatchResult) -> void:
 		result = r
 		match_ended_count += 1)
+	arena.skills.skill_used.connect(func(slot: int) -> void:
+		var b := arena.skills.get_behavior(slot)
+		if b != null:
+			module_uses[b.data.id] = module_uses.get(b.data.id, 0) + 1)
 	arena.add_child(self)
 
 
 func _physics_process(_delta: float) -> void:
 	if arena.is_over or passive:
 		return
-	var slot := arena.skills.get_slot(1)
-	if slot != null and slot.is_ready():
-		arena.use_skill(1)
+	if use_modules:
+		_use_modules()
+	else:
+		var slot := arena.skills.get_slot(1)
+		if slot != null and slot.is_ready():
+			arena.use_skill(1)
 	_buy()
+
+
+## Regras simples por Módulo (BRF-171): meteoro e choque quando há alvo (choque só em grupo ou chefe),
+## congelamento com muitos inimigos perto do Núcleo ou chefe perto, escudo com o Núcleo abaixo de 60% ou chefe perto.
+func _use_modules() -> void:
+	for slot in range(1, arena.skills.slot_count() + 1):
+		var s := arena.skills.get_slot(slot)
+		if s == null or not s.is_ready():
+			continue
+		var data := arena.skills.get_behavior(slot).data
+		var core := arena.anima.position
+		var near := 0
+		var boss_near := false
+		var boss_alive := false
+		for e in arena.active_enemies:
+			if e.state == Enemy.State.DEAD:
+				continue
+			var d := GroundPlane.distance(core, e.position)
+			if e is Boss:
+				boss_alive = true
+				boss_near = boss_near or d <= 350.0
+			if d <= 250.0:
+				near += 1
+		match data.type:
+			SkillData.Type.AREA:
+				if data.effect_params.has("jumps"):
+					var t := AreaSkill.densest_enemy(core, arena.active_enemies, data.target_range, data.radius)
+					if t != null and (boss_alive or _neighbors(t, data.radius) >= 2):
+						arena.use_skill(slot)
+				else:
+					arena.use_skill(slot)
+			SkillData.Type.CONTROL:
+				if near >= 4 or boss_near:
+					if not arena.use_skill(slot, _closest_enemy_pos()):
+						arena.use_skill(slot)
+			SkillData.Type.DEFENSE:
+				if float(arena.anima.core.current) / arena.anima.core.max_hp < 0.6 or boss_near:
+					arena.use_skill(slot)
+
+
+func _neighbors(t: Enemy, radius: float) -> int:
+	var n := 0
+	for e in arena.active_enemies:
+		if e.state != Enemy.State.DEAD and GroundPlane.distance(t.position, e.position) <= radius:
+			n += 1
+	return n
+
+
+func _closest_enemy_pos() -> Vector2:
+	var best := Vector2.INF
+	var best_d := INF
+	for e in arena.active_enemies:
+		if e.state == Enemy.State.DEAD:
+			continue
+		var d := GroundPlane.distance(arena.anima.position, e.position)
+		if d < best_d:
+			best_d = d
+			best = e.position
+	return best
 
 
 func _buy() -> void:

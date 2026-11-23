@@ -57,6 +57,8 @@ const AIM_THRESHOLD := 24.0
 @export var inject_action := true
 ## Arrastar a partir do botão pronto para mirar (T-178). Desligado = acionamento ao apertar, como antes.
 @export var drag_aim := false
+## T-218: se válido, decide a cada toque se este botão aceita mira (sobrepõe `drag_aim`; o Módulo do slot muda entre partidas).
+var aim_check := Callable()
 
 var action := &"skill_1"
 ## Nível de conta que libera o slot (só exibição; quem decide é o meta-jogo).
@@ -247,7 +249,8 @@ func _gui_input(event: InputEvent) -> void:
 
 
 func _down(local: Vector2) -> void:
-	if drag_aim and state == State.READY:
+	var can_aim: bool = aim_check.call() if aim_check.is_valid() else drag_aim
+	if can_aim and state == State.READY:
 		_pending = true
 		_press_at = _to_viewport(local)
 		_pop(PRESS_SCALE)

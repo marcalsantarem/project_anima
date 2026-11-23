@@ -80,14 +80,26 @@ O comportamento fica em um script por `type` (`SkillBehavior` → `AreaSkill`, .
 | Slot | Input Action | Skill (M1) | Tipo | Cooldown | Raio | Efeito |
 |---|---|---|---|---|---|---|
 | 1 | `skill_1` (`1`) | `skill_meteor` | area (METEOR) | 10 s | 160 px | 40 de dano no impacto, 0,6 s após o acionamento |
-| 2 | `skill_2` (`2`) | `skill_stasis` | control | 15 s | 220 px | congela por 2,5 s; `effect_params.slow_after` = 0,5 por 1,5 s |
-| 3 | `skill_3` (`3`) | `skill_aegis` | defense | 20 s | — | escudo no Núcleo por 4 s, absorve até 50 de dano |
+| 2 | `skill_2` (`2`) | `skill_freeze` (T-109) | control | 15 s | 200 px | congela 2,0 s e depois lentidão 50% por 1,5 s (`effect_params`); chefe só fica lento; mira manual |
+| 3 | `skill_3` (`3`) | `skill_shield` (T-110) | defense | 20 s | — | escudo no Núcleo por 4 s, absorve até 50 (`effect_params.absorb`) |
+| — | qualquer slot | `skill_shock` (T-212) | area (INSTANT) | 8 s | salto 130 px | 25 de dano, salta 3 vezes entre inimigos próximos, 80% do dano por salto (`effect_params.jumps`, `falloff`) |
+
+No M5 o jogador escolhe o Módulo de cada slot. Níveis (1 a 5), valores por nível, custos e liberação: [meta.md](meta.md), "Módulos: evolução por Moeda". Os ids `skill_stasis`/`skill_aegis` viraram `skill_freeze`/`skill_shield`.
 
 - **Ao acionar:** valida o cooldown → aplica o efeito → emite `skill_used(slot)` e passa a emitir `cooldown_changed`. Acionar em cooldown não faz nada (a UI pode dar feedback de "indisponível").
 - **Sem alvo:** se não há inimigo ao alcance, a skill de área não dispara e **não gasta o cooldown**.
 - **Alvo da área e do controle:** automático, no ponto de maior densidade de inimigos dentro de `target_range` (calculado no acionamento; os centros candidatos são as posições dos inimigos).
 - **Área:** dano por distância (raio da skill + raio do inimigo), sem usar a layer `skill_areas`. Mira manual: ver "Foco manual e mira dos Módulos" (decisão 46).
 - **Feedback:** antecipação curta (~0,1 s) + impacto forte; tremor leve **desligável**.
+
+### Módulos novos: congelamento, escudo, choque (T-109, T-110, T-212; BRF-165)
+
+Valores do Nv 1 nos `.tres`; tudo vem de `SkillData`/`effect_params` (níveis 2 a 5 chegam pelo T-213). `behavior_for`: `CONTROL` → `FreezeSkill`, `DEFENSE` → `ShieldSkill`, `AREA`/`INSTANT` com `effect_params.jumps` → `ShockSkill`.
+- **Congelamento** (`FreezeSkill`, estende `AreaSkill`): mira por ponto (`use_skill(slot, at)`, `can_aim`); automático exige inimigo ao alcance (senão não dispara nem gasta recarga). Após `windup`, inimigos no `radius` (+ raio do inimigo) ficam **parados por `duration`** e depois **lentos** (`slow_after` = fração de velocidade perdida, `slow_time` s). Sem dano. Chefe (`boss_frozen = false`): só lento (`slow_after`) por `duration`. Estados no `Enemy`: `frozen_left`, `slow_left`, `slow_mult`, `freeze()`, `slow()`, `status_delta()` (congelado = nada anda nem atira; lento = movimento e cadência × `slow_mult`). Reaplicar renova (máximo, não soma); `recycle` limpa. Ignora `stat_skill_damage`.
+- **Escudo** (`ShieldSkill`, estado em `CoreShield`, `anima.shield`): absorve até `effect_params.absorb` ou `duration` s (o que vier primeiro) **antes do HP do Núcleo** (depois da Defesa; vale para contato, tiros e golpe do chefe via `Anima.take_core_damage`). Sempre dispara; reacionar renova. Ignora `stat_skill_damage`.
+- **Choque** (`ShockSkill`): automático (ignora `at`); sem inimigo ao alcance não dispara. 1º alvo = `AreaSkill.densest_enemy` com `radius` = raio de salto; depois salta ao vivo mais próximo ainda não atingido dentro de `radius`, até `jumps` saltos (1 + `jumps` golpes). Dano do golpe k = `damage × stat_skill_damage × falloff^k` (arredondado, mín. 1). Acerta o chefe sem lançá-lo (`Enemy.take_chain_damage`).
+- **Núcleos:** `stat_cooldown` vale para os 3; `stat_skill_damage` só para o choque (e meteoro).
+- **Sinais** (sem efeito visual novo; VFX = T-215): `Arena.skill_cast` no choque (1º alvo) e congelamento (centro); `skill_chain_hit(slot, from, to, damage, index)` por golpe do choque; `shield_started(absorb, duration)`, `shield_absorbed(amount, remaining)`, `shield_ended(broken)`. O congelamento reaproveita o decalque do `AreaSkill`.
 
 ### Meteoro de fogo (T-139, decisão 37)
 
@@ -287,6 +299,10 @@ Também na `Arena`, só em eventos (nenhum por quadro; as ligações são feitas
 | `boss_launched(from: Vector2, to: Vector2)` | chefe lançado (meteoro; ou defesa arquivada esgotada); `to` = fim do voo |
 | `enemy_damaged(at: Vector2, amount: int, by_skill: bool)` | T-117: cada dano na vida de inimigo/chefe (antes de `enemy_died`); `by_skill` = meteoro. Dano na defesa arquivada não emite |
 | `skill_fall_started(slot: int, at: Vector2, fall_time: float)` | meteoro começa a cair (uma vez por uso, só se não foi anulado): `at` = ponto de impacto, `fall_time` = s até o impacto (≈ `fall_time` dos dados) |
+| `skill_chain_hit(slot, from: Vector2, to: Vector2, damage: int, index: int)` | T-212: cada golpe do choque (`index` 0 = Anima → 1º alvo), antes do dano |
+| `shield_started(absorb: int, duration: float)` | T-110: escudo ligado (ou renovado) |
+| `shield_absorbed(amount: int, remaining: int)` | T-110: dano absorvido e absorção restante |
+| `shield_ended(broken: bool)` | T-110: `true` = absorção esgotada; `false` = acabou o tempo |
 | `boss_attack_landed(at: Vector2)` | golpe do ogro acerta o Núcleo (antes do dano); `at` = âncora do Núcleo |
 
 `skill_used(slot)` e `skill_ready(slot)` já são repassados pela `Arena` (seção acima).
@@ -322,6 +338,8 @@ API da `Arena` para a UI (AG02, T-178). `at` em coordenadas da Arena = as do vie
 
 **Bot (100 seeds) antes → depois do chefe dentro do alcance:** vitória 100% → 100%; Energia de quem vence 40% → 40%; luta 27 s → 26 s. O lançamento de 600 px já era cortado pela borda visível na maioria dos casos; vida e dano do chefe mantidos. O bot não usa foco nem mira manual.
 Testes: `tests/unit/match/test_focus_and_aim.gd`.
+
+**T-218 (BRF-169): mira por Módulo.** `SkillData.manual_aim: bool` (true em `skill_meteor` e `skill_freeze`; falso nos demais) define `can_aim()` da `AreaSkill`. `Arena.skill_supports_aim(slot) -> bool` (via `SkillController.supports_aim`). `show_skill_aim(slot, at)` serve o congelamento: círculo no `radius` do Módulo em cor de gelo (`SkillAim.ICE_FILL`, `SkillController.aim_color`), sem telégrafo de queda. `use_skill(slot, at)` com `at` fora de `can_aim_at` devolve `false` sem gastar recarga (meteoro e congelamento); choque e escudo ignoram `at`.
 
 ### Upgrades da partida (T-134)
 
@@ -409,8 +427,9 @@ Botão de velocidade no HUD da partida (T-275). Controlador implementado na T-27
 | Ondas, HP do Núcleo, Partículas, vitória/derrota | protótipo | T-105 |
 | Skill de área (meteoro) | protótipo | T-108, T-139 |
 | Sinais para VFX | protótipo | T-148 |
-| Skill de controle | pendente | T-109 |
-| Skill de defesa | pendente | T-110 |
+| Módulo Congelamento | protótipo | T-109 |
+| Módulo Escudo | protótipo | T-110 |
+| Módulo Choque | protótipo | T-212 |
 | Arquétipos (tanque, atirador, enxame) | protótipo | T-111 |
 | Chefe (ogro) | protótipo | T-115, T-150, T-166, T-167, BRF-076 (lançamento no alcance) |
 | Barra de vida dos inimigos | protótipo | T-149 |

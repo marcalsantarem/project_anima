@@ -14,7 +14,24 @@ const BENCH_PROJECTILES := 300
 const BENCH_PHASE_FRAMES := 600
 const BENCH_WARMUP_FRAMES := 60
 
+## Falsos do Congelamento/Escudo/Choque (T-215): o diretor lê `arena.skills.get_slot(n).data` e os
+## inimigos em `arena.active_enemies` por duck typing.
+class FakeEnemy:
+	extends Node2D
+	var frozen_left := 0.0
+	var slow_left := 0.0
+
+
+class FakeSkills:
+	extends RefCounted
+	func get_slot(slot: int) -> Dictionary:
+		var ids := [&"fx_skill_cast", &"fx_freeze", &"fx_shock"]
+		return {"data": {"fx_id": ids[clampi(slot - 1, 0, 2)], "duration": 2.0}}
+
+
 var pool: FxPool
+var skills := FakeSkills.new()
+var active_enemies: Array = []
 var director: FxDirector
 var _t := 0.0
 var _step := 0
@@ -60,6 +77,9 @@ func _process(delta: float) -> void:
 	if _bench:
 		_bench_step()
 		return
+	for e: FakeEnemy in active_enemies:
+		e.frozen_left = maxf(e.frozen_left - delta, 0.0)
+		e.slow_left = maxf(e.slow_left - delta, 0.0)
 	_t += delta
 	if _t < 0.15:
 		return
@@ -105,6 +125,21 @@ func _meteor_and_boss(i: int) -> void:
 			emit_signal(&"core_hp_changed", _core_hp, 100)
 		18:
 			emit_signal(&"boss_telegraph_started", &"boss_slam", 0.5, boss_at, 110.0)
+		12: # Choque: 4 saltos do Anima por 4 alvos
+			var path: Array[Vector2] = [CENTER, Vector2(300, 520), Vector2(400, 450), Vector2(310, 380), Vector2(410, 330)]
+			for k in 4:
+				emit_signal(&"skill_chain_hit", 3, path[k], path[k + 1], 10, k)
+		24: # Congelamento: 6 inimigos parados (um deles só lento, como o chefe)
+			_spawn_frozen(Vector2(480, 520), 180.0)
+			emit_signal(&"skill_cast", 2, Vector2(480, 520), 200.0)
+		30: # Escudo: 2 absorções; quebra (1º ciclo) ou acaba o tempo (2º)
+			emit_signal(&"shield_started", 50, 2.0)
+		32:
+			emit_signal(&"shield_absorbed", 10, 40)
+		33:
+			emit_signal(&"shield_absorbed", 30, 10)
+		34:
+			emit_signal(&"shield_ended", i % 80 < 40)
 		20:
 			emit_signal(&"skill_cast", 1, boss_at, 160.0)
 			emit_signal(&"boss_launched", boss_at, Vector2(360, 250))
@@ -112,6 +147,19 @@ func _meteor_and_boss(i: int) -> void:
 			emit_signal(&"skill_fizzled", 1, Vector2(500, 420))
 		38:
 			emit_signal(&"boss_defeated")
+
+
+func _spawn_frozen(at: Vector2, spread: float) -> void:
+	for e: FakeEnemy in active_enemies:
+		e.queue_free()
+	active_enemies.clear()
+	for k in 6:
+		var e := FakeEnemy.new()
+		e.position = at + Vector2.from_angle(k * 1.05) * spread * 0.6 * Vector2(1, 0.75)
+		e.frozen_left = 0.0 if k == 5 else 2.0
+		e.slow_left = 2.0 if k == 5 else 1.5
+		add_child(e)
+		active_enemies.append(e)
 
 
 func _unhandled_input(event: InputEvent) -> void:

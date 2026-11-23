@@ -36,6 +36,12 @@ signal focus_changed(enemy: Node)
 signal enemy_damaged(at: Vector2, amount: int, by_skill: bool)
 ## Meteoro começa a cair (início da queda): ponto de impacto e s até ele.
 signal skill_fall_started(slot: int, at: Vector2, fall_time: float)
+## Salto do Choque (HUD/VFX): de/para (tela, chão), dano e índice do salto (0 = Anima para o 1º alvo).
+signal skill_chain_hit(slot: int, from: Vector2, to: Vector2, damage: int, index: int)
+## Escudo do Núcleo (HUD/VFX): início (absorção e duração), dano absorvido (e quanto resta) e fim.
+signal shield_started(absorb: int, duration: float)
+signal shield_absorbed(amount: int, remaining: int)
+signal shield_ended(broken: bool)
 ## Golpe do ogro acerta o Núcleo: `at` = âncora do Núcleo (tela), antes do dano.
 signal boss_attack_landed(at: Vector2)
 
@@ -158,6 +164,10 @@ func _ready() -> void:
 	skills.skill_cast.connect(_on_skill_impact)
 	skills.skill_fizzled.connect(skill_fizzled.emit)
 	skills.skill_fall_started.connect(skill_fall_started.emit)
+	skills.skill_chain_hit.connect(skill_chain_hit.emit)
+	anima.shield.started.connect(shield_started.emit)
+	anima.shield.absorbed.connect(shield_absorbed.emit)
+	anima.shield.ended.connect(shield_ended.emit)
 	add_child(_focus_marker)
 	add_child(_skill_aim)
 	add_child(damage_numbers)
@@ -211,6 +221,11 @@ func aim_rect() -> Rect2:
 	return free_rect()
 
 
+## O Módulo do slot aceita mira manual (meteoro e congelamento). Choque, escudo e vazio: false.
+func skill_supports_aim(slot: int) -> bool:
+	return skills.supports_aim(slot)
+
+
 func can_aim_at(at: Vector2) -> bool:
 	return at.is_finite() and aim_rect().has_point(at)
 
@@ -222,7 +237,7 @@ func show_skill_aim(slot: int, at: Vector2) -> void:
 		hide_skill_aim()
 		return
 	var rect := aim_rect()
-	_skill_aim.show_at(at.clamp(rect.position, rect.end), r)
+	_skill_aim.show_at(at.clamp(rect.position, rect.end), r, skills.aim_color(slot))
 
 
 func hide_skill_aim() -> void:

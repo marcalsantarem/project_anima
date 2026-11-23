@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/match/skills/skill_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/ui/ui_icon_skill_freeze.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"skill_freeze"
+type = 1
+delivery = 0
+cooldown = 15.0
+radius = 200.0
+damage = 0
+duration = 2.0
+windup = 0.1
+target_range = 600.0
+manual_aim = true
+effect_params = {
+"boss_frozen": false,
+"slow_after": 0.5,
+"slow_time": 1.5
+}
+fx_id = &"fx_freeze"
+sfx_id = &"sfx_freeze"
+icon = ExtResource("2")

@@ -69,6 +69,8 @@ func test_lock_matrix_by_level() -> void:
 				assert_eq(SceneFlow.current_tab, id, "livre navega (NV %d %s)" % [level, id])
 				if id == HangarNav.CORES:
 					assert_true(SceneFlow.hangar_tab_node(id) is CoresScreen, "Núcleos com tela própria (T-207)")
+				elif id == HangarNav.MODULES:
+					assert_true(SceneFlow.hangar_tab_node(id) is ModulesScreen, "Módulos com tela própria (T-216)")
 				elif id != HangarNav.PLAY:
 					assert_true(SceneFlow.hangar_tab_node(id) is ComingSoonScreen, "%s cai no Em breve" % id)
 					assert_eq(bar.current, id, "barra marca o ativo")

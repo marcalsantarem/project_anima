@@ -16,6 +16,7 @@ damage = 40
 duration = 0.0
 windup = 0.0
 target_range = 600.0
+manual_aim = true
 effect_params = {}
 fx_id = &"fx_skill_cast"
 sfx_id = &"sfx_meteor"
